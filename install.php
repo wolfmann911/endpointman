@@ -776,7 +776,7 @@ $sql = 'INSERT INTO `asterisk`.`endpointman_global_vars` (`idnum`, `var_name`, `
 $db->query($sql);
 
 out("Add Automatic Update Check [Can be Disabled]");
-$sql = "INSERT INTO cronmanager (module, id, time, freq, lasttime, command) VALUES ('endpointman', 'UPDATES', '23', '24', '0', 'php ".LOCAL_PATH "includes/update_check.php')";
+$sql = "INSERT INTO cronmanager (module, id, time, freq, lasttime, command) VALUES ('endpointman', 'UPDATES', '23', '24', '0', 'php ".LOCAL_PATH. "includes/update_check.php')";
 $db->query($sql);
 
 $arp = $endpoint->find_exec("arp");
