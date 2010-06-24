@@ -1,0 +1,78 @@
+<html>
+<head>
+	<title>PBX Endpoint Configuration Manager</title>
+	{if condition="isset($template_editor_display)"}
+		<link href="/admin/modules/endpointman/templates/stylesheets/coda-slider-2.0a.css" media="screen, projection" rel="stylesheet" type="text/css" /> 
+
+ 
+		<!-- Begin JavaScript --> 
+			<script type="text/javascript" src="/admin/modules/endpointman/templates/javascript/jquery.easing.1.3.js"></script> 
+			<script type="text/javascript" src="/admin/modules/endpointman/templates/javascript/jquery.coda-slider-2.0.js"></script> 
+			 <script type="text/javascript"> 
+	            $().ready(function() {
+	            	$('#coda-slider-9').codaSlider({
+						dynamicArrows: false
+					});
+	            });
+	         </script> 
+		<!-- End JavaScript -->
+	{/if}
+	{if condition="isset($amp_conf_serial)"}
+		<script type="text/javascript" charset="utf-8"> 
+		$(function(){
+			$("select#brand_edit").change(function(){
+				$.getJSON("/admin/modules/endpointman/includes/ajax_select.php?amp_conf={$amp_conf_serial}&type=model",{id: $(this).val()}, function(j){
+					var options = '';
+					for (var i = 0; i < j.length; i++) {
+						options += '<option value="' + j[i].optionValue + '">' + j[i].optionDisplay + '</option>';
+					}
+					$("#model_new").html(options);
+					$('#model_new option:first').attr('selected', 'selected');
+					$("#template_list").html('<option></option>');
+					$('#template_list option:first').attr('selected', 'selected');
+				})
+			})			
+		})
+		$(function(){
+			$("select#product_select").change(function(){
+				$.getJSON("/admin/modules/endpointman/includes/ajax_select.php?amp_conf={$amp_conf_serial}&type=template",{id: $(this).val()}, function(j){
+					var options = '';
+					for (var i = 0; i < j.length; i++) {
+						options += '<option value="' + j[i].optionValue + '">' + j[i].optionDisplay + '</option>';
+					}
+					$("#template_selector").html(options);
+					$('#template_selector option:first').attr('selected', 'selected');
+				})
+			})			
+		})
+		$(function(){
+			$("select#model_new").change(function(){
+				$.getJSON("/admin/modules/endpointman/includes/ajax_select.php?amp_conf={$amp_conf_serial}&type=template2",{id: $(this).val()}, function(j){
+					var options = '';
+					for (var i = 0; i < j.length; i++) {
+						options += '<option value="' + j[i].optionValue + '">' + j[i].optionDisplay + '</option>';
+					}
+					$("#template_list").html(options);
+					$('#template_list option:first').attr('selected', 'selected');
+				})
+			})			
+		})
+		$(function(){
+			$("select#brand_list_selected").change(function(){
+				$.getJSON("/admin/modules/endpointman/includes/ajax_select.php?amp_conf={$amp_conf_serial}&type=model",{id: $(this).val()}, function(j){
+					var options = '';
+					for (var i = 0; i < j.length; i++) {
+						options += '<option value="' + j[i].optionValue + '">' + j[i].optionDisplay + '</option>';
+					}
+					$("#model_list_selected").html(options);
+					$('#model_list_selected option:first').attr('selected', 'selected');
+				})
+			})			
+		})
+		</script>
+	{/if}
+</head>
+<body face="Arial" onload="focus();displaymac.mac.focus()">
+<br>
+<h1><face="Arial"><center><?=_('End Point Configuration Manager')?></center></h1>
+<hr>

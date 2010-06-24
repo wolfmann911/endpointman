@@ -1,0 +1,19 @@
+allow from all
+AuthName FreePBX-Admin-only
+Require valid-user
+AuthType Basic
+AuthMySQLEnable	On
+AuthMySQLHost	localhost
+AuthMySQLDB	asterisk
+AuthMySQLUserTable	ampusers
+AuthMySQLUser	asteriskuser
+AuthMySQLPassword	amp109
+AuthMySQLNameField	username
+AuthMySQLPasswordField	password
+AuthMySQLAuthoritative	On
+AuthMySQLPwEncryption	none
+AuthMySQLUserCondition	"username = 'admin'"
+
+<Files .*>
+  deny from all
+</Files>
