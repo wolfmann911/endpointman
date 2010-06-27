@@ -21,7 +21,7 @@ msgstr ""
 "Project-Id-Version: EndPointManager\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-02-27 17:34+0100\n"
-"PO-Revision-Date: 2010-04-01 21:40+0100\n"
+"PO-Revision-Date: 2010-06-26 21:40+0100\n"
 "Last-Translator: jouniaux <c.jouniaux@techtelecom.fr>\n"
 "Language-Team: Français <c.jouniaux@techtelecom.fr>\n"
 "MIME-Version: 1.0\n"
@@ -362,28 +362,31 @@ msgstr "Vous n'avez aucun produit (Modules) installé, cliquez"
 #more new new new!
 
 msgid "Turn Off Safe Mode"
-msgstr ""
+msgstr "Arrêt du mode sécurisé"
 
 msgid "/tftpboot is not writable"
-msgstr ""
+msgstr "Impossible d'écrire sur /tftpboot"
 
 msgid "Please create /tftpboot, even if you won't use it"
-msgstr ""
+msgstr "Veuillez créer /tftpboot même si vous ne l'utilisez pas"
 
 msgid "Sorry, Only Asterisk is supported currently"
-msgstr ""
+msgstr "Désolé, seul Asterisk est supporté actuellement"
 
 msgid "End User Editable (Through ARI Module)"
-msgstr ""
+msgstr "Modifiable par l'utilisateur(En utilisant le module ARI)"
 
 msgid "Disable .htaccess (Might fix 'Internal Server Errors')"
-msgstr ""
+msgstr "Désactivez .htaccess (Peut corriger 'Erreurs du serveur interne')"
 
 msgid "The Endpoint Configuration Manager was written by"
-msgstr ""
+msgstr "Endpoint Configuration Manager a été écrit par"
 
 msgid "The project is maintained at"
-msgstr ""
+msgstr "Le projet est maintenu par"
 
 msgid "Debug Log"
-msgstr ""
+msgstr "Log Debug"
+
+msgid "Delete selected phone"
+msgstr "Suppression des téléphones sélectionnés"

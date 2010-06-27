@@ -1251,19 +1251,29 @@ class endpointmanager {
 			return(FALSE);
 		}	
 	}
+	
+	function validate_netmask($mask) {
+		if (preg_match("/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\/(\d{1,2})$/", $mask)) {
+			return(TRUE);
+		} else {
+			return(FALSE);
+		}
+	}
 
 	//Discover New Device/Hardware
 	function discover_new($netmask, $use_nmap=TRUE) {
-		global $global_cfg, $debug;
+		global $global_cfg, $debug, $error;
 	    //Written by tm1000
 	    //Version 1.0
 
 	    //nmap will actually discover 'unseen' devices that the VoIP server hasn't heard from
 	    //If the user just wishes to use the local arp cache they can tell the function to not use nmap
 	    //This results in a speed increase from 60 seconds to less than one second.
-	    if ($use_nmap) {
+	    if (($use_nmap) AND ($this->validate_netmask($netmask))) {
 	        shell_exec($global_cfg['nmap_location'].' -v -sP '. $netmask);
-	    }
+	    } elseif(!$this->validate_netmask($netmask)) {
+			return(FALSE);
+		}
 	    	//Get arp list
 	    	$arp_list = shell_exec($global_cfg['arp_location'] . " -an");
 			//$arp_list = shell_exec("arp -an");
