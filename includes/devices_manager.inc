@@ -350,6 +350,7 @@ if (isset($template_editor)) {
 	if($ma = $endpoint->modelsAvailable()) {
 		$tpl->assign("models_ava", $ma);
 	}
+	$tpl->assign("web_path", WEB_PATH);
 	$tpl->assign("product_list", $product_list);
 	$tpl->assign("display_ext", $endpoint->displayExtension());
 	$tpl->assign("brand_ava", $endpoint->brandAvailable());

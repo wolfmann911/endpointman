@@ -1,7 +1,7 @@
 <module>
 	<rawname>endpointman</rawname>
 	<name>PBX End Point Manager</name>
-	<version>1.9.9</version>
+	<version>2.0.0</version>
 	<type>tool</type>
 	<category>System Administration</category>
 	<menuitems>
@@ -18,5 +18,5 @@
 	<info>http://projects.colsolgrp.net/projects/show/endpointman</info>
 	<location>contributed_modules/release/endpointman-1.9.9.tgz</location>
 
-<md5sum>b99f3ddc7e9e51692d7a0208401a2ad7</md5sum>
+<md5sum>c202f25d0979f47204c97058b4a9cd56</md5sum>
 </module>

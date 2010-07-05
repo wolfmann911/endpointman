@@ -149,7 +149,7 @@ if (isset($installer)) {
 	$wfh=fopen($outfile,'w');
 	fwrite($wfh, $temp_amp);
 	fclose($wfh);
-	$tpl->assign("installer_address", $_SERVER["HTTP_HOST"]."/admin/modules/endpointman/includes/installer.php");
+	$tpl->assign("installer_address", $_SERVER["HTTP_HOST"].WEB_PATH."includes/installer.php");
 }
 
 global $debug, $global_cfg;

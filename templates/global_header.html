@@ -6,8 +6,8 @@
 
  
 		<!-- Begin JavaScript --> 
-			<script type="text/javascript" src="/admin/modules/endpointman/templates/javascript/jquery.easing.1.3.js"></script> 
-			<script type="text/javascript" src="/admin/modules/endpointman/templates/javascript/jquery.coda-slider-2.0.js"></script> 
+			<script type="text/javascript" src="<?=WEB_PATH?>templates/javascript/jquery.easing.1.3.js"></script> 
+			<script type="text/javascript" src="<?=WEB_PATH?>templates/javascript/jquery.coda-slider-2.0.js"></script> 
 			 <script type="text/javascript"> 
 	            $().ready(function() {
 	            	$('#coda-slider-9').codaSlider({
@@ -21,7 +21,7 @@
 		<script type="text/javascript" charset="utf-8"> 
 		$(function(){
 			$("select#brand_edit").change(function(){
-				$.getJSON("/admin/modules/endpointman/includes/ajax_select.php?amp_conf={$amp_conf_serial}&type=model",{id: $(this).val()}, function(j){
+				$.getJSON("<?=WEB_PATH?>includes/ajax_select.php?amp_conf={$amp_conf_serial}&type=model",{id: $(this).val()}, function(j){
 					var options = '';
 					for (var i = 0; i < j.length; i++) {
 						options += '<option value="' + j[i].optionValue + '">' + j[i].optionDisplay + '</option>';
@@ -35,7 +35,7 @@
 		})
 		$(function(){
 			$("select#product_select").change(function(){
-				$.getJSON("/admin/modules/endpointman/includes/ajax_select.php?amp_conf={$amp_conf_serial}&type=template",{id: $(this).val()}, function(j){
+				$.getJSON("<?=WEB_PATH?>includes/ajax_select.php?amp_conf={$amp_conf_serial}&type=template",{id: $(this).val()}, function(j){
 					var options = '';
 					for (var i = 0; i < j.length; i++) {
 						options += '<option value="' + j[i].optionValue + '">' + j[i].optionDisplay + '</option>';
@@ -47,7 +47,7 @@
 		})
 		$(function(){
 			$("select#model_new").change(function(){
-				$.getJSON("/admin/modules/endpointman/includes/ajax_select.php?amp_conf={$amp_conf_serial}&type=template2",{id: $(this).val()}, function(j){
+				$.getJSON("<?=WEB_PATH?>includes/ajax_select.php?amp_conf={$amp_conf_serial}&type=template2",{id: $(this).val()}, function(j){
 					var options = '';
 					for (var i = 0; i < j.length; i++) {
 						options += '<option value="' + j[i].optionValue + '">' + j[i].optionDisplay + '</option>';
@@ -59,7 +59,7 @@
 		})
 		$(function(){
 			$("select#brand_list_selected").change(function(){
-				$.getJSON("/admin/modules/endpointman/includes/ajax_select.php?amp_conf={$amp_conf_serial}&type=model",{id: $(this).val()}, function(j){
+				$.getJSON("<?=WEB_PATH?>includes/ajax_select.php?amp_conf={$amp_conf_serial}&type=model",{id: $(this).val()}, function(j){
 					var options = '';
 					for (var i = 0; i < j.length; i++) {
 						options += '<option value="' + j[i].optionValue + '">' + j[i].optionDisplay + '</option>';

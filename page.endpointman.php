@@ -51,34 +51,6 @@ if(!is_writeable(PHONE_MODULES_PATH)) {
 	chmod(PHONE_MODULES_PATH, 0764);
 }
 
-if(!file_exists(LOCAL_PATH.".htaccess")) {
-$htaccess = "allow from all
-AuthName FreePBX-Admin-only
-Require valid-user
-AuthType Basic
-AuthMySQLEnable\tOn
-AuthMySQLHost\tlocalhost
-AuthMySQLDB\tasterisk
-AuthMySQLUserTable\tampusers
-AuthMySQLUser\t".$amp_conf['AMPDBUSER']."
-AuthMySQLPassword\t".$amp_conf['AMPDBPASS']."
-AuthMySQLNameField\tusername
-AuthMySQLPasswordField\tpassword
-AuthMySQLAuthoritative\tOn
-AuthMySQLPwEncryption\tnone
-AuthMySQLUserCondition\t\"username = 'admin'\"
-
-<Files .*>
-  deny from all
-</Files>
-";
-
-	$outfile = LOCAL_PATH.".htaccess";
-	$wfh=fopen($outfile,'w');
-	fwrite($wfh,$htaccess);
-	fclose($wfh);
-}
-
 if($amp_conf['AMPENGINE'] != 'asterisk') {
 	die(_("Sorry, Only Asterisk is supported currently"));
 }

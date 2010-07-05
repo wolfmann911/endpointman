@@ -108,7 +108,7 @@ If ($ver < "1.9.0") {
 		$sql_update_vars = "INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES
 		(5, 'config_location', '/tftpboot/'),
 		(6, 'update_server', 'http://www.the159.com/endpoint/'),
-		(7, 'version', '1.9.9'),
+		(7, 'version', '2.0.0'),
 		(8, 'enable_ari', '0'),
 		(9, 'debug', '0'),
 		(10, 'arp_location', '".$arp."'),
@@ -117,7 +117,7 @@ If ($ver < "1.9.0") {
 		$db->query($sql_update_vars);
 		
 		define("UPDATE_PATH", 'http://www.the159.com/endpoint/');
-		define("VER", '1.9.9');
+		define("VER", '2.0.0');
 		
 		out("Updating Mac List table");
 		$sql = 'ALTER TABLE `endpointman_mac_list` DROP `map`';
@@ -319,7 +319,7 @@ If ($ver < "1.9.0") {
 		$sql = 'ALTER TABLE `endpointman_template_list` ADD `config_files_override` TEXT NULL AFTER `custom_cfg_data`';
 		
 		out("Updating Version Number");
-		$sql = "UPDATE  endpointman_global_vars SET  value =  '1.9.9' WHERE  var_name = 'version'";
+		$sql = "UPDATE  endpointman_global_vars SET  value =  '2.0.0' WHERE  var_name = 'version'";
 		
 		out("Creating Custom Configs Table");
 		$sql = "CREATE TABLE IF NOT EXISTS `endpointman_custom_configs` (
@@ -384,7 +384,7 @@ If ($ver < "1.9.0") {
 	$db->query($sql);
 	
 	out("Update Version Number");	
-	$sql = 'UPDATE endpointman_global_vars SET value = \'1.9.9\' WHERE var_name = "version"';
+	$sql = 'UPDATE endpointman_global_vars SET value = \'2.0.0\' WHERE var_name = "version"';
 	$db->query($sql);
 	
 	out('Alter custom_cfg_data');
@@ -415,39 +415,44 @@ If ($ver < "1.9.0") {
 	$db->query($sql);
 	
 	out("Update Version Number");	
-	$sql = 'UPDATE endpointman_global_vars SET value = \'1.9.9\' WHERE var_name = "version"';
+	$sql = 'UPDATE endpointman_global_vars SET value = \'2.0.0\' WHERE var_name = "version"';
 	$db->query($sql);
 	
 } elseif($ver == "1.9.3") {
 	out("Update Version Number");	
-	$sql = 'UPDATE endpointman_global_vars SET value = \'1.9.9\' WHERE var_name = "version"';
+	$sql = 'UPDATE endpointman_global_vars SET value = \'2.0.0\' WHERE var_name = "version"';
 	$db->query($sql);
 } elseif($ver == "1.9.4") {
 	out("Your Database is already up to date!");
 	out("Update Version Number");	
-	$sql = 'UPDATE endpointman_global_vars SET value = \'1.9.9\' WHERE var_name = "version"';
+	$sql = 'UPDATE endpointman_global_vars SET value = \'2.0.0\' WHERE var_name = "version"';
 	$db->query($sql);
 } elseif($ver == "1.9.5") {
 	out("Your Database is already up to date!");
 	out("Update Version Number");	
-	$sql = 'UPDATE endpointman_global_vars SET value = \'1.9.9\' WHERE var_name = "version"';
+	$sql = 'UPDATE endpointman_global_vars SET value = \'2.0.0\' WHERE var_name = "version"';
 	$db->query($sql);
 } elseif($ver == "1.9.6") {
 	out("Your Database is already up to date!");
 	out("Update Version Number");	
-	$sql = 'UPDATE endpointman_global_vars SET value = \'1.9.9\' WHERE var_name = "version"';
+	$sql = 'UPDATE endpointman_global_vars SET value = \'2.0.0\' WHERE var_name = "version"';
 	$db->query($sql);
 } elseif($ver == "1.9.7") {
 	out("Your Database is already up to date!");
 	out("Update Version Number");	
-	$sql = 'UPDATE endpointman_global_vars SET value = \'1.9.9\' WHERE var_name = "version"';
+	$sql = 'UPDATE endpointman_global_vars SET value = \'2.0.0\' WHERE var_name = "version"';
 	$db->query($sql);
 } elseif($ver == "1.9.8") {
 	out("Your Database is already up to date!");
 	out("Update Version Number");	
-	$sql = 'UPDATE endpointman_global_vars SET value = \'1.9.9\' WHERE var_name = "version"';
+	$sql = 'UPDATE endpointman_global_vars SET value = \'2.0.0\' WHERE var_name = "version"';
 	$db->query($sql);
 } elseif($ver == "1.9.9") {
+	out("Your Database is already up to date!");
+	out("Update Version Number");	
+	$sql = 'UPDATE endpointman_global_vars SET value = \'2.0.0\' WHERE var_name = "version"';
+	$db->query($sql);
+} elseif($ver == "2.0.0") {
 	out("Your Database is already up to date!");
 } else {
 	out("Creating Brand List Table");
@@ -484,7 +489,7 @@ If ($ver < "1.9.0") {
 	(4, 'gmthr', ''),
 	(5, 'config_location', '/tftpboot/'),
 	(6, 'update_server', 'http://www.the159.com/endpoint/'),
-	(7, 'version', '1.9.9'),
+	(7, 'version', '2.0.0'),
 	(8, 'enable_ari', '0'),
 	(9, 'debug', '0'),
 	(10, 'arp_location', '".$arp."'),
@@ -703,38 +708,20 @@ If ($ver < "1.9.0") {
 	$db->query($sql);
 }
 
-out("Fixing .htaccess issues (#288)");
-$htaccess = "allow from all
-AuthName FreePBX-Admin-only
-Require valid-user
-AuthType Basic
-AuthMySQLEnable\tOn
-AuthMySQLHost\tlocalhost
-AuthMySQLDB\tasterisk
-AuthMySQLUserTable\tampusers
-AuthMySQLUser\t".$amp_conf['AMPDBUSER']."
-AuthMySQLPassword\t".$amp_conf['AMPDBPASS']."
-AuthMySQLNameField\tusername
-AuthMySQLPasswordField\tpassword
-AuthMySQLAuthoritative\tOn
-AuthMySQLPwEncryption\tnone
-AuthMySQLUserCondition\t\"username = 'admin'\"
+if(file_exists($amp_conf['AMPWEBROOT']."/recordings")) {
+	out("Installing ARI Module");		
+	copy(LOCAL_PATH. "Install/phonesettings.module", $amp_conf['AMPWEBROOT']."/recordings/modules/phonesettings.module");
 
-<Files .*>
-  deny from all
-</Files>
-";
+	copy(LOCAL_PATH. "templates/javascript/jquery.coda-slider-2.0.js", $amp_conf['AMPWEBROOT']."/recordings/theme/js/jquery.coda-slider-2.0.js");
 
-$outfile =LOCAL_PATH. ".htaccess";
-$wfh=fopen($outfile,'w');
-fwrite($wfh,$htaccess);
-fclose($wfh);
+	copy(LOCAL_PATH. "templates/javascript/jquery.easing.1.3.js", $amp_conf['AMPWEBROOT']."/recordings/theme/js/jquery.easing.1.3.js");
 
-out("Installing ARI Module");		
-rename(LOCAL_PATH. "Install/phonesettings.module", $amp_conf['AMPWEBROOT']."/recordings/modules/phonesettings.module");
-		
-out("Fixing permissions on ARI module");
-chmod($amp_conf['AMPWEBROOT']."/recordings/modules/phonesettings.module", 0664);
+	copy(LOCAL_PATH. "templates/stylesheets/coda-slider-2.0a.css", $amp_conf['AMPWEBROOT']."/recordings/theme/coda-slider-2.0a.css");
+
+	
+	out("Fixing permissions on ARI module");
+	chmod($amp_conf['AMPWEBROOT']."/recordings/modules/phonesettings.module", 0664);
+}
 
 out("Adding Custom Field to OUI List");
 $sql = 'ALTER TABLE `endpointman_oui_list` ADD `custom` INT(1) NOT NULL DEFAULT \'0\'';
@@ -786,7 +773,7 @@ $sql = "UPDATE endpointman_global_vars SET value = '".$arp."' WHERE var_name = '
 $db->query($sql);
 
 out("Update Version Number [Yes again, just in case]");	
-$sql = 'UPDATE endpointman_global_vars SET value = \'1.9.9\' WHERE var_name = "version"';
+$sql = 'UPDATE endpointman_global_vars SET value = \'2.0.0\' WHERE var_name = "version"';
 $db->query($sql);
 
 ?>

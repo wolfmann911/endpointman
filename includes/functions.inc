@@ -61,17 +61,28 @@ class endpointmanager {
 		//attached to the end of every link so we can flow through FreePBX
 		define("WEB_VARS", "?type=tool&display=endpointman");
 		//This is really hacky but I have to do it when people have different directories instead of admin
-		if(!array_key_exists('PHONE_MODULES_PATH',$amp_conf)) {
+		if((!array_key_exists('PHONE_MODULES_PATH',$amp_conf)) AND (dirname($_SERVER['SCRIPT_NAME']) != "/recordings")) {
 			//Define the location of phone modules, keeping it outside of the module directory so that when the user updates endpointmanager they don't lose all of their phones
 			define("PHONE_MODULES_PATH", dirname($_SERVER["SCRIPT_FILENAME"])."/modules/_ep_phone_modules/");
 			
 			//Get local path information
-			define("LOCAL_PATH", dirname($_SERVER["SCRIPT_FILENAME"])."/modules/endpointman/");	
-		
+			define("WEB_PATH", dirname($_SERVER['SCRIPT_NAME'])."/modules/endpointman/");
+			define("LOCAL_PATH", dirname($_SERVER["SCRIPT_FILENAME"])."/modules/endpointman/");				
+			
 			//have to hack around freepbx....
 			$amp_conf['PHONE_MODULES_PATH'] = PHONE_MODULES_PATH;
 			$amp_conf['LOCAL_ENDPOINT_PATH'] = LOCAL_PATH;
+		} elseif(dirname($_SERVER['SCRIPT_NAME']) == "/recordings") {
+			//Define the location of phone modules, keeping it outside of the module directory so that when the user updates endpointmanager they don't lose all of their phones
+			define("PHONE_MODULES_PATH", $amp_conf['AMPWEBROOT']."/admin/modules/_ep_phone_modules/");
 			
+			//Get local path information
+			define("WEB_PATH", "/admin/modules/endpointman/");
+			define("LOCAL_PATH", $amp_conf['AMPWEBROOT']."/admin/modules/endpointman/");				
+			
+			//have to hack around freepbx....
+			$amp_conf['PHONE_MODULES_PATH'] = PHONE_MODULES_PATH;
+			$amp_conf['LOCAL_ENDPOINT_PATH'] = LOCAL_PATH;
 		} else {
 			define("PHONE_MODULES_PATH", $amp_conf['PHONE_MODULES_PATH']);
 			define("LOCAL_PATH", $amp_conf['LOCAL_ENDPOINT_PATH']);		

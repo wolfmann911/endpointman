@@ -44,7 +44,7 @@ switch($_REQUEST['subpage']) {
 		$wfh=fopen($outfile,'w');
 		fwrite($wfh, $temp_amp);
 		fclose($wfh);
-		$tpl->assign("exporter_address", $_SERVER["HTTP_HOST"]."/admin/modules/endpointman/includes/export.php");
+		$tpl->assign("exporter_address", $_SERVER["HTTP_HOST"].WEB_PATH."includes/export.php");
 		//Dave B's Q&D file upload security code (http://us2.php.net/manual/en/features.file-upload.php) 
 		if((isset($_REQUEST['action'])) AND (isset($_REQUEST['button_import'])) AND ($_REQUEST['action'] == "import")) {
 			$allowedExtensions = array("csv","txt"); 
@@ -319,7 +319,7 @@ switch($_REQUEST['subpage']) {
 			if((isset($_POST['disable_htaccess'])) AND ($_POST['disable_htaccess'] == "on")) {
 				$htaccess = "allow from all";
 
-				$outfile = $amp_conf['AMPWEBROOT']."/admin/modules/endpointman/.htaccess";
+				$outfile = $amp_conf['AMPWEBROOT'].WEB_PATH.".htaccess";
 				$wfh=fopen($outfile,'w');
 				fwrite($wfh,$htaccess);
 				fclose($wfh);
@@ -346,7 +346,7 @@ AuthMySQLUserCondition\t\"username = 'admin'\"
 </Files>
 ";
 
-				$outfile = $amp_conf['AMPWEBROOT']."/admin/modules/endpointman/.htaccess";
+				$outfile = $amp_conf['AMPWEBROOT'].WEB_PATH.".htaccess";
 				$wfh=fopen($outfile,'w');
 				fwrite($wfh,$htaccess);
 				fclose($wfh);

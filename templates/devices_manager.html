@@ -179,8 +179,8 @@
 	<td width="25%" align='center'>{$value.model}</td>
 	<td width="19%" align='center'>{$value.ext} - {$value.description}</td>
 	<td align='center' width='18%'>{$value.template_name}</td>
-	<td align='center' width='9%'><a href={$web_vars}&editready=true&page=devices_manager&id={$value.id}><img src='/admin/modules/endpointman/templates/images/edit.gif' ALT='<?=_('Edit')?>' border='0'></a></td>
-	<td align='center' width='5%'><a href={$web_vars}&deleteready=true&page=devices_manager&id={$value.id}><img src='/admin/modules/endpointman/templates/images/delete.gif' ALT='<?=_('Delete')?>' border='0'></a></td>
+	<td align='center' width='9%'><a href={$web_vars}&editready=true&page=devices_manager&id={$value.id}><img src='{$web_path}templates/images/edit.gif' ALT='<?=_('Edit')?>' border='0'></a></td>
+	<td align='center' width='5%'><a href={$web_vars}&deleteready=true&page=devices_manager&id={$value.id}><img src='{$web_path}templates/images/delete.gif' ALT='<?=_('Delete')?>' border='0'></a></td>
 	</tr>
 	{/loop}
 </table>
