@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 */
-global $global_cfg, $amp_conf, $debug;
+global $global_cfg, $amp_conf, $debug, $type;
 
 //Set opened variables
 $message = NULL;
@@ -35,13 +35,13 @@ $result = mysql_query($sql);
 $sql2 = "SELECT * FROM endpointman_mac_list";
 $result2 = mysql_query($sql2);
 if((!mysql_num_rows($result)) && (!mysql_num_rows($result2))) {
-	$message = "Welcome to Enpoint Manager!<br />You have no products (Modules) installed, click <a href=\"config.php".WEB_VARS."&page=brand_model_manager\">here</a> to install some";
+	$message = _("Welcome to Endpoint Manager")."!<br />"._("You have no products (Modules) installed, click")." <a href=\"config.php?display=epm_config&type=$type\">"._("here")."</a> "._("to install some");
 	$no_add = TRUE;
 } elseif(!mysql_num_rows($result)) {
-	$message = "Thanks for upgrading to version 2.0! Please head on over to <a href=\"config.php".WEB_VARS."&page=brand_model_manager\">\"Brand Configurations/Setup\"</a> to setup and install phone configurations";
+	$message = "Thanks for upgrading to version 2.0! Please head on over to <a href=\"config.php?display=epm_config&type=$type\">\"Brand Configurations/Setup\"</a> to setup and install phone configurations";
 	$no_add = TRUE;
 } elseif($global_cfg['srvip'] == "") {
-	$message = "Your Global Variables are not set! Please head on over to <a href=\"config.php".WEB_VARS."&page=advanced\">\"Advanced Settings\"</a> to setup your configuration";
+	$message = "Your Global Variables are not set! Please head on over to <a href=\"config.php?type=$type&display=epm_advanced\">\"Advanced Settings\"</a> to setup your configuration";
 	$no_add = TRUE;
 }
 if(isset($_REQUEST['button_add'])) {
@@ -346,7 +346,7 @@ if (isset($template_editor)) {
 	$tpl->assign("list", $list);
 	$tpl->assign("error", "");
 	$tpl->assign("srvip", $_SERVER["SERVER_ADDR"]);
-	$tpl->assign("web_vars", WEB_VARS);
+  $tpl->assign("web_var", "?type=$type");
 	if($ma = $endpoint->modelsAvailable()) {
 		$tpl->assign("models_ava", $ma);
 	}

@@ -19,14 +19,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 */
+global $type;
+
 $tpl = new RainTPL( LOCAL_PATH.'templates' );
 //Set the message variable to nothing, however we can set it later and it will show up on the page
 $message = "";
 $tpl->assign("message", $message);
-$tpl->assign("web_vars", WEB_VARS);
+$tpl->assign("web_vars", "?type=$type");
 
 echo $tpl->draw( 'global_header' );
-echo $tpl->draw( 'global_links' );
 echo $tpl->draw( 'advanced_subheader' );
 
 if(!isset($_REQUEST['subpage'])) {
@@ -449,5 +450,4 @@ if($global_cfg['debug']) {
 	global $debug;
 	$tpl->assign("debug", $debug);
 }
-echo $tpl->draw( 'global_footer' );
 ?>

@@ -57,9 +57,8 @@ WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWIS
 class endpointmanager {
 	//Load this class upon construction of the class
     function __construct() {
-		global $amp_conf,$global_cfg, $endpoint_db;
+		global $amp_conf,$global_cfg, $endpoint_db; $type;
 		//attached to the end of every link so we can flow through FreePBX
-		define("WEB_VARS", "?type=tool&display=endpointman");
 		//This is really hacky but I have to do it when people have different directories instead of admin
 		if((!array_key_exists('PHONE_MODULES_PATH',$amp_conf)) AND (dirname($_SERVER['SCRIPT_NAME']) != "/recordings")) {
 			//Define the location of phone modules, keeping it outside of the module directory so that when the user updates endpointmanager they don't lose all of their phones
@@ -293,7 +292,6 @@ class endpointmanager {
 		$tpl->assign("template_editor_display", 1);
 		
 		echo $tpl->draw( 'global_header' );
-		echo $tpl->draw( 'global_links' );
 		//Let the template system know if we are working with a general template or a specific [for that phone only] template
 		$tpl->assign("custom", $custom);
 		if($custom)
@@ -345,13 +343,11 @@ class endpointmanager {
 		
 		$tpl->assign("template_editor", $out);
 		$tpl->assign("hidden_id", $row['id']);
-		$tpl->assign("web_vars", WEB_VARS);
 		$tpl->assign("hidden_custom", $custom);
 		echo $tpl->draw( 'template_editor' );
 
 		$tpl->assign("debug", $debug);
 	
-		echo $tpl->draw( 'global_footer' );
 	}
 
 	function generate_gui_html($cfg_data,$custom_cfg_data=NULL, $admin=FALSE, $user_cfg_data=NULL) {

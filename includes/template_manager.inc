@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 */
 global $debug;
+global $type;
 $message = NULL;
 $no_add = FALSE;
 $default_display = FALSE;
@@ -28,10 +29,10 @@ $result = mysql_query($sql);
 $sql2 = "SELECT * FROM endpointman_mac_list";
 $result2 = mysql_query($sql2);
 if((!mysql_num_rows($result)) && (!mysql_num_rows($result2))) {
-	$message = _("Welcome to Endpoint Manager")."!<br />"._("You have no products (Modules) installed, click")." <a href=\"config.php".WEB_VARS."&page=brand_model_manager\">"._("here")."</a> "._("to install some");
+	$message = _("Welcome to Endpoint Manager")."!<br />"._("You have no products (Modules) installed, click")." <a href=\"config.php?display=epm_config&type=$type\">"._("here")."</a> "._("to install some");
 	$no_add = TRUE;
 } elseif(!mysql_num_rows($result)) {
-	$message = "Thanks for upgrading to version 2.0! Please head on over to <a href=\"config.php".WEB_VARS."&page=brand_model_manager\">\"Brand Configurations/Setup\"</a> to setup and install phone configurations";
+	$message = "Thanks for upgrading to version 2.0! Please head on over to <a href=\"config.php?display=epm_config&type=$type\">\"Brand Configurations/Setup\"</a> to setup and install phone configurations";
 	$no_add = TRUE;
 }
 
@@ -90,7 +91,7 @@ if($default_display) {
 	$tpl->assign("no_add", $no_add);
 	$tpl->assign("debug", $debug);
 	$tpl->assign("message", $message);
-	$tpl->assign("web_vars", WEB_VARS);
+	$tpl->assign("web_var", "?type=$type");
 	echo $tpl->draw( 'template_manager' );
 }
 ?>

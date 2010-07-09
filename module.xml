@@ -3,9 +3,14 @@
 	<name>PBX End Point Manager</name>
 	<version>2.0.0</version>
 	<type>tool</type>
-	<category>System Administration</category>
+	<category>End Point Manager</category>
+	<publisher>Andrew Nagy</publisher>
+	<license>GPLv2</license>
 	<menuitems>
-		<endpointman>PBX End Point Manager</endpointman>
+		<epm_devices sort="1">End Point Device List</epm_devices>
+		<epm_templates sort="2">End Point Template Manager</epm_templates>
+		<epm_config sort="3">End Point Configuration</epm_config>
+		<epm_advanced sort="4">End Point Advanced Settings</epm_advanced>
 	</menuitems>
 	 <description>PBX End Point Manager supports automated deployment of multiple manufacturers IP telephones.</description>
 	 <changelog>

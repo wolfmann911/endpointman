@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 */
 $check_for_updates = FALSE;
+global $type;
 
 if((isset($_REQUEST['button_install'])) OR (isset($_REQUEST['button_update']))) {
 	if(isset($_REQUEST['product'])) {
@@ -167,7 +168,7 @@ if($global_cfg['debug']) {
 	$tpl->assign("debug", $debug);
 }
 $tpl->assign("error", $error);
-$tpl->assign("web_vars", WEB_VARS);
+$tpl->assign("web_var", "?type=$type");
 $tpl->assign("brand2_list", $row_out);
 //draw the template	
 echo $tpl->draw( 'brand_model_manager' );

@@ -180,7 +180,6 @@ class phonesettings {
 	$tpl->assign("in_ari", 1);
 	$tpl->assign("template_editor", $out);
 	$tpl->assign("hidden_id", $row['id']);
-	$tpl->assign("web_vars", WEB_VARS);
 	$tpl->assign("hidden_custom", $custom);
 	$template .= $tpl->draw( 'template_editor', TRUE );
 	

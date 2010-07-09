@@ -1,5 +1,4 @@
 {include="global_header"}
-{include="global_links"}
 <h2 align='center'>{$error}</h2>
 {if condition="isset($id)"}
 <input type='hidden' name='id' value='{$id}'>
@@ -10,7 +9,7 @@
 	<h3 align='center'>{$message}</h3>
 	{/if}
 	{if condition="$no_add == FALSE"}
-	<form action='config.php{$web_vars}&page=devices_manager' method='POST'>
+	<form action='config.php{$web_var}&display=epm_devices' method='POST'>
   <label><?=_('Search for new devices in netmask')?>
     <input name="netmask" type="text" value="{$srvip}/24">
     <input type="Submit" name="button_go" value="<?=_('Go')?>">
@@ -33,7 +32,7 @@
 <td width="9%" align='center'></td>
 </tr><tr>
 	{if condition="$no_add == FALSE"}
-	<form action='config.php{$web_vars}&page=devices_manager' method='POST'>
+	<form action='config.php{$web_var}&display=epm_devices' method='POST'>
 		<td align='center' width='5px'><input type="checkbox" name="checkbox" id="checkbox" disabled></td>
 		
 <td align='center'>
@@ -65,7 +64,7 @@
   <label>
 	{if condition="$mode == 'EDIT'"}
 	<input name="edit_id" type="hidden" value="{$edit_id}">
-	<input name="page" type="hidden" value="devices_manager">
+	<input name="display" type="hidden" value="epm_devices">
 	<select name="model_list">
     {loop name="models_ava"}
       <option value="{$value.value}" {if condition="isset($value.selected)"}selected{/if}>{$value.text}</option>
@@ -114,7 +113,7 @@
 	  <td align='center'>&nbsp;</td>
   </tr>
 	{if condition="is_array($unmanaged)"}
-		<form action='config.php{$web_vars}&page=devices_manager' method='POST'>
+		<form action='config.php{$web_var}&display=epm_devices' method='POST'>
 		<input name="devices_cached" type="hidden" value="{$cached_devices}">
 		{loop name="unmanaged"}
 		<input name="mac_{$value.id}" type="hidden" value="{$value.mac_strip}">
@@ -170,7 +169,7 @@
 	  <td align='center'><h3>Edit</h3></td>
 	  <td align='center'><h3>Delete</h3></td>
   </tr>
-	<form action='config.php{$web_vars}&page=devices_manager' method='POST'>
+	<form action='config.php{$web_var}&display=epm_devices' method='POST'>
 	{loop name="list"}
 	<tr>
 	<td align='center' width='5px'><input type="checkbox" name="selected[]" value="{$value.id}"></td>
@@ -179,8 +178,8 @@
 	<td width="25%" align='center'>{$value.model}</td>
 	<td width="19%" align='center'>{$value.ext} - {$value.description}</td>
 	<td align='center' width='18%'>{$value.template_name}</td>
-	<td align='center' width='9%'><a href={$web_vars}&editready=true&page=devices_manager&id={$value.id}><img src='{$web_path}templates/images/edit.gif' ALT='<?=_('Edit')?>' border='0'></a></td>
-	<td align='center' width='5%'><a href={$web_vars}&deleteready=true&page=devices_manager&id={$value.id}><img src='{$web_path}templates/images/delete.gif' ALT='<?=_('Delete')?>' border='0'></a></td>
+	<td align='center' width='9%'><a href={$web_vars}&editready=true&display=epm_devices&id={$value.id}><img src='{$web_path}templates/images/edit.gif' ALT='<?=_('Edit')?>' border='0'></a></td>
+	<td align='center' width='5%'><a href={$web_vars}&deleteready=true&display=epm_devices&id={$value.id}><img src='{$web_path}templates/images/delete.gif' ALT='<?=_('Delete')?>' border='0'></a></td>
 	</tr>
 	{/loop}
 </table>
@@ -229,4 +228,3 @@
 </tr>
 </table>
 </form>
-{include="global_footer"}

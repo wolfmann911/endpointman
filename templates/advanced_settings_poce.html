@@ -1,4 +1,4 @@
-<center><form method="post" action="config.php{$web_vars}&page=advanced&subpage=poce">
+<center><form method="post" action="config.php{$web_vars}&display=epm_advanced&subpage=poce">
   <?=_("Select Product")?>
   <select name="product_select" id="product_select">
 	{loop name="product_list"}
@@ -11,7 +11,7 @@
 </form>
 </center>
 <hr width="30%">
-<form method="post" action="config.php{$web_vars}&page=advanced&subpage=poce&product_select={$product_selected}&phone_options=true">
+<form method="post" action="config.php{$web_vars}&display=epm_advanced&subpage=poce&product_select={$product_selected}&phone_options=true">
 {if condition="isset($options)"}	
 {$options}
 {/if}
@@ -23,13 +23,13 @@
     <td valign="top">
 	<u><?=_("Local File Configs")?></u><br />
 	{loop name="file_list"}
-	<a href="config.php{$web_vars}&page=advanced&subpage=poce&product_select={$product_selected}&file={$value.value}">{$value.text}</a><br />
+	<a href="config.php{$web_vars}&display=epm_advanced&subpage=poce&product_select={$product_selected}&file={$value.value}">{$value.text}</a><br />
 	{/loop}
 	<hr>
 	<u><?=_("User File Configs")?></u><br />
 	{if condition="isset($sql_file_list)"}
 		{loop name="sql_file_list"}
-		<a href="config.php{$web_vars}&page=advanced&subpage=poce&product_select={$product_selected}&sql={$value.value}">{$value.text}</a> [{$value.ref}] <a href="{$web_vars}&page=advanced&subpage=poce&product_select={$product_selected}&sql={$value.value}&delete=yes"><img src='images/delete.gif' ALT='Delete' border='0'></a>
+		<a href="config.php{$web_vars}&display=epm_advanced&subpage=poce&product_select={$product_selected}&sql={$value.value}">{$value.text}</a> [{$value.ref}] <a href="{$web_vars}&display=epm_advanced&subpage=poce&product_select={$product_selected}&sql={$value.value}&delete=yes"><img src='images/delete.gif' ALT='Delete' border='0'></a>
 		<br />
 		{/loop}
 	{/if}
