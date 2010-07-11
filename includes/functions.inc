@@ -779,7 +779,10 @@ class endpointmanager {
 		chmod(PHONE_MODULES_PATH.$brand_directory, 0777);
 		$this->deltree(PHONE_MODULES_PATH."temp/" .$brand_directory);
 		exec("chmod 777 -R ". PHONE_MODULES_PATH.$brand_directory);
-		echo "<script>$('div.demo-container').text('Done!, Please refresh the page to see the installed options.');</script>";
+
+    //TODO: once iframe access is fixed to not go into the module, this should be $_SERVER['PHP_SELF']."?type=tool...", and type=tool should be passed in (in case it is not tool)
+    //
+		echo "<script>$('div.demo-container').html('<a href=\"#\" onclick=\"parent.location.href = \'/admin/config.php?type=tool&display=epm_config\';\">"._("Install Done, Click to Return")."</a>');</script>";
 	}
 	
 	function remove_brand($id=NULL) {
@@ -937,7 +940,9 @@ class endpointmanager {
 		
 		$this->sync_product($id);
 		
-		echo "<script>$('div.demo-container').text('Done!, Please refresh the page to see the installed options.');</script>";
+    //TODO: once iframe access is fixed to not go into the module, this should be $_SERVER['PHP_SELF']."?type=tool...", and type=tool should be passed in (in case it is not tool)
+    //
+		echo "<script>$('div.demo-container').html('<a href=\"#\" onclick=\"parent.location.href = \'/admin/config.php?type=tool&display=epm_config\';\">"._("Install Done, Click to Return")."</a>');</script>";
 		
 		if($global_cfg['debug']) {
 			unlink(LOCAL_PATH."debug_installer.log");
