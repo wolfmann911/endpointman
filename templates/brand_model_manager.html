@@ -18,7 +18,7 @@
 }
 -->
 </style>
-<h1 align='center'><font color='red'>{$error}</font></h1>
+<h3 align='center'><font color='red'>{$error}</font></h3>
 <center>
 <form action='config.php{$web_var}&display=epm_config' method='POST'>
 	<input type="submit" name="button_check_for_updates" value="<?=_('Check for Updates')?>"> 
@@ -28,10 +28,29 @@
 <br><br>
 
 {if condition="isset($installer_address)"}
-<?=_('Please wait for the progress bar to show below (this might take a minute or two)')?>
-<iframe src="http://{$installer_address}" frameborder=0 width="100%" height=70 scrolling="no"></iframe>
-{/if}
+<script>
+function process_module_actions(actions) {
+	freepbx_modal_show('moduleBox');
+	urlStr = "config.php?type=tool&amp;display=epm_config&amp;quietmode=1&amp;handler=file&amp;file=installer.html.php&amp;module=endpointman&amp;type=install&amp;brand={$brand}";
+	urlStr += "&amp;rand="+Math.random ( );
+	for (var i in actions) {
+		urlStr += "&amp;moduleaction["+i+"]="+actions[i];
+	}
+	$('#moduleBox').html('<iframe src="'+urlStr+'"></iframe><a href="#" onclick="close_module_actions(1)">Return</a>');
+}
+function close_module_actions(goback) {
+	//freepbx_modal_close('moduleBox');
+	freepbx_modal_hide('moduleBox');
+	if (goback) {
+  		location.href = 'config.php?display=epm_config&amp;type=tool';
+	}
+}
+process_module_actions();
+</script>
 
+<div id="moduleBox" style="display:none;"></div> 
+
+{/if}
 
 {loop name="brand2_list"}
 <table width="100%" class="brand" border="0" cellspacing="0" cellpadding="0">
@@ -43,7 +62,7 @@
     <td width="97%">{loop name="value.products"}
 	<table width="100%" class="product" border="0" cellspacing="0" cellpadding="0">
       <tr>
-        <td colspan="2">{$value.long_name} {if condition="$value.cfg_ver != ''"}(<?=_('Version')?> [{$value.cfg_ver}]){/if} <form action='config.php{$web_var}&display=epm_config' method='POST'><input type="hidden" name="product" value="{$value.id}"><input type="submit" name="button_{if condition="$value.installed == '1'"}uninstall{else}install{/if}" class="button_{if condition="$value.installed == '1'"}Disable{else}Enable{/if}" value="{if condition="$value.installed == '1'"}<?=_('Uninstall')?>{else}<?=_('Install')?>{/if}">{if condition="array_key_exists('update',$value)"}{if condition="$value.update == 1"}<input type="submit" name="button_update" class="button_update" value="Update">{/if}{/if}{if condition="$value.fw_type == 'install'"}<input type="submit" name="button_install_firmware" class="button_update" value="<?=_('Install Firmware')?>">{elseif condition="$value.fw_type == 'remove'"}<input type="submit" name="button_remove_firmware" class="button_update" value="<?=_('Remove Firmware')?>">{/if}{if condition="array_key_exists('update_fw',$value)"}{if condition="$value.update_fw == 1"}<input type="submit" name="button_update_firmware" class="button_update" value="<?=_('Update Firmware')?>">{/if}{/if}</form>{if condition="array_key_exists('update',$value)"}{if condition="$value.update == 1"}New Version: <i>{$value.update_vers}</i> <br/>Changes: <i>{$value.update_desc}</i>{/if}{/if}</td>
+        <td colspan="2">{$value.long_name} {if condition="$value.cfg_ver != ''"}(<?=_('Version')?> [{$value.cfg_ver}]){/if} <form action='config.php{$web_var}&display=epm_config' method='POST'><input type="hidden" name="product" value="{$value.id}">{if condition="array_key_exists('update',$value)"}{if condition="$value.update == 1"}<input type="submit" name="button_update" class="button_update" value="Update">{/if}{/if}{if condition="$value.fw_type == 'install'"}<input type="submit" name="button_install_firmware" class="button_update" value="<?=_('Install Firmware')?>">{elseif condition="$value.fw_type == 'remove'"}<input type="submit" name="button_remove_firmware" class="button_update" value="<?=_('Remove Firmware')?>">{/if}{if condition="array_key_exists('update_fw',$value)"}{if condition="$value.update_fw == 1"}<input type="submit" name="button_update_firmware" class="button_update" value="<?=_('Update Firmware')?>">{/if}{/if}</form>{if condition="array_key_exists('update',$value)"}{if condition="$value.update == 1"}New Version: <i>{$value.update_vers}</i> <br/>Changes: <i>{$value.update_desc}</i>{/if}{/if}</td>
       </tr>
       <tr>
         <td width="4%">&nbsp;</td>

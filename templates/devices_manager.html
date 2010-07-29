@@ -178,8 +178,8 @@
 	<td width="25%" align='center'>{$value.model}</td>
 	<td width="19%" align='center'>{$value.ext} - {$value.description}</td>
 	<td align='center' width='18%'>{$value.template_name}</td>
-	<td align='center' width='9%'><a href={$web_vars}&editready=true&display=epm_devices&id={$value.id}><img src='{$web_path}templates/images/edit.gif' ALT='<?=_('Edit')?>' border='0'></a></td>
-	<td align='center' width='5%'><a href={$web_vars}&deleteready=true&display=epm_devices&id={$value.id}><img src='{$web_path}templates/images/delete.gif' ALT='<?=_('Delete')?>' border='0'></a></td>
+	<td align='center' width='9%'><a href=config.php?type=tool&display=epm_devices&editready=true&display=epm_devices&id={$value.id}><img src='{$web_path}templates/images/edit.gif' ALT='<?=_('Edit')?>' border='0'></a></td>
+	<td align='center' width='5%'><a href=config.php?type=tool&display=epm_devices&deleteready=true&display=epm_devices&id={$value.id}><img src='{$web_path}templates/images/delete.gif' ALT='<?=_('Delete')?>' border='0'></a></td>
 	</tr>
 	{/loop}
 </table>

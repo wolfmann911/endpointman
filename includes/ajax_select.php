@@ -21,14 +21,6 @@ http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 */
 include 'jsonwrapper.php';
 
-$amp_conf = unserialize(base64_decode($_REQUEST['amp_conf']));
-
-$link = mysql_connect('localhost', $amp_conf['AMPDBUSER'], $amp_conf['AMPDBPASS']);
-mysql_select_db($amp_conf['AMPDBNAME'], $link);
-
-
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
 if(($_REQUEST['id'] == "") OR ($_REQUEST['id'] == "0")) {
 	$out[0]['optionValue'] = "";
 	$out[0]['optionDisplay'] = "";
@@ -36,21 +28,21 @@ if(($_REQUEST['id'] == "") OR ($_REQUEST['id'] == "0")) {
 	die();
 }
 
-if($_REQUEST['type'] == "model") {
+if($_REQUEST['atype'] == "model") {
 	$sql = "SELECT * FROM endpointman_model_list WHERE enabled = 1 AND brand =". $_GET['id'];
-} elseif ($_REQUEST['type'] == "template") {
-	$sql = "SELECT id, name as model FROM  endpointman_template_list WHERE  product_id =". $_GET['id'];
-} elseif ($_REQUEST['type'] == "template2") {
-	$sql = "SELECT endpointman_template_list.id, endpointman_template_list.name as model FROM endpointman_template_list, endpointman_model_list, endpointman_product_list WHERE endpointman_template_list.product_id = endpointman_model_list.product_id AND endpointman_model_list.product_id = endpointman_product_list.id AND endpointman_model_list.id = ". $_GET['id'];
+} elseif ($_REQUEST['atype'] == "template") {
+	$sql = "SELECT id, name as model FROM  endpointman_template_list WHERE  product_id = '". $_GET['id']."'";
+} elseif ($_REQUEST['atype'] == "template2") {
+	$sql = "SELECT endpointman_template_list.id, endpointman_template_list.name as model FROM endpointman_template_list, endpointman_model_list, endpointman_product_list WHERE endpointman_template_list.product_id = endpointman_model_list.product_id AND endpointman_model_list.product_id = endpointman_product_list.id AND endpointman_model_list.id = '". $_GET['id']."'";
+} elseif ($_REQUEST['atype'] == "model_clone") {
+        $sql = "SELECT endpointman_model_list.id, endpointman_model_list.model as model FROM endpointman_model_list, endpointman_product_list WHERE endpointman_product_list.id = endpointman_model_list.product_id AND endpointman_model_list.enabled = 1 AND endpointman_model_list.hidden = 0 AND product_id = '". $_GET['id']."'";
 }
 
-$result = mysql_query($sql);
-
-if (($_REQUEST['type'] == "template") OR ($_REQUEST['type'] == "template2")) {
+if (($_REQUEST['atype'] == "template") OR ($_REQUEST['atype'] == "template2")) {
 	$out[0]['optionValue'] = 0;
 	$out[0]['optionDisplay'] = "Custom...";
 	$i=1;
-} elseif ($_REQUEST['type'] == "model") {
+} elseif ($_REQUEST['atype'] == "model") {
 	$out[0]['optionValue'] = 0;
 	$out[0]['optionDisplay'] = "";
 	$i=1;
@@ -58,8 +50,9 @@ if (($_REQUEST['type'] == "template") OR ($_REQUEST['type'] == "template2")) {
 	$i=0;
 }
 
+$result = $db->getAll($sql,array(), DB_FETCHMODE_ASSOC);
 
-while ($row = mysql_fetch_assoc($result)) {
+foreach($result as $row) {
 	$out[$i]['optionValue'] = $row['id'];
 	$out[$i]['optionDisplay'] = $row['model'];
 	$i++;
