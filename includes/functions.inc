@@ -1213,7 +1213,6 @@ class endpointmanager {
 
     //Discover New Device/Hardware
     function discover_new($netmask, $use_nmap=TRUE) {
-        global $global_cfg, $debug, $error;
         //Written by tm1000
         //Version 1.0
 
@@ -1221,18 +1220,16 @@ class endpointmanager {
         //If the user just wishes to use the local arp cache they can tell the function to not use nmap
         //This results in a speed increase from 60 seconds to less than one second.
         if (($use_nmap) AND ($this->validate_netmask($netmask))) {
-            shell_exec($global_cfg['nmap_location'].' -v -sP '. $netmask);
+            shell_exec($this->global_cfg['nmap_location'].' -v -sP '. $netmask);
         } elseif(!$this->validate_netmask($netmask)) {
             return(FALSE);
         }
         //Get arp list
-        $arp_list = shell_exec($global_cfg['arp_location'] . " -an");
-        //$arp_list = shell_exec("arp -an");
-        if($global_cfg['debug']) {
-            $debug .= "ARP LIST:\n".$arp_list;
-        }
+        $arp_list = shell_exec($this->global_cfg['arp_location'] . " -an");
+
         //Throw arp list into an array, break by new lines
         $arp_array = explode("\n", $arp_list);
+
 
         //Find all references to active computers by searching out mac addresses.
         $temp = array_values(array_unique(preg_grep("/[0-9a-f][0-9a-f][:-]".
@@ -1242,10 +1239,6 @@ class endpointmanager {
                 "[0-9a-f][0-9a-f][:-]".
                 "[0-9a-f][0-9a-f]/i", $arp_array)));
 
-        if($global_cfg['debug']) {
-            $arp_arry = print_r($temp, true);
-            $debug .= "ARP Array:\n".$arp_arry;
-        }
         //Go through each row of valid arp entries and pull out the information and add it into a nice array!
         foreach ($temp as $key => &$value) {
 
@@ -1266,34 +1259,37 @@ class endpointmanager {
                 //Find the matching brand model to the oui
                 $oui_sql = "SELECT endpointman_brand_list.name, endpointman_brand_list.id FROM endpointman_oui_list, endpointman_brand_list WHERE oui LIKE '%". $oui ."%' AND endpointman_brand_list.id = endpointman_oui_list.brand AND endpointman_brand_list.installed = 1 LIMIT 1";
 
-
-                $brand_result = mysql_query($oui_sql);
-                $brand = mysql_fetch_row($brand_result);
-                if ($brand == FALSE) {
+                $brand =& $this->db->getRow($oui_sql, array(), DB_FETCHMODE_ASSOC);
+                
+                $res =& $this->db->query($oui_sql);
+                $brand_count = $res->numRows();
+                
+                if (!$brand_count) {
                     //oui doesn't have a matching mysql reference, probably a PC/router/wap/printer of some sort.
-                    $brand[0] = FALSE;
-                    $brand[1] = NULL;
+                    $brand['name'] = FALSE;
+                    $brand['id'] = NULL;
                 }
 
                 //Find out if endpoint has already been configured for this mac address
                 $epm_sql = "SELECT * FROM endpointman_mac_list WHERE mac LIKE  '%". $mac_strip ."%'";
-                $epm_result = mysql_query($epm_sql);
-                $epm_row = mysql_fetch_row($epm_result);
-                if ($epm_row == TRUE) {
+                $epm_row =& $this->db->getRow($epm_sql, array(), DB_FETCHMODE_ASSOC);
+
+                $res =& $this->db->query($epm_sql);
+                $epm_count = $res->numRows();
+
+                if ($epm_count) {
                     $epm = TRUE;
                 } else {
                     $epm = FALSE;
                 }
 
                 //Add into a final array
-                $final[$key] = array("ip" => $ip, "mac" => $mac, "mac_strip" => $mac_strip, "oui" => $oui, "brand" => $brand[0], "brand_id" => $brand[1], "endpoint_managed" => $epm);
+                $final[$key] = array("ip" => $ip, "mac" => $mac, "mac_strip" => $mac_strip, "oui" => $oui, "brand" => $brand['name'], "brand_id" => $brand['id'], "endpoint_managed" => $epm);
             }
         }
+
         $final = array_values($final);
-        if($global_cfg['debug']) {
-            $arp_arry = print_r($final, true);
-            $debug .= "Final output from 'discover_new' function:\n".$arp_arry;
-        }
+
         if(!is_array($final)) {
             return(FALSE);
         } else {

@@ -126,29 +126,26 @@ if(isset($_REQUEST['button_add'])) {
         $num = $_REQUEST['add'][$i];
         if($mac = $endpoint->mac_check_clean($_REQUEST['mac_'.$num])) {
             $sql = "SELECT * FROM endpointman_mac_list WHERE ext = ".$_REQUEST['ext_list_'.$num];
-            $result=mysql_query($sql);
-            if(!mysql_num_rows($result)) {
+            $res =& $endpoint->db->query($sql);
+            $count_macs = $res->numRows();
+            if(!$count_macs) {
                 $sql = 'SELECT `name` FROM `users` WHERE `extension` = '.$_REQUEST['ext_list_'.$num];
-                $result=mysql_query($sql);
-                $name=mysql_fetch_array($result);
+                $name =& $endpoint->db->getOne($sql,array(),DB_FETCHMODE_ASSOC);
+
 
                 $sql = 'SELECT endpointman_product_list. * , endpointman_brand_list.directory FROM endpointman_model_list, endpointman_brand_list, endpointman_product_list WHERE endpointman_model_list.id =  \''.$_REQUEST['model_list_'.$num].'\' AND endpointman_model_list.brand = endpointman_brand_list.id AND endpointman_model_list.product_id = endpointman_product_list.id';
-                $result=mysql_query($sql);
-                $row=mysql_fetch_array($result);
+                $row =& $endpoint->db->getAll($sql,array(),DB_FETCHMODE_ASSOC);
+
 
                 $sql = "INSERT INTO `endpointman_mac_list` (`mac`, `model`, `ext`, `description`) VALUES ('".$mac."', '".$_REQUEST['model_list_'.$num]."', '".$_REQUEST['ext_list_'.$num]."', '".$name['name']."')";
-                mysql_query($sql);
+                $endpoint->db->query($sql);
 
                 $sql = 'SELECT id FROM endpointman_mac_list WHERE ext ='. $_REQUEST['ext_list_'.$num];
-                $result=mysql_query($sql);
-                $ext_id=mysql_fetch_array($result);
+                $mac_new_id =& $endpoint->db->getOne($sql,array(),DB_FETCHMODE_ASSOC);
 
-                if(file_exists(PHONE_MODULES_PATH.$row['directory'].'/'.$row['cfg_dir'].'/functions.inc')) {
-                    require_once(PHONE_MODULES_PATH.$row['directory'].'/'.$row['cfg_dir'].'/functions.inc');
-                    $phone_config = new $row['cfg_dir']();
-                    $phone_config->generate_config($ext_id['id']);
-                    unset($phone_config);
-                }
+                $row_new = $endpoint->get_phone_info($mac_new_id);
+                $endpoint->prepare_configs($row_new);
+ 
                 $message = _("Saved")."!";
             } else {
                 $message = _("One or more selected phones had the same extension as a phone already added, these devices were not added");
@@ -197,9 +194,9 @@ if(isset($_REQUEST['button_add'])) {
                 $final[$i] = $temp[$i];
                 $final[$i]['id'] = $i;
                 $sqln = "SELECT * FROM endpointman_model_list WHERE enabled = 1 AND brand =".$temp[$i]['brand_id'];
-                $model_list=mysql_query($sqln);
+                $model_list =& $endpoint->db->getAll($sqln,array(),DB_FETCHMODE_ASSOC);
                 $j = 0;
-                while($row = mysql_fetch_assoc($model_list)) {
+                foreach($model_list as $row) {
                     $final[$i]['list'][$j] = $row;
                     $j++;
                 }
