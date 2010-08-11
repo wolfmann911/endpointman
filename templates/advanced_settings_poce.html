@@ -21,6 +21,11 @@
 <table width="70%" border="0" cellspacing="4" cellpadding="4">
   <tr>
     <td valign="top">
+        <u><?=_("Custom Template Files")?></u><br />
+	{loop name="template_file_list"}
+	<a href="config.php{$web_vars}&display=epm_advanced&subpage=poce&product_select={$product_selected}&temp_file={$value.value}">{$value.text}</a><br />
+	{/loop}
+	<hr>
 	<u><?=_("Local File Configs")?></u><br />
 	{loop name="file_list"}
 	<a href="config.php{$web_vars}&display=epm_advanced&subpage=poce&product_select={$product_selected}&file={$value.value}">{$value.text}</a><br />
@@ -41,13 +46,13 @@
       <br>
       <label>
         <input type="submit" name="button_save" value="<?=_('Save')?>">
-      </label> or 
+      </label>{if condition="!isset($temp_file)"} or
       <label>
         <input type="submit" name="button_save_as" value="<?=_('Save As')?>..">
       </label>
 	<label>
 	  <input type="text" name="save_as_name" id="save_as_name" value="{if condition="isset($save_as_name_value)"}{$save_as_name_value}{/if}">
-	</label>
+	</label>{/if}
     </form></td>
   </tr>
 </table>

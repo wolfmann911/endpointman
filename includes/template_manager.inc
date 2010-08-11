@@ -1,24 +1,11 @@
 <?PHP
-/*
-Endpoint Manager V2
-Copyright (C) 2009-2010  Ed Macri, John Mullinix and Andrew Nagy 
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
-http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
-*/
+/**
+ * Endpoint Manager Template Manager File
+ *
+ * @author Andrew Nagy
+ * @license MPL / GPLv2 / LGPL
+ * @package Provisioner
+ */
 $message = NULL;
 $no_add = FALSE;
 $default_display = FALSE;
@@ -77,6 +64,7 @@ if($default_display) {
 
 	$sql = 'SELECT endpointman_mac_list.id,endpointman_mac_list.mac,endpointman_mac_list.model,endpointman_mac_list.description, endpointman_model_list.model as model_clone, endpointman_product_list.short_name as model_class FROM endpointman_mac_list, endpointman_model_list, endpointman_product_list WHERE endpointman_product_list.id = endpointman_model_list.product_id AND endpointman_mac_list.custom_cfg_data IS NOT NULL AND endpointman_model_list.id = endpointman_mac_list.model AND endpointman_mac_list.custom_cfg_template = 0';
         $template_list =& $db->getAll($sql, array(), DB_FETCHMODE_ASSOC);
+        $row_out = array();
         foreach($template_list as $row) {
 		$row_out[$i] = $row;
 		$row_out[$i]['custom'] = 1;
@@ -84,7 +72,8 @@ if($default_display) {
 		$i++;
 	}
 
-	$sql = "SELECT endpointman_product_list.* FROM endpointman_product_list, endpointman_model_list WHERE endpointman_product_list.id = endpointman_model_list.product_id AND endpointman_model_list.hidden = 0 AND endpointman_model_list.enabled = 1 AND endpointman_product_list.hidden != 1 AND endpointman_product_list.cfg_dir !=  ''";
+	$sql = "SELECT DISTINCT endpointman_product_list.* FROM endpointman_product_list, endpointman_model_list WHERE endpointman_product_list.id = endpointman_model_list.product_id AND endpointman_model_list.hidden = 0 AND endpointman_model_list.enabled = 1 AND endpointman_product_list.hidden != 1 AND endpointman_product_list.cfg_dir !=  ''";
+        
         $template_list =& $db->getAll($sql, array(), DB_FETCHMODE_ASSOC);
 	$i = 1;
         $class_row[0]['value'] = 0;
@@ -103,4 +92,3 @@ if($default_display) {
 	$tpl->assign("message", $message);
 	echo $tpl->draw( 'template_manager' );
 }
-?>

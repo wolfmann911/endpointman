@@ -1,4 +1,11 @@
 <?PHP
+/**
+ * Endpoint Manager Update Check File
+ *
+ * @author Andrew Nagy
+ * @license MPL / GPLv2 / LGPL
+ * @package Provisioner
+
 error_reporting(0);
 
 $rfh=fopen("/etc/amportal.conf","r") or Die("amportal.conf did not open.");
@@ -96,5 +103,5 @@ while($row = mysql_fetch_assoc($result)) {
 		mail($email, 'Phone Updates Available', $message);
 	}
 }
-
-?>
+ * 
+ */

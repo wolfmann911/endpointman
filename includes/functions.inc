@@ -1,59 +1,11 @@
 <?php
-/*
-Endpoint Manager V2
-Copyright (C) 2009-2010  Ed Macri, John Mullinix and Andrew Nagy 
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
-http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
-*/
-/*
-Functions get_files_list, get_url_contents and html2text written by Jeremy Jacobs
-Fitness Plus Equipment Data Sources, Inc.
-http://www.FitnessRepairParts.com
-This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
-*/
-/*
-Functions download_file_with_progress_bar', 'endpointmanager_read_header, 'endpointmanager_read_body' are Borrowed from pfSense
-Authors of said functions: Keyvan Minoukadeh, Modified by Scott Ullrich
-License for pfSense is as follows:
-
-pfSense is Copyright 2004-2009 BSD Perimeter, LLC
-Current logo is Copyright 2005-2009 BSD Perimeter, LLC
-
-pfSense is a federally registered trademark of BSD Perimeter LLC. Any unauthorized use of this trademark is prohibited by state and federal law and international treaties. 
-
-All rights reserved.
-
-Portions from m0n0wall, Copyright 2002-2009 Manuel Kasper. Please refer to source code header for exact copyright information.
-
-Source Code
-pfSense source code is released under the BSD license, under terms as follows.
-
-Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-
-Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
-INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. 
-IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES 
-(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
-WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+/**
+ * Endpoint Manager Functions File
+ *
+ * @author Andrew Nagy
+ * @license MPL / GPLv2 / LGPL
+ * @package Provisioner
+ */
 class endpointmanager {
     //Load this class upon construction of the class
 
@@ -65,13 +17,13 @@ class endpointmanager {
     function __construct() {
         global $amp_conf,$global_cfg, $endpoint_db, $db, $type;
 
+        date_default_timezone_set('America/Los_Angeles');
+
         $this->db = $db;
         $this->amp_conf = $amp_conf;
         $this->error = array();
 
 
-        //attached to the end of every link so we can flow through FreePBX
-        //This is really hacky but I have to do it when people have different directories instead of admin
         //Define the location of phone modules, keeping it outside of the module directory so that when the user updates endpointmanager they don't lose all of their phones
         define("PHONE_MODULES_PATH", dirname($_SERVER["SCRIPT_FILENAME"])."/modules/_ep_phone_modules/");
 
@@ -80,7 +32,7 @@ class endpointmanager {
         define("LOCAL_PATH", dirname($_SERVER["SCRIPT_FILENAME"])."/modules/endpointman/");
 
 
-
+        //close open mysql stuff
         mysql_close();
 
 
@@ -105,6 +57,47 @@ class endpointmanager {
         mysql_query($sql);
     }
 
+    function file_upload_error_message($error_code) {
+        switch ($error_code) {
+            case UPLOAD_ERR_INI_SIZE:
+                return 'The uploaded file exceeds the upload_max_filesize directive in php.ini';
+            case UPLOAD_ERR_FORM_SIZE:
+                return 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form';
+            case UPLOAD_ERR_PARTIAL:
+                return 'The uploaded file was only partially uploaded';
+            case UPLOAD_ERR_NO_FILE:
+                return 'No file was uploaded';
+            case UPLOAD_ERR_NO_TMP_DIR:
+                return 'Missing a temporary folder';
+            case UPLOAD_ERR_CANT_WRITE:
+                return 'Failed to write file to disk';
+            case UPLOAD_ERR_EXTENSION:
+                return 'File upload stopped by extension';
+            default:
+                return 'Unknown upload error';
+        }
+    }
+
+    function get_brand_from_mac($mac){
+        $oui = substr($mac,0,6);
+        //Find the matching brand model to the oui
+        $oui_sql = "SELECT endpointman_brand_list.name, endpointman_brand_list.id FROM endpointman_oui_list, endpointman_brand_list WHERE oui LIKE '%". $oui ."%' AND endpointman_brand_list.id = endpointman_oui_list.brand AND endpointman_brand_list.installed = 1 LIMIT 1";
+        $brand =& $this->db->getRow($oui_sql, array(), DB_FETCHMODE_ASSOC);
+
+        $res =& $this->db->query($oui_sql);
+        $brand_count = $res->numRows();
+
+        if (!$brand_count) {
+            //oui doesn't have a matching mysql reference, probably a PC/router/wap/printer of some sort.
+           $phone_info['id'] = 0;
+           $phone_info['name'] = _("Unknown");
+        } else {
+           $phone_info['id'] = $brand['id'];
+           $phone_info['name'] = $brand['name'];
+        }
+
+        return($phone_info);
+    }
     /**
      * Send this function an ID from the mac devices list table and you'll get all the information we have on that particular phone
      * @param integer $mac_id ID number reference from the MySQL database referencing the table endpointman_mac_list
@@ -116,6 +109,7 @@ class endpointmanager {
             die("Can't get phone info!");
         }
         $sql = "SELECT id,mac,model FROM  endpointman_mac_list WHERE model > 0 AND id =".$mac_id;
+
         $res =& $this->db->query($sql);
         if($res->numRows()) {
             //Returns Brand Name, Brand Directory, Model Name, Mac Address, Extension (FreePBX), Custom Configuration Template, Custom Configuration Data, Product Name, Product ID, Product Configuration Directory, Product Configuration Version, Product XML name,
@@ -135,14 +129,20 @@ class endpointmanager {
 
             }
         } else {
+            $sql = "SELECT id, mac, ext FROM endpointman_mac_list WHERE id =".$mac_id;
             //Phone is unknown, we need to display this to the end user so that they can make corrections
-            $row=mysql_fetch_array($result);
+            $row =& $this->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
+
+            $brand = $this->get_brand_from_mac($row['mac']);
+            $phone_info['brand_id'] = $brand['id'];
+            $phone_info['name'] = $brand['name'];
+
             $phone_info['id'] = $mac_id;
             $phone_info['model_id'] = 0;
-            $phone_info['brand_id'] = 0;
+            $phone_info['product_id'] = 0;
+            $phone_info['custom_cfg_template'] = 0;
             $phone_info['ext'] = $row['ext'];
             $phone_info['mac'] = $row['mac'];
-            $phone_info['name'] = 'Unknown';
         }
 
         return $phone_info;
@@ -173,7 +173,7 @@ class endpointmanager {
 
         //Determine if we are dealing with a general template or a specific [for that phone only] template (custom =0 means general)
         if($custom == 0) {
-            $sql = "SELECT endpointman_product_list.config_files, endpointman_product_list.long_name, endpointman_model_list.template_data, endpointman_model_list.id as model_id, endpointman_template_list.* FROM endpointman_product_list, endpointman_model_list, endpointman_template_list WHERE endpointman_product_list.id = endpointman_template_list.product_id AND endpointman_template_list.model_id = endpointman_model_list.id AND endpointman_template_list.id = ".$id;
+            $sql = "SELECT endpointman_product_list.config_files, endpointman_product_list.long_name, endpointman_product_list.id as product_id, endpointman_model_list.template_data, endpointman_model_list.id as model_id, endpointman_template_list.* FROM endpointman_product_list, endpointman_model_list, endpointman_template_list WHERE endpointman_product_list.id = endpointman_template_list.product_id AND endpointman_template_list.model_id = endpointman_model_list.id AND endpointman_template_list.id = ".$id;
         } else {
             $sql = "SELECT endpointman_product_list.config_files, endpointman_mac_list.*, endpointman_model_list.id as model_id, endpointman_model_list.template_data, endpointman_product_list.id as product_id, endpointman_product_list.long_name, endpointman_product_list.cfg_dir, endpointman_brand_list.directory FROM endpointman_brand_list, endpointman_mac_list, endpointman_model_list, endpointman_product_list WHERE endpointman_mac_list.id=".$id." AND endpointman_mac_list.model = endpointman_model_list.id AND endpointman_model_list.brand = endpointman_brand_list.id AND endpointman_model_list.product_id = endpointman_product_list.id";
         }
@@ -204,7 +204,7 @@ class endpointmanager {
         $alt = 0;
         //TODO: Perhaps fix this alternative files list
         foreach($config_files_list as $files) {
-            $sql = "SELECT * FROM  endpointman_custom_configs WHERE product_id = ".$row['id']." AND original_name = '".$files."'";
+            $sql = "SELECT * FROM  endpointman_custom_configs WHERE product_id = '".$row['product_id']."' AND original_name = '".$files."'";
             $alt_configs_list_count =& $this->db->query($sql);
             if($alt_configs_list_count->numRows() > 0) {
                 $alt_configs_list =& $this->db->getAll($sql, array(), DB_FETCHMODE_ASSOC);
@@ -225,6 +225,7 @@ class endpointmanager {
             }
             $i++;
         }
+
         $tpl->assign("alt_configs", $alt_configs);
         $tpl->assign("alt", $alt);
 
@@ -254,6 +255,10 @@ class endpointmanager {
     function generate_gui_html($cfg_data,$custom_cfg_data=NULL, $admin=FALSE, $user_cfg_data=NULL) {
         //take the data out of the database and turn it back into an array for use
         $cfg_data = unserialize($cfg_data);
+
+
+
+
         $count = count($cfg_data);
 
         //Check to see if there is a custom template for this phone already listed in the endpointman_mac_list database
@@ -430,7 +435,9 @@ class endpointmanager {
     }
 
     function prepare_configs($phone_info) {
-        require(PHONE_MODULES_PATH.'setup.php');
+        if(!class_exists('ProvisionerConfig')) {
+            require(PHONE_MODULES_PATH.'setup.php');
+        }
 
         $class = "endpoint_" . $phone_info['directory'] . "_" . $phone_info['cfg_dir'] . '_phone';
 
@@ -456,7 +463,18 @@ class endpointmanager {
         $provisioner_lib->server[1]['port'] = 5060;
 
         //Provide alternate Configuration file instead of the one from the hard drive
-        //$endpoint->config_files_override['$mac.cfg'] = "{\$srvip}\n{\$admin_pass|0}\n{\$test.line.1}";
+        $temp = "";
+        if(!empty($phone_info['config_files_override'])){
+            $temp = unserialize($phone_info['config_files_override']);
+            foreach($temp as $list) {
+                $sql = "SELECT original_name,data FROM endpointman_custom_configs WHERE id = ".$list;
+                $res =& $this->db->query($sql);
+                if($res->numRows()) {
+                    $data = $this->db->getRow($sql, array(),DB_FETCHMODE_ASSOC);
+                    $provisioner_lib->config_files_override[$data['original_name']] = $data['data'];
+                }
+            }
+        }
 
         //Pretend we have three lines, we could just have one line or 20...whatever the phone supports
         $provisioner_lib->lines[1] = array('ext' => $phone_info['ext'], 'secret' => $phone_info['secret'], 'displayname' => $phone_info['description']);
@@ -470,8 +488,10 @@ class endpointmanager {
         }
 
         $new_template_data = array();
-        foreach($template_data as $key => $data) {
-            $new_template_data = array_merge($new_template_data, array($key => $data['value']));
+        if(is_array($template_data)) {
+            foreach($template_data as $key => $data) {
+                $new_template_data = array_merge($new_template_data, array($key => $data['value']));
+            }
         }
 
         //Set Variables according to the template_data files included. We can include different template.xml files within family_data.xml also one can create
@@ -485,59 +505,53 @@ class endpointmanager {
         $returned_data = $provisioner_lib->generate_config();
 
         foreach($returned_data as $key => $data) {
-            $fp = fopen("/tftpboot/".$key, 'w');
+            $fp = fopen($this->global_cfg['config_location'].$key, 'w');
             fwrite($fp, $data);
             fclose($fp);
         }
 
-        unset($provisioner_lib);
     }
 
     function firmware_update_check($id=NULL) {
-        $sql = "SELECT * FROM  endpointman_product_list WHERE  id =". $id;
-        $result = mysql_query($sql);
-        $row = mysql_fetch_array($result);
+        $sql = "SELECT * FROM  endpointman_product_list WHERE  id ='". $id."'";
+        $row =& $this->db->getRow($sql,array(),DB_FETCHMODE_ASSOC);
 
         $sql = "SELECT directory FROM  endpointman_brand_list WHERE id =". $row['brand'];
-        $result = mysql_query($sql);
-        if(mysql_num_rows($result)) {
-            $brand_row = mysql_fetch_array($result);
+        $brand_directory =& $this->db->getOne($sql);
 
-            //config drive unknown!
-            if ($row['cfg_dir'] == "") {
-                return FALSE;
-            } else {
-                $temp = $this->xml2array(PHONE_MODULES_PATH.$brand_row['directory']."/".$row['cfg_dir']."/template_data.xml");
-                if((array_key_exists('data',$temp)) AND (!is_array($temp['data']['firmware_ver']))) {
-                    if($row['firmware_vers'] < $temp['data']['firmware_ver']) {
-                        return $temp;
-                    } else {
-                        return FALSE;
-                    }
+        //config drive unknown!
+        if ($row['cfg_dir'] == "") {
+            return FALSE;
+        } else {
+            $temp = $this->xml2array(PHONE_MODULES_PATH."endpoint/".$brand_directory."/".$row['cfg_dir']."/template_data.xml");
+            if((array_key_exists('data',$temp)) AND (!is_array($temp['data']['firmware_ver']))) {
+                if($row['firmware_vers'] < $temp['data']['firmware_ver']) {
+                    return $temp;
                 } else {
                     return FALSE;
                 }
+            } else {
+                return FALSE;
             }
-        } else {
-            return FALSE;
         }
+
     }
 
     function firmware_local_check($id=NULL) {
-        $sql = "SELECT * FROM  endpointman_product_list WHERE hidden = 0 AND id =". $id;
-        $result = mysql_query($sql);
-        if(mysql_num_rows($result)) {
-            $row = mysql_fetch_array($result);
+        $sql = "SELECT * FROM  endpointman_product_list WHERE hidden = 0 AND id ='". $id ."'";
+        $res =& $this->db->query($sql);
+
+        if($res->numRows()) {
+            $row =& $this->db->getRow($sql,array(),DB_FETCHMODE_ASSOC);
 
             $sql = "SELECT directory FROM  endpointman_brand_list WHERE hidden = 0 AND id =". $row['brand'];
-            $result = mysql_query($sql);
-            $brand_row = mysql_fetch_array($result);
+            $brand_directory =& $this->db->getOne($sql);
 
             //config drive unknown!
             if ($row['cfg_dir'] == "") {
                 return("nothing");
             } else {
-                $temp = $this->xml2array(PHONE_MODULES_PATH.$brand_row['directory']."/".$row['cfg_dir']."/template_data.xml");
+                $temp = $this->xml2array(PHONE_MODULES_PATH.$brand_directory."/".$row['cfg_dir']."/template_data.xml");
                 if((isset ($temp['data']['firmware_ver'])) AND (!is_array($temp['data']['firmware_ver']))) {
                     if($row['firmware_vers'] == "") {
                         return("install");
@@ -680,7 +694,6 @@ class endpointmanager {
 
             //rename(PHONE_MODULES_PATH."temp/setup.php", PHONE_MODULES_PATH."setup.php");
 
-
             rename(PHONE_MODULES_PATH."temp/endpoint/base.php", PHONE_MODULES_PATH."endpoint/base.php");
 
             $sql = "UPDATE endpointman_global_vars SET value = '".$endpoint_last_mod."' WHERE var_name = 'endpoint_vers'";
@@ -713,11 +726,22 @@ class endpointmanager {
                 }
 
                 $brand_name = $data['directory'];
-                $version[$brand_name] = $temp['version'];
+                $version[$brand_name] = $temp['last_modified'];
+
+                $last_mod = "";
+
+                $temp['family_list']['family'] = $this->fix_single_array_keys($temp['family_list']['family']);
+
+                foreach($temp['family_list']['family'] as $list) {
+                    $last_mod = max($last_mod, $list['last_modified']);
+                }
+                $last_mod = max($last_mod, $version[$brand_name]);
+
+                $version[$brand_name] = $last_mod;
 
                 if(!($this->arraysearchrecursive($brand_name, $row, 'directory'))) {
                     //insert row
-                    $sql = "INSERT INTO endpointman_brand_list (id, name, directory, cfg_ver) VALUES ('".$temp['brand_id']."', '".$temp['name']."', '".$temp['directory']."', '".$temp['version']."')";
+                    $sql = "INSERT INTO endpointman_brand_list (id, name, directory, cfg_ver) VALUES ('".$temp['brand_id']."', '".$temp['name']."', '".$temp['directory']."', '".$version[$brand_name]."')";
                     $this->db->query($sql);
                 } else {
                     //in database already!
@@ -767,11 +791,6 @@ class endpointmanager {
             $brand_version = $temp['data']['brands']['version'];
             $package = $temp['data']['brands']['package'];
 
-            echo "Updating data..........";
-            $sql = "UPDATE endpointman_brand_list SET name = '".$brand_name."', cfg_ver = '".$brand_version."', installed = 1, hidden = 0 WHERE id = ".$id;
-            $this->db->query($sql);
-            echo "Done!<br/>";
-
             echo "Downloading Tarball.......";
             $this->download_file_with_progress_bar(UPDATE_PATH.$row[0]['directory'].'/'.$package, PHONE_MODULES_PATH."temp/".$package);
             echo "Done!<br />";
@@ -805,10 +824,12 @@ class endpointmanager {
             unlink(PHONE_MODULES_PATH.'temp/'. $package);
             echo "Done!<br />";
 
-
+            $last_mod = "";
             $temp['data']['brands']['family_list']['family'] = $this->fix_single_array_keys($temp['data']['brands']['family_list']['family']);
             foreach($temp['data']['brands']['family_list']['family'] as $family_list) {
                 echo "Updating Family Lines.................<br/>";
+                $last_mod = max($last_mod, $family_list['last_modified']);
+
                 $family_line_xml = $this->xml2array(PHONE_MODULES_PATH.'/endpoint/'.$row[0]['directory'].'/'.$family_list['directory'].'/family_data.xml');
                 $data =& $this->db->getOne("SELECT id FROM endpointman_product_list WHERE id='".$brand_id."-".$family_line_xml['data']['id']."'", array(), DB_FETCHMODE_ASSOC);
                 $short_name = preg_replace("/\[(.*?)\]/si", "", $family_line_xml['data']['name']);
@@ -836,6 +857,13 @@ class endpointmanager {
                     $this->db->query($sql);
                 }
             }
+
+            $brand_version = max($last_mod, $brand_version);
+            echo "Updating data..........";
+            $sql = "UPDATE endpointman_brand_list SET name = '".$brand_name."', cfg_ver = '".$brand_version."', installed = 1, hidden = 0 WHERE id = ".$id;
+            $this->db->query($sql);
+            echo "Done!<br/>";
+            
         } else {
             echo "<br/>Error Connecting to the Package Repository. Module not installed. Please Try again later.";
         }
@@ -867,6 +895,10 @@ class endpointmanager {
         $sql = "SELECT * FROM  endpointman_model_list WHERE id='".$model."'";
 
         $model_id = explode("-",$model);
+
+        if((!$model_id[0]) OR (!$model_id[1])) {
+            return(FALSE);
+        }
 
         $model_row =& $this->db->getRow($sql, array(),DB_FETCHMODE_ASSOC);
 
@@ -1031,9 +1063,9 @@ class endpointmanager {
 
     function table_exists ($table) {
         $sql = "SHOW TABLES FROM asterisk";
-        $result = mysql_query($sql);
+        $result = $this->db->getAll($sql);
 
-        while ($row = mysql_fetch_row($result)) {
+        foreach($result as $row) {
             if ($row[0] == $table) {
                 return TRUE;
             }
@@ -1336,9 +1368,9 @@ class endpointmanager {
 
     function displayExtension($ext = NULL) {
         if(!isset($ext)) {
-            $not_added="SELECT devices.id, devices.description FROM devices WHERE devices.id not in (SELECT devices.id FROM devices, endpointman_mac_list WHERE tech='sip' AND devices.id = endpointman_mac_list.ext )";
+            $not_added="SELECT devices.id, devices.description FROM devices WHERE tech='sip' AND devices.id not in (SELECT devices.id FROM devices, endpointman_mac_list WHERE tech='sip' AND devices.id = endpointman_mac_list.ext ) ORDER BY devices.id";
         } else {
-            $not_added="SELECT devices.id, devices.description FROM devices WHERE devices.id not in (SELECT devices.id FROM devices, endpointman_mac_list WHERE tech='sip' AND devices.id = endpointman_mac_list.ext AND endpointman_mac_list.ext !=".$ext." )";
+            $not_added="SELECT devices.id, devices.description FROM devices WHERE tech='sip' AND devices.id not in (SELECT devices.id FROM devices, endpointman_mac_list WHERE tech='sip' AND devices.id = endpointman_mac_list.ext AND endpointman_mac_list.ext !=".$ext." ) ORDER BY devices.id";
         }
         $result=mysql_query($not_added);
 
@@ -1365,7 +1397,8 @@ class endpointmanager {
      * @return array Number array used to generate a select box
      */
     function brandAvailable ($selected = NULL) {
-        $sql="SELECT endpointman_brand_list.name, endpointman_brand_list.id FROM  endpointman_brand_list,endpointman_model_list WHERE endpointman_model_list.brand = endpointman_brand_list.id AND endpointman_model_list.enabled = 1 AND endpointman_model_list.hidden = 0 AND endpointman_brand_list.installed = 1 AND endpointman_brand_list.hidden = 0";
+        $sql="SELECT DISTINCT endpointman_brand_list.name, endpointman_brand_list.id FROM  endpointman_brand_list,endpointman_model_list WHERE endpointman_model_list.brand = endpointman_brand_list.id AND endpointman_model_list.enabled = 1 AND endpointman_model_list.hidden = 0 AND endpointman_brand_list.installed = 1 AND endpointman_brand_list.hidden = 0";
+       
         $data =& $this->db->getAll($sql,array(), DB_FETCHMODE_ASSOC);
         $temp[0]['value'] = "";
         $temp[0]['text'] = "";

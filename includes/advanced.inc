@@ -1,24 +1,11 @@
 <?PHP
-/*
-Endpoint Manager V2
-Copyright (C) 2009-2010  Ed Macri, John Mullinix and Andrew Nagy 
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
-http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
-*/
+/**
+ * Endpoint Manager Advanced File
+ *
+ * @author Andrew Nagy
+ * @license MPL / GPLv2 / LGPL
+ * @package Provisioner
+ */
 
 $tpl = new RainTPL( LOCAL_PATH.'templates' );
 //Set the message variable to nothing, however we can set it later and it will show up on the page
@@ -63,33 +50,34 @@ switch($_REQUEST['subpage']) {
                                 if($device[0] != "") {
                                     if($mac = $endpoint->mac_check_clean($device[0])) {
                                         $sql = "SELECT id FROM endpointman_brand_list WHERE name LIKE '%".$device[1]."%' LIMIT 1";
-                                        $res_brand = mysql_query($sql);
-                                        if(mysql_num_rows($res_brand)) {
-                                            $brand_id = mysql_fetch_row($res_brand);
+                                        $res =& $db->query($sql);
+                                        if($res->numRows()) {
+                                            $brand_id = $endpoint->db->getOne($sql);
                                             $brand_id = $brand_id[0];
                                         } else {
                                             $brand_id = 0;
                                         }
-                                        $sql = "SELECT id FROM endpointman_model_list WHERE brand = ".$brand_id." AND model LIKE '%".$device[2]."%' LIMIT 1";
-                                        $res_model = mysql_query($sql);
-                                        $sql = "SELECT extension, name FROM users WHERE extension LIKE '%".$device[3]."%' LIMIT 1";
-                                        $res_ext = mysql_query($sql);
-                                        if(mysql_num_rows($res_model)) {
-                                            $model_id = mysql_fetch_row($res_model);
-                                            $model_id = $model_id[0];
+                                        $sql_model = "SELECT id FROM endpointman_model_list WHERE brand = ".$brand_id." AND model LIKE '%".$device[2]."%' LIMIT 1";
+                                        $sql_ext = "SELECT extension, name FROM users WHERE extension LIKE '%".$device[3]."%' LIMIT 1";
+
+                                        $res_model =& $db->query($sql_model);
+                                        if($res_model->numRows()) {
+                                            $model_id =& $db->getRow($sql_model,array(), DB_FETCHMODE_ASSOC);
+                                            $model_id = $model_id['id'];
                                         } else {
                                             $model_id = 0;
                                         }
-                                        if(mysql_num_rows($res_ext)) {
-                                            $ext = mysql_fetch_row($res_ext);
-                                            $description = $ext[1];
-                                            $ext = $ext[0];
+                                        $res_ext =& $db->query($sql_ext);
+                                        if($res_ext->numRows()) {
+                                            $ext =& $db->getRow($sql_ext,array(), DB_FETCHMODE_ASSOC);
+                                            $description = $ext['name'];
+                                            $ext = $ext['extension'];
                                         } else {
                                             $ext = '';
                                             $description = '';
                                         }
                                         $sql = "INSERT INTO  endpointman_mac_list (mac, model, ext, description) VALUES ('".$mac."','".$model_id."','".$ext."','".$description."')";
-                                        mysql_query($sql);
+                                        $endpoint->db->query($sql);
                                         $message .= "Inserted Mac Address ".$mac."<br/>";
                                     } else {
                                         $message .= "Invalid Mac on line ". $i. "<br />";
@@ -111,47 +99,129 @@ switch($_REQUEST['subpage']) {
         }
         echo $tpl->draw( 'advanced_settings_iedl' );
         break;
+    case "manual_upload":
+        $sql = "SELECT value FROM endpointman_global_vars WHERE var_name LIKE 'endpoint_vers'";
+        $provisioner_ver = $endpoint->db->getOne($sql);
+        $provisioner_ver = date("n-j-y",$provisioner_ver) . " at " . date("g:ia",$provisioner_ver);
+        $tpl->assign("provisioner_ver", $provisioner_ver);
+
+        $provisioner_ver = filemtime(PHONE_MODULES_PATH."master.xml");
+        $provisioner_ver = date("n-j-y",$provisioner_ver) . " at " . date("g:ia",$provisioner_ver);
+        $tpl->assign("master_ver", $provisioner_ver);
+        $uploads_dir = PHONE_MODULES_PATH."temp";
+
+        if(isset($_REQUEST['upload_provisioner'])) {
+
+            $extension = pathinfo($_FILES["package"]["name"],PATHINFO_EXTENSION);
+            if($extension == "tgz") {
+                if ($_FILES['package']['error'] == UPLOAD_ERR_OK) {
+                    $tmp_name = $_FILES["package"]["tmp_name"];
+                    $name = $_FILES["package"]["name"];
+                    move_uploaded_file($tmp_name, "$uploads_dir/$name");
+                    $tpl->assign("show_installer", 1);
+                    $tpl->assign("package", $name);
+                    $tpl->assign("type", "upload_provisioner");
+                    $tpl->assign("xml", 0);
+                } else {
+                    $message = $endpoint->file_upload_error_message($_FILES['package']['error']);
+                }
+            } else {
+                $message = "Invalid Extension";
+            }
+            
+
+        } elseif(isset($_REQUEST['upload_master_xml'])) {
+            $extension = pathinfo($_FILES["xml"]["name"],PATHINFO_EXTENSION);
+            if($extension == "xml") {
+                if ($_FILES['xml']['error'] == UPLOAD_ERR_OK) {
+                    $tmp_name = $_FILES['xml']["tmp_name"];
+                    $name = $_FILES['xml']["name"];
+                    move_uploaded_file($tmp_name, "$uploads_dir/$name");
+                    $tpl->assign("show_installer", 1);
+                    $tpl->assign("package", 0);
+                    $tpl->assign("type", "upload_master_xml");
+                    $tpl->assign("xml", $name);
+                } else {
+                    $message = $endpoint->file_upload_error_message($_FILES['xml']['error']);
+                }
+            } else {
+                $message = "Invalid Extension";
+            }
+        } elseif(isset($_REQUEST['upload_brand'])) {
+            $error = FALSE;
+            $files_list = array();
+            $i = 0;
+            foreach($_FILES as $files) {
+                $extension = pathinfo($files["name"],PATHINFO_EXTENSION);
+                if(($extension == "xml") OR ($extension == "tgz")) {
+                    if ($files['error'] == UPLOAD_ERR_OK) {
+                        $tmp_name = $files["tmp_name"];
+                        $name = $files["name"];
+                        move_uploaded_file($tmp_name, "$uploads_dir/$name");
+                        $files_list[$i] = $name;
+                        $i++;
+                    } else {
+                        $error_message = $endpoint->file_upload_error_message($files['error']);
+                        $error = TRUE;
+                    }
+                } else {
+                    $error_message = "Invalid Extension";
+                    $error = TRUE;
+                }
+            }
+            if(!$error){
+                $tpl->assign("show_installer", 1);
+                $tpl->assign("package", $files_list[1]);
+                $tpl->assign("type", "upload_brand");
+                $tpl->assign("xml", $files_list[0]);
+            } else {
+                $message = $error_message;
+            }
+
+        }
+        $tpl->assign("message", $message);
+
+        echo $tpl->draw( 'advanced_settings_manual_upload' );
+        break;
     case "sh_manager":
         if(isset($_REQUEST['button_hide'])) {
             if(isset($_REQUEST['model'])) {
-                $sql = "UPDATE endpointman_model_list SET hidden = 1 WHERE id = ".$_REQUEST['model'];
+                $sql = "UPDATE endpointman_model_list SET hidden = 1 WHERE id = '".$_REQUEST['model']."'";
             } elseif(isset($_REQUEST['brand'])) {
                 $sql = "UPDATE endpointman_brand_list SET hidden = 1 WHERE id = ".$_REQUEST['brand'];
             } elseif(isset($_REQUEST['product'])) {
-                $sql = "UPDATE endpointman_product_list SET hidden = 1 WHERE id = ".$_REQUEST['product'];
+                $sql = "UPDATE endpointman_product_list SET hidden = 1 WHERE id = '".$_REQUEST['product']."'";
             }
-            mysql_query($sql);
+            $endpoint->db->query($sql);
         }elseif(isset($_REQUEST['button_show'])) {
             if(isset($_REQUEST['model'])) {
-                $sql = "UPDATE endpointman_model_list SET hidden = 0 WHERE id = ".$_REQUEST['model'];
+                $sql = "UPDATE endpointman_model_list SET hidden = 0 WHERE id = '".$_REQUEST['model']."'";
             } elseif(isset($_REQUEST['brand'])) {
                 $sql = "UPDATE endpointman_brand_list SET hidden = 0 WHERE id = ".$_REQUEST['brand'];
             } elseif(isset($_REQUEST['product'])) {
-                $sql = "UPDATE endpointman_product_list SET hidden = 0 WHERE id = ".$_REQUEST['product'];
+                $sql = "UPDATE endpointman_product_list SET hidden = 0 WHERE id = '".$_REQUEST['product']."'";
             }
-            mysql_query($sql);
+            $endpoint->db->query($sql);
         }
         $sql="SELECT * from endpointman_brand_list WHERE id > 0 ORDER BY id ASC ";
-        $result=mysql_query($sql);
+        $result =& $endpoint->db->getAll($sql, array(), DB_FETCHMODE_ASSOC);
         $i = 0;
-        while($row = mysql_fetch_assoc($result)) {
+        foreach($result as $row) {
             $row_out[$i] = $row;
             $row_out[$i]['count'] = $i;
             if($row['installed']) {
                 $j = 0;
                 $sql = 'SELECT * FROM endpointman_product_list WHERE brand = '.$row['id'].' ORDER BY long_name ASC';
-                $result2=mysql_query($sql);
+                $result2 =& $endpoint->db->getAll($sql, array(), DB_FETCHMODE_ASSOC);
                 $xml_data = "";
-                while($row2 = mysql_fetch_assoc($result2)) {
+                foreach($result2 as $row2) {
                     $row_out[$i]['products'][$j] = $row2;
-                    if($row2['installed']) {
-                        $sql = 'SELECT * FROM endpointman_model_list WHERE product_id = '.$row2['id'];
-                        $result3=mysql_query($sql);
-                        $k = 0;
-                        while($row3 = mysql_fetch_assoc($result3)) {
-                            $row_out[$i]['products'][$j]['models'][$k] = $row3;
-                            $k++;
-                        }
+                    $sql = 'SELECT * FROM endpointman_model_list WHERE product_id = '.$row2['id'];
+                    $result3 =& $endpoint->db->getAll($sql, array(), DB_FETCHMODE_ASSOC);
+                    $k = 0;
+                    foreach($result3 as $row3) {
+                        $row_out[$i]['products'][$j]['models'][$k] = $row3;
+                        $k++;
                     }
                     $j++;
                 }
@@ -193,9 +263,9 @@ switch($_REQUEST['subpage']) {
         break;
     case "poce":
         $sql = 'SELECT * FROM `endpointman_product_list` WHERE `hidden` = 0 AND `id` > 0';
-        $result = mysql_query($sql);
+        $data =& $endpoint->db->getAll($sql, array(), DB_FETCHMODE_ASSOC);
         $i = 0;
-        while($row = mysql_fetch_assoc($result)) {
+        foreach($data as $row) {
             $product_list[$i]['value'] = $row['id'];
             $product_list[$i]['text'] = $row['long_name'];
             if((isset($_REQUEST['product_select'])) AND ($_REQUEST['product_select'] == $row['id'])) {
@@ -205,13 +275,51 @@ switch($_REQUEST['subpage']) {
         }
         if(isset($_REQUEST['delete'])) {
             $sql = "DELETE FROM endpointman_custom_configs WHERE id =". $_REQUEST['sql'];
-            mysql_query($sql);
+            $endpoint->db->query($sql);
+        }
+        if(isset($_REQUEST['temp_file'])) {
+            $file = $_REQUEST['temp_file'];
+
+            $sql = "SELECT cfg_dir,directory,config_files FROM endpointman_product_list,endpointman_brand_list WHERE endpointman_product_list.brand = endpointman_brand_list.id AND endpointman_product_list.id = '". $_REQUEST['product_select'] ."'";
+            $row =& $endpoint->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
+
+            $file=PHONE_MODULES_PATH.'endpoint/'.$row['directory']."/".$row['cfg_dir']."/".$file;
+
+            if(isset($_REQUEST['config_text'])) {
+                if(isset($_REQUEST['button_save'])) {
+                    $wfh=fopen($file,'w');
+                    fwrite($wfh,$_REQUEST['config_text']);
+                    fclose($wfh);
+                }
+            }
+
+            if(!file_exists($file)) {
+                $fp = fopen($file, 'w');
+                fwrite($fp, '
+<!--<template_data>
+    <item>
+            <description>General Settings</description>
+            <type>group</type>
+    </item>
+    <item>
+            <variable>$sip_digit_timeout</variable>
+            <default_value>4</default_value>
+            <description>SIP Digit Timeout</description>
+            <type>input</type>
+    </item>
+</template_data>-->
+                            ');
+                fclose($fp);
+            }
+            $handle = fopen($file, "rb");
+            $contents = fread($handle, filesize($file));
+            fclose($handle);
+            $tpl->assign("config_data", $contents);
         }
         if(isset($_REQUEST['file'])) {
-            $sql = 'SELECT cfg_dir,directory,config_files FROM endpointman_product_list,endpointman_brand_list WHERE endpointman_product_list.brand = endpointman_brand_list.id AND endpointman_product_list.id =' . $_REQUEST['product_select'];
+            $sql = "SELECT cfg_dir,directory,config_files FROM endpointman_product_list,endpointman_brand_list WHERE endpointman_product_list.brand = endpointman_brand_list.id AND endpointman_product_list.id = '". $_REQUEST['product_select'] ."'";
+            $row =& $endpoint->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
 
-            $result = mysql_query($sql);
-            $row = mysql_fetch_assoc($result);
             $config_files = explode(",",$row['config_files']);
             $file=PHONE_MODULES_PATH.'endpoint/'.$row['directory']."/".$row['cfg_dir']."/".$config_files[$_REQUEST['file']];
             if(isset($_REQUEST['config_text'])) {
@@ -220,8 +328,8 @@ switch($_REQUEST['subpage']) {
                     fwrite($wfh,$_REQUEST['config_text']);
                     fclose($wfh);
                 }elseif(isset($_REQUEST['button_save_as'])) {
-                    $sql = 'INSERT INTO endpointman_custom_configs (name, original_name, product_id, data) VALUES ("'.addslashes($_REQUEST['save_as_name']).'","'.addslashes($config_files[$_REQUEST['file']]).'",'.$_REQUEST['product_select'].',"'.addslashes($_REQUEST['config_text']).'")';
-                    mysql_query($sql);
+                    $sql = 'INSERT INTO endpointman_custom_configs (name, original_name, product_id, data) VALUES ("'.addslashes($_REQUEST['save_as_name']).'","'.addslashes($config_files[$_REQUEST['file']]).'","'.$_REQUEST['product_select'].'","'.addslashes($_REQUEST['config_text']).'")';
+                    $endpoint->db->query($sql);
                 }
             }
             $handle = fopen($file, "rb");
@@ -233,38 +341,37 @@ switch($_REQUEST['subpage']) {
             if(isset($_REQUEST['config_text'])) {
                 if(isset($_REQUEST['button_save'])) {
                     $sql = "UPDATE endpointman_custom_configs SET data = '".addslashes($_REQUEST['config_text'])."' WHERE id = ".$_REQUEST['sql'];
-                    mysql_query($sql);
+                    $endpoint->db->query($sql);
                 }elseif(isset($_REQUEST['button_save_as'])) {
-                    $sql = 'SELECT original_name FROM endpointman_custom_configs WHERE id = 11';
-                    $res = mysql_query($sql);
-                    $file_name = mysql_fetch_array($res);
+                    $sql = 'SELECT original_name FROM endpointman_custom_configs WHERE id = '.$_REQUEST['sql'];
+                    $file_name = $endpoint->db->getOne($sql);
 
-                    $sql = 'INSERT INTO endpointman_custom_configs (name, original_name, product_id, data) VALUES ("'.addslashes($_REQUEST['save_as_name']).'","'.addslashes($file_name['original_name']).'",'.$_REQUEST['product_select'].',"'.addslashes($_REQUEST['config_text']).'")';
-                    mysql_query($sql);
+                    $sql = "INSERT INTO endpointman_custom_configs (name, original_name, product_id, data) VALUES ('".addslashes($_REQUEST['save_as_name'])."','".addslashes($file_name)."','".$_REQUEST['product_select']."','".addslashes($_REQUEST['config_text'])."')";
+                    $endpoint->db->query($sql);
                 }
             }
             $sql = 'SELECT * FROM endpointman_custom_configs WHERE id =' . $_REQUEST['sql'];
-            $result = mysql_query($sql);
-            $row = mysql_fetch_assoc($result);
+            $row =& $endpoint->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
             $tpl->assign("save_as_name_value", $row['name']);
             $tpl->assign("config_data", $row['data']);
         }
         if(isset($_REQUEST['product_select'])) {
-            $sql = 'SELECT cfg_dir,directory,config_files FROM endpointman_product_list,endpointman_brand_list WHERE endpointman_product_list.brand = endpointman_brand_list.id AND endpointman_product_list.id =' . $_REQUEST['product_select'];
-            $result = mysql_query($sql);
-            $row = mysql_fetch_assoc($result);
+            $sql = "SELECT cfg_dir,directory,config_files FROM endpointman_product_list,endpointman_brand_list WHERE endpointman_product_list.brand = endpointman_brand_list.id AND endpointman_product_list.id ='" . $_REQUEST['product_select'] . "'";
+            
+            $row =& $endpoint->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
             $config_files = explode(",",$row['config_files']);
             $i = 0;
-            while($i < count($config_files)) {
+            foreach($config_files as $config_files_data) {
                 $file_list[$i]['value'] = $i;
-                $file_list[$i]['text'] = $config_files[$i];
+                $file_list[$i]['text'] = $config_files_data;
                 $i++;
             }
-            $sql = 'SELECT * FROM `endpointman_custom_configs` WHERE `product_id` = '. $_REQUEST['product_select'];
-            $result = mysql_query($sql);
+            $sql = "SELECT * FROM endpointman_custom_configs WHERE product_id = '". $_REQUEST['product_select'] . "'";
+            $res =& $endpoint->db->query($sql);
             $i = 0;
-            if(mysql_num_rows($result)) {
-                while($row2 = mysql_fetch_assoc($result)) {
+            if($res->numRows()) {
+                $data =& $endpoint->db->getAll($sql, array(), DB_FETCHMODE_ASSOC);
+                foreach($data as $row2) {
                     $sql_file_list[$i]['value'] = $row2['id'];
                     $sql_file_list[$i]['text'] = $row2['name'];
                     $sql_file_list[$i]['ref'] = $row2['original_name'];
@@ -286,6 +393,26 @@ switch($_REQUEST['subpage']) {
                 } else {
                     $tpl->assign("options", $phone_config->display_options());
                 }
+            }
+
+
+
+            $template_file_list[0]['value'] = "template_data_custom.xml";
+            $template_file_list[0]['text'] = "template_data_custom.xml";
+
+            $sql = 'SELECT model FROM `endpointman_model_list` WHERE `product_id` LIKE CONVERT(_utf8 \'1-2\' USING latin1) COLLATE latin1_swedish_ci AND `enabled` = 1 AND `hidden` = 0';
+            $data =& $endpoint->db->getAll($sql, array(), DB_FETCHMODE_ASSOC);
+            $i = 1;
+            foreach($data as $list) {
+                $template_file_list[$i]['value'] = "template_data_" . $list['model'] . "_custom.xml";
+                $template_file_list[$i]['text'] = "template_data_" . $list['model'] . "_custom.xml";
+            }
+
+            $tpl->assign("template_file_list",$template_file_list);
+            if(isset($_REQUEST['temp_file'])) {
+                $tpl->assign("temp_file",1);
+            } else {
+                $tpl->assign("temp_file",NULL);
             }
 
             $tpl->assign("file_list", $file_list);
@@ -407,4 +534,3 @@ switch($_REQUEST['subpage']) {
         echo $tpl->draw( 'advanced_settings_settings' );
         break;
 }
-?>

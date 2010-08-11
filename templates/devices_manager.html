@@ -43,15 +43,7 @@
 	{/if}</td>
 <td align='center'>  <label>
 	{if condition="$mode == 'EDIT'"}
-		{if condition="$name == 'Unknown'"}
-			<select name="brand_list" id="brand_edit">
-		    {loop name="brand_ava"}
-		      <option value="{$value.value}" {if condition="isset($value.selected)"}selected{/if}>{$value.text}</option>
-		      {/loop}
-		    </select>
-		{else}
-			{$name}
-		{/if}
+            {$name}
 	{else}
     <select name="brand_list" id="brand_edit">
     {loop name="brand_ava"}
@@ -67,7 +59,7 @@
 	<input name="display" type="hidden" value="epm_devices">
 	<select name="model_list">
     {loop name="models_ava"}
-      <option value="{$value.value}" {if condition="isset($value.selected)"}selected{/if}>{$value.text}</option>
+      <option value="{$value.value}" {if condition="!empty($value.selected)"}selected{/if}>{$value.text}</option>
       {/loop}
     </select>
 	{else}

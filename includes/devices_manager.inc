@@ -1,24 +1,11 @@
 <?PHP
-/*
-Endpoint Manager V2
-Copyright (C) 2009-2010  Ed Macri, John Mullinix and Andrew Nagy 
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
-http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
-*/
+/**
+ * Endpoint Manager Devices Manager File
+ *
+ * @author Andrew Nagy
+ * @license MPL / GPLv2 / LGPL
+ * @package Provisioner
+ */
 
 //Set opened variables
 $message = NULL;
@@ -54,6 +41,7 @@ if(isset($_REQUEST['button_add'])) {
         $row =& $endpoint->db->getRow($sql,array(),DB_FETCHMODE_ASSOC);
 
         $cfg_data = unserialize($row['template_data']);
+
         $count = count($cfg_data);
         $i = 0;
         while($i < $count) {
@@ -67,6 +55,7 @@ if(isset($_REQUEST['button_add'])) {
             }
             $i++;
         }
+
         $custom_cfg_data = serialize($custom_cfg_data);
 
         $sql = "INSERT INTO `endpointman_mac_list` (`mac`, `model`, `ext`, `description`, `custom_cfg_data`, `custom_cfg_template`) VALUES ('".$mac."', '".$_REQUEST['model_list']."', '".$_REQUEST['ext_list']."', '".$name."', '".$custom_cfg_data."', '".$_REQUEST['template_list']."')";
@@ -74,6 +63,10 @@ if(isset($_REQUEST['button_add'])) {
 
         $sql = 'SELECT id FROM endpointman_mac_list WHERE ext ='. $_REQUEST['ext_list'];
         $ext_id =& $endpoint->db->getOne($sql);
+
+        $mac_id = $endpoint->get_phone_info($ext_id);
+
+        $endpoint->prepare_configs($mac_id);
 
         $message = _("Saved")."!";
     } else {
@@ -89,6 +82,8 @@ if(isset($_REQUEST['button_add'])) {
         $message = _("No Device Selected to Edit!")."!";
     } else {
         $template_editor = TRUE;
+        $sql = "UPDATE  endpointman_mac_list SET  model =  '".$_REQUEST['model_list']."' WHERE  id =".$_REQUEST['edit_id'];
+        $endpoint->db->query($sql);
         if ($_REQUEST['template_list'] == 0) {
             $endpoint->edit_template_display($_REQUEST['edit_id'],1);
         } else {
@@ -110,16 +105,8 @@ if(isset($_REQUEST['button_add'])) {
 } elseif(isset($_REQUEST['deleteready'])) {
     $row = $endpoint->get_phone_info($_REQUEST['id']);
 
-    if(file_exists(PHONE_MODULES_PATH.$row['directory'].'/'.$row['cfg_dir'].'/functions.inc')) {
-        require_once(PHONE_MODULES_PATH.$row['directory'].'/'.$row['cfg_dir'].'/functions.inc');
-
-        $phone_config = new $row['cfg_dir']();
-        $phone_config->delete_config($_REQUEST['id']);
-        unset($phone_config);
-    }
-
     $sql = "DELETE FROM endpointman_mac_list WHERE id=".$_REQUEST['id'];
-    $result=mysql_query($sql);
+    $endpoint->db->query($sql);
 } elseif((isset($_REQUEST['button_add_selected_phones'])) AND (isset($_REQUEST['add']))) {
     $list_num = count($_REQUEST['add']);
     for($i=0;$i<$list_num;$i++) {
@@ -282,7 +269,10 @@ $unknown_list =& $endpoint->db->getAll($sql,array(),DB_FETCHMODE_ASSOC);
 
 foreach($unknown_list as $row) {	#Displays unknown phones in the database with edit and delete buttons
     $list[$i] = $row;
-    $list[$i]['name'] = _("Unknown");
+
+    $brand_info = $endpoint->get_brand_from_mac($row['mac']);
+
+    $list[$i]['name'] = $brand_info['name'];
     $list[$i]['template_name'] = "N/A";
     $list[$i]['model'] = _("Unknown");
     $i++;
@@ -336,6 +326,7 @@ if (isset($template_editor)) {
         if($ma = $endpoint->modelsAvailable($edit_row['model_id'],NULL,$edit_row['brand_id'])) {
             $tpl->assign("mac", $edit_row['mac']);
             $tpl->assign("name", $edit_row['name']);
+            $tpl->assign("brand_id", $edit_row['brand_id']);
             $tpl->assign("models_ava", $ma);
             $tpl->assign("display_ext", $endpoint->displayExtension($edit_row['ext']));
             $tpl->assign("display_templates", $endpoint->display_templates($edit_row['product_id'],$edit_row['custom_cfg_template']));
@@ -353,4 +344,3 @@ if (isset($template_editor)) {
     //draw the template
     echo $tpl->draw( 'devices_manager' );
 }
-?>
