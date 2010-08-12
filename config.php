@@ -8,6 +8,8 @@
  */
 // Check for safe mode
 
+
+
 if( ini_get('safe_mode') ){
 	die(_('Turn Off Safe Mode'));
 }
@@ -22,13 +24,16 @@ if(file_exists('/tftpboot')) {
 
 include 'includes/functions.inc';
 
-global $endpoint, $debug;
-
 $debug = NULL;
 
 $endpoint = new endpointmanager();
 
-global $global_cfg, $debug;
+if(!file_exists(PHONE_MODULES_PATH)) {
+	mkdir(PHONE_MODULES_PATH, 0764);
+}
+if(!file_exists(PHONE_MODULES_PATH."temp/")) {
+	mkdir(PHONE_MODULES_PATH."temp/", 0764);
+}
 
 if(!is_writeable(LOCAL_PATH)) {
 	chmod(LOCAL_PATH, 0764);

@@ -12,7 +12,7 @@ global $type;
 
 //initialize a Rain TPL object
 $tpl = new RainTPL( LOCAL_PATH.'templates' );
-
+$endpoint->error['brand_update_check'] = "";
 if((isset($_REQUEST['button_install'])) OR (isset($_REQUEST['button_update']))) {
 	if(isset($_REQUEST['brand'])) {
 		$installer = array("type" => 'brand', "id" => $_REQUEST['brand']);		
@@ -52,6 +52,7 @@ $sql="SELECT * from endpointman_brand_list WHERE id > 0 AND hidden = 0 ORDER BY 
 $brand_list =& $endpoint->db->getAll($sql,array(),DB_FETCHMODE_ASSOC);
 $i = 0;
 $note = "";
+$row_out = array();
 foreach($brand_list as $row) {
 	$row_out[$i] = $row;
         $row_out[$i]['cfg_ver'] = date("n-j-y",$row['cfg_ver']) . " at " . date("g:ia",$row['cfg_ver']);
@@ -130,7 +131,7 @@ if (isset($installer)) {
 $tpl->assign("error", $error);
 $tpl->assign("web_var", "?type=$type");
 $tpl->assign("brand2_list", $row_out);
-//$tpl->assign("error", $endpoint->error['brand_update_check']);
+$tpl->assign("error", $endpoint->error['brand_update_check']);
 
 //draw the template	
 echo $tpl->draw( 'brand_model_manager' );

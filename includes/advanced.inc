@@ -27,11 +27,7 @@ switch($_REQUEST['subpage']) {
         $temp_amp['amp_serial'] = $amp_serial;
         $temp_amp = base64_encode(serialize($temp_amp));
 
-        $outfile=LOCAL_PATH."/includes/amp.ini";
-        $wfh=fopen($outfile,'w');
-        fwrite($wfh, $temp_amp);
-        fclose($wfh);
-        $tpl->assign("exporter_address", $_SERVER["HTTP_HOST"].WEB_PATH."includes/export.php");
+        $tpl->assign("exporter_address", "config.php?type=tool&amp;display=epm_config&amp;quietmode=1&amp;handler=file&amp;file=export.html.php&amp;module=endpointman&amp;rand=".rand());
         //Dave B's Q&D file upload security code (http://us2.php.net/manual/en/features.file-upload.php)
         if((isset($_REQUEST['action'])) AND (isset($_REQUEST['button_import'])) AND ($_REQUEST['action'] == "import")) {
             $allowedExtensions = array("csv","txt");
@@ -105,8 +101,9 @@ switch($_REQUEST['subpage']) {
         $provisioner_ver = date("n-j-y",$provisioner_ver) . " at " . date("g:ia",$provisioner_ver);
         $tpl->assign("provisioner_ver", $provisioner_ver);
 
-        $provisioner_ver = filemtime(PHONE_MODULES_PATH."master.xml");
-        $provisioner_ver = date("n-j-y",$provisioner_ver) . " at " . date("g:ia",$provisioner_ver);
+        //$provisioner_ver = filemtime(PHONE_MODULES_PATH."master.xml");
+        //$provisioner_ver = date("n-j-y",$provisioner_ver) . " at " . date("g:ia",$provisioner_ver);
+        $provisioner_ver = "";
         $tpl->assign("master_ver", $provisioner_ver);
         $uploads_dir = PHONE_MODULES_PATH."temp";
 

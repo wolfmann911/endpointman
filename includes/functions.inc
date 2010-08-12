@@ -36,7 +36,7 @@ class endpointmanager {
         mysql_close();
 
 
-        $this->global_cfg =& $db->getAssoc("SELECT var_name, value FROM endpointman_global_vars");
+        $this->global_cfg =& $this->db->getAssoc("SELECT var_name, value FROM endpointman_global_vars");
 
         define("UPDATE_PATH", $this->global_cfg['update_server']);
         define("VER", $this->global_cfg['version']);
@@ -670,7 +670,7 @@ class endpointmanager {
     function brand_update_check() {
         $result = $this->download_xml(UPDATE_PATH . "master.xml");
 
-        $message = NULL;
+        $message = "";
 
         if(!$result) {
             $message .= "Not able to connect to repository. Using local master file instead.";
@@ -1372,8 +1372,6 @@ class endpointmanager {
         } else {
             $not_added="SELECT devices.id, devices.description FROM devices WHERE tech='sip' AND devices.id not in (SELECT devices.id FROM devices, endpointman_mac_list WHERE tech='sip' AND devices.id = endpointman_mac_list.ext AND endpointman_mac_list.ext !=".$ext." ) ORDER BY devices.id";
         }
-        $result=mysql_query($not_added);
-
         $result =& $this->db->getAll($not_added,array(), DB_FETCHMODE_ASSOC);
 
 

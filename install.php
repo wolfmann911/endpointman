@@ -1,7 +1,9 @@
-<?php
+<?PHP
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 /*
 Endpoint Manager V2
-Copyright (C) 2009-2010  Ed Macri, John Mullinix and Andrew Nagy 
+Copyright (C) 2009-2010  Ed Macri, John Mullinix and Andrew Nagy
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -32,18 +34,54 @@ if (! function_exists("outn")) {
     }
 }
 
+function find_exec($exec) {
+    $usr_bin = glob("/usr/bin/".$exec);
+    $usr_sbin = glob("/usr/sbin/".$exec);
+    $sbin = glob("/sbin/".$exec);
+    $bin = glob("/bin/".$exec);
+    $etc = glob("/etc/".$exec);
+    if(isset($usr_bin[0])) {
+        return("/usr/bin/".$exec);
+    } elseif(isset($usr_sbin[0])) {
+        return("/usr/sbin/".$exec);
+    } elseif(isset($sbin[0])) {
+        return("/sbin/".$exec);
+    } elseif(isset($bin[0])) {
+        return("/bin/".$exec);
+    } elseif(isset($etc[0])) {
+        return("/etc/".$exec);
+    } else {
+        return($exec);
+    }
+}
+
 global $db;
 
 out("Endpoint Manager Installer");
 out("Creating New phone modules directory");
 
-mkdir(PHONE_MODULES_PATH, 0777);
+define("PHONE_MODULES_PATH", $amp_conf['AMPWEBROOT'].'/admin/modules/_ep_phone_modules/');
+define("LOCAL_PATH", $amp_conf['AMPWEBROOT'].'/admin/modules/endpointman/');
+
+
+if(!file_exists(PHONE_MODULES_PATH)) {
+	mkdir(PHONE_MODULES_PATH, 0764);
+}
+
+if(!file_exists(PHONE_MODULES_PATH."setup.php")) {
+	copy(LOCAL_PATH."Install/setup.php",PHONE_MODULES_PATH."setup.php");
+}
+
+if(!file_exists(PHONE_MODULES_PATH."temp/")) {
+	mkdir(PHONE_MODULES_PATH."temp/", 0764);
+}
 //Detect Version
 
 function ep_table_exists ($table) {
+	global $db;
     $sql = "SHOW TABLES FROM asterisk";
-    $result = $this->db->getAll($sql);
-    
+    $result = $db->getAll($sql);
+
     foreach($result as $row) {
         if ($row[0] == $table) {
             return TRUE;
@@ -59,7 +97,7 @@ if(ep_table_exists("endpointman_global_vars")) {
 } else {
     $global_cfg['version'] = '?';
 }
-
+$new_install = FALSE;
 if(!isset($global_cfg['version'])) {
     $ver = "1.0.3";
 } elseif($global_cfg['version'] == '2.0') {
@@ -87,14 +125,15 @@ if(!isset($global_cfg['version'])) {
 } elseif($global_cfg['version'] == '2.2.0') {
     $ver = "2.2.0";
 } else {
-    $ver = "?";
+    $ver = "1000";
+	$new_install = TRUE;
 }
 
 $ver = (float) $ver;
 
 out('Version Identified as '. $ver);
 
-if($ver < "1.9.0") {
+if(($ver < "1.9.0") AND ($ver > 0)) {
         out("Please Wait While we upgrade your old setup");
         //Expand the value option
         $sql = 'ALTER TABLE `endpointman_global_vars` CHANGE `value` `value` VARCHAR(100) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT \'Data\'';
@@ -102,9 +141,9 @@ if($ver < "1.9.0") {
 
         out("Locating NMAP + ARP + ASTERISK Executables");
 
-        $nmap = $endpoint->find_exec("nmap");
-        $arp = $endpoint->find_exec("arp");
-        $asterisk = $endpoint->find_exec("asterisk");
+        $nmap = find_exec("nmap");
+        $arp = find_exec("arp");
+        $asterisk = find_exec("asterisk");
 
         out("Updating Global Variables table");
         //Add new Vars into database
@@ -271,9 +310,9 @@ if($ver < "1.9.0") {
 if ($ver <= "1.9.0") {
         out("Locating NMAP + ARP + ASTERISK Executables");
 
-        $nmap = $endpoint->find_exec("nmap");
-        $arp = $endpoint->find_exec("arp");
-        $asterisk = $endpoint->find_exec("asterisk");
+        $nmap = find_exec("nmap");
+        $arp = find_exec("arp");
+        $asterisk = find_exec("asterisk");
 
         out("Updating Global Variables table");
         //Add new Vars into database
@@ -352,9 +391,9 @@ if ($ver <= "1.9.1") {
 
         out("Locating NMAP + ARP + ASTERISK Executables");
 
-        $nmap = $endpoint->find_exec("nmap");
-        $arp = $endpoint->find_exec("arp");
-        $asterisk = $endpoint->find_exec("asterisk");
+        $nmap = find_exec("nmap");
+        $arp = find_exec("arp");
+        $asterisk = find_exec("asterisk");
 
         out('Updating Global Variables');
 
@@ -458,9 +497,9 @@ if($ver <= "2.0.0") {
         }
 
         out("Locating NMAP + ARP + ASTERISK Executables");
-        $nmap = $endpoint->find_exec("nmap");
-        $arp = $endpoint->find_exec("arp");
-        $asterisk = $endpoint->find_exec("asterisk");
+        $nmap = find_exec("nmap");
+        $arp = find_exec("arp");
+        $asterisk = find_exec("asterisk");
 
         $sql_update_vars = "INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (11, 'nmap_location', '".$asterisk."')";
         $db->query($sql_update_vars);
@@ -588,34 +627,72 @@ if($ver <= "2.0.0") {
             "70" => "7-2-4",
             "71" => "7-2-5",
             "72" => "7-2-6"
-            );
-
-        $new_product_list = array(
-            "6" => "1-1",
-            "7" => "1-2",
-            "1" => "2-1",
-            "2" => "2-2",
-            "3" => "",
-            "5" => "",
-            "4" => "4-3",
-            "8" => "6-1",
-            "9" => "7-1",
-            "11" => "7-2",
-            "10" => "8-1"
         );
 
         foreach($data as $list) {
-
-            $sql = "UPDATE endpointman_mac_list SET model = '".$new_model_list[$list['model']]."' WHERE id = ". $list['id'];
+            $sql = "UPDATE endpointman_mac_list SET model = '".$new_model_list[$list['id']]."' WHERE id = ". $list['id'];
             $db->query($sql);
         }
+
+        $data = array();
+
+        $data =& $db->getAll("SELECT * FROM endpointman_template_list",array(), DB_FETCHMODE_ASSOC);
+
+        $new_product_list = array(
+            "6" => array("product_id" => "1-1", "model_id" => ""),
+            "7" => array("product_id" => "1-2", "model_id" => ""),
+            "1" => array("product_id" => "2-1", "model_id" => ""),
+            "2" => array("product_id" => "2-2", "model_id" => ""),
+            "3" => array("product_id" => "", "model_id" => ""),
+            "5" => array("product_id" => "", "model_id" => ""),
+            "4" => array("product_id" => "4-3", "model_id" => ""),
+            "8" => array("product_id" => "6-1", "model_id" => ""),
+            "9" => array("product_id" => "7-1", "model_id" => ""),
+            "11" => array("product_id" => "7-2", "model_id" => ""),
+            "10" => array("product_id" => "8-1", "model_id" => "")
+        );
+
+
+
+        foreach($data as $list) {
+
+            $sql = "UPDATE endpointman_template_list SET model_id = '".$new_product_list[$list['id']]['model_id']."', product_id = '".$new_product_list[$list['id']]['product_id']."' WHERE id = ". $list['id'];
+            $db->query($sql);
+        }
+
+
+
+
+        $data = array();
+        $data =& $db->getAll("SELECT * FROM  endpointman_custom_configs",array(), DB_FETCHMODE_ASSOC);
+        $variable_change = array(
+          "{\$srvip}" => "{\$server.ip.1}",
+          "{\$ext}" => "{\$ext.line.1}",
+          "{\$pass}" => "{\$pass.line.1}",
+          "{\$secret}" => "{\$pass.line.1}",
+          "{\$displayname}" => "{\$displayname.line.1}"
+        );
+
+        foreach($data as $list) {
+            foreach($variable_change as $key => $value) {
+                $list['data'] = str_replace($key, $value, $list['data']);
+            }
+            $sql = "UPDATE endpointman_custom_configs SET data = '".addslashes($list['data'])."' WHERE id = ". $list['id'];
+            $db->query($sql);
+        }
+
+        exec("rm -Rf ".PHONE_MODULES_PATH);
+
+        mkdir(PHONE_MODULES_PATH, 0777);
+        mkdir(PHONE_MODULES_PATH."temp/", 0777);
+
 
         out("Update Version Number");
         $sql = "UPDATE endpointman_global_vars SET value = '".$version."' WHERE var_name = 'version'";
         $db->query($sql);
 }
 
-if ($ver == "?") {
+if ($new_install) {
 
         out("Creating Brand List Table");
         $sql = "CREATE TABLE IF NOT EXISTS `endpointman_brand_list` (
@@ -639,9 +716,9 @@ if ($ver == "?") {
         $db->query($sql);
 
         out("Locating NMAP + ARP + ASTERISK Executables");
-        $nmap = $endpoint->find_exec("nmap");
-        $arp = $endpoint->find_exec("arp");
-        $asterisk = $endpoint->find_exec("asterisk");
+        $nmap = find_exec("nmap");
+        $arp = find_exec("arp");
+        $asterisk = find_exec("asterisk");
 
         out("Inserting data into the global vars Table");
         $sql = "INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES
@@ -656,7 +733,7 @@ if ($ver == "?") {
             (9, 'debug', '1'),
             (10, 'arp_location', '".$arp."'),
             (11, 'nmap_location', '".$nmap."'),
-            (12, 'asterisk_location', '".$asterisk."')
+            (12, 'asterisk_location', '".$asterisk."'),
             (13, 'language', ''),
             (14, 'check_updates', '1'),
             (15, 'disable_htaccess', ''),
@@ -888,6 +965,3 @@ if ($ver == "?") {
             chmod($amp_conf['AMPWEBROOT']."/recordings/modules/phonesettings.module", 0664);
         }
 }
-
-
-?>

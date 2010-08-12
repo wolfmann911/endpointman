@@ -8,8 +8,6 @@
  */
 require 'functions.inc';
 
-global $endpoint;
-
 $endpoint = new endpointmanager();
 
 function out($text){
@@ -65,7 +63,6 @@ if($_REQUEST['type'] == "brand") {
                     echo "Move Successful<br />";
                     $endpoint->brand_update_check();
                     echo "Updating Brands<br />";
-
                 }
             } else {
             }
@@ -106,7 +103,7 @@ if($_REQUEST['type'] == "brand") {
                     mkdir(PHONE_MODULES_PATH."endpoint/".$brand_directory);
                 }
 
-                rename(PHONE_MODULES_PATH."temp/".$_REQUEST['xml'], PHONE_MODULES_PATH."endpoint/".$brand_directory."brand_data.xml");
+                rename(PHONE_MODULES_PATH."temp/".$_REQUEST['xml'], PHONE_MODULES_PATH."endpoint/".$brand_directory."/brand_data.xml");
 
                 echo "Extracting Tarball........";
                 exec("tar -xvf ".PHONE_MODULES_PATH.'temp/'. $package ." -C ".PHONE_MODULES_PATH."temp/");
@@ -170,11 +167,48 @@ if($_REQUEST['type'] == "brand") {
                     }
                 }
 
-                $brand_version = max($last_mod, $brand_version);
-                echo "Updating data..........";
-                $sql = "UPDATE endpointman_brand_list SET name = '".$brand_name."', cfg_ver = '".$brand_version."', installed = 1, hidden = 0 WHERE id = ".$brand_id;
-                $endpoint->db->query($sql);
-                echo "Done!<br/>";
+                $row =& $endpoint->db->getAll('SELECT * FROM  endpointman_brand_list WHERE id > 0', array(), DB_FETCHMODE_ASSOC);
+
+
+                if(file_exists(PHONE_MODULES_PATH."endpoint/".$brand_directory."/brand_data.xml")) {
+                    $temp = $endpoint->xml2array(PHONE_MODULES_PATH."endpoint/".$brand_directory."/brand_data.xml");
+
+                    $temp = $temp['data']['brands'];
+
+                    $temp['oui_list']['oui'] = $endpoint->fix_single_array_keys($temp['oui_list']['oui']);
+
+                    foreach($temp['oui_list']['oui'] as $oui) {
+                        $sql = "INSERT INTO endpointman_oui_list (`oui`, `brand`, `custom`) VALUES ('".$oui."', '".$temp['brand_id']."', '0')";
+                        $endpoint->db->query($sql);
+
+                    }
+
+                    $brand_name = $data['directory'];
+                    $version[$brand_name] = $temp['last_modified'];
+
+                    $last_mod = "";
+
+                    $temp['family_list']['family'] = $endpoint->fix_single_array_keys($temp['family_list']['family']);
+
+                    foreach($temp['family_list']['family'] as $list) {
+                        $last_mod = max($last_mod, $list['last_modified']);
+                    }
+                    $last_mod = max($last_mod, $version[$brand_name]);
+
+                    $version[$brand_name] = $last_mod;
+
+                    if(!($endpoint->arraysearchrecursive($brand_name, $row, 'directory'))) {
+                        //insert row
+                        $sql = "INSERT INTO endpointman_brand_list (id, name, directory, cfg_ver, installed) VALUES ('".$temp['brand_id']."', '".$temp['name']."', '".$temp['directory']."', '".$version[$brand_name]."', 1)";
+                        $endpoint->db->query($sql);
+                    } else {
+                        $brand_version = max($last_mod, $brand_version);
+                        echo "Updating data..........";
+                        $sql = "UPDATE endpointman_brand_list SET name = '".$temp['name']."', cfg_ver = '".$version[$brand_name]."', installed = 1, hidden = 0 WHERE id = ".$temp['brand_id'];
+                        $endpoint->db->query($sql);
+                        echo "Done!<br/>";
+                    }
+                }
             }
             break;
     }
