@@ -421,6 +421,7 @@ switch($_REQUEST['subpage']) {
         break;
     case "settings":
     default:
+        $message = "";
         if(isset($_REQUEST['button_update_globals'])) {
             $_POST['srvip'] = trim($_POST['srvip']);  #trim whitespace from IP address
 
@@ -431,8 +432,25 @@ switch($_REQUEST['subpage']) {
             $sql="UPDATE endpointman_global_vars SET value='" . $_POST['tz'] . "' WHERE var_name='tz'";
             $endpoint->db->query($sql);
 
-            $sql="UPDATE endpointman_global_vars SET value='" . $_POST['config_loc'] . "' WHERE var_name='config_location'";
-            $endpoint->db->query($sql);
+            //No trailing slash. Help the user out and add one :-)
+            if($_POST['config_loc'][strlen($_POST['config_loc'])-1] != "/") {
+                $_POST['config_loc'] = $_POST['config_loc'] ."/";
+            }
+
+            if((isset($_POST['config_loc'])) AND ($_POST['config_loc'] != "")) {
+                if((file_exists($_POST['config_loc'])) AND (is_dir($_POST['config_loc']))) {
+                    if(is_writable($_POST['config_loc'])) {
+                        $sql="UPDATE endpointman_global_vars SET value='" . $_POST['config_loc'] . "' WHERE var_name='config_location'";
+                        $endpoint->db->query($sql);
+                    } else {
+                        $message = "<h3><center><font color='red'>Directory Not Writable!</font></center></h3>";
+                    }
+                } else {
+                    $message = "<h3><center><font color='red'>Not a Vaild Directory</font></center></h3>";
+                }
+            } else {
+                $message = "<h3><center><font color='red'>No Configuration Location Defined!</font></center></h3>";
+            }
 
             if((isset($_POST['enable_ari'])) AND ($_POST['enable_ari'] == "on")) {
                 $_POST['enable_ari'] = 1;
@@ -480,10 +498,7 @@ switch($_REQUEST['subpage']) {
             $sql="UPDATE endpointman_global_vars SET value='" . $_POST['arp_loc'] . "' WHERE var_name='arp_location'";
             $endpoint->db->query($sql);
 
-            $sql="UPDATE endpointman_global_vars SET value='" . $_POST['disable_htaccess'] . "' WHERE var_name='disable_htaccess'";
-            $endpoint->db->query($sql);
-
-            $message = "<h3><center>Updated!</center></h3>";
+            $message .= "<h3><center>Updated!</center></h3>";
         }
         //Because we are working with global variables we probably updated them, so lets refresh those variables
         $endpoint->global_cfg =& $db->getAssoc("SELECT var_name, value FROM endpointman_global_vars");

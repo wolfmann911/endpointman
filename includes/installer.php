@@ -19,31 +19,9 @@ if($_REQUEST['type'] == "brand") {
 } elseif($_REQUEST['type'] == "js-multiple") {
     $list = explode(",",$_REQUEST['id']);
     sort($list,SORT_STRING);
-    echo "<pre>";
-    print_r($list);
+
     foreach($list as $data) {
-        $parameters = explode("_",$data);
-        $type = $parameters[0];
-        $id = $parameters[1];
-        //Check to see if it's already installed
-        if($type == "models") {
-            $parameters2 = explode("-",$id);
-            $brand = $parameters2[0];
-            $product_id = $parameters2[0]."-".$parameters2[1];
-            $sql = "UPDATE endpointman_model_list SET enabled = 1 WHERE id = '".$id."'";
-            $endpoint->db->query($sql);
-            $sql = 'SELECT `model` FROM `endpointman_model_list` WHERE `id` LIKE CONVERT(_utf8 \''.$id.'\' USING latin1) COLLATE latin1_swedish_ci';
-            $name = $endpoint->db->getOne($sql);
-            out("Enabling Model ".$name);
-        } elseif($type == "products") {
-            $sql = "UPDATE endpointman_model_list SET enabled = 1 WHERE product_id = '".$id."'";
-            $endpoint->db->query($sql);
-            $sql = 'SELECT `short_name` FROM `endpointman_product_list` WHERE `id` LIKE CONVERT(_utf8 \''.$id.'\' USING latin1) COLLATE latin1_swedish_ci';
-            $name = $endpoint->db->getOne($sql);
-            out("Enabling all models in ".$name);
-        } elseif($type == "brand") {
-            $endpoint->update_brand($id);
-        }
+
     }
 } elseif($_REQUEST['type'] == "firmware") {
     $endpoint->install_firmware($data['id']);
@@ -140,12 +118,12 @@ if($_REQUEST['type'] == "brand") {
                     $last_mod = max($last_mod, $family_list['last_modified']);
 
                     $family_line_xml = $endpoint->xml2array(PHONE_MODULES_PATH.'/endpoint/'.$brand_directory.'/'.$family_list['directory'].'/family_data.xml');
-                    $data =& $endpoint->db->getOne("SELECT id FROM endpointman_product_list WHERE id='".$brand_id."-".$family_line_xml['data']['id']."'", array(), DB_FETCHMODE_ASSOC);
+                    $data =& $endpoint->db->getOne("SELECT id FROM endpointman_product_list WHERE id='".$brand_id.$family_line_xml['data']['id']."'", array(), DB_FETCHMODE_ASSOC);
                     $short_name = preg_replace("/\[(.*?)\]/si", "", $family_line_xml['data']['name']);
                     if($data) {
-                        $sql = "UPDATE endpointman_product_list SET short_name = '".$short_name."', long_name = '".$family_line_xml['data']['name']."', cfg_ver = '".$family_line_xml['data']['version']."', config_files='".$family_line_xml['data']['configuration_files']."', hidden = '0' WHERE id = '".$brand_id."-".$family_line_xml['data']['id']."'";
+                        $sql = "UPDATE endpointman_product_list SET short_name = '".$short_name."', long_name = '".$family_line_xml['data']['name']."', cfg_ver = '".$family_line_xml['data']['version']."', config_files='".$family_line_xml['data']['configuration_files']."', hidden = '0' WHERE id = '".$brand_id.$family_line_xml['data']['id']."'";
                     } else {
-                        $sql = "INSERT INTO endpointman_product_list (`id`, `brand`, `short_name`, `long_name`, `cfg_dir`, `cfg_ver`, `config_files`, `hidden`) VALUES ('".$brand_id."-".$family_line_xml['data']['id']."', '".$brand_id."', '".$short_name."', '".$family_line_xml['data']['name']."', '".$family_line_xml['data']['directory']."', '".$family_line_xml['data']['version']."','".$family_line_xml['data']['configuration_files']."', '0')";
+                        $sql = "INSERT INTO endpointman_product_list (`id`, `brand`, `short_name`, `long_name`, `cfg_dir`, `cfg_ver`, `config_files`, `hidden`) VALUES ('".$brand_id.$family_line_xml['data']['id']."', '".$brand_id."', '".$short_name."', '".$family_line_xml['data']['name']."', '".$family_line_xml['data']['directory']."', '".$family_line_xml['data']['version']."','".$family_line_xml['data']['configuration_files']."', '0')";
                     }
 
                     $endpoint->db->query($sql);
@@ -157,11 +135,11 @@ if($_REQUEST['type'] == "brand") {
                         } else {
                             $template_list = $model_list['template_data']['files'];
                         }
-                        $m_data =& $endpoint->db->getOne("SELECT id FROM endpointman_model_list WHERE id='".$brand_id."-".$family_line_xml['data']['id']."-".$model_list['id']."'", array(), DB_FETCHMODE_ASSOC);
+                        $m_data =& $endpoint->db->getOne("SELECT id FROM endpointman_model_list WHERE id='".$brand_id.$family_line_xml['data']['id'].$model_list['id']."'", array(), DB_FETCHMODE_ASSOC);
                         if($m_data) {
-                            $sql = "UPDATE endpointman_model_list SET model = '".$model_list['model']."', template_list = '".$template_list."', enabled = '0', hidden = '0' WHERE id = '".$brand_id."-".$family_line_xml['data']['id']."'";
+                            $sql = "UPDATE endpointman_model_list SET model = '".$model_list['model']."', template_list = '".$template_list."', enabled = '0', hidden = '0' WHERE id = '".$brand_id.$family_line_xml['data']['id']."'";
                         } else {
-                            $sql = "INSERT INTO endpointman_model_list (`id`, `brand`, `model`, `product_id`, `template_list`, `enabled`, `hidden`) VALUES ('".$brand_id."-".$family_line_xml['data']['id']."-".$model_list['id']."', '".$brand_id."', '".$model_list['model']."', '".$brand_id."-".$family_line_xml['data']['id']."', '".$template_list."', '0', '0')";
+                            $sql = "INSERT INTO endpointman_model_list (`id`, `brand`, `model`, `product_id`, `template_list`, `enabled`, `hidden`) VALUES ('".$brand_id.$family_line_xml['data']['id'].$model_list['id']."', '".$brand_id."', '".$model_list['model']."', '".$brand_id.$family_line_xml['data']['id']."', '".$template_list."', '0', '0')";
                         }
                         $endpoint->db->query($sql);
                     }
@@ -183,7 +161,7 @@ if($_REQUEST['type'] == "brand") {
 
                     }
 
-                    $brand_name = $data['directory'];
+                    $brand_name = $temp['directory'];
                     $version[$brand_name] = $temp['last_modified'];
 
                     $last_mod = "";
@@ -213,3 +191,5 @@ if($_REQUEST['type'] == "brand") {
             break;
     }
 }
+
+echo "<hr>\n\t<a href=\"#\" onclick=\"parent.close_module_actions(true);\" style=\"text-decoration:none\" />"._("Return")."</a>";

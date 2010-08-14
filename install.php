@@ -58,7 +58,6 @@ function find_exec($exec) {
 global $db;
 
 out("Endpoint Manager Installer");
-out("Creating New phone modules directory");
 
 define("PHONE_MODULES_PATH", $amp_conf['AMPWEBROOT'].'/admin/modules/_ep_phone_modules/');
 define("LOCAL_PATH", $amp_conf['AMPWEBROOT'].'/admin/modules/endpointman/');
@@ -66,14 +65,17 @@ define("LOCAL_PATH", $amp_conf['AMPWEBROOT'].'/admin/modules/endpointman/');
 
 if(!file_exists(PHONE_MODULES_PATH)) {
 	mkdir(PHONE_MODULES_PATH, 0764);
+        out("Creating Phone Modules Directory");
 }
 
 if(!file_exists(PHONE_MODULES_PATH."setup.php")) {
 	copy(LOCAL_PATH."Install/setup.php",PHONE_MODULES_PATH."setup.php");
+        out("Moving Auto Provisioner Class");
 }
 
 if(!file_exists(PHONE_MODULES_PATH."temp/")) {
 	mkdir(PHONE_MODULES_PATH."temp/", 0764);
+        out("Creating temp folder");
 }
 //Detect Version
 
@@ -90,7 +92,7 @@ function ep_table_exists ($table) {
     return FALSE;
 }
 
-$version = "2.2.0";
+$version = "2.2.3";
 
 if(ep_table_exists("endpointman_global_vars")) {
         $global_cfg =& $db->getAssoc("SELECT var_name, value FROM endpointman_global_vars");
@@ -124,14 +126,22 @@ if(!isset($global_cfg['version'])) {
     $ver = "2.0.0";
 } elseif($global_cfg['version'] == '2.2.0') {
     $ver = "2.2.0";
+} elseif($global_cfg['version'] == '2.2.1') {
+    $ver = "2.2.1";
+} elseif($global_cfg['version'] == '2.2.2') {
+    $ver = "2.2.2";
 } else {
     $ver = "1000";
-	$new_install = TRUE;
+    $new_install = TRUE;
 }
 
 $ver = (float) $ver;
 
-out('Version Identified as '. $ver);
+if($new_install) {
+    out('New Installation Detected!');
+} else {
+    out('Version Identified as '. $ver);
+}
 
 if(($ver < "1.9.0") AND ($ver > 0)) {
         out("Please Wait While we upgrade your old setup");
@@ -634,29 +644,33 @@ if($ver <= "2.0.0") {
             $db->query($sql);
         }
 
-        $data = array();
 
-        $data =& $db->getAll("SELECT * FROM endpointman_template_list",array(), DB_FETCHMODE_ASSOC);
 
         $new_product_list = array(
-            "6" => array("product_id" => "1-1", "model_id" => ""),
-            "7" => array("product_id" => "1-2", "model_id" => ""),
-            "1" => array("product_id" => "2-1", "model_id" => ""),
-            "2" => array("product_id" => "2-2", "model_id" => ""),
+            "6" => array("product_id" => "1-1", "model_id" => "1-1-1"),
+            "7" => array("product_id" => "1-2", "model_id" => "1-2-1"),
+            "1" => array("product_id" => "2-1", "model_id" => "2-1-1"),
+            "2" => array("product_id" => "2-2", "model_id" => "2-2-1"),
             "3" => array("product_id" => "", "model_id" => ""),
             "5" => array("product_id" => "", "model_id" => ""),
-            "4" => array("product_id" => "4-3", "model_id" => ""),
-            "8" => array("product_id" => "6-1", "model_id" => ""),
-            "9" => array("product_id" => "7-1", "model_id" => ""),
-            "11" => array("product_id" => "7-2", "model_id" => ""),
-            "10" => array("product_id" => "8-1", "model_id" => "")
+            "4" => array("product_id" => "4-3", "model_id" => "4-3-1"),
+            "8" => array("product_id" => "6-1", "model_id" => "6-1-1"),
+            "9" => array("product_id" => "7-1", "model_id" => "7-1-1"),
+            "11" => array("product_id" => "7-2", "model_id" => "7-2-1"),
+            "10" => array("product_id" => "8-1", "model_id" => "8-1-1")
         );
 
-
-
+        $data = array();
+        $data =& $db->getAll("SELECT * FROM endpointman_custom_configs",array(), DB_FETCHMODE_ASSOC);
         foreach($data as $list) {
+            $sql = "UPDATE endpointman_custom_configs SET product_id = '".$new_product_list[$list['product_id']]['product_id']."' WHERE id = ". $list['id'];
+            $db->query($sql);
+        }
 
-            $sql = "UPDATE endpointman_template_list SET model_id = '".$new_product_list[$list['id']]['model_id']."', product_id = '".$new_product_list[$list['id']]['product_id']."' WHERE id = ". $list['id'];
+        $data = array();
+        $data =& $db->getAll("SELECT * FROM endpointman_template_list",array(), DB_FETCHMODE_ASSOC);
+        foreach($data as $list) {
+            $sql = "UPDATE endpointman_template_list SET model_id = '".$new_product_list[$list['model_id']]['model_id']."', product_id = '".$new_product_list[$list['product_id']]['product_id']."' WHERE id = ". $list['id'];
             $db->query($sql);
         }
 
@@ -683,14 +697,70 @@ if($ver <= "2.0.0") {
 
         exec("rm -Rf ".PHONE_MODULES_PATH);
 
-        mkdir(PHONE_MODULES_PATH, 0777);
-        mkdir(PHONE_MODULES_PATH."temp/", 0777);
+        if(!file_exists(PHONE_MODULES_PATH)) {
+                mkdir(PHONE_MODULES_PATH, 0764);
+                out("Creating Phone Modules Directory");
+        }
 
+        if(!file_exists(PHONE_MODULES_PATH."setup.php")) {
+                copy(LOCAL_PATH."Install/setup.php",PHONE_MODULES_PATH."setup.php");
+                out("Moving Auto Provisioner Class");
+        }
 
-        out("Update Version Number");
-        $sql = "UPDATE endpointman_global_vars SET value = '".$version."' WHERE var_name = 'version'";
-        $db->query($sql);
+        if(!file_exists(PHONE_MODULES_PATH."temp/")) {
+                mkdir(PHONE_MODULES_PATH."temp/", 0764);
+                out("Creating temp folder");
+        }
 }
+if ($ver <= "2.2.1") {
+}
+
+if ($ver <= "2.2.2") {
+
+    out("Remove all Dashes in IDs");
+    $data = array();
+    $data =& $db->getAll("SELECT * FROM `endpointman_model_list",array(), DB_FETCHMODE_ASSOC);
+    foreach($data as $list) {
+        $new_model_id = str_replace("-", "", $list['id']);
+        $sql = "UPDATE endpointman_model_list SET id = '".$new_model_id."' WHERE id = ". $list['id'];
+        $db->query($sql);
+    }
+
+    $data = array();
+    $data =& $db->getAll("SELECT * FROM `endpointman_product_list",array(), DB_FETCHMODE_ASSOC);
+    foreach($data as $list) {
+        $new_product_id = str_replace("-", "", $list['id']);
+        $sql = "UPDATE endpointman_product_list SET id = '".$new_product_id."' WHERE id = ". $list['id'];
+        $db->query($sql);
+    }
+
+    $data = array();
+    $data =& $db->getAll("SELECT * FROM `endpointman_mac_list",array(), DB_FETCHMODE_ASSOC);
+    foreach($data as $list) {
+        $new_model_id = str_replace("-", "", $list['model']);
+        $sql = "UPDATE endpointman_mac_list SET model = '".$new_model_id."' WHERE id = ". $list['id'];
+        $db->query($sql);
+    }
+
+    $data = array();
+    $data =& $db->getAll("SELECT * FROM endpointman_template_list",array(), DB_FETCHMODE_ASSOC);
+    foreach($data as $list) {
+        $new_model_id = str_replace("-", "", $list['model_id']);
+        $new_product_id = str_replace("-", "", $list['product_id']);
+        $sql = "UPDATE endpointman_template_list SET model_id = '".$new_model_id."', product_id = '".$new_product_id."' WHERE id = ". $list['id'];
+        $db->query($sql);
+    }
+
+    $data = array();
+    $data =& $db->getAll("SELECT * FROM endpointman_custom_configs",array(), DB_FETCHMODE_ASSOC);
+    foreach($data as $list) {
+        $new_product_id = str_replace("-", "", $list['product_id']);
+        $sql = "UPDATE endpointman_custom_configs SET product_id = '".$new_product_id."' WHERE id = ". $list['id'];
+        $db->query($sql);
+    }
+}
+
+
 
 if ($new_install) {
 
@@ -964,4 +1034,8 @@ if ($new_install) {
             out("Fixing permissions on ARI module");
             chmod($amp_conf['AMPWEBROOT']."/recordings/modules/phonesettings.module", 0664);
         }
+} else {
+    out("Update Version Number");
+    $sql = "UPDATE endpointman_global_vars SET value = '".$version."' WHERE var_name = 'version'";
+    $db->query($sql);
 }

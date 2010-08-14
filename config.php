@@ -8,8 +8,6 @@
  */
 // Check for safe mode
 
-
-
 if( ini_get('safe_mode') ){
 	die(_('Turn Off Safe Mode'));
 }

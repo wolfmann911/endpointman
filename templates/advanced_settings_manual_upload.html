@@ -8,7 +8,7 @@ function process_module_actions(actions) {
 	for (var i in actions) {
 		urlStr += "&amp;moduleaction["+i+"]="+actions[i];
 	}
-	$('#moduleBox').html('<iframe src="'+urlStr+'"></iframe><a href="#" onclick="close_module_actions(1)">Return</a>');
+	$('#moduleBox').html('<iframe src="'+urlStr+'"></iframe>');
 }
 function close_module_actions(goback) {
 	//freepbx_modal_close('moduleBox');

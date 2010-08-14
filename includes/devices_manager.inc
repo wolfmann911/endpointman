@@ -36,6 +36,8 @@ if(isset($_REQUEST['button_add'])) {
         $sql = 'SELECT `name` FROM `users` WHERE `extension` = '.$_REQUEST['ext_list'];
         $name =& $endpoint->db->getOne($sql);
 
+        $endpoint->sync_model($_REQUEST['model_list']);
+
         $sql = 'SELECT endpointman_product_list. * , endpointman_model_list.template_data, endpointman_brand_list.directory FROM endpointman_model_list, endpointman_brand_list, endpointman_product_list WHERE endpointman_model_list.id =  \''.$_REQUEST['model_list'].'\' AND endpointman_model_list.brand = endpointman_brand_list.id AND endpointman_model_list.product_id = endpointman_product_list.id';
         
         $row =& $endpoint->db->getRow($sql,array(),DB_FETCHMODE_ASSOC);
@@ -55,8 +57,12 @@ if(isset($_REQUEST['button_add'])) {
             }
             $i++;
         }
-
-        $custom_cfg_data = serialize($custom_cfg_data);
+        if(is_array($custom_cfg_data)) {
+            $custom_cfg_data = serialize($custom_cfg_data);
+        } else {
+            $temp = array();
+            $custom_cfg_data = serialize($temp);
+        }
 
         $sql = "INSERT INTO `endpointman_mac_list` (`mac`, `model`, `ext`, `description`, `custom_cfg_data`, `custom_cfg_template`) VALUES ('".$mac."', '".$_REQUEST['model_list']."', '".$_REQUEST['ext_list']."', '".$name."', '".$custom_cfg_data."', '".$_REQUEST['template_list']."')";
         $endpoint->db->query($sql);
@@ -124,7 +130,7 @@ if(isset($_REQUEST['button_add'])) {
                 $row =& $endpoint->db->getAll($sql,array(),DB_FETCHMODE_ASSOC);
 
 
-                $sql = "INSERT INTO `endpointman_mac_list` (`mac`, `model`, `ext`, `description`) VALUES ('".$mac."', '".$_REQUEST['model_list_'.$num]."', '".$_REQUEST['ext_list_'.$num]."', '".$name['name']."')";
+                $sql = "INSERT INTO `endpointman_mac_list` (`mac`, `model`, `ext`, `description`) VALUES ('".$mac."', '".$_REQUEST['model_list_'.$num]."', '".$_REQUEST['ext_list_'.$num]."', '".$name."')";
                 $endpoint->db->query($sql);
 
                 $sql = 'SELECT id FROM endpointman_mac_list WHERE ext ='. $_REQUEST['ext_list_'.$num];
@@ -234,7 +240,41 @@ if(isset($_REQUEST['button_add'])) {
         $sql = 'SELECT endpointman_mac_list.id FROM endpointman_mac_list , endpointman_model_list , endpointman_brand_list , endpointman_product_list WHERE endpointman_brand_list.id = endpointman_model_list.brand AND endpointman_model_list.id = endpointman_mac_list.model AND endpointman_model_list.product_id = endpointman_product_list.id AND endpointman_brand_list.id = '.$_REQUEST['rb_brand'].' ORDER BY endpointman_product_list.cfg_dir ASC';
         $data =& $endpoint->db->getAll($sql,array(),DB_FETCHMODE_ASSOC);
         foreach($data as $row) {
-            //TODO: Add Reboot back here
+            if(!class_exists('ProvisionerConfig')) {
+                require(PHONE_MODULES_PATH.'setup.php');
+            }
+            $phone_info = $endpoint->get_phone_info($row['id']);
+            if(is_array($phone_info['template_data'])) {
+                $template_data = unserialize($phone_info['template_data']['custom_cfg_data']);
+            } else {
+                $template_data = unserialize($phone_info['custom_cfg_data']);
+            }
+
+            $new_template_data = array();
+            if(is_array($template_data)) {
+                foreach($template_data as $key => $data) {
+                    $new_template_data = array_merge($new_template_data, array($key => $data['value']));
+                }
+            }
+
+            $class = "endpoint_" . $phone_info['directory'] . "_" . $phone_info['cfg_dir'] . '_phone';
+
+            $provisioner_lib = new $class();
+
+            $provisioner_lib->root_dir = PHONE_MODULES_PATH;
+
+            $provisioner_lib->engine = 'asterisk';
+            $provisioner_lib->system = 'unix';
+
+            $provisioner_lib->options = $new_template_data;
+
+            //have to because of versions less than php5.3
+            $provisioner_lib->brand_name = $phone_info['directory'];
+            $provisioner_lib->family_line = $phone_info['cfg_dir'];
+
+            $provisioner_lib->lines[1] = array('ext' => $phone_info['ext']);
+            $provisioner_lib->reboot();
+            unset($provisioner_lib);
         }
     } else {
         $message = _("No Brand Selected for Reboot");
@@ -282,16 +322,17 @@ $amp_send['AMPDBUSER'] = $amp_conf['AMPDBUSER'];
 $amp_send['AMPDBPASS'] = $amp_conf['AMPDBPASS'];
 $amp_send['AMPDBNAME'] = $amp_conf['AMPDBNAME'];
 
-$sql = "SELECT DISTINCT endpointman_product_list.id, endpointman_product_list.long_name  FROM endpointman_product_list, endpointman_template_list WHERE endpointman_product_list.hidden = 0 AND endpointman_template_list.product_id = endpointman_product_list.id";
-$result =& $endpoint->db->getAll($sql,array(),DB_FETCHMODE_ASSOC);
+$sql = "SELECT DISTINCT endpointman_product_list.* FROM endpointman_product_list, endpointman_model_list WHERE endpointman_product_list.id = endpointman_model_list.product_id AND endpointman_model_list.hidden = 0 AND endpointman_model_list.enabled = 1 AND endpointman_product_list.hidden != 1 AND endpointman_product_list.cfg_dir !=  ''";
 
-$product_list[0]['value'] = "";
-$product_list[0]['text'] = "";
+$template_list =& $db->getAll($sql, array(), DB_FETCHMODE_ASSOC);
 $i = 1;
-foreach($result as $row) {
-    $product_list[$i]['value'] = $row['id'];
-    $product_list[$i]['text'] = $row['long_name'];
-    $i++;
+$product_list = array();
+$product_list[0]['value'] = 0;
+$product_list[0]['text'] = "";
+foreach($template_list as $row) {
+        $product_list[$i]['value'] = $row['id'];
+        $product_list[$i]['text'] = $row['short_name'];
+        $i++;
 }
 
 //initialize a Rain TPL object
