@@ -21,7 +21,7 @@
 		*1.0.0* Initial release (5.26.2009).
         </changelog>
 	<info>http://projects.colsolgrp.net/projects/show/endpointman</info>
-	<location>contributed_modules/release/endpointman-2.0.0.tgz</location>
+	<location>contributed_modules/release/endpointman-2.2.4.tgz</location>
 
-<md5sum>b1341a35ef60d0fad17348803a0a7833</md5sum>
+<md5sum>6c18b4259e79b593ed4da8c70bd2e2e7</md5sum>
 </module>
