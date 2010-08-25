@@ -24,7 +24,7 @@ if($_REQUEST['type'] == "brand") {
 
     }
 } elseif($_REQUEST['type'] == "firmware") {
-    $endpoint->install_firmware($data['id']);
+    $endpoint->install_firmware($_REQUEST['id']);
 } elseif($_REQUEST['type'] == "manual_install") {
     switch($_REQUEST['install_type']) {
         case "upload_master_xml":

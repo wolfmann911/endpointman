@@ -92,7 +92,7 @@ function ep_table_exists ($table) {
     return FALSE;
 }
 
-$version = "2.2.3";
+$version = "2.2.4";
 
 if(ep_table_exists("endpointman_global_vars")) {
         $global_cfg =& $db->getAssoc("SELECT var_name, value FROM endpointman_global_vars");
@@ -578,8 +578,8 @@ if($ver <= "2.0.0") {
             "2" => "1-2-11",
             "3" => "1-2-10",
             "4" => "1-2-9",
-            "6" => "",
-            "7" => "",
+            "6" => "4-2-3",
+            "7" => "4-3-7",
             "8" => "6-1-1",
             "9" => "6-1-2",
             "10" => "6-1-3",
@@ -587,18 +587,18 @@ if($ver <= "2.0.0") {
             "12"  => "6-1-5",
             "13"  => "6-1-6",
             "15" => "2-1-3",
-            "22"  => "",
+            "22"  => "4-2-4",
             "23" => "2-1-2",
             "24" => "2-1-1",
             "25" => "2-1-4",
             "26" => "2-1-5",
             "27" => "2-2-1",
             "28" => "2-2-2",
-            "29" => "",
-            "30" => "",
-            "31" => "",
-            "32" => "",
-            "33" => "",
+            "29" => "4-2-1",
+            "30" => "4-2-5",
+            "31" => "4-2-6",
+            "32" => "4-2-7",
+            "33" => "4-2-2",
             "34" => "4-3-1",
             "35" => "4-3-2",
             "36" => "4-3-3",
@@ -610,8 +610,8 @@ if($ver <= "2.0.0") {
             "42" => "4-3-10",
             "43" => "4-3-11",
             "44" => "4-3-12",
-            "45" => "",
-            "46" => "",
+            "45" => "4-1-1",
+            "46" => "4-1-2",
             "47" => "1-2-1",
             "48" => "1-2-2",
             "49" => "1-1-1",
@@ -640,7 +640,7 @@ if($ver <= "2.0.0") {
         );
 
         foreach($data as $list) {
-            $sql = "UPDATE endpointman_mac_list SET model = '".$new_model_list[$list['id']]."' WHERE id = ". $list['id'];
+            $sql = "UPDATE endpointman_mac_list SET model = '".$new_model_list[$list['model']]."' WHERE id = ". $list['id'];
             $db->query($sql);
         }
 
@@ -651,8 +651,8 @@ if($ver <= "2.0.0") {
             "7" => array("product_id" => "1-2", "model_id" => "1-2-1"),
             "1" => array("product_id" => "2-1", "model_id" => "2-1-1"),
             "2" => array("product_id" => "2-2", "model_id" => "2-2-1"),
-            "3" => array("product_id" => "", "model_id" => ""),
-            "5" => array("product_id" => "", "model_id" => ""),
+            "3" => array("product_id" => "4-2", "model_id" => "4-2-1"),
+            "5" => array("product_id" => "4-1", "model_id" => "4-1-1"),
             "4" => array("product_id" => "4-3", "model_id" => "4-3-1"),
             "8" => array("product_id" => "6-1", "model_id" => "6-1-1"),
             "9" => array("product_id" => "7-1", "model_id" => "7-1-1"),
@@ -670,7 +670,7 @@ if($ver <= "2.0.0") {
         $data = array();
         $data =& $db->getAll("SELECT * FROM endpointman_template_list",array(), DB_FETCHMODE_ASSOC);
         foreach($data as $list) {
-            $sql = "UPDATE endpointman_template_list SET model_id = '".$new_product_list[$list['model_id']]['model_id']."', product_id = '".$new_product_list[$list['product_id']]['product_id']."' WHERE id = ". $list['id'];
+            $sql = "UPDATE endpointman_template_list SET model_id = '".$new_product_list[$list['product_id']]['model_id']."', product_id = '".$new_product_list[$list['product_id']]['product_id']."' WHERE id = ". $list['id'];
             $db->query($sql);
         }
 
@@ -739,7 +739,7 @@ if ($ver <= "2.2.2") {
     foreach($data as $list) {
         $new_model_id = str_replace("-", "", $list['model']);
         $sql = "UPDATE endpointman_mac_list SET model = '".$new_model_id."' WHERE id = ". $list['id'];
-        $db->query($sql);
+		$db->query($sql);
     }
 
     $data = array();
@@ -758,6 +758,9 @@ if ($ver <= "2.2.2") {
         $sql = "UPDATE endpointman_custom_configs SET product_id = '".$new_product_id."' WHERE id = ". $list['id'];
         $db->query($sql);
     }
+} if ($ver <= "2.2.3") {
+	$sql = 'UPDATE `asterisk`.`endpointman_global_vars` SET `value` = \'http://www.provisioner.net/release/\' WHERE `endpointman_global_vars`.`idnum` = 6 LIMIT 1;';
+	$db->query($sql);
 }
 
 

@@ -53,13 +53,16 @@ if(isset($_REQUEST['edit_template'])) {
 }
 
 if($default_display) {
-	$sql = 'SELECT endpointman_template_list.*, endpointman_product_list.short_name as model_class, endpointman_model_list.model as model_clone FROM endpointman_template_list, endpointman_model_list, endpointman_product_list WHERE endpointman_model_list.enabled = 1 AND endpointman_model_list.hidden = 0 AND endpointman_template_list.model_id = endpointman_model_list.id AND endpointman_template_list.product_id = endpointman_product_list.id';
+	$sql = 'SELECT endpointman_template_list.*, endpointman_product_list.short_name as model_class, endpointman_model_list.model as model_clone, endpointman_model_list.enabled FROM endpointman_template_list, endpointman_model_list, endpointman_product_list WHERE endpointman_model_list.hidden = 0 AND endpointman_template_list.model_id = endpointman_model_list.id AND endpointman_template_list.product_id = endpointman_product_list.id';
         $template_list =& $db->getAll($sql, array(), DB_FETCHMODE_ASSOC);
 	$i = 0;
         $row_out = array();
         foreach($template_list as $row) {
                 $row_out[$i] = $row;
 		$row_out[$i]['custom'] = 0;
+                if(!$row['enabled']) {
+                    $row_out[$i]['model_clone'] = $row_out[$i]['model_clone']."<i>(Disabled)</i>";
+                }
 		$i++;
 	}
 

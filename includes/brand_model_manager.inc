@@ -111,8 +111,6 @@ foreach($brand_list as $row) {
 	$i++;
 }
 
-
-
 if (!isset($error)) {
 	$error = "";
 }
@@ -126,7 +124,6 @@ if (isset($installer)) {
 	$tpl->assign("brand", $brand);
         $tpl->assign("installer", $installer);	
 }
-
 
 $tpl->assign("error", $error);
 $tpl->assign("web_var", "?type=$type");

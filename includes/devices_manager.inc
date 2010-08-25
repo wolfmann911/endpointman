@@ -281,7 +281,7 @@ if(isset($_REQUEST['button_add'])) {
     }
 }
 
-$sql = 'SELECT endpointman_mac_list.id , endpointman_mac_list.mac , endpointman_model_list.model , endpointman_mac_list.ext , endpointman_mac_list.description , endpointman_brand_list.name, endpointman_mac_list.custom_cfg_data, endpointman_mac_list.custom_cfg_template FROM endpointman_mac_list , endpointman_model_list , endpointman_brand_list WHERE ( endpointman_model_list.id = endpointman_mac_list.model ) AND ( endpointman_model_list.brand = endpointman_brand_list.id )';
+$sql = 'SELECT endpointman_mac_list.id , endpointman_mac_list.mac , endpointman_model_list.model, endpointman_model_list.enabled , endpointman_mac_list.ext , endpointman_mac_list.description , endpointman_brand_list.name, endpointman_mac_list.custom_cfg_data, endpointman_mac_list.custom_cfg_template FROM endpointman_mac_list , endpointman_model_list , endpointman_brand_list WHERE ( endpointman_model_list.id = endpointman_mac_list.model ) AND ( endpointman_model_list.brand = endpointman_brand_list.id )';
 
 $devices_list =& $endpoint->db->getAll($sql,array(),DB_FETCHMODE_ASSOC);
 
@@ -299,8 +299,11 @@ foreach($devices_list as $row) {	#Displays the phones in the database with edit 
         $row2 =& $endpoint->db->getOne($sql);
         $list[$i]['template_name'] = $row2;
     }
+    if (!$row['enabled']) {
+        $list[$i]['model'] = $row['model']."<i>(Disabled)</i>";
+    }
     $i++;
-}		# End while
+}
 
 
 $sql = 'SELECT * FROM  endpointman_mac_list WHERE model = 0';

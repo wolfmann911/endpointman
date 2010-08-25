@@ -274,7 +274,7 @@ switch($_REQUEST['subpage']) {
             $sql = "DELETE FROM endpointman_custom_configs WHERE id =". $_REQUEST['sql'];
             $endpoint->db->query($sql);
         }
-        if(isset($_REQUEST['temp_file'])) {
+        if(1 == 0) {
             $file = $_REQUEST['temp_file'];
 
             $sql = "SELECT cfg_dir,directory,config_files FROM endpointman_product_list,endpointman_brand_list WHERE endpointman_product_list.brand = endpointman_brand_list.id AND endpointman_product_list.id = '". $_REQUEST['product_select'] ."'";

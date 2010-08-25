@@ -26,8 +26,7 @@ function endpointman_get_config($engine) {
 }
 function endpointman_configpageinit($pagename) {
 	global $currentcomponent;
-
-        endpointman_applyhooks();
+	endpointman_applyhooks();
 }
 function endpointman_applyhooks() {
 	global $currentcomponent;
@@ -46,10 +45,9 @@ function endpointman_configpageload() {
 
 	// Don't display this stuff it it's on a 'This xtn has been deleted' page.
 	if ($action != 'del') {
-		$langcode = languages_user_get($extdisplay);
 		$section = _('End Point Manager');
 		$msgInvalidLanguage = _('Please enter a valid Lajnguage Code');
-		//$currentcomponent->addguielem($section, new gui_textbox('langcode', $langcode, _('Language Code'), _('This will cause all messages and voice prompts to use the selected language if installed.'), "!isFilename()", $msgInvalidLanguage, true),9);
+		//$currentcomponent->addguielem($section, new gui_textbox('brand', $langcode, _('Language Code'), _('This will cause all messages and voice prompts to use the selected language if installed.'), "!isFilename()", $msgInvalidLanguage, true),9);
 		//$currentcomponent->addguielem($section, "",9);
 
 	}

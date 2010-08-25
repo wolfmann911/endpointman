@@ -208,9 +208,9 @@ class endpointmanager {
 
         //Determine if we are dealing with a general template or a specific [for that phone only] template (custom =0 means general)
         if($custom == 0) {
-            $sql = "SELECT endpointman_product_list.config_files, endpointman_product_list.long_name, endpointman_product_list.id as product_id, endpointman_model_list.template_data, endpointman_model_list.id as model_id, endpointman_template_list.* FROM endpointman_product_list, endpointman_model_list, endpointman_template_list WHERE endpointman_product_list.id = endpointman_template_list.product_id AND endpointman_template_list.model_id = endpointman_model_list.id AND endpointman_template_list.id = ".$id;
+            $sql = "SELECT endpointman_model_list.model as model_name, endpointman_product_list.config_files, endpointman_product_list.short_name, endpointman_product_list.id as product_id, endpointman_model_list.template_data, endpointman_model_list.id as model_id, endpointman_template_list.* FROM endpointman_product_list, endpointman_model_list, endpointman_template_list WHERE endpointman_product_list.id = endpointman_template_list.product_id AND endpointman_template_list.model_id = endpointman_model_list.id AND endpointman_template_list.id = ".$id;
         } else {
-            $sql = "SELECT endpointman_product_list.config_files, endpointman_mac_list.*, endpointman_model_list.id as model_id, endpointman_model_list.template_data, endpointman_product_list.id as product_id, endpointman_product_list.long_name, endpointman_product_list.cfg_dir, endpointman_brand_list.directory FROM endpointman_brand_list, endpointman_mac_list, endpointman_model_list, endpointman_product_list WHERE endpointman_mac_list.id=".$id." AND endpointman_mac_list.model = endpointman_model_list.id AND endpointman_model_list.brand = endpointman_brand_list.id AND endpointman_model_list.product_id = endpointman_product_list.id";
+            $sql = "SELECT endpointman_model_list.model as model_name, endpointman_product_list.config_files, endpointman_mac_list.*, endpointman_model_list.id as model_id, endpointman_model_list.template_data, endpointman_product_list.id as product_id, endpointman_product_list.short_name, endpointman_product_list.cfg_dir, endpointman_brand_list.directory FROM endpointman_brand_list, endpointman_mac_list, endpointman_model_list, endpointman_product_list WHERE endpointman_mac_list.id=".$id." AND endpointman_mac_list.model = endpointman_model_list.id AND endpointman_model_list.brand = endpointman_brand_list.id AND endpointman_model_list.product_id = endpointman_product_list.id";
         }
 
         $row =& $this->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
@@ -226,8 +226,12 @@ class endpointmanager {
         } else {
             $tpl->assign("template_name", $row['name']);
         }
-        $tpl->assign("model", $row['long_name']);
+        $tpl->assign("product", $row['short_name']);
+        $tpl->assign("model", $row['model_name']);
 
+        if($ma = $this->modelsAvailable($row['model_id'], NULL, NULL, $row['product_id'])) {
+            $tpl->assign("models_ava", $ma);
+        }
         //Start the display of the html file in the product folder
         if($row['config_files_override'] == "") {
             $config_files_saved = "";
@@ -504,7 +508,7 @@ class endpointmanager {
 
         //Provide alternate Configuration file instead of the one from the hard drive
         $temp = "";
-        if(!empty($phone_info['config_files_override'])){
+        if(!empty($phone_info['config_files_override'])) {
             $temp = unserialize($phone_info['config_files_override']);
             foreach($temp as $list) {
                 $sql = "SELECT original_name,data FROM endpointman_custom_configs WHERE id = ".$list;
@@ -544,10 +548,64 @@ class endpointmanager {
         // Because every brand is an extension (eventually) of endpoint, you know this function will exist regardless of who it is
         $returned_data = $provisioner_lib->generate_config();
 
+        //Create Directory Structure (If needed)
+        if(isset($provisioner_lib->directory_structure)) {
+            foreach($provisioner_lib->directory_structure as $data) {
+                $dir = $this->global_cfg['config_location'] . $data;
+                if(!file_exists($dir)) {
+                    mkdir($dir);
+                }
+            }
+        }
+
+        //Copy Files/Directories (If needed)
+        if(isset($provisioner_lib->copy_files)) {
+            foreach($provisioner_lib->copy_files as $data) {
+                if(((file_exists($this->global_cfg['config_location'].$data)) AND (!in_array($data,$provisioner_lib->protected_files))) OR (!file_exists($this->global_cfg['config_location'].$data))) {
+                    if(is_dir(PHONE_MODULES_PATH."endpoint/".$phone_info['directory']."/".$phone_info['cfg_dir']."/".$data)) {
+                        if(!file_exists($this->global_cfg['config_location'].$data)) {
+                            mkdir($this->global_cfg['config_location'].$data);
+                        }
+                        $dir_iterator = new RecursiveDirectoryIterator(PHONE_MODULES_PATH."endpoint/".$phone_info['directory']."/".$phone_info['cfg_dir']."/".$data."/");
+                        $iterator = new RecursiveIteratorIterator($dir_iterator, RecursiveIteratorIterator::SELF_FIRST);
+                        // could use CHILD_FIRST if you so wish
+                        foreach ($iterator as $file) {
+                            if(is_dir($file)) {
+                                $dir = str_replace(PHONE_MODULES_PATH."endpoint/".$phone_info['directory']."/".$phone_info['cfg_dir']."/".$data."/", "", $file);
+                                if(!file_exists($this->global_cfg['config_location'].$data."/".$dir)) {
+                                    mkdir($this->global_cfg['config_location'].$data."/".$dir);
+                                }
+                            } else {
+                                $dir = str_replace(PHONE_MODULES_PATH."endpoint/".$phone_info['directory']."/".$phone_info['cfg_dir']."/".$data."/", "", $file);
+                                copy($file, $this->global_cfg['config_location'].$data."/".$dir);
+                            }
+                        }
+                    } else {
+                        copy(PHONE_MODULES_PATH."endpoint/".$phone_info['directory']."/".$phone_info['cfg_dir']."/".$data,$this->global_cfg['config_location'].$data);
+                    }
+                }
+            }
+        }
+
+        $sql = 'SELECT `value` FROM `endpointman_global_vars` WHERE `var_name` LIKE CONVERT(_utf8 \'version\' USING latin1) COLLATE latin1_swedish_ci';
+        $epm_version = $this->db->getOne($sql);
+
+        $sql = 'SELECT `value` FROM `endpointman_global_vars` WHERE `var_name` LIKE CONVERT(_utf8 \'endpoint_vers\' USING latin1) COLLATE latin1_swedish_ci';
+        $prov_version = $this->db->getOne($sql);
+
+        $sql = 'SELECT `cfg_ver` FROM `endpointman_brand_list` WHERE `directory` LIKE CONVERT(_utf8 \'grandstream\' USING latin1) COLLATE latin1_swedish_ci';
+        $brand_version = $this->db->getOne($sql);
+
+        //Generate Files
         foreach($returned_data as $key => $data) {
-            $fp = fopen($this->global_cfg['config_location'].$key, 'w');
-            fwrite($fp, $data);
-            fclose($fp);
+            if(((file_exists($this->global_cfg['config_location'].$key)) AND (!in_array($key,$provisioner_lib->protected_files))) OR (!file_exists($this->global_cfg['config_location'].$key))) {
+                $fp = fopen($this->global_cfg['config_location'].$key, 'w');
+                $data = str_replace("[\$epm_version]", "EndPoint Manager Version ".$epm_version,$data);
+                $data = str_replace("[\$provisioner_version]", date('m/d/Y',$prov_version)." at ".date("G:i",$prov_version),$data);
+                $data = str_replace("[\$brand_version]", date('m/d/Y',$brand_version)." at ".date("G:i",$brand_version),$data);
+                fwrite($fp, $data);
+                fclose($fp);
+            }
         }
         $provisioner_lib->reboot();
 
@@ -564,7 +622,7 @@ class endpointmanager {
         if ($row['cfg_dir'] == "") {
             return FALSE;
         } else {
-            $temp = $this->xml2array(PHONE_MODULES_PATH."endpoint/".$brand_directory."/".$row['cfg_dir']."/template_data.xml");
+            $temp = $this->xml2array(PHONE_MODULES_PATH."endpoint/".$brand_directory."/".$row['cfg_dir']."/family_data.xml");
             if((array_key_exists('data',$temp)) AND (!is_array($temp['data']['firmware_ver']))) {
                 if($row['firmware_vers'] < $temp['data']['firmware_ver']) {
                     return $temp;
@@ -592,7 +650,8 @@ class endpointmanager {
             if ($row['cfg_dir'] == "") {
                 return("nothing");
             } else {
-                $temp = $this->xml2array(PHONE_MODULES_PATH.$brand_directory."/".$row['cfg_dir']."/template_data.xml");
+                $temp = $this->xml2array(PHONE_MODULES_PATH."endpoint/".$brand_directory."/".$row['cfg_dir']."/family_data.xml");
+
                 if((isset ($temp['data']['firmware_ver'])) AND (!is_array($temp['data']['firmware_ver']))) {
                     if($row['firmware_vers'] == "") {
                         return("install");
@@ -609,58 +668,48 @@ class endpointmanager {
     }
 
     function remove_firmware($id=NULL) {
-        global $global_cfg;
-        $sql = "SELECT * FROM  endpointman_product_list WHERE  id =". $id;
-        $result = mysql_query($sql);
-        $row = mysql_fetch_array($result);
+        $sql = "SELECT firmware_files FROM  endpointman_product_list WHERE  id =". $id;
+        $files = $this->db->getOne($sql);
 
-        $file_list = explode(",",$row['firmware_files']);
+        $file_list = explode(",",$files);
         $i = 0;
         while($i < count($file_list)) {
-            unlink($global_cfg['config_location'].$file_list[$i]);
+            unlink($this->global_cfg['config_location'].$file_list[$i]);
             $i++;
         }
         $sql = 'UPDATE endpointman_product_list SET firmware_files = "", firmware_vers = "" WHERE id = '.$id;
-        mysql_query($sql);
+        $this->db->query($sql);
     }
 
     function install_firmware($product_id) {
-        global $global_cfg, $debug;
         $sql = 'SELECT endpointman_product_list.*, endpointman_brand_list.directory FROM endpointman_product_list, endpointman_brand_list WHERE endpointman_product_list.brand = endpointman_brand_list.id AND endpointman_product_list.id = '.$product_id;
-        $result = mysql_query($sql);
-        $row = mysql_fetch_array($result);
-        $temp = $this->xml2array(PHONE_MODULES_PATH.$row['directory']."/".$row['cfg_dir']."/template_data.xml");
+        $row =& $this->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
+        $temp = $this->xml2array(PHONE_MODULES_PATH."endpoint/".$row['directory']."/".$row['cfg_dir']."/family_data.xml");
         if($temp['data']['firmware_ver'] > $row['firmware_vers']) {
-            echo "<script>$('div.demo-container').text('Installing firmware');</script>";
-            $this->download_file_with_progress_bar(UPDATE_PATH . $temp['data']['firmware_pkg'], PHONE_MODULES_PATH."temp/".$temp['data']['firmware_pkg']);
-            global $global_cfg, $endpoint;
-            if(!file_exists(PHONE_MODULES_PATH.$row['directory']."/".$row['cfg_dir']."/firmware")) {
-                mkdir(PHONE_MODULES_PATH.$row['directory']."/".$row['cfg_dir']."/firmware");
+            echo "Downloading firmware..";
+            $this->download_file_with_progress_bar(UPDATE_PATH.$row['directory']."/". $temp['data']['firmware_pkg'], PHONE_MODULES_PATH."temp/".$temp['data']['firmware_pkg']);
+            echo "Done!<br />";
+            if(!file_exists(PHONE_MODULES_PATH."endpoint/".$row['directory']."/".$row['cfg_dir']."/firmware")) {
+                mkdir(PHONE_MODULES_PATH."endpoint/".$row['directory']."/".$row['cfg_dir']."/firmware");
             }
-            exec("unzip ".PHONE_MODULES_PATH."temp/" . $temp['data']['firmware_pkg'] ." -d ".PHONE_MODULES_PATH.$row['directory']."/".$row['cfg_dir']."/firmware/", $debug_a = array());
-            if ($handle = opendir(PHONE_MODULES_PATH.$row['directory']."/".$row['cfg_dir']."/firmware/")) {
-                while (false !== ($file = readdir($handle))) {
-                    if ($file != "." && $file != "..") {
-                        $list .= $file.",";
-                    }
-                }
-                closedir($handle);
+            echo "Installing Firmware...";
+            exec("rm -Rf ".PHONE_MODULES_PATH."endpoint/".$row['directory']."/".$row['cfg_dir']."/firmware");
+            mkdir(PHONE_MODULES_PATH."endpoint/".$row['directory']."/".$row['cfg_dir']."/firmware");
+            exec("tar -xvf ".PHONE_MODULES_PATH.'temp/'. $temp['data']['firmware_pkg'] ." -C ".PHONE_MODULES_PATH."endpoint/".$row['directory']."/".$row['cfg_dir']);
+            $i = 0;
+            foreach (glob(PHONE_MODULES_PATH."endpoint/".$row['directory']."/".$row['cfg_dir']."/firmware/*.*") as $filename) {
+                $file = basename($filename);
+                $list[$i] = $file;
+                copy($filename, $this->global_cfg['config_location'].$file);
+                $i++;
             }
-            $list = substr_replace($list ,"",-1);
-            exec("cp -r " . PHONE_MODULES_PATH.$row['directory']."/".$row['cfg_dir']."/firmware/*.* ". $global_cfg['config_location'], $debug_a2 = array());
+            $list = implode(",", $list);
             $sql = "UPDATE endpointman_product_list SET firmware_vers = '".$temp['data']['firmware_ver']."', firmware_files = '".$list."' WHERE id = ". $row['id'];
-            mysql_query($sql);
-            echo "<script>$('div.demo-container').text('Done!');</script>";
+            $this->db->query($sql);
+            echo "Done!";
         } else {
-            echo "<script>$('div.demo-container').text('Your Firmware is already up to date');</script>";
+            echo "Your Firmware is already up to date";
 
-        }
-        if($global_cfg['debug']) {
-            $debug = array_merge($debug_a, $debug_a2);
-            $outfile=LOCAL_PATH."debug_installer.log";
-            $wfh=fopen($outfile,'a');
-            fwrite($wfh,print_r($debug, TRUE));
-            fclose($wfh);
         }
     }
 
@@ -988,14 +1037,18 @@ class endpointmanager {
 
             if (file_exists(PHONE_MODULES_PATH.'/endpoint/'.$brand_row['directory'].'/'.$product_row['cfg_dir'].'/template_data_custom.xml')) {
                 $template_data_multi = $this->xml2array(PHONE_MODULES_PATH.'/endpoint/'.$brand_row['directory'].'/'.$product_row['cfg_dir'].'/template_data_custom.xml');
-                $template_data_multi = $this->fix_single_array_keys($template_data_multi['template_data']['item']);
-                $template_data_array = array_merge($template_data_array, $template_data_multi);
+                if($template_data_multi) {
+                    $template_data_multi = $this->fix_single_array_keys($template_data_multi['template_data']['item']);
+                    $template_data_array = array_merge($template_data_array, $template_data_multi);
+                }
             }
 
             if (file_exists(PHONE_MODULES_PATH.'/endpoint/'.$brand_row['directory'].'/'.$product_row['cfg_dir'].'/template_data_' . $model_row['model'] . '_custom.xml')) {
                 $template_data_multi = $this->xml2array(self::$modules_path . $this->brand_name . "/" . $this->family_line . "/template_data_" . $this->model . "_custom.xml");
-                $template_data_multi = $this->fix_single_array_keys($template_data_multi['template_data']['item']);
-                $template_data_array = array_merge($template_data_array, $template_data_multi);
+                if($template_data_multi) {
+                    $template_data_multi = $this->fix_single_array_keys($template_data_multi['template_data']['item']);
+                    $template_data_array = array_merge($template_data_array, $template_data_multi);
+                }
             }
 
             if(empty($template_data_array)) {
@@ -1034,6 +1087,7 @@ class endpointmanager {
         $progress_bar = 1;
         $file_size  = 1;
         $downloaded = 1;
+        echo "&nbsp;";
         /* open destination file */
         $fout = fopen($destination_file, "wb");
 
@@ -1422,7 +1476,7 @@ class endpointmanager {
         }
     }
 
-    function modelsAvailable($model=NULL, $macAdd=NULL, $brand=NULL) {
+    function modelsAvailable($model=NULL, $macAdd=NULL, $brand=NULL, $product=NULL) {
         if (isset($macAdd)) {
             $oui=substr($macAdd,0,6);
         }
@@ -1430,6 +1484,8 @@ class endpointmanager {
             $sql="SELECT endpointman_model_list.* FROM endpointman_model_list, endpointman_product_list WHERE endpointman_model_list.product_id = endpointman_product_list.id AND endpointman_model_list.enabled = 1 AND endpointman_product_list.hidden = 0";
         }elseif((isset($brand)) && ($brand !=0)) {
             $sql="SELECT endpointman_model_list.* FROM endpointman_model_list, endpointman_product_list WHERE endpointman_model_list.product_id = endpointman_product_list.id AND endpointman_model_list.enabled = 1 AND endpointman_product_list.hidden = 0 AND endpointman_model_list.brand = " . $brand;
+        }elseif((isset($product)) && ($product !=0)) {
+            $sql="SELECT * FROM endpointman_model_list WHERE product_id = ".$product;
         } else {
             $sql="SELECT endpointman_model_list.* FROM endpointman_model_list, endpointman_product_list WHERE endpointman_model_list.product_id = endpointman_product_list.id AND endpointman_model_list.enabled = 1 AND endpointman_product_list.hidden = 0";
         }
@@ -1557,11 +1613,6 @@ class endpointmanager {
 }
 
 function endpointman_update_progress_bar($out) {
-    /*
-	echo "\n<script type=\"text/javascript\" language=\"javascript\">";
-	echo 'document.getElementById("tb").style.width = "'.$out.'%";';	
-	echo "\n</script>";
-    */
     echo ".";
 }
 
@@ -1569,7 +1620,6 @@ function endpointmanager_read_header($ch, $string) {
     global $file_size, $fout;
     $length = strlen($string);
     $regs = "";
-    //ereg("(Content-Length:) (.*)", $string, $regs);
     preg_match("/(Content-Length:) (.*)/i", $string, $regs);
     if((isset($regs[2])) AND ($regs[2] <> "")) {
         $file_size = intval($regs[2]);
@@ -1579,9 +1629,6 @@ function endpointmanager_read_header($ch, $string) {
 }
 
 function endpointmanager_read_body($ch, $string) {
-    //Andrew Nagy added the below echo, otherwise the progress bar never updated until the download was complete
-    //echo "&nbsp;";
-    //end Andrew code
     global $fout, $file_size, $downloaded, $lastseen, $progress_bar;
     $length = strlen($string);
     $downloaded += intval($length);
