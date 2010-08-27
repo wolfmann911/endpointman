@@ -553,7 +553,7 @@ class endpointmanager {
             foreach($provisioner_lib->directory_structure as $data) {
                 $dir = $this->global_cfg['config_location'] . $data;
                 if(!file_exists($dir)) {
-                    mkdir($dir);
+                    mkdir($dir, 0777);
                 }
             }
         }
@@ -564,7 +564,7 @@ class endpointmanager {
                 if(((file_exists($this->global_cfg['config_location'].$data)) AND (!in_array($data,$provisioner_lib->protected_files))) OR (!file_exists($this->global_cfg['config_location'].$data))) {
                     if(is_dir(PHONE_MODULES_PATH."endpoint/".$phone_info['directory']."/".$phone_info['cfg_dir']."/".$data)) {
                         if(!file_exists($this->global_cfg['config_location'].$data)) {
-                            mkdir($this->global_cfg['config_location'].$data);
+                            mkdir($this->global_cfg['config_location'].$data, 0777);
                         }
                         $dir_iterator = new RecursiveDirectoryIterator(PHONE_MODULES_PATH."endpoint/".$phone_info['directory']."/".$phone_info['cfg_dir']."/".$data."/");
                         $iterator = new RecursiveIteratorIterator($dir_iterator, RecursiveIteratorIterator::SELF_FIRST);
@@ -573,15 +573,17 @@ class endpointmanager {
                             if(is_dir($file)) {
                                 $dir = str_replace(PHONE_MODULES_PATH."endpoint/".$phone_info['directory']."/".$phone_info['cfg_dir']."/".$data."/", "", $file);
                                 if(!file_exists($this->global_cfg['config_location'].$data."/".$dir)) {
-                                    mkdir($this->global_cfg['config_location'].$data."/".$dir);
+                                    mkdir($this->global_cfg['config_location'].$data."/".$dir, 0777);
                                 }
                             } else {
                                 $dir = str_replace(PHONE_MODULES_PATH."endpoint/".$phone_info['directory']."/".$phone_info['cfg_dir']."/".$data."/", "", $file);
                                 copy($file, $this->global_cfg['config_location'].$data."/".$dir);
+                                chmod($this->global_cfg['config_location'].$data."/".$dir, 0777);
                             }
                         }
                     } else {
                         copy(PHONE_MODULES_PATH."endpoint/".$phone_info['directory']."/".$phone_info['cfg_dir']."/".$data,$this->global_cfg['config_location'].$data);
+                        chmod($this->global_cfg['config_location'].$data, 0777);
                     }
                 }
             }
