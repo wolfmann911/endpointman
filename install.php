@@ -1,6 +1,6 @@
 <?PHP
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
+//ini_set('display_errors', 1);
+//error_reporting(E_ALL);
 /*
 Endpoint Manager V2
 Copyright (C) 2009-2010  Ed Macri, John Mullinix and Andrew Nagy
@@ -92,7 +92,7 @@ function ep_table_exists ($table) {
     return FALSE;
 }
 
-$version = "2.2.4";
+$version = "2.2.5";
 
 if(ep_table_exists("endpointman_global_vars")) {
         $global_cfg =& $db->getAssoc("SELECT var_name, value FROM endpointman_global_vars");
@@ -130,12 +130,14 @@ if(!isset($global_cfg['version'])) {
     $ver = "2.2.1";
 } elseif($global_cfg['version'] == '2.2.2') {
     $ver = "2.2.2";
+} elseif($global_cfg['version'] == '2.2.3') {
+    $ver = "2.2.3";
+} elseif($global_cfg['version'] == '2.2.4') {
+    $ver = "2.2.4";
 } else {
     $ver = "1000";
     $new_install = TRUE;
 }
-
-$ver = (float) $ver;
 
 if($new_install) {
     out('New Installation Detected!');
@@ -674,9 +676,6 @@ if($ver <= "2.0.0") {
             $db->query($sql);
         }
 
-
-
-
         $data = array();
         $data =& $db->getAll("SELECT * FROM  endpointman_custom_configs",array(), DB_FETCHMODE_ASSOC);
         $variable_change = array(
@@ -763,7 +762,15 @@ if ($ver <= "2.2.2") {
 	$db->query($sql);
 }
 
+if ($ver <= "2.2.4") {
+}
 
+if ($ver <= "2.2.5") {  
+    out("Fix Debug Left on Error, this turns off debug.");
+    $sql = 'UPDATE `asterisk`.`endpointman_global_vars` SET `value` = \'1\' WHERE `endpointman_global_vars`.`idnum` = 9 LIMIT 1;';
+    $db->query($sql);
+
+}
 
 if ($new_install) {
 
@@ -802,13 +809,13 @@ if ($new_install) {
             (5, 'config_location', '/tftpboot/'),
             (6, 'update_server', 'http://www.provisioner.net/release/'),
             (7, 'version', '".$version."'),
-            (8, 'enable_ari', '1'),
-            (9, 'debug', '1'),
+            (8, 'enable_ari', '0'),
+            (9, 'debug', '0'),
             (10, 'arp_location', '".$arp."'),
             (11, 'nmap_location', '".$nmap."'),
             (12, 'asterisk_location', '".$asterisk."'),
             (13, 'language', ''),
-            (14, 'check_updates', '1'),
+            (14, 'check_updates', '0'),
             (15, 'disable_htaccess', ''),
             (16, 'endpoint_vers', '0')";
         $db->query($sql);

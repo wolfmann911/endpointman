@@ -727,13 +727,14 @@ class endpointmanager {
     function download_xml($location,$directory=NULL) {
         if(!isset($directory)) {
             $destination_file = PHONE_MODULES_PATH.'master.xml';
+			$directory = "master";
         } else {
             if(!file_exists(PHONE_MODULES_PATH.'/'.$directory)) {
                 mkdir(PHONE_MODULES_PATH.'/'.$directory);
             }
             $destination_file = PHONE_MODULES_PATH.'/'.$directory.'/brand_data.xml';
         }
-        $temp_file = PHONE_MODULES_PATH.'temp/temp.xml';
+        $temp_file = PHONE_MODULES_PATH.'temp/'.$directory.'.xml';
         if($this->download_xml_file($location, $temp_file)) {
             $handle = fopen($temp_file, "rb");
             $contents = fread($handle, filesize($temp_file));
