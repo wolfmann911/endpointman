@@ -9,7 +9,7 @@
 
 $tpl = new RainTPL( LOCAL_PATH.'templates' );
 //Set the message variable to nothing, however we can set it later and it will show up on the page
-$message = "";
+$message = NULL;
 $tpl->assign("message", $message);
 $tpl->assign("web_vars", "?type=$type");
 
@@ -120,10 +120,10 @@ switch($_REQUEST['subpage']) {
                     $tpl->assign("type", "upload_provisioner");
                     $tpl->assign("xml", 0);
                 } else {
-                    $message = $endpoint->file_upload_error_message($_FILES['package']['error']);
+                    $endpoint->error['manual_upload'] = $endpoint->file_upload_error_message($_FILES['package']['error']);
                 }
             } else {
-                $message = "Invalid Extension";
+                $endpoint->error['manual_upload'] = "Invalid File Extension";
             }
             
 
@@ -139,10 +139,10 @@ switch($_REQUEST['subpage']) {
                     $tpl->assign("type", "upload_master_xml");
                     $tpl->assign("xml", $name);
                 } else {
-                    $message = $endpoint->file_upload_error_message($_FILES['xml']['error']);
+                    $endpoint->error['manual_upload'] = $endpoint->file_upload_error_message($_FILES['xml']['error']);
                 }
             } else {
-                $message = "Invalid Extension";
+                $endpoint->error['manual_upload'] = "Invalid File Extension";
             }
         } elseif(isset($_REQUEST['upload_brand'])) {
             $error = FALSE;
@@ -158,11 +158,11 @@ switch($_REQUEST['subpage']) {
                         $files_list[$i] = $name;
                         $i++;
                     } else {
-                        $error_message = $endpoint->file_upload_error_message($files['error']);
+                        $endpoint->error['manual_upload'] = $endpoint->file_upload_error_message($files['error']);
                         $error = TRUE;
                     }
                 } else {
-                    $error_message = "Invalid Extension";
+                    $endpoint->error['manual_upload'] = "Invalid File Extension";
                     $error = TRUE;
                 }
             }
@@ -176,7 +176,20 @@ switch($_REQUEST['subpage']) {
             }
 
         }
-        $tpl->assign("message", $message);
+        $error_message = NULL;
+        foreach($endpoint->error as $key => $error) {
+            $error_message .= $error;
+            if($endpoint->global_cfg['debug']) {
+                $error_message .= " Function: [".$key."]";
+            }
+            $error_message .= "<br />";
+        }
+        if(isset($message)) {
+            $endpoint->display_message_box($message,$tpl,0);
+        }
+        if(isset($error_message)) {
+            $endpoint->display_message_box($error_message,$tpl,1);
+        }
 
         echo $tpl->draw( 'advanced_settings_manual_upload' );
         break;
@@ -421,7 +434,6 @@ switch($_REQUEST['subpage']) {
         break;
     case "settings":
     default:
-        $message = "";
         if(isset($_REQUEST['button_update_globals'])) {
             $_POST['srvip'] = trim($_POST['srvip']);  #trim whitespace from IP address
 
@@ -443,13 +455,13 @@ switch($_REQUEST['subpage']) {
                         $sql="UPDATE endpointman_global_vars SET value='" . $_POST['config_loc'] . "' WHERE var_name='config_location'";
                         $endpoint->db->query($sql);
                     } else {
-                        $message = "<h3><center><font color='red'>Directory Not Writable!</font></center></h3>";
+                        $endpoint->error['config_dir'] = "Directory Not Writable!";
                     }
                 } else {
-                    $message = "<h3><center><font color='red'>Not a Vaild Directory</font></center></h3>";
+                    $endpoint->error['config_dir'] = "Not a Vaild Directory";
                 }
             } else {
-                $message = "<h3><center><font color='red'>No Configuration Location Defined!</font></center></h3>";
+                $endpoint->error['config_dir'] = "No Configuration Location Defined!";
             }
 
             if((isset($_POST['enable_ari'])) AND ($_POST['enable_ari'] == "on")) {
@@ -498,7 +510,7 @@ switch($_REQUEST['subpage']) {
             $sql="UPDATE endpointman_global_vars SET value='" . $_POST['arp_loc'] . "' WHERE var_name='arp_location'";
             $endpoint->db->query($sql);
 
-            $message .= "<h3><center>Updated!</center></h3>";
+            $message .= "Updated!";
         }
         //Because we are working with global variables we probably updated them, so lets refresh those variables
         $endpoint->global_cfg =& $db->getAssoc("SELECT var_name, value FROM endpointman_global_vars");
@@ -533,7 +545,22 @@ switch($_REQUEST['subpage']) {
         $tpl->assign("ari_selected", $ari_selected);
         $tpl->assign("updates_selected", $updates_selected);
         $tpl->assign("debug_selected", $debug_selected);
-        $tpl->assign("message", $message);
+
+        $error_message = NULL;
+        foreach($endpoint->error as $key => $error) {
+            $error_message .= $error;
+            if($endpoint->global_cfg['debug']) {
+                $error_message .= " Function: [".$key."]";
+            }
+            $error_message .= "<br />";
+        }
+        if(isset($message)) {
+            $endpoint->display_message_box($message,$tpl,0);
+        }
+        if(isset($error_message)) {
+            $endpoint->display_message_box($error_message,$tpl,1);
+        }
+
         $tpl->assign("ip", $_SERVER["SERVER_ADDR"]);
         $tpl->assign("srvip", $endpoint->global_cfg['srvip']);
         $tpl->assign("arp_location", $endpoint->global_cfg['arp_location']);

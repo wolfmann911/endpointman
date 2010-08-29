@@ -20,17 +20,18 @@ if(file_exists('/tftpboot')) {
 	die(_("Please create /tftpboot, even if you won't use it"));
 }
 
+if(phpversion < '5.0.0') {
+    die(_('PHP Version MUST be greater than 5!'));
+}
+
 include 'includes/functions.inc';
 
 $debug = NULL;
 
 $endpoint = new endpointmanager();
 
-if(!file_exists(PHONE_MODULES_PATH)) {
-	mkdir(PHONE_MODULES_PATH, 0764);
-}
 if(!file_exists(PHONE_MODULES_PATH."temp/")) {
-	mkdir(PHONE_MODULES_PATH."temp/", 0764);
+	mkdir(PHONE_MODULES_PATH."temp/", 0764, TRUE);
 }
 
 if(!is_writeable(LOCAL_PATH)) {
@@ -38,7 +39,11 @@ if(!is_writeable(LOCAL_PATH)) {
 }
 
 if(!is_writeable(PHONE_MODULES_PATH)) {
-	chmod(PHONE_MODULES_PATH, 0764);
+    chmod(PHONE_MODULES_PATH, 0764);
+    $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(PHONE_MODULES_PATH), RecursiveIteratorIterator::SELF_FIRST); 
+    foreach($iterator as $item) {
+        chmod($item, 0764);
+    }
 }
 
 if($amp_conf['AMPENGINE'] != 'asterisk') {

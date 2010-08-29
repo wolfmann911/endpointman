@@ -12,7 +12,7 @@ global $type;
 
 //initialize a Rain TPL object
 $tpl = new RainTPL( LOCAL_PATH.'templates' );
-$endpoint->error['brand_update_check'] = "";
+
 if((isset($_REQUEST['button_install'])) OR (isset($_REQUEST['button_update']))) {
 	if(isset($_REQUEST['brand'])) {
 		$installer = array("type" => 'brand', "id" => $_REQUEST['brand']);		
@@ -125,10 +125,20 @@ if (isset($installer)) {
         $tpl->assign("installer", $installer);	
 }
 
-$tpl->assign("error", $error);
 $tpl->assign("web_var", "?type=$type");
 $tpl->assign("brand2_list", $row_out);
-$tpl->assign("error", $endpoint->error['brand_update_check']);
+
+$error_message = NULL;
+foreach($endpoint->error as $key => $error) {
+    $error_message .= $error;
+    if($endpoint->global_cfg['debug']) {
+        $error_message .= " Function: [".$key."]";
+    }
+    $error_message .= "<br />";
+}
+if(isset($error_message)) {
+    $endpoint->display_message_box($error_message,$tpl,1);
+}
 
 //draw the template	
 echo $tpl->draw( 'brand_model_manager' );

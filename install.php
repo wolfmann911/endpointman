@@ -92,7 +92,7 @@ function ep_table_exists ($table) {
     return FALSE;
 }
 
-$version = "2.2.5";
+$version = "2.2.6";
 
 if(ep_table_exists("endpointman_global_vars")) {
         $global_cfg =& $db->getAssoc("SELECT var_name, value FROM endpointman_global_vars");
@@ -134,6 +134,10 @@ if(!isset($global_cfg['version'])) {
     $ver = "2.2.3";
 } elseif($global_cfg['version'] == '2.2.4') {
     $ver = "2.2.4";
+} elseif($global_cfg['version'] == '2.2.5') {
+    $ver = "2.2.5";
+} elseif($global_cfg['version'] == '2.2.6') {
+    $ver = "2.2.6";
 } else {
     $ver = "1000";
     $new_install = TRUE;
@@ -763,14 +767,24 @@ if ($ver <= "2.2.2") {
 }
 
 if ($ver <= "2.2.4") {
-}
-
-if ($ver <= "2.2.5") {  
     out("Fix Debug Left on Error, this turns off debug.");
     $sql = 'UPDATE `asterisk`.`endpointman_global_vars` SET `value` = \'1\' WHERE `endpointman_global_vars`.`idnum` = 9 LIMIT 1;';
     $db->query($sql);
-
 }
+
+if ($ver <= "2.2.5") {  
+    out("Fixing Permissions of Phone Modules Directory");
+    $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(PHONE_MODULES_PATH), RecursiveIteratorIterator::SELF_FIRST);
+    foreach($iterator as $item) {
+        chmod($item, 0764);
+    }
+
+    out("Creating Endpoint Version Row");
+    $sql = 'INSERT INTO `asterisk`.`endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (NULL, \'endpoint_vers\', \'\');';
+    $db->query($sql);
+}
+
+
 
 if ($new_install) {
 

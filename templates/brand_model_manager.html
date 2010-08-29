@@ -1,4 +1,7 @@
 {include="global_header"}
+{if condition="isset($show_error_box)"}
+    {include="message_box"}
+{/if}
 <style type="text/css">
 <!--
 .brand {
@@ -18,7 +21,6 @@
 }
 -->
 </style>
-<h3 align='center'><font color='red'>{$error}</font></h3>
 <center>
 <form action='config.php{$web_var}&display=epm_config' method='POST'>
 	<input type="submit" name="button_check_for_updates" value="<?=_('Check for Updates')?>"> 

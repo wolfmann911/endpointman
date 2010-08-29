@@ -10,6 +10,8 @@ require 'functions.inc';
 
 $endpoint = new endpointmanager();
 
+echo "<html><head><title>Installer</title></head><body>";
+
 function out($text){
     echo $text."<br />";
 }
@@ -192,4 +194,4 @@ if($_REQUEST['type'] == "brand") {
     }
 }
 
-echo "<hr>\n\t<a href=\"#\" onclick=\"parent.close_module_actions(true);\" style=\"text-decoration:none\" />"._("Return")."</a>";
+echo "<hr>\n\t<a href=\"#\" onclick=\"parent.close_module_actions(true);\" style=\"text-decoration:none\" />"._("Return")."</a></body></html>";

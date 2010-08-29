@@ -9,6 +9,9 @@
 
 //Set opened variables
 $message = NULL;
+$error_message = NULL;
+
+
 $no_add = FALSE;
 $final = NULL;
 $button = NULL;
@@ -150,7 +153,6 @@ if(isset($_REQUEST['button_add'])) {
     }
 } elseif((isset($_REQUEST['button_update_phones'])) AND (isset($_REQUEST['selected']))) {
     if(($_REQUEST['brand_list_selected'] > 0) AND ($_REQUEST['model_list_selected'] > 0)) {
-
         foreach($_REQUEST['selected'] as $key => $data) {
             $sql = "UPDATE endpointman_mac_list SET custom_cfg_data = '', custom_cfg_template = '', user_cfg_data = '', config_files_override = '', model = '".$_REQUEST['model_list_selected']."' WHERE id =  ". $_REQUEST['selected'][$key];
             $endpoint->db->query($sql);
@@ -159,7 +161,6 @@ if(isset($_REQUEST['button_add'])) {
             $endpoint->prepare_configs($phone_info);
 
             $message = _("Saved")."!";
-
         }
     } else {
         $message = _("Please select a Brand and/or Model");
@@ -381,9 +382,19 @@ if (isset($template_editor)) {
         }
     }
 
-
-    $tpl->assign("message", $message);
-    $tpl->assign("debug", $debug);
+    foreach($endpoint->error as $key => $error) {
+        $error_message .= $error;
+        if($endpoint->global_cfg['debug']) {
+            $error_message .= " Function: [".$key."]";
+        }
+        $error_message .= "<br />";
+    }
+    if(isset($error_message)) {
+        $endpoint->display_message_box($error_message,$tpl,1);
+    }
+    if(isset($message)) {
+        $endpoint->display_message_box($message,$tpl,0);
+    }
 
     //draw the template
     echo $tpl->draw( 'devices_manager' );

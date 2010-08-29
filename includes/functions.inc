@@ -52,6 +52,13 @@ class endpointmanager {
         include LOCAL_PATH."includes/rain.tpl.class.php";
     }
 
+    function display_message_box($message, $tpl, $fatal_error=0) {
+        $tpl->assign("show_error_box", 1);
+        $tpl->assign("advanced_debug", $this->global_cfg['debug']);
+        $tpl->assign("fatal_error", $fatal_error);
+        $tpl->assign("error_message", $message);
+    }
+
     function add_freepbx_notification($id, $type, $display_text, $text, $link) {
         $sql = "INSERT INTO notifications (module, id, level, display_text, link, candelete, timestamp, extended_text) VALUES ('endpointman', '".$id."', '500', '".$display_text."', '".$link."', '1', '".time()."', '".$text."')";
         mysql_query($sql);
@@ -141,7 +148,8 @@ class endpointmanager {
     function get_phone_info($mac_id=NULL) {
         //You could screw up a phone if the mac_id is blank
         if (!isset($mac_id)) {
-            die("Can't get phone info!");
+            $this->error['get_phone_info'] = "Mac ID is not set";
+            return(FALSE);
         }
         $sql = "SELECT id,mac,model FROM  endpointman_mac_list WHERE model > 0 AND id =".$mac_id;
 
@@ -688,9 +696,9 @@ class endpointmanager {
         $row =& $this->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
         $temp = $this->xml2array(PHONE_MODULES_PATH."endpoint/".$row['directory']."/".$row['cfg_dir']."/family_data.xml");
         if($temp['data']['firmware_ver'] > $row['firmware_vers']) {
-            echo "Downloading firmware..";
+            echo "<div style='float: left'>Downloading firmware...</div><div style='float: left' id=\"DivExample\">.</div>";
             $this->download_file_with_progress_bar(UPDATE_PATH.$row['directory']."/". $temp['data']['firmware_pkg'], PHONE_MODULES_PATH."temp/".$temp['data']['firmware_pkg']);
-            echo "Done!<br />";
+            echo "<script type='text/javascript'>document.getElementById('DivExample').innerHTML='Done!';</script><br />";
             if(!file_exists(PHONE_MODULES_PATH."endpoint/".$row['directory']."/".$row['cfg_dir']."/firmware")) {
                 mkdir(PHONE_MODULES_PATH."endpoint/".$row['directory']."/".$row['cfg_dir']."/firmware");
             }
@@ -732,7 +740,7 @@ class endpointmanager {
 			$directory = "master";
         } else {
             if(!file_exists(PHONE_MODULES_PATH.'/'.$directory)) {
-                mkdir(PHONE_MODULES_PATH.'/'.$directory);
+                mkdir(PHONE_MODULES_PATH.'/'.$directory,0764);
             }
             $destination_file = PHONE_MODULES_PATH.'/'.$directory.'/brand_data.xml';
         }
@@ -748,6 +756,7 @@ class endpointmanager {
                 return(FALSE);
             } else {
                 rename($temp_file, $destination_file);
+                chmod($destination_file,0764);
                 return(TRUE);
             }
         } else {
@@ -759,10 +768,9 @@ class endpointmanager {
     function brand_update_check() {
         $master_result = $this->download_xml(UPDATE_PATH . "master.xml");
 
-        $message = "";
 
         if(!$master_result) {
-            $message .= "Not able to connect to repository. Using local master file instead.";
+            $this->error['brand_update_check_master'] = "Not able to connect to repository. Using local master file instead.";
         }
 
         $temp = $this->xml2array(PHONE_MODULES_PATH.'master.xml');
@@ -775,7 +783,7 @@ class endpointmanager {
 
         if(($data == "") OR ($data <= $endpoint_last_mod)) {
             if((!$master_result) OR (!$this->download_file_no_progress_bar(UPDATE_PATH.'/'.$endpoint_package, PHONE_MODULES_PATH."temp/".$endpoint_package))) {
-                $message .= "<br/>Not able to connect to repository. Using local Provisioner.net Package";
+                $this->error['brand_update_check_xml'] = "<br/>Not able to connect to repository. Using local Provisioner.net Package";
             } else {
                 exec("tar -xvf ".PHONE_MODULES_PATH.'temp/'. $endpoint_package ." -C ".PHONE_MODULES_PATH."temp/");
 
@@ -802,7 +810,7 @@ class endpointmanager {
                 //TODO: Make this pull from the local directory
                 $result = $this->download_xml(UPDATE_PATH .$data['directory']."/".$data['directory'].".xml","endpoint/".$data['directory']);
                 if(!$result) {
-                    $message .= "<br/>Not able to connect to repository. Using local brand [".$data['name']."] file instead.";
+                    $this->error['brand_update_check'] = "<br/>Not able to connect to repository. Using local brand [".$data['name']."] file instead.";
                 }
 
                 if(file_exists(PHONE_MODULES_PATH."endpoint/".$data['directory']."/brand_data.xml")) {
@@ -840,7 +848,7 @@ class endpointmanager {
                         //in database already!
                     }
                 } else {
-                    $message .= "<br/>Error: No Local File for ".$data['name']."!";
+                    $this->error['brand_update_check_local_file'] = "<br/>Error: No Local File for ".$data['name']."!";
                 }
             }
 
@@ -862,9 +870,8 @@ class endpointmanager {
                 }
             }
         } else {
-            $message .= "<br/>Aborting Brand Downloads. Can't Get Master File, Assuming Timeout Issues!";
+            $this->error['brand_update_check_master_file'] = "<br/>Aborting Brand Downloads. Can't Get Master File, Assuming Timeout Issues!";
         }
-        $this->error['brand_update_check'] = $message;
 
         return $out;
     }
@@ -887,10 +894,10 @@ class endpointmanager {
             $brand_last_mod = $temp['data']['brands']['last_modified'];
             $package = $temp['data']['brands']['package'];
 
-            echo "Downloading Tarball.......";
+            echo "<div style='float: left'>Downloading Brand Package...</div><div style='float: left' id=\"DivExample\">.</div>";
             $this->download_file_with_progress_bar(UPDATE_PATH.$row[0]['directory'].'/'.$package, PHONE_MODULES_PATH."temp/".$package);
-            echo "Done!<br />";
-
+            echo "<script type='text/javascript'>document.getElementById('DivExample').innerHTML='Done!';</script><br />";
+            
             echo "Extracting Tarball........";
             exec("tar -xvf ".PHONE_MODULES_PATH.'temp/'. $package ." -C ".PHONE_MODULES_PATH."temp/");
             echo "Done!<br />";
@@ -904,12 +911,13 @@ class endpointmanager {
                 if(is_dir($file)) {
                     $dir = str_replace(PHONE_MODULES_PATH."temp/".$row[0]['directory']."/", "", $file);
                     if(!file_exists(PHONE_MODULES_PATH."endpoint/".$row[0]['directory']."/".$dir)) {
-                        mkdir(PHONE_MODULES_PATH."endpoint/".$row[0]['directory']."/".$dir);
+                        mkdir(PHONE_MODULES_PATH."endpoint/".$row[0]['directory']."/".$dir,0764);
                     }
                 } else {
                     if(basename($file) != "brand_data.xml") {
                         $dir = str_replace(PHONE_MODULES_PATH."temp/".$row[0]['directory']."/", "", $file);
                         rename($file, PHONE_MODULES_PATH."endpoint/".$row[0]['directory']."/".$dir);
+                        chmod(PHONE_MODULES_PATH."endpoint/".$row[0]['directory']."/".$dir,0764);
                     }
                 }
             }
@@ -1007,6 +1015,7 @@ class endpointmanager {
             $key = $this->arraysearchrecursive($model_row['model'], $family_line_xml['data']['model_list'], 'model');
 
             if($key === FALSE) {
+                $this->error['sync_model'] = "Can't locate model in family XML file";
                 return(FALSE);
             } else {
                 if(is_array($family_line_xml['data']['model_list'][$key[0]]['template_data']['files'])) {
@@ -1055,6 +1064,7 @@ class endpointmanager {
             }
 
             if(empty($template_data_array)) {
+                $this->error['sync_model'] = "No Template Data Found";
                 return(FALSE);
             }
 
@@ -1401,10 +1411,14 @@ class endpointmanager {
         //nmap will actually discover 'unseen' devices that the VoIP server hasn't heard from
         //If the user just wishes to use the local arp cache they can tell the function to not use nmap
         //This results in a speed increase from 60 seconds to less than one second.
-        if (($use_nmap) AND ($this->validate_netmask($netmask))) {
+        if (($use_nmap) AND (file_exists($this->global_cfg['nmap_location'])) AND ($this->validate_netmask($netmask))) {
             shell_exec($this->global_cfg['nmap_location'].' -v -sP '. $netmask);
         } elseif(!$this->validate_netmask($netmask)) {
+            $this->error['discover_new'] = "Invalid Netmask";
             return(FALSE);
+        } elseif(!file_exists($this->global_cfg['nmap_location'])) {
+            $this->error['discover_new'] = "Could Not Find NMAP, Using ARP Only";
+            //return(FALSE);
         }
         //Get arp list
         $arp_list = shell_exec($this->global_cfg['arp_location'] . " -an");
@@ -1425,7 +1439,9 @@ class endpointmanager {
         foreach ($temp as $key => &$value) {
 
             //Pull out the IP address from row. It's always the first entry in the row and it can only be a max of 15 characters with the delimiters
-            $ip = trim(substr($value, 0, 15));
+            preg_match_all("/\((.*?)\)/",$value,$matches);
+            $ip = $matches[1];
+            $ip = $ip[0];
 
             //Pull out the mac address by looking for the delimiter
             $mac = substr($value, (strpos($value, ":") -2), 17);
@@ -1511,7 +1527,7 @@ class endpointmanager {
         }
 
         if(!isset($temp)) {
-            $this->error['modelsAvailable'] = "SQL Statement came out empty!";
+            $this->error['modelsAvailable'] = "You need to enable at least ONE model";
             return(FALSE);
         } else {
             return($temp);
@@ -1615,8 +1631,15 @@ class endpointmanager {
 
 }
 
+function endpointman_flush_buffers(){
+    ob_end_flush();
+    //ob_flush();
+    flush();
+    ob_start();
+}
+
 function endpointman_update_progress_bar($out) {
-    echo ".";
+    echo '<script type="text/javascript">document.getElementById(\'DivExample\').innerHTML="%'.$out.'";</script>';
 }
 
 function endpointmanager_read_header($ch, $string) {
@@ -1627,7 +1650,8 @@ function endpointmanager_read_header($ch, $string) {
     if((isset($regs[2])) AND ($regs[2] <> "")) {
         $file_size = intval($regs[2]);
     }
-    ob_flush();
+    //ob_flush();
+    endpointman_flush_buffers();
     return $length;
 }
 
@@ -1645,7 +1669,7 @@ function endpointmanager_read_body($ch, $string) {
     }
     if($fout)
         fwrite($fout, $string);
-    ob_flush();
+    //ob_flush();
+    endpointman_flush_buffers();
     return $length;
 }
-?>

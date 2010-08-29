@@ -17,7 +17,9 @@
     <body>
         {else}
 	{if condition="$custom != 0"}
-        <?=_('a custom config template for extension')?> {$ext}, <?=_('Model')?>: {$model}
+        <strong><?=_('Template Name')?>:</strong> <i>Custom Template: Extension {$ext}</i><br />
+        <strong><?=_('Product Line')?>:</strong> {$product}<br />
+        <strong><?=_('Clone of Model')?>:</strong> {$model}
 	{/if}
 	{if condition="$custom == 0"}
         <strong><?=_('Template Name')?>:</strong> <i>{$template_name}</i><br />
@@ -40,10 +42,12 @@
 	{/if}
             <br />
             <?=_('You can also use certain variables in your configs')?>:<br />{noparse}
-	-"{$srvip}" = <?=_('Server IP')?><br />
+	-"{$server.ip.1}" = <?=_('Server 1 IP')?><br />
+        -"{$server.port.1}" = <?=_('Server 1 Port')?><br />
 	-"{$mac}" = <?=_('Device\'s Mac Address')?><br />
-	-"{$ext}" = <?=_('Device\'s Default Extension (Line 1 or Master)')?><br />
-	-"{$diplayname}" = <?=_('Device\'s Description in FreePBX (Usually the Full Name)')?><br />{/noparse}
+        -"{$model}" = <?=_('Device\'s Model')?><br />
+	-"{$ext.line.1}" = <?=_('Device\'s Default Extension (Line 1 or Master)')?><br />
+	-"{$displayname.line.1}" = <?=_('Device\'s Description in FreePBX (Usually the Full Name)')?><br />{/noparse}
             <br />
             {/if}
 

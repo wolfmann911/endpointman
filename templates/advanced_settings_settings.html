@@ -1,4 +1,6 @@
-<h3>{$message}</h3>
+{if condition="isset($show_error_box)"}
+    {include="message_box"}
+{/if}
 <form action='config.php{$web_vars}&display=epm_advanced&subpage=settings' method='POST'>
 <table width='90%' align='center'>
 <tr>

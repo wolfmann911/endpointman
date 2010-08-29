@@ -1,4 +1,6 @@
-<center><h3>{$message}</h3></center>
+{if condition="isset($show_error_box)"}
+    {include="message_box"}
+{/if}
 {if condition="isset($show_installer)"}
 <script>
 function process_module_actions(actions) {

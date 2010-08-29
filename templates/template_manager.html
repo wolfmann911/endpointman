@@ -1,5 +1,7 @@
 {include="global_header"}
-<h3><center>{$message}</center></h3>
+{if condition="isset($show_error_box)"}
+    {include="message_box"}
+{/if}
 {if condition="$no_add == FALSE"}
 <center>
 	<h3><?=_('Add New Template')?>:</h3><form action="config.php?display=epm_templates&Submit=EditTemplate" method="POST">
