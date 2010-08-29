@@ -18,7 +18,7 @@
 		*2.2.5* Fixed Debug Always on Error &amp File download errors &amp Fix float error on install
         </changelog>
 	<info>http://projects.colsolgrp.net/projects/show/endpointman</info>
-	<location>contributed_modules/release/endpointman-2.0.0.tgz</location>
+	<location>contributed_modules/release/endpointman-2.2.6.tgz</location>
 
-<md5sum>b1341a35ef60d0fad17348803a0a7833</md5sum>
+<md5sum>65556134f52245ad1b268d0b98c6a3e7</md5sum>
 </module>
