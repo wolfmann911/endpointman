@@ -23,6 +23,8 @@ if($_REQUEST['atype'] == "model") {
 	$sql = "SELECT DISTINCT endpointman_template_list.id, endpointman_template_list.name as model FROM endpointman_template_list, endpointman_model_list, endpointman_product_list WHERE endpointman_template_list.product_id = endpointman_model_list.product_id AND endpointman_model_list.product_id = endpointman_product_list.id AND endpointman_model_list.id = '". $_GET['id']."'";
 } elseif ($_REQUEST['atype'] == "model_clone") {
         $sql = "SELECT endpointman_model_list.id, endpointman_model_list.model as model FROM endpointman_model_list, endpointman_product_list WHERE endpointman_product_list.id = endpointman_model_list.product_id AND endpointman_model_list.enabled = 1 AND endpointman_model_list.hidden = 0 AND product_id = '". $_GET['id']."'";
+}   elseif ($_REQUEST['atype'] == "lines") {
+        $sql = "SELECT max_lines FROM endpointman_model_list WHERE id = '". $_GET['id']."'";
 }
 
 if (($_REQUEST['atype'] == "template") OR ($_REQUEST['atype'] == "template2")) {
@@ -37,7 +39,16 @@ if (($_REQUEST['atype'] == "template") OR ($_REQUEST['atype'] == "template2")) {
 	$i=0;
 }
 
-$result = $db->getAll($sql,array(), DB_FETCHMODE_ASSOC);
+if($_REQUEST['atype'] == "lines") {
+    $count = $db->getOne($sql);
+    for($z=0;$z<$count;$z++) {
+        $result[$z]['id'] = $z + 1;
+        $result[$z]['model'] = $z + 1;
+    }
+} else {
+    $result = $db->getAll($sql,array(), DB_FETCHMODE_ASSOC);
+}
+
 
 foreach($result as $row) {
 	$out[$i]['optionValue'] = $row['id'];

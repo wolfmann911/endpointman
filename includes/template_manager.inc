@@ -68,7 +68,7 @@ if($default_display) {
         $i++;
     }
 
-    $sql = 'SELECT endpointman_mac_list.id,endpointman_mac_list.mac,endpointman_mac_list.model,endpointman_mac_list.description, endpointman_model_list.model as model_clone, endpointman_product_list.short_name as model_class FROM endpointman_mac_list, endpointman_model_list, endpointman_product_list WHERE endpointman_product_list.id = endpointman_model_list.product_id AND endpointman_mac_list.custom_cfg_data IS NOT NULL AND endpointman_model_list.id = endpointman_mac_list.model AND endpointman_mac_list.custom_cfg_template = 0';
+    $sql = 'SELECT endpointman_mac_list.id, endpointman_mac_list.mac, endpointman_mac_list.model, endpointman_line_list.description, endpointman_model_list.model as model_clone, endpointman_product_list.short_name as model_class FROM endpointman_mac_list, endpointman_model_list, endpointman_product_list, endpointman_line_list WHERE endpointman_mac_list.id = endpointman_line_list.mac_id AND endpointman_product_list.id = endpointman_model_list.product_id AND endpointman_mac_list.global_custom_cfg_data IS NOT NULL AND endpointman_model_list.id = endpointman_mac_list.model AND endpointman_mac_list.template_id = 0';
     $template_list =& $db->getAll($sql, array(), DB_FETCHMODE_ASSOC);
     foreach($template_list as $row) {
         $row_out[$i] = $row;

@@ -22,11 +22,6 @@ if(!isset($_REQUEST['subpage'])) {
 
 switch($_REQUEST['subpage']) {
     case "iedl":
-        $amp_serial = base64_encode(serialize($amp_conf));
-        $amp_serial = base64_encode(serialize($amp_conf));
-        $temp_amp['amp_serial'] = $amp_serial;
-        $temp_amp = base64_encode(serialize($temp_amp));
-
         $tpl->assign("exporter_address", "config.php?type=tool&amp;display=epm_config&amp;quietmode=1&amp;handler=file&amp;file=export.html.php&amp;module=endpointman&amp;rand=".rand());
         //Dave B's Q&D file upload security code (http://us2.php.net/manual/en/features.file-upload.php)
         if((isset($_REQUEST['action'])) AND (isset($_REQUEST['button_import'])) AND ($_REQUEST['action'] == "import")) {
@@ -72,8 +67,15 @@ switch($_REQUEST['subpage']) {
                                             $ext = '';
                                             $description = '';
                                         }
-                                        $sql = "INSERT INTO  endpointman_mac_list (mac, model, ext, description) VALUES ('".$mac."','".$model_id."','".$ext."','".$description."')";
+                                        $sql = "INSERT INTO  endpointman_mac_list (mac, model) VALUES ('".$mac."','".$model_id."')";
                                         $endpoint->db->query($sql);
+
+                                        $sql = 'SELECT last_insert_id()';
+                                        $ext_id =& $endpoint->db->getOne($sql);
+
+                                        $sql = "INSERT INTO `endpointman_line_list` (`mac_id`, `ext`, `line`, `description`) VALUES ('".$ext_id."', '".$ext."', '1','".$description."')";
+                                        $endpoint->db->query($sql);
+                                        
                                         $message .= "Inserted Mac Address ".$mac."<br/>";
                                     } else {
                                         $message .= "Invalid Mac on line ". $i. "<br />";

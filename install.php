@@ -92,7 +92,7 @@ function ep_table_exists ($table) {
     return FALSE;
 }
 
-$version = "2.2.6";
+$version = "2.2.7";
 
 if(ep_table_exists("endpointman_global_vars")) {
         $global_cfg =& $db->getAssoc("SELECT var_name, value FROM endpointman_global_vars");
@@ -138,6 +138,8 @@ if(!isset($global_cfg['version'])) {
     $ver = "2.2.5";
 } elseif($global_cfg['version'] == '2.2.6') {
     $ver = "2.2.6";
+} elseif($global_cfg['version'] == '2.2.7') {
+    $ver = "2.2.7";
 } else {
     $ver = "1000";
     $new_install = TRUE;
@@ -784,6 +786,62 @@ if ($ver <= "2.2.5") {
     $db->query($sql);
 }
 
+if ($ver <= "2.2.6") {
+    $sql = "CREATE TABLE IF NOT EXISTS `endpointman_line_list` (
+  `luid` int(11) NOT NULL AUTO_INCREMENT,
+  `mac_id` int(11) NOT NULL,
+  `line` smallint(2) NOT NULL,
+  `ext` varchar(15) NOT NULL,
+  `description` varchar(20) NOT NULL,
+  `custom_cfg_data` longblob NOT NULL,
+  `user_cfg_data` longblob NOT NULL,
+  PRIMARY KEY (`luid`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;";
+    $db->query($sql);
+
+    $data = array();
+    $data =& $db->getAll("SELECT * FROM endpointman_mac_list",array(), DB_FETCHMODE_ASSOC);
+    foreach($data as $list) {
+        $sql = "INSERT INTO endpointman_line_list (mac_id, line, ext, description) VALUES ('".$list['id']."', '1', '".$list['ext']."', '".$list['description']."')";
+        $db->query($sql);
+    }
+
+    $sql = 'ALTER TABLE `endpointman_custom_configs` CHANGE `data` `data` LONGBLOB NOT NULL';
+    $db->query($sql);
+
+    $sql = 'ALTER TABLE `endpointman_mac_list` DROP `description`';
+    $db->query($sql);
+
+    $sql = 'ALTER TABLE `endpointman_mac_list` DROP `ext`';
+    $db->query($sql);
+
+    $sql = 'ALTER TABLE `endpointman_mac_list` CHANGE `custom_cfg_template` `template_id` INT(11) NOT NULL';
+    $db->query($sql);
+
+    $sql = 'ALTER TABLE `endpointman_mac_list` CHANGE `cfg_template_data` `global_template_id` LONGBLOB NOT NULL';
+    $db->query($sql);
+
+    $sql = 'ALTER TABLE `endpointman_mac_list` CHANGE `user_cfg_data` `global_user_cfg_data` LONGBLOB NOT NULL';
+    $db->query($sql);
+
+    $sql = 'ALTER TABLE `endpointman_model_list` ADD `max_lines` SMALLINT(2) NOT NULL AFTER `model`;';
+    $db->query($sql);
+
+    $sql = 'ALTER TABLE `endpointman_model_list` CHANGE `template_data` `template_data` LONGBLOB NOT NULL';
+    $db->query($sql);
+
+    $sql = 'ALTER TABLE `endpointman_template_list` CHANGE `custom_cfg_data` `global_custom_cfg_data` LONGBLOB NULL DEFAULT NULL';
+    $db->query($sql);
+
+    $sql = 'ALTER TABLE `endpointman_mac_list` CHANGE `custom_cfg_data` `global_custom_cfg_data` LONGBLOB NOT NULL';
+    $db->query($sql);
+
+}
+
+if ($ver <= "2.2.7") {
+
+}
+
 
 
 if ($new_install) {
@@ -799,6 +857,20 @@ if ($new_install) {
                   PRIMARY KEY (`id`)
                 ) ENGINE=MyISAM DEFAULT CHARSET=latin1";
         $db->query($sql);
+
+        out("Creating Line List Table");
+
+        $sql = "CREATE TABLE IF NOT EXISTS `endpointman_line_list` (
+  `luid` int(11) NOT NULL AUTO_INCREMENT,
+  `mac_id` int(11) NOT NULL,
+  `line` smallint(2) NOT NULL,
+  `ext` varchar(15) NOT NULL,
+  `description` varchar(20) NOT NULL,
+  `custom_cfg_data` longblob NOT NULL,
+  `user_cfg_data` longblob NOT NULL,
+  PRIMARY KEY (`luid`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;";
+    $db->query($sql);
 
         out("Creating Global Variables Table");
         $sql = "CREATE TABLE IF NOT EXISTS `endpointman_global_vars` (
@@ -836,32 +908,31 @@ if ($new_install) {
 
         out("Creating mac list Table");
         $sql = "CREATE TABLE IF NOT EXISTS `endpointman_mac_list` (
-          `id` int(10) NOT NULL AUTO_INCREMENT,
-          `mac` varchar(12) DEFAULT NULL,
-          `model` varchar(11) NOT NULL,
-          `ext` varchar(15) DEFAULT 'Not Assigned',
-          `description` varchar(20) DEFAULT NULL,
-          `custom_cfg_template` int(11) NOT NULL,
-          `custom_cfg_data` blob NOT NULL,
-          `user_cfg_data` blob NOT NULL,
-          `config_files_override` text NOT NULL,
-          PRIMARY KEY (`id`),
-          UNIQUE KEY `mac` (`mac`)
-        ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1";
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `mac` varchar(12) DEFAULT NULL,
+  `model` varchar(11) NOT NULL,
+  `template_id` int(11) NOT NULL,
+  `global_custom_cfg_data` longblob NOT NULL,
+  `global_user_cfg_data` blob NOT NULL,
+  `config_files_override` text NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `mac` (`mac`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1";
         $db->query($sql);
 
         out("Creating model List Table");
         $sql = "CREATE TABLE IF NOT EXISTS `endpointman_model_list` (
-          `id` varchar(11) NOT NULL COMMENT 'Key ',
-          `brand` int(11) NOT NULL COMMENT 'Brand',
-          `model` varchar(25) NOT NULL COMMENT 'Model',
-          `template_list` text NOT NULL,
-          `template_data` blob NOT NULL,
-          `product_id` varchar(11) NOT NULL,
-          `enabled` int(1) NOT NULL DEFAULT '0',
-          `hidden` int(1) NOT NULL DEFAULT '0',
-          PRIMARY KEY (`id`)
-        ) ENGINE=MyISAM DEFAULT CHARSET=latin1";
+  `id` varchar(11) NOT NULL COMMENT 'Key ',
+  `brand` int(11) NOT NULL COMMENT 'Brand',
+  `model` varchar(25) NOT NULL COMMENT 'Model',
+  `max_lines` smallint(2) NOT NULL,
+  `template_list` text NOT NULL,
+  `template_data` longblob NOT NULL,
+  `product_id` varchar(11) NOT NULL,
+  `enabled` int(1) NOT NULL DEFAULT '0',
+  `hidden` int(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1";
         $db->query($sql);
 
         out("Creating oui List Table");
@@ -877,31 +948,31 @@ if ($new_install) {
 
         out("Creating product List Table");
         $sql = "CREATE TABLE IF NOT EXISTS `endpointman_product_list` (
-          `id` varchar(11) NOT NULL,
-          `brand` int(11) NOT NULL,
-          `long_name` varchar(255) NOT NULL,
-          `short_name` varchar(255) NOT NULL,
-          `cfg_dir` varchar(255) NOT NULL,
-          `cfg_ver` varchar(255) NOT NULL,
-          `hidden` int(1) NOT NULL DEFAULT '0',
-          `firmware_vers` varchar(255) NOT NULL,
-          `firmware_files` text NOT NULL,
-          `config_files` text,
-          `special_cfgs` blob NOT NULL,
-          PRIMARY KEY (`id`)
-        ) ENGINE=MyISAM DEFAULT CHARSET=latin1;";
+  `id` varchar(11) NOT NULL,
+  `brand` int(11) NOT NULL,
+  `long_name` varchar(255) NOT NULL,
+  `short_name` varchar(255) NOT NULL,
+  `cfg_dir` varchar(255) NOT NULL,
+  `cfg_ver` varchar(255) NOT NULL,
+  `hidden` int(1) NOT NULL DEFAULT '0',
+  `firmware_vers` varchar(255) NOT NULL,
+  `firmware_files` text NOT NULL,
+  `config_files` text,
+  `special_cfgs` blob NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1";
         $db->query($sql);
 
         out("Creating Template List Table");
         $sql = "CREATE TABLE IF NOT EXISTS `endpointman_template_list` (
-          `id` int(11) NOT NULL AUTO_INCREMENT,
-          `product_id` varchar(11) NOT NULL,
-          `model_id` varchar(10) NOT NULL,
-          `name` varchar(255) NOT NULL,
-          `custom_cfg_data` blob,
-          `config_files_override` text,
-          PRIMARY KEY (`id`)
-        ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1";
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `product_id` varchar(11) NOT NULL,
+  `model_id` varchar(10) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `global_custom_cfg_data` longblob,
+  `config_files_override` text,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1";
         $db->query($sql);
 
         out("Creating Time Zone List Table");

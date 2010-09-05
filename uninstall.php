@@ -53,6 +53,9 @@ $result = $db->query($sql);
 $sql = "DROP TABLE `endpointman_mac_list`";
 $result = $db->query($sql);
 
+$sql = "DROP TABLE `endpointman_line_list`";
+$result = $db->query($sql);
+
 $sql = "DROP TABLE `endpointman_model_list`";
 $result = $db->query($sql);
 

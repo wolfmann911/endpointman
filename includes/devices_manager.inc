@@ -67,11 +67,18 @@ if(isset($_REQUEST['button_add'])) {
             $custom_cfg_data = serialize($temp);
         }
 
-        $sql = "INSERT INTO `endpointman_mac_list` (`mac`, `model`, `ext`, `description`, `custom_cfg_data`, `custom_cfg_template`) VALUES ('".$mac."', '".$_REQUEST['model_list']."', '".$_REQUEST['ext_list']."', '".$name."', '".$custom_cfg_data."', '".$_REQUEST['template_list']."')";
+        $sql = "INSERT INTO `endpointman_mac_list` (`mac`, `model`, `global_custom_cfg_data`, `template_id`) VALUES ('".$mac."', '".$_REQUEST['model_list']."', '".$custom_cfg_data."', '".$_REQUEST['template_list']."')";
         $endpoint->db->query($sql);
 
-        $sql = 'SELECT id FROM endpointman_mac_list WHERE ext ='. $_REQUEST['ext_list'];
+        $sql = 'SELECT last_insert_id()';
         $ext_id =& $endpoint->db->getOne($sql);
+
+        if(!isset($_REQUEST['line_list'])) {
+            $_REQUEST['line_list'] = 1;
+        }
+
+        $sql = "INSERT INTO `endpointman_line_list` (`mac_id`, `ext`, `line`, `description`) VALUES ('".$ext_id."', '".$_REQUEST['ext_list']."', '".$_REQUEST['line_list']."', '".$name."')";
+        $endpoint->db->query($sql);
 
         $mac_id = $endpoint->get_phone_info($ext_id);
 
@@ -103,7 +110,10 @@ if(isset($_REQUEST['button_add'])) {
     $sql = "SELECT name FROM users WHERE extension = ".$_REQUEST['ext_list'];
     $name=$endpoint->db->getOne($sql);
 
-    $sql = "UPDATE endpointman_mac_list SET custom_cfg_template = '".$_REQUEST['template_list']."', model = '".$_REQUEST['model_list']."', ext = ".$_REQUEST['ext_list'].", description = '".$name."' WHERE id =  ". $_REQUEST['edit_id'];
+    $sql = "UPDATE endpointman_mac_list SET template_id = '".$_REQUEST['template_list']."', model = '".$_REQUEST['model_list']."' WHERE id =  ". $_REQUEST['edit_id'];
+    $endpoint->db->query($sql);
+
+    $sql = "UPDATE endpointman_line_list SET ext = ".$_REQUEST['ext_list'].", description = '".$name."' WHERE mac_id =  ". $_REQUEST['edit_id'];
     $endpoint->db->query($sql);
 
     $row = $endpoint->get_phone_info($_REQUEST['edit_id']);
@@ -116,12 +126,14 @@ if(isset($_REQUEST['button_add'])) {
 
     $sql = "DELETE FROM endpointman_mac_list WHERE id=".$_REQUEST['id'];
     $endpoint->db->query($sql);
+    $sql = "DELETE FROM endpointman_line_list WHERE mac_id=".$_REQUEST['id'];
+    $endpoint->db->query($sql);
 } elseif((isset($_REQUEST['button_add_selected_phones'])) AND (isset($_REQUEST['add']))) {
     $list_num = count($_REQUEST['add']);
     for($i=0;$i<$list_num;$i++) {
         $num = $_REQUEST['add'][$i];
         if($mac = $endpoint->mac_check_clean($_REQUEST['mac_'.$num])) {
-            $sql = "SELECT * FROM endpointman_mac_list WHERE ext = ".$_REQUEST['ext_list_'.$num];
+            $sql = "SELECT * FROM endpointman_line_list WHERE ext = ".$_REQUEST['ext_list_'.$num];
             $res =& $endpoint->db->query($sql);
             $count_macs = $res->numRows();
             if(!$count_macs) {
@@ -129,17 +141,24 @@ if(isset($_REQUEST['button_add'])) {
                 $name =& $endpoint->db->getOne($sql,array(),DB_FETCHMODE_ASSOC);
 
 
-                $sql = 'SELECT endpointman_product_list. * , endpointman_brand_list.directory FROM endpointman_model_list, endpointman_brand_list, endpointman_product_list WHERE endpointman_model_list.id =  \''.$_REQUEST['model_list_'.$num].'\' AND endpointman_model_list.brand = endpointman_brand_list.id AND endpointman_model_list.product_id = endpointman_product_list.id';
-                $row =& $endpoint->db->getAll($sql,array(),DB_FETCHMODE_ASSOC);
+                //$sql = 'SELECT endpointman_product_list. * , endpointman_brand_list.directory FROM endpointman_model_list, endpointman_brand_list, endpointman_product_list WHERE endpointman_model_list.id =  \''.$_REQUEST['model_list_'.$num].'\' AND endpointman_model_list.brand = endpointman_brand_list.id AND endpointman_model_list.product_id = endpointman_product_list.id';
+                //$row =& $endpoint->db->getAll($sql,array(),DB_FETCHMODE_ASSOC);
 
 
-                $sql = "INSERT INTO `endpointman_mac_list` (`mac`, `model`, `ext`, `description`) VALUES ('".$mac."', '".$_REQUEST['model_list_'.$num]."', '".$_REQUEST['ext_list_'.$num]."', '".$name."')";
+                $sql = "INSERT INTO `endpointman_mac_list` (`mac`, `model`, `template_id`) VALUES ('".$mac."', '".$_REQUEST['model_list_'.$num]."', '0')";
                 $endpoint->db->query($sql);
 
-                $sql = 'SELECT id FROM endpointman_mac_list WHERE ext ='. $_REQUEST['ext_list_'.$num];
-                $mac_new_id =& $endpoint->db->getOne($sql,array(),DB_FETCHMODE_ASSOC);
+                $sql = 'SELECT last_insert_id()';
+                $ext_id =& $endpoint->db->getOne($sql);
 
-                $row_new = $endpoint->get_phone_info($mac_new_id);
+                if(!isset($_REQUEST['line_list_'.$num])) {
+                    $_REQUEST['line_list_'.$num] = 1;
+                }
+
+                $sql = "INSERT INTO `endpointman_line_list` (`mac_id`, `ext`, `line`, `description`) VALUES ('".$ext_id."', '".$_REQUEST['ext_list_'.$num]."', '".$_REQUEST['line_list_'.$num]."', '".$name."')";
+                $endpoint->db->query($sql);
+
+                $row_new = $endpoint->get_phone_info($ext_id);
                 $endpoint->prepare_configs($row_new);
  
                 $message = _("Saved")."!";
@@ -169,6 +188,8 @@ if(isset($_REQUEST['button_add'])) {
     if(isset($_REQUEST['selected'])) {
         foreach($_REQUEST['selected'] as $key => $data) {
             $sql = "DELETE FROM endpointman_mac_list WHERE id=".$_REQUEST['selected'][$key];
+            $endpoint->db->query($sql);
+            $sql = "DELETE FROM endpointman_line_list WHERE mac_id=".$_REQUEST['selected'][$key];
             $endpoint->db->query($sql);
         }
     } else {
@@ -282,26 +303,35 @@ if(isset($_REQUEST['button_add'])) {
     }
 }
 
-$sql = 'SELECT endpointman_mac_list.id , endpointman_mac_list.mac , endpointman_model_list.model, endpointman_model_list.enabled , endpointman_mac_list.ext , endpointman_mac_list.description , endpointman_brand_list.name, endpointman_mac_list.custom_cfg_data, endpointman_mac_list.custom_cfg_template FROM endpointman_mac_list , endpointman_model_list , endpointman_brand_list WHERE ( endpointman_model_list.id = endpointman_mac_list.model ) AND ( endpointman_model_list.brand = endpointman_brand_list.id )';
+$sql = 'SELECT endpointman_mac_list.id , endpointman_mac_list.mac , endpointman_model_list.model, endpointman_model_list.enabled , endpointman_brand_list.name, endpointman_mac_list.global_custom_cfg_data, endpointman_mac_list.template_id FROM endpointman_mac_list , endpointman_model_list , endpointman_brand_list WHERE ( endpointman_model_list.id = endpointman_mac_list.model ) AND ( endpointman_model_list.brand = endpointman_brand_list.id )';
 
 $devices_list =& $endpoint->db->getAll($sql,array(),DB_FETCHMODE_ASSOC);
 
 
 $i = 0;
 $list = array();
-foreach($devices_list as $row) {	#Displays the phones in the database with edit and delete buttons
-    $list[$i] = $row;
-    if (($row['custom_cfg_template'] == 0) && (isset($row['custom_cfg_data'])) ) {
-        $list[$i]['template_name'] = "Custom-".$row['mac'];
-    } elseif((!isset($row['custom_cfg_data'])) && ($row['custom_cfg_template'] == 0)) {
-        $list[$i]['template_name'] = "N/A";
-    } else {
-        $sql = "SELECT name FROM endpointman_template_list WHERE id =".$row['custom_cfg_template'];
-        $row2 =& $endpoint->db->getOne($sql);
-        $list[$i]['template_name'] = $row2;
-    }
-    if (!$row['enabled']) {
-        $list[$i]['model'] = $row['model']."<i>(Disabled)</i>";
+foreach($devices_list as $devices_row) {
+    $sql = 'SELECT * FROM endpointman_line_list WHERE mac_id = '.$devices_row['id'];
+    $line_list =& $endpoint->db->getAll($sql,array(),DB_FETCHMODE_ASSOC);
+    $list[$i] = $devices_row;
+    $z = 0;
+    foreach($line_list as $line_row) {
+        $list[$i]['ext'] = $line_row['ext'];
+        $list[$i]['line'] = $line_row['line'];
+        $list[$i]['description'] = $line_row['description'];
+        if (($devices_row['template_id'] == 0) && (isset($devices_row['global_custom_cfg_data'])) ) {
+            $list[$i]['template_name'] = "Custom-".$devices_row['mac'];
+        } elseif((!isset($devices_row['custom_cfg_data'])) && ($devices_row['template_id'] == 0)) {
+            $list[$i]['template_name'] = "N/A";
+        } else {
+            $sql = "SELECT name FROM endpointman_template_list WHERE id =".$devices_row['template_id'];
+            $template_name =& $endpoint->db->getOne($sql);
+            $list[$i]['template_name'] = $template_name;
+        }
+        if (!$devices_row['enabled']) {
+            $list[$i]['model'] = $devices_row['model']."<i>(Disabled)</i>";
+        }
+        $z++;
     }
     $i++;
 }
@@ -374,7 +404,7 @@ if (isset($template_editor)) {
             $tpl->assign("brand_id", $edit_row['brand_id']);
             $tpl->assign("models_ava", $ma);
             $tpl->assign("display_ext", $endpoint->displayExtension($edit_row['ext']));
-            $tpl->assign("display_templates", $endpoint->display_templates($edit_row['product_id'],$edit_row['custom_cfg_template']));
+            $tpl->assign("display_templates", $endpoint->display_templates($edit_row['product_id'],$edit_row['template_id']));
             $tpl->assign("edit_id", $edit_row['id']);
         } else {
             $message = _("You have disabled/removed all models that correspond to this brand. Please enable them in 'Brand Configurations/Setup' before trying to edit this phone");

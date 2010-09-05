@@ -12,16 +12,8 @@ if( ini_get('safe_mode') ){
 	die(_('Turn Off Safe Mode'));
 }
 
-if(file_exists('/tftpboot')) {
-	if(!is_writeable('/tftpboot')) {
-		die(_('/tftpboot is not writable'));
-	}
-} else {
-	die(_("Please create /tftpboot, even if you won't use it"));
-}
-
-if(phpversion < '5.0.0') {
-    die(_('PHP Version MUST be greater than 5!'));
+if(phpversion < '5.1.0') {
+    die(_('PHP Version MUST be greater than 5.1.0!'));
 }
 
 include 'includes/functions.inc';

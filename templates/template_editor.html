@@ -19,7 +19,13 @@
 	{if condition="$custom != 0"}
         <strong><?=_('Template Name')?>:</strong> <i>Custom Template: Extension {$ext}</i><br />
         <strong><?=_('Product Line')?>:</strong> {$product}<br />
-        <strong><?=_('Clone of Model')?>:</strong> {$model}
+        <strong><?=_('Clone of Model')?>:</strong> {$model}<br />
+        <strong><?=_('Area')?>:</strong>
+        <select name="area_list" disabled>
+        {loop name="area_ava"}
+        <option value="{$value.value}" {if condition="!empty($value.selected)"}selected{/if}>{$value.text}</option>
+        {/loop}
+        </select>
 	{/if}
 	{if condition="$custom == 0"}
         <strong><?=_('Template Name')?>:</strong> <i>{$template_name}</i><br />
@@ -27,6 +33,12 @@
         <strong><?=_('Clone of Model')?>:</strong>
         <select name="model_list">
         {loop name="models_ava"}
+        <option value="{$value.value}" {if condition="!empty($value.selected)"}selected{/if}>{$value.text}</option>
+        {/loop}
+        </select>
+        <strong><?=_('Area')?>:</strong>
+        <select name="area_list">
+        {loop name="area_ava"}
         <option value="{$value.value}" {if condition="!empty($value.selected)"}selected{/if}>{$value.text}</option>
         {/loop}
         </select>
@@ -62,6 +74,7 @@
                                 <tr>
                                     <td nowrap>
 						{if condition="$value.type == 'input'"}
+                                                
                                         <label>{$value.description}: <input type='text' name='{$value.key}' value='{$value.value}' size="40"></label>
 						{elseif condition="$value.type == 'radio'"}
 							{$value.description}

@@ -22,19 +22,20 @@
 </center>
 <table align='center' width='90%'>
   <tr>
-<td align='center' width='5px'></td>
-<td width="11%" align='center'><h3><?=_('Mac Address')?></h3></td>
-<td width="13%" align='center'><h3><?=_('Brand')?></h3></td>
-<td width="25%" align='center'><h3><?=_('Model of Phone')?></h3></td>
-<td width="19%" align='center'><h3><?=_('Extension Number')?></h3></td>
-<td width="18%" align='center'><h3><?=_('Template')?></h3></td>
+<td align='center' width='45'></td>
+<td width="157" align='center'><h3><?=_('Mac Address')?></h3></td>
+<td width="187" align='center'><h3><?=_('Brand')?></h3></td>
+<td width="216" align='center'><h3><?=_('Model of Phone')?></h3></td>
+<td width="172" align='center'><h3><?=_('Line')?></h3></td>
+<td width="275" align='center'><h3><?=_('Extension Number')?></h3></td>
+<td width="154" align='center'><h3><?=_('Template')?></h3></td>
 
-<td width="9%" align='center'></td>
+<td width="234" align='center'></td>
 </tr><tr>
 	{if condition="$no_add == FALSE"}
 	<form action='config.php{$web_var}&display=epm_devices' method='POST'>
-		<td align='center' width='5px'><input type="checkbox" name="checkbox" id="checkbox" disabled></td>
-		
+            <td align='center' width='2%'>&nbsp;</td>
+
 <td align='center'>
 	{if condition="$mode == 'EDIT'"}
 	{$mac}
@@ -52,7 +53,7 @@
     </select>
 	{/if}
 </td>
-<td align='center'>  
+<td align='center'>
   <label>
 	{if condition="$mode == 'EDIT'"}
 	<input name="edit_id" type="hidden" value="{$edit_id}">
@@ -63,10 +64,20 @@
       {/loop}
     </select>
 	{else}
-	<select name="model_list" id="model_new"><option></option></select>
-	{/if} 
+        <select name="model_list" id="model_new"><option></option></select>
+	{/if}
   </label></td>
-<td align='center'> 
+<td align='center'>
+  <label>
+	{if condition="$mode == 'EDIT'"}
+        <select name="line_list" id="line_list" disabled>
+            <option value="1">1</option>
+        </select>
+	{else}
+        <select name="line_list" id="line_list" disabled><option></option></select>
+	{/if}
+  </label></td>
+<td align='center'>
     <select name="ext_list" id="select">
     {loop name="display_ext"}
       <option value="{$value.value}" {if condition="isset($value.selected)"}selected{/if}>{$value.text}</option>
@@ -88,7 +99,7 @@
 	{/if}
 </td>
 {$edit}
-<td width="5%" align='center'><input type='reset' value='<?=_('Reset')?>'></td>
+<td align='center'><input type='reset' value='<?=_('Reset')?>'></td>
 </tr>
 </table>
 </form>
@@ -98,8 +109,8 @@
 	<tr>
 	  <td align='center'>&nbsp;</td>
 	  <td align='center'>&nbsp;</td>
-	  <td align='center'>&nbsp;</td>
-	  <td colspan="2" align='center'><h3><?=_('Unmanaged Extensions')?></h3></td>
+          <td align='center'>&nbsp;</td>
+	  <td colspan="3" align='center'><h3><?=_('Unmanaged Extensions')?></h3></td>
 	  <td align='center'>&nbsp;</td>
 	  <td align='center'>&nbsp;</td>
 	  <td align='center'>&nbsp;</td>
@@ -110,33 +121,39 @@
 		{loop name="unmanaged"}
 		<input name="mac_{$value.id}" type="hidden" value="{$value.mac_strip}">
 		<tr>
-		<td align='center' width='5px'><input type="checkbox" name="add[]" value="{$value.id}"></td>
-		<td align='center' width='11%'>{$value.mac_strip}<br />({$value.ip})</td>
-		<td width="13%" align='center'>{$value.brand}</td>
-		<td width="25%" align='center'>
-	
+		<td align='center' width='20'><input type="checkbox" name="add[]" value="{$value.id}"></td>
+		<td align='center' width='148'>{$value.mac_strip}<br />({$value.ip})</td>
+		<td width="188" align='center'>{$value.brand}</td>
+		<td width="216" align='center'>
+
 		<select name="model_list_{$value.id}">
-	  
+
 	    {loop name="value.list"}
-      
+
 		  <option value="{$value.id}">{$value.model}</option>
-	  
+
 	      {/loop}
-    
+
 		  </select></td>
-		<td width="19%" align='center'>
+                  		<td width="141" align='center'>
+                                    <select name="line_list_{$value.id}" id="line_list" disabled>
+                                        <option value="1">1</option>
+                                    </select>
+                                </td>
+
+		<td width="276" align='center'>
 			<select name="ext_list_{$value.id}" id="ext">
-	  
+
 	    {loop name="display_ext"}
-      
+
 		  <option value="{$value.value}">{$value.text}</option>
-	  
+
 	      {/loop}
-    
+
 		  </select></td>
-		<td align='center' width='18%'>&nbsp;</td>
-		<td align='center' width='9%'></td>
-		<td align='center' width='5%'>&nbsp;</td>
+		<td align='center' width='220'>&nbsp;</td>
+		<td align='center' width='154'></td>
+		<td align='center' width='73'>&nbsp;</td>
 		</tr>
 		{/loop}
 		<tr>
@@ -153,28 +170,30 @@
 
 <table width='90%' align='center'>
 	<tr>
+	  <td width="2%" align='center'>&nbsp;</td>
 	  <td align='center'>&nbsp;</td>
 	  <td align='center'>&nbsp;</td>
-	  <td align='center'>&nbsp;</td>
-	  <td colspan="2" align='center'><h3><?=_('Current Managed Extensions')?></h3></td>
-	  <td align='center'>&nbsp;</td>
+	  <td colspan="3" align='center'><h3><?=_('Current Managed Extensions')?></h3></td>
+          <td align='center'>&nbsp;</td>
 	  <td align='center'><h3>Edit</h3></td>
 	  <td align='center'><h3>Delete</h3></td>
   </tr>
 	<form action='config.php{$web_var}&display=epm_devices' method='POST'>
 	{loop name="list"}
 	<tr>
-	<td align='center' width='5px'><input type="checkbox" name="selected[]" value="{$value.id}"></td>
+	<td align='center' ><input type="checkbox" name="selected[]" value="{$value.id}"></td>
 	<td align='center' width='11%'>{$value.mac}</td>
 	<td width="13%" align='center'>{$value.name}</td>
-	<td width="25%" align='center'>{$value.model}</td>
+	<td width="14%" align='center'>{$value.model}</td>
+        <td width="10%" align='center'>{$value.line}</td>
 	<td width="19%" align='center'>{$value.ext} - {$value.description}</td>
-	<td align='center' width='18%'>{$value.template_name}</td>
+	<td align='center' width='15%'>{$value.template_name}</td>
 	<td align='center' width='9%'><a href=config.php?type=tool&display=epm_devices&editready=true&display=epm_devices&id={$value.id}><img src='{$web_path}templates/images/edit.gif' ALT='<?=_('Edit')?>' border='0'></a></td>
-	<td align='center' width='5%'><a href=config.php?type=tool&display=epm_devices&deleteready=true&display=epm_devices&id={$value.id}><img src='{$web_path}templates/images/delete.gif' ALT='<?=_('Delete')?>' border='0'></a></td>
+	<td align='center' width='7%'><a href=config.php?type=tool&display=epm_devices&deleteready=true&display=epm_devices&id={$value.id}><img src='{$web_path}templates/images/delete.gif' ALT='<?=_('Delete')?>' border='0'></a></td>
 	</tr>
 	{/loop}
 </table>
+
 <hr>
 <center>
 <h4>
@@ -210,11 +229,11 @@
 	{loop name="product_list"}
 	<option value="{$value.value}">{$value.text}</option>
 	{/loop}
-</select> <?=_('with')?>  
+</select> <?=_('with')?>
   <label>
     <select name="template_selector" id="template_selector">
       <option></option>
-    </select> 
+    </select>
     <input type="submit" name="button_rebuild_reboot" value="<?=_('Rebuild & Reboot')?>">
   </label></td>
 </tr>
