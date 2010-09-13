@@ -743,7 +743,7 @@ class endpointmanager {
             }
         }
 
-        $provisioner_lib->processor_info = "EndPoint Manager Version ".$epm_version;
+        $provisioner_lib->processor_info = "EndPoint Manager Version ".$this->global_cfg['version'];
 
         //Generate Files
         foreach($returned_data as $key => $data) {
