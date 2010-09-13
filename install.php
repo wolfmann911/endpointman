@@ -92,7 +92,7 @@ function ep_table_exists ($table) {
     return FALSE;
 }
 
-$version = "2.2.7";
+$version = "2.2.8";
 
 if(ep_table_exists("endpointman_global_vars")) {
         $global_cfg =& $db->getAssoc("SELECT var_name, value FROM endpointman_global_vars");
@@ -140,6 +140,8 @@ if(!isset($global_cfg['version'])) {
     $ver = "2.2.6";
 } elseif($global_cfg['version'] == '2.2.7') {
     $ver = "2.2.7";
+} elseif($global_cfg['version'] == '2.2.8') {
+	$ver = "2.2.8";
 } else {
     $ver = "1000";
     $new_install = TRUE;
@@ -839,6 +841,10 @@ if ($ver <= "2.2.6") {
 }
 
 if ($ver <= "2.2.7") {
+
+}
+
+if ($ver <= "2.2.8") {
 
 }
 

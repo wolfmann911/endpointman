@@ -36,13 +36,13 @@ if((!$family_list) && (!$mac_list)) {
 
 if(isset($_REQUEST['button_add'])) {
     if($mac = $endpoint->mac_check_clean($_REQUEST['mac'])) {
-        $sql = 'SELECT `name` FROM `users` WHERE `extension` = '.$_REQUEST['ext_list'];
+        $sql = 'SELECT description FROM devices WHERE id = '.$_REQUEST['ext_list'];
         $name =& $endpoint->db->getOne($sql);
 
         $endpoint->sync_model($_REQUEST['model_list']);
 
         $sql = 'SELECT endpointman_product_list. * , endpointman_model_list.template_data, endpointman_brand_list.directory FROM endpointman_model_list, endpointman_brand_list, endpointman_product_list WHERE endpointman_model_list.id =  \''.$_REQUEST['model_list'].'\' AND endpointman_model_list.brand = endpointman_brand_list.id AND endpointman_model_list.product_id = endpointman_product_list.id';
-        
+
         $row =& $endpoint->db->getRow($sql,array(),DB_FETCHMODE_ASSOC);
 
         $cfg_data = unserialize($row['template_data']);
@@ -107,7 +107,7 @@ if(isset($_REQUEST['button_add'])) {
         }
     }
 } elseif(isset($_REQUEST['button_save'])) {
-    $sql = "SELECT name FROM users WHERE extension = ".$_REQUEST['ext_list'];
+    $sql = "SELECT description FROM devices WHERE id = ".$_REQUEST['ext_list'];
     $name=$endpoint->db->getOne($sql);
 
     $sql = "UPDATE endpointman_mac_list SET template_id = '".$_REQUEST['template_list']."', model = '".$_REQUEST['model_list']."' WHERE id =  ". $_REQUEST['edit_id'];
@@ -160,7 +160,7 @@ if(isset($_REQUEST['button_add'])) {
 
                 $row_new = $endpoint->get_phone_info($ext_id);
                 $endpoint->prepare_configs($row_new);
- 
+
                 $message = _("Saved")."!";
             } else {
                 $message = _("One or more selected phones had the same extension as a phone already added, these devices were not added");

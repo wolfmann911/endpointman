@@ -14,8 +14,13 @@ class endpointmanager {
     public $global_cfg;
     public $error;
 
+    /**
+     *
+     * @global array $amp_conf Data taken about FreePBX from FreePBX as a global, we move this into a public variable
+     * @global object $db Pear DB information, we move this into a public variable
+     */
     function __construct() {
-        global $amp_conf,$global_cfg, $endpoint_db, $db, $type;
+        global $amp_conf, $db, $global_cfg;
 
         date_default_timezone_set('America/Los_Angeles');
 
@@ -32,26 +37,29 @@ class endpointmanager {
         define("LOCAL_PATH", dirname($_SERVER["SCRIPT_FILENAME"])."/modules/endpointman/");
 
 
-        //close open mysql stuff
-        mysql_close();
-
-
         $this->global_cfg =& $this->db->getAssoc("SELECT var_name, value FROM endpointman_global_vars");
 
         define("UPDATE_PATH", $this->global_cfg['update_server']);
         define("VER", $this->global_cfg['version']);
-
+       
         //Define error reporting
         if($this->global_cfg['debug']) {
             error_reporting(E_ALL);
             ini_set('display_errors', 1);
         } else {
             ini_set('display_errors', 0);
-        }
+        }     
+
         //include the local template class
         include LOCAL_PATH."includes/rain.tpl.class.php";
     }
 
+    /**
+     * Displays the message box on any page if triggered.
+     * @param string $message The text of the message
+     * @param string $tpl Not used at this time
+     * @param int $fatal_error Either 0 or 1, 1 would be red, 0 would be black
+     */
     function display_message_box($message, $tpl, $fatal_error=0) {
         $tpl->assign("show_error_box", 1);
         $tpl->assign("advanced_debug", $this->global_cfg['debug']);
@@ -59,11 +67,25 @@ class endpointmanager {
         $tpl->assign("error_message", $message);
     }
 
+    /**
+     * A hacky way to add notifications into freepbx
+     * @deprecated Supposed to remove
+     * @param <type> $id
+     * @param <type> $type
+     * @param <type> $display_text
+     * @param <type> $text
+     * @param <type> $link
+     */
     function add_freepbx_notification($id, $type, $display_text, $text, $link) {
         $sql = "INSERT INTO notifications (module, id, level, display_text, link, candelete, timestamp, extended_text) VALUES ('endpointman', '".$id."', '500', '".$display_text."', '".$link."', '1', '".time()."', '".$text."')";
         mysql_query($sql);
     }
 
+    /**
+     * Taken from PHP.net. A list of errors returned when uploading files.
+     * @param <type> $error_code
+     * @return string
+     */
     function file_upload_error_message($error_code) {
         switch ($error_code) {
             case UPLOAD_ERR_INI_SIZE:
@@ -85,7 +107,18 @@ class endpointmanager {
         }
     }
 
+    /**
+     * Get the brand from any mac sent
+     * @param string $mac
+     * @return array
+     */
     function get_brand_from_mac($mac){
+        //Check for valid mac address first
+        if(!preg_match("/[0-9a-f][0-9a-f][:-][0-9a-f][0-9a-f][:-][0-9a-f][0-9a-f][:-][0-9a-f][0-9a-f][:-][0-9a-f][0-9a-f][:-][0-9a-f][0-9a-f]/i",$mac)) {
+            return(FALSE);
+        }
+
+        //Get the OUI only
         $oui = substr($mac,0,6);
         //Find the matching brand model to the oui
         $oui_sql = "SELECT endpointman_brand_list.name, endpointman_brand_list.id FROM endpointman_oui_list, endpointman_brand_list WHERE oui LIKE '%". $oui ."%' AND endpointman_brand_list.id = endpointman_oui_list.brand AND endpointman_brand_list.installed = 1 LIMIT 1";
@@ -106,6 +139,13 @@ class endpointmanager {
         return($phone_info);
     }
 
+    /**
+     * Setup provisioner class from Provisioner.net
+     *
+     * Not used yet
+     *
+     * @param <type> $mac_id
+     */
     function setup_provisioner($mac_id=NULL) {
         if(!class_exists('ProvisionerConfig')) {
             require(PHONE_MODULES_PATH.'setup.php');
@@ -140,6 +180,7 @@ class endpointmanager {
         $provisioner_lib->brand_name = $phone_info['directory'];
         $provisioner_lib->family_line = $phone_info['cfg_dir'];
     }
+
     /**
      * Send this function an ID from the mac devices list table and you'll get all the information we have on that particular phone
      * @param integer $mac_id ID number reference from the MySQL database referencing the table endpointman_mac_list
@@ -156,7 +197,7 @@ class endpointmanager {
         $res =& $this->db->query($sql);
         if($res->numRows()) {
             //Returns Brand Name, Brand Directory, Model Name, Mac Address, Extension (FreePBX), Custom Configuration Template, Custom Configuration Data, Product Name, Product ID, Product Configuration Directory, Product Configuration Version, Product XML name,
-            $sql = "SELECT endpointman_mac_list.config_files_override, endpointman_mac_list.global_user_cfg_data, endpointman_model_list.id as model_id, endpointman_brand_list.id as brand_id, endpointman_brand_list.name, endpointman_brand_list.directory, endpointman_model_list.model, endpointman_mac_list.mac, endpointman_line_list.ext, endpointman_mac_list.template_id, endpointman_mac_list.global_custom_cfg_data, endpointman_product_list.long_name, endpointman_product_list.id as product_id, endpointman_product_list.cfg_dir, endpointman_product_list.cfg_ver, endpointman_model_list.template_data, endpointman_model_list.enabled, users.name as description, sip.data as secret FROM endpointman_line_list, endpointman_mac_list, endpointman_model_list, endpointman_brand_list, endpointman_product_list, sip, users WHERE endpointman_mac_list.model = endpointman_model_list.id AND endpointman_brand_list.id = endpointman_model_list.brand AND endpointman_product_list.id = endpointman_model_list.product_id AND endpointman_line_list.ext = sip.id AND sip.keyword = 'secret' AND endpointman_line_list.ext = users.extension AND endpointman_mac_list.id = endpointman_line_list.mac_id AND endpointman_mac_list.id = ". $mac_id;
+            $sql = "SELECT endpointman_mac_list.config_files_override, endpointman_mac_list.global_user_cfg_data, endpointman_model_list.id as model_id, endpointman_brand_list.id as brand_id, endpointman_brand_list.name, endpointman_brand_list.directory, endpointman_model_list.model, endpointman_mac_list.mac, endpointman_line_list.ext, endpointman_mac_list.template_id, endpointman_mac_list.global_custom_cfg_data, endpointman_product_list.long_name, endpointman_product_list.id as product_id, endpointman_product_list.cfg_dir, endpointman_product_list.cfg_ver, endpointman_model_list.template_data, endpointman_model_list.enabled, devices.description, sip.data as secret FROM endpointman_line_list, endpointman_mac_list, endpointman_model_list, endpointman_brand_list, endpointman_product_list, sip, devices WHERE endpointman_mac_list.model = endpointman_model_list.id AND endpointman_brand_list.id = endpointman_model_list.brand AND endpointman_product_list.id = endpointman_model_list.product_id AND endpointman_line_list.ext = sip.id AND sip.keyword = 'secret' AND endpointman_line_list.ext = devices.id AND endpointman_mac_list.id = endpointman_line_list.mac_id AND endpointman_mac_list.id = ". $mac_id;
 
             $phone_info =& $this->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
 
@@ -177,8 +218,13 @@ class endpointmanager {
             $row =& $this->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
 
             $brand = $this->get_brand_from_mac($row['mac']);
-            $phone_info['brand_id'] = $brand['id'];
-            $phone_info['name'] = $brand['name'];
+            if($brand) {
+                $phone_info['brand_id'] = $brand['id'];
+                $phone_info['name'] = $brand['name'];
+            } else {
+                $phone_info['brand_id'] = 0;
+                $phone_info['name'] = 'Unknown';
+            }
 
             $phone_info['id'] = $mac_id;
             $phone_info['model_id'] = 0;
@@ -188,6 +234,29 @@ class endpointmanager {
             $phone_info['mac'] = $row['mac'];
         }
 
+        //Final Output needs to look like this:
+        //$this['mac_id']
+        //$this['model_id']
+        //$this['brand_id']
+        //$this['template_id']
+        //$this['product_id']
+        //$this['mac']
+        //$this['cfg_dir']
+        //$this['cfg_ver']
+        //$this['model_name']
+        //$this['brand_name']
+        //$this['long_name']
+        //$this['config_files_override']
+        //$this['global_custom_cfg_data']
+        //$this['global_user_cfg_data']
+        //$this['template_data']
+        //$this['enabled']
+        //$this['line'][1]['ext']
+        //$this['line'][1]['description']
+        //$this['line'][1]['secret']
+        //$this['line'][1]['custom_cfg_data']
+        //$this['line'][1]['user_cfg_data']
+        //
         return $phone_info;
     }
 
@@ -383,64 +452,79 @@ class endpointmanager {
         return($template_variables_array);
     }
 
-function generate_form_data ($i,$cfg_data,$key,$custom_cfg_data) {
-    $admin = TRUE;
-    if ($cfg_data[$i]['type'] == "input") {
-        if((!$admin) && (isset($user_cfg_data[$key]['value']))) {
-            $custom_cfg_data[$key]['value'] = $user_cfg_data[$key]['value'];
-        }
-        $template_variables_array['type'] = "input";
-        $template_variables_array['key'] = $key;
-        $template_variables_array['value'] = $custom_cfg_data[$key]['value'];
-        $template_variables_array['description'] = $cfg_data[$i]['description'];
-    } elseif ($cfg_data[$i]['type'] == "radio") {
-        if((!$admin) && (isset($user_cfg_data[$key]['value']))) {
-            $custom_cfg_data[$key]['value'] = $user_cfg_data[$key]['value'];
-        }
-        $num = $custom_cfg_data[$key]['value'];
-        $template_variables_array['type'] = "radio";
-        $template_variables_array['key'] = $key;
-        $template_variables_array['description'] = $cfg_data[$i]['description'];
-        $z = 0;
-        while($z < count($cfg_data[$i]['data'])) {
-            $template_variables_array['data'][$z]['key'] = $key;
-            $template_variables_array['data'][$z]['value'] = $cfg_data[$i]['data'][$z]['value'];
-            $template_variables_array['data'][$z]['description'] = $cfg_data[$i]['data'][$z]['text'];
-            if ($cfg_data[$i]['data'][$z]['value'] == $num) {
-                $template_variables_array['data'][$z]['checked'] = 'checked';
+    /**
+     * Generate an array that will get parsed as HTML from an array of values from XML
+     * @param int $i
+     * @param array $cfg_data
+     * @param string $key
+     * @param array $custom_cfg_data
+     * @return array
+     */
+    function generate_form_data ($i,$cfg_data,$key,$custom_cfg_data) {
+        $admin = TRUE;
+        if ($cfg_data[$i]['type'] == "input") {
+            if((!$admin) && (isset($user_cfg_data[$key]['value']))) {
+                $custom_cfg_data[$key]['value'] = $user_cfg_data[$key]['value'];
             }
-            $z++;
-        }
-    } elseif ($cfg_data[$i]['type'] == "list") {
-        if((!$admin) && (isset($user_cfg_data[$key]['value']))) {
-            $custom_cfg_data[$key]['value'] = $user_cfg_data[$key]['value'];
-        }
-        $num = $custom_cfg_data[$key]['value'];
-        $template_variables_array['type'] = "list";
-        $template_variables_array['key'] = $key;
-        $template_variables_array['description'] = $cfg_data[$i]['description'];
-        $z = 0;
-        while($z < count($cfg_data[$i]['data'])) {
-            $template_variables_array['data'][$z]['value'] = $cfg_data[$i]['data'][$z]['value'];
-            $template_variables_array['data'][$z]['description'] = $cfg_data[$i]['data'][$z]['text'];
-            if ($cfg_data[$i]['data'][$z]['value'] == $num) {
-                $template_variables_array['data'][$z]['selected'] = 'selected';
+            $template_variables_array['type'] = "input";
+            $template_variables_array['key'] = $key;
+            $template_variables_array['value'] = $custom_cfg_data[$key]['value'];
+            $template_variables_array['description'] = $cfg_data[$i]['description'];
+        } elseif ($cfg_data[$i]['type'] == "radio") {
+            if((!$admin) && (isset($user_cfg_data[$key]['value']))) {
+                $custom_cfg_data[$key]['value'] = $user_cfg_data[$key]['value'];
             }
-            $z++;
+            $num = $custom_cfg_data[$key]['value'];
+            $template_variables_array['type'] = "radio";
+            $template_variables_array['key'] = $key;
+            $template_variables_array['description'] = $cfg_data[$i]['description'];
+            $z = 0;
+            while($z < count($cfg_data[$i]['data'])) {
+                $template_variables_array['data'][$z]['key'] = $key;
+                $template_variables_array['data'][$z]['value'] = $cfg_data[$i]['data'][$z]['value'];
+                $template_variables_array['data'][$z]['description'] = $cfg_data[$i]['data'][$z]['text'];
+                if ($cfg_data[$i]['data'][$z]['value'] == $num) {
+                    $template_variables_array['data'][$z]['checked'] = 'checked';
+                }
+                $z++;
+            }
+        } elseif ($cfg_data[$i]['type'] == "list") {
+            if((!$admin) && (isset($user_cfg_data[$key]['value']))) {
+                $custom_cfg_data[$key]['value'] = $user_cfg_data[$key]['value'];
+            }
+            $num = $custom_cfg_data[$key]['value'];
+            $template_variables_array['type'] = "list";
+            $template_variables_array['key'] = $key;
+            $template_variables_array['description'] = $cfg_data[$i]['description'];
+            $z = 0;
+            while($z < count($cfg_data[$i]['data'])) {
+                $template_variables_array['data'][$z]['value'] = $cfg_data[$i]['data'][$z]['value'];
+                $template_variables_array['data'][$z]['description'] = $cfg_data[$i]['data'][$z]['text'];
+                if ($cfg_data[$i]['data'][$z]['value'] == $num) {
+                    $template_variables_array['data'][$z]['selected'] = 'selected';
+                }
+                $z++;
+            }
+        } elseif ($cfg_data[$i]['type'] == "break") {
+            $template_variables_array['type'] = "break";
         }
-    } elseif ($cfg_data[$i]['type'] == "break") {
-        $template_variables_array['type'] = "break";
-    }
-    if(($this->global_cfg['enable_ari']) AND ($admin) AND ($cfg_data[$i]['type'] != "break") AND ($cfg_data[$i]['type'] != "group")) {
-        $template_variables_array['aried'] = 1;
-        $template_variables_array['ari']['key'] = $key;
-        if(isset($custom_cfg_data[$key]['ari'])) {
-            $template_variables_array['ari']['checked'] = "checked";
+        if(($this->global_cfg['enable_ari']) AND ($admin) AND ($cfg_data[$i]['type'] != "break") AND ($cfg_data[$i]['type'] != "group")) {
+            $template_variables_array['aried'] = 1;
+            $template_variables_array['ari']['key'] = $key;
+            if(isset($custom_cfg_data[$key]['ari'])) {
+                $template_variables_array['ari']['checked'] = "checked";
+            }
         }
+        return($template_variables_array);
     }
-    return($template_variables_array);
-}
 
+    /**
+     * Save template from the template view pain
+     * @param int $id Either the MAC ID or Template ID
+     * @param int $custom Either 0 or 1, it determines if $id is MAC ID or Template ID
+     * @param array $variables The variables sent from the form. usually everything in $_REQUEST[]
+     * @return string Location of area to return to in Endpoint Manager
+     */
     function save_template($id, $custom, $variables) {
         //Custom Means specific to that MAC
         //This function is reversed. Not sure why
@@ -538,20 +622,23 @@ function generate_form_data ($i,$cfg_data,$key,$custom_cfg_data) {
 
     }
 
+    /**
+     * Prepare and then send the data that Provisioner expects, then take what provisioner gives us and do what it says
+     * @param array $phone_info
+     */
     function prepare_configs($phone_info) {
         if(!class_exists('ProvisionerConfig')) {
             require(PHONE_MODULES_PATH.'setup.php');
         }
 
+        //Load Provisioner
         $class = "endpoint_" . $phone_info['directory'] . "_" . $phone_info['cfg_dir'] . '_phone';
-
         $provisioner_lib = new $class();
 
+        //Tell the system who we are and were to find the data.
         $provisioner_lib->root_dir = PHONE_MODULES_PATH;
-
         $provisioner_lib->engine = 'asterisk';
         $provisioner_lib->system = 'unix';
-
 
         //have to because of versions less than php5.3
         $provisioner_lib->brand_name = $phone_info['directory'];
@@ -561,10 +648,11 @@ function generate_form_data ($i,$cfg_data,$key,$custom_cfg_data) {
         $provisioner_lib->mac = $phone_info['mac'];
 
         //Phone Model (Please reference family_data.xml in the family directory for a list of recognized models)
+        //This has to match word for word. I really need to fix this....
         $provisioner_lib->model = $phone_info['model'];
 
         //Timezone
-        $provisioner_lib->timezone = $this->global_cfg['gmthr'];
+        $provisioner_lib->timezone = $this->global_cfg['tz'];
 
         //Server IP
         $provisioner_lib->server[1]['ip'] = $this->global_cfg['srvip'];
@@ -586,8 +674,6 @@ function generate_form_data ($i,$cfg_data,$key,$custom_cfg_data) {
 
         //Pretend we have three lines, we could just have one line or 20...whatever the phone supports
         $provisioner_lib->lines[1] = array('ext' => $phone_info['ext'], 'secret' => $phone_info['secret'], 'displayname' => $phone_info['description']);
-        //$endpoint->lines[2] = array('ext' => '104', 'secret' => 'blah4', 'displayname' => 'Display Name');
-        //$endpoint->lines[3] = array('ext' => '105', 'secret' => 'blah5', 'displayname' => 'Other Account');
 
         if(is_array($phone_info['template_data'])) {
             $template_data = unserialize($phone_info['template_data']['global_custom_cfg_data']);
@@ -657,22 +743,12 @@ function generate_form_data ($i,$cfg_data,$key,$custom_cfg_data) {
             }
         }
 
-        $sql = 'SELECT `value` FROM `endpointman_global_vars` WHERE `var_name` LIKE CONVERT(_utf8 \'version\' USING latin1) COLLATE latin1_swedish_ci';
-        $epm_version = $this->db->getOne($sql);
-
-        $sql = 'SELECT `value` FROM `endpointman_global_vars` WHERE `var_name` LIKE CONVERT(_utf8 \'endpoint_vers\' USING latin1) COLLATE latin1_swedish_ci';
-        $prov_version = $this->db->getOne($sql);
-
-        $sql = 'SELECT `cfg_ver` FROM `endpointman_brand_list` WHERE `directory` LIKE CONVERT(_utf8 \'grandstream\' USING latin1) COLLATE latin1_swedish_ci';
-        $brand_version = $this->db->getOne($sql);
+        $provisioner_lib->processor_info = "EndPoint Manager Version ".$epm_version;
 
         //Generate Files
         foreach($returned_data as $key => $data) {
             if(((file_exists($this->global_cfg['config_location'].$key)) AND (!in_array($key,$provisioner_lib->protected_files))) OR (!file_exists($this->global_cfg['config_location'].$key))) {
                 $fp = fopen($this->global_cfg['config_location'].$key, 'w');
-                $data = str_replace("[\$epm_version]", "EndPoint Manager Version ".$epm_version,$data);
-                $data = str_replace("[\$provisioner_version]", date('m/d/Y',$prov_version)." at ".date("G:i",$prov_version),$data);
-                $data = str_replace("[\$brand_version]", date('m/d/Y',$brand_version)." at ".date("G:i",$brand_version),$data);
                 fwrite($fp, $data);
                 fclose($fp);
                 if(!file_exists($this->global_cfg['config_location'].$key)) {
@@ -683,6 +759,11 @@ function generate_form_data ($i,$cfg_data,$key,$custom_cfg_data) {
         $provisioner_lib->reboot();
     }
 
+    /**
+     * Check for new firmware on the servers
+     * @param int $id Product ID
+     * @return bool True on yes False on no
+     */
     function firmware_update_check($id=NULL) {
         $sql = "SELECT * FROM  endpointman_product_list WHERE  id ='". $id."'";
         $row =& $this->db->getRow($sql,array(),DB_FETCHMODE_ASSOC);
@@ -708,6 +789,11 @@ function generate_form_data ($i,$cfg_data,$key,$custom_cfg_data) {
 
     }
 
+    /**
+     * Check to see the status of the firmware locally (installed or not)
+     * @param int $id
+     * @return string
+     */
     function firmware_local_check($id=NULL) {
         $sql = "SELECT * FROM  endpointman_product_list WHERE hidden = 0 AND id ='". $id ."'";
         $res =& $this->db->query($sql);
@@ -739,6 +825,10 @@ function generate_form_data ($i,$cfg_data,$key,$custom_cfg_data) {
         }
     }
 
+    /**
+     * Remove firmware from the Hard Drive
+     * @param int $id Procut ID
+     */
     function remove_firmware($id=NULL) {
         $sql = "SELECT firmware_files FROM  endpointman_product_list WHERE  id =". $id;
         $files = $this->db->getOne($sql);
@@ -753,6 +843,10 @@ function generate_form_data ($i,$cfg_data,$key,$custom_cfg_data) {
         $this->db->query($sql);
     }
 
+    /**
+     * Install Firmware for the specified Product Line
+     * @param <type> $product_id
+     */
     function install_firmware($product_id) {
         $sql = 'SELECT endpointman_product_list.*, endpointman_brand_list.directory FROM endpointman_product_list, endpointman_brand_list WHERE endpointman_product_list.brand = endpointman_brand_list.id AND endpointman_product_list.id = '.$product_id;
         $row =& $this->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
@@ -785,6 +879,13 @@ function generate_form_data ($i,$cfg_data,$key,$custom_cfg_data) {
         }
     }
 
+    /**
+     * Fix arrays so that they don't return an empty array if the array is empty
+     * Instead we will return an empty string
+     * Also we fix the problem of wanting to get single arrays with keys but not getting them
+     * @param array $array
+     * @return array
+     */
     function fix_single_array_keys($array) {
         if((empty($array[0])) AND (!empty($array))) {
             $array_n[0] = $array;
@@ -796,7 +897,14 @@ function generate_form_data ($i,$cfg_data,$key,$custom_cfg_data) {
         }
     }
 
+    /**
+     * Download the requested XML configuration files from the web
+     * @param string $location full URL of the XML file
+     * @param string $directory Directory to place the XML file in relation to provisioner.net
+     * @return bool True if downloaded, false if failed.
+     */
     function download_xml($location,$directory=NULL) {
+        //If directory is not set then assume we are working with the master.xml file
         if(!isset($directory)) {
             $destination_file = PHONE_MODULES_PATH.'master.xml';
 			$directory = "master";
@@ -826,7 +934,11 @@ function generate_form_data ($i,$cfg_data,$key,$custom_cfg_data) {
         }
     }
 
-    //Check for new packges for brands. These packages will include phone models and such which the user can remove if they want
+    /**
+     * Check for new packges for brands. These packages will include phone models and such which the user can remove if they want
+     * This function will alos auto-update the provisioner.net library incase anything has changed
+     * @return array An array of all the brands/products/models and information about what's  enabled, installed or otherwise
+     */
     function brand_update_check() {
         $master_result = $this->download_xml(UPDATE_PATH . "master.xml");
 
@@ -938,8 +1050,11 @@ function generate_form_data ($i,$cfg_data,$key,$custom_cfg_data) {
         return $out;
     }
 
-    //Version 2.5 good
-    //Still needs way to determine when models move...perhaps another function?
+    /**
+     * This will install or updated a brand package (which is the same thing to this)
+     * Still needs way to determine when models move...perhaps another function?
+     * @param <type> $id
+     */
     function update_brand($id = NULL) {
         $row =& $this->db->getAll('SELECT * FROM  endpointman_brand_list WHERE id ='.$id, array(), DB_FETCHMODE_ASSOC);
 
@@ -1035,7 +1150,10 @@ function generate_form_data ($i,$cfg_data,$key,$custom_cfg_data) {
         }
     }
 
-    //Version 2.5 good
+    /**
+     * Remove the brand
+     * @param int $id Brand ID
+     */
     function remove_brand($id=NULL) {
         $brand_dir =& $this->db->getOne("SELECT directory FROM endpointman_brand_list WHERE id=".$id);
 
@@ -1054,6 +1172,11 @@ function generate_form_data ($i,$cfg_data,$key,$custom_cfg_data) {
         $this->db->query($sql);
     }
 
+    /**
+     * Sync the XML files (incuding all template files) from the hard drive with the database
+     * @param int $model Model ID
+     * @return boolean True on sync completed. False on sync failed
+     */
     function sync_model($model=NULL) {
 
         //TODO: combine these queries
@@ -1137,6 +1260,18 @@ function generate_form_data ($i,$cfg_data,$key,$custom_cfg_data) {
         return(TRUE);
     }
 
+    /**
+     * Taken from http://www.php.net/manual/en/function.array-search.php#69232
+     * search haystack for needle and return an array of the key path, FALSE otherwise.
+     * if NeedleKey is given, return only for this key mixed ArraySearchRecursive(mixed Needle,array Haystack[,NeedleKey[,bool Strict[,array Path]]])
+     * @author ob (at) babcom (dot) biz
+     * @param mixed $Needle
+     * @param array $Haystack
+     * @param mixed $NeedleKey
+     * @param bool $Strict
+     * @param array $Path
+     * @return array
+     */
     function arraysearchrecursive($Needle,$Haystack,$NeedleKey="",$Strict=false,$Path=array()) {
         if(!is_array($Haystack))
             return false;
@@ -1156,6 +1291,19 @@ function generate_form_data ($i,$cfg_data,$key,$custom_cfg_data) {
         }
         return false;
     }
+
+    /**
+     * cURL function to download files with a progress bar and echo output while downloading to the screen
+     * @global <type> $ch
+     * @global <type> $fout
+     * @global <type> $file_size
+     * @global <type> $downloaded
+     * @global <type> $pkg_interface
+     * @global <type> $progress_bar
+     * @param <type> $url_file
+     * @param <type> $destination_file
+     * @return <type>
+     */
     function download_file_with_progress_bar($url_file, $destination_file) {
         global $ch, $fout, $file_size, $downloaded, $pkg_interface, $progress_bar;
         set_time_limit(0);
@@ -1266,11 +1414,20 @@ function generate_form_data ($i,$cfg_data,$key,$custom_cfg_data) {
         }
     }
 
-    //Delete Directory Tree, Doesn't work. though
+    /**
+     * Delete Directory Tree.
+     * @deprecated In favor of rmrf
+     * @param string $dir Full Directory path to delete
+     */
     function deltree($dir) {
         $this->rmrf($dir);
     }
 
+    /**
+     * A function to quickly remove a directory (works in seconds for a hundred thousand files)
+     * @author http://www.php.net/manual/en/function.glob.php#93669
+     * @param string $dir Full Directory path to delete
+     */
     function rmrf($dir) {
         foreach (glob($dir) as $file) {
             if (is_dir($file)) {
@@ -1282,8 +1439,12 @@ function generate_form_data ($i,$cfg_data,$key,$custom_cfg_data) {
         }
     }
 
-
-    function table_exists ($table) {
+    /**
+     * Only used once in all of Endpoint Manager to determine if a table exists
+     * @param <type> $table
+     * @return <type>
+     */
+    function table_exists($table) {
         $sql = "SHOW TABLES FROM asterisk";
         $result = $this->db->getAll($sql);
 
@@ -1296,8 +1457,12 @@ function generate_form_data ($i,$cfg_data,$key,$custom_cfg_data) {
     }
 
     /**
-     Parse XML file into an array
-     Taken from Sister Project SuperFecta
+     * xml2array() will convert the given XML text to an array in the XML structure.
+     * @author http://www.php.net/manual/en/function.xml-parse.php#87920
+     * @param sting $url the XML url (usually a local file)
+     * @param boolean $get_attributes 1 or 0. If this is 1 the function will get the attributes as well as the tag values - this results in a different array structure in the return value.
+     * @param string $priority Can be 'tag' or 'attribute'. This will change the way the resulting array sturcture. For 'tag', the tags are given more importance.
+     * @return array The parsed XML in an array form.
      */
     function xml2array($url, $get_attributes = 1, $priority = 'tag') {
         $contents = "";
@@ -1415,7 +1580,11 @@ function generate_form_data ($i,$cfg_data,$key,$custom_cfg_data) {
         return ($xml_array);
     }
 
-    //This function takes a string and tries to determine if it's a valid mac addess, return FALSE if invalid
+    /**
+     * This function takes a string and tries to determine if it's a valid mac addess, return FALSE if invalid
+     * @param string $mac The full mac address
+     * @return mixed The cleaned up MAC is it was a MAC or False if not a mac
+     */
     function mac_check_clean($mac) {
         if ((strlen($mac) == "17") OR (strlen($mac) == "12")) {
             //It might be better to use switch here instead of these IF statements...
@@ -1457,6 +1626,11 @@ function generate_form_data ($i,$cfg_data,$key,$custom_cfg_data) {
         }
     }
 
+    /**
+     * Check for valid netmast to avoid security issues
+     * @param string $mask the complete netmask, eg [1.1.1.1/24]
+     * @return boolean True if valid, False if not
+     */
     function validate_netmask($mask) {
         if (preg_match("/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\/(\d{1,2})$/", $mask)) {
             return(TRUE);
@@ -1465,14 +1639,19 @@ function generate_form_data ($i,$cfg_data,$key,$custom_cfg_data) {
         }
     }
 
-    //Discover New Device/Hardware
+    /**
+     * Discover New Device/Hardware
+     * nmap will actually discover 'unseen' devices that the VoIP server hasn't heard from
+     * If the user just wishes to use the local arp cache they can tell the function to not use nmap
+     * This results in a speed increase from 60 seconds to less than one second.
+     * @author tm1000
+     * @version 1.5
+     * @param mixed $netmask The netmask, eg [1.1.1.1/24]
+     * @param boolean $use_nmap True use nmap, false don't use it
+     * @return array List of devices found on the network
+     */
     function discover_new($netmask, $use_nmap=TRUE) {
-        //Written by tm1000
-        //Version 1.0
 
-        //nmap will actually discover 'unseen' devices that the VoIP server hasn't heard from
-        //If the user just wishes to use the local arp cache they can tell the function to not use nmap
-        //This results in a speed increase from 60 seconds to less than one second.
         if (($use_nmap) AND (file_exists($this->global_cfg['nmap_location'])) AND ($this->validate_netmask($netmask))) {
             shell_exec($this->global_cfg['nmap_location'].' -v -sP '. $netmask);
         } elseif(!$this->validate_netmask($netmask)) {
@@ -1556,6 +1735,7 @@ function generate_form_data ($i,$cfg_data,$key,$custom_cfg_data) {
             return ($final);
         }
     }
+
     function areaAvailable($model,$area=NULL) {
 
         $temp[0]['value'] = 'GLOBAL';
