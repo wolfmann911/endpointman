@@ -128,6 +128,7 @@ if(isset($_REQUEST['button_add'])) {
     $endpoint->db->query($sql);
     $sql = "DELETE FROM endpointman_line_list WHERE mac_id=".$_REQUEST['id'];
     $endpoint->db->query($sql);
+    $message = _("Deleted")."!";
 } elseif((isset($_REQUEST['button_add_selected_phones'])) AND (isset($_REQUEST['add']))) {
     $list_num = count($_REQUEST['add']);
     for($i=0;$i<$list_num;$i++) {
@@ -232,6 +233,10 @@ if(isset($_REQUEST['button_add'])) {
     foreach($mac_list as $data) {
         $phone_info = $endpoint->get_phone_info($data['id']);
         $endpoint->prepare_configs($phone_info);
+        foreach($phone_info['line'] as $line) {
+            $sql = "UPDATE endpointman_line_list SET description = '".$line['description']."' WHERE luid = ".$line['luid'];
+            $endpoint->db->query($sql);
+        }
     }
 } elseif(isset($_REQUEST['button_rebuild_reboot'])) {
     if($_REQUEST['product_select'] == "") {
@@ -246,6 +251,10 @@ if(isset($_REQUEST['button_add'])) {
             $endpoint->db->query($sql);
             $phone_info = $endpoint->get_phone_info($row['id']);
             $endpoint->prepare_configs($phone_info);
+            foreach($phone_info['line'] as $line) {
+                $sql = "UPDATE endpointman_line_list SET description = '".$line['description']."' WHERE luid = ".$line['luid'];
+                $endpoint->db->query($sql);
+            }
         }
     }
 } elseif(isset($_REQUEST['button_rebuild_selected'])) {
@@ -403,7 +412,7 @@ if (isset($template_editor)) {
             $tpl->assign("name", $edit_row['name']);
             $tpl->assign("brand_id", $edit_row['brand_id']);
             $tpl->assign("models_ava", $ma);
-            $tpl->assign("display_ext", $endpoint->displayExtension($edit_row['ext']));
+            $tpl->assign("display_ext", $endpoint->displayExtension($edit_row['line'][1]['luid']));
             $tpl->assign("display_templates", $endpoint->display_templates($edit_row['product_id'],$edit_row['template_id']));
             $tpl->assign("edit_id", $edit_row['id']);
         } else {
@@ -419,11 +428,13 @@ if (isset($template_editor)) {
         }
         $error_message .= "<br />";
     }
-    if(isset($error_message)) {
-        $endpoint->display_message_box($error_message,$tpl,1);
-    }
+
     if(isset($message)) {
         $endpoint->display_message_box($message,$tpl,0);
+    }
+
+    if(isset($error_message)) {
+        $endpoint->display_message_box($error_message,$tpl,1);
     }
 
     //draw the template

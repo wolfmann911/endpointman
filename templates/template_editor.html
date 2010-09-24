@@ -90,7 +90,7 @@
 						{/if}
                                     </td><td width="90%">
 						{if condition="isset($value.aried)"}
-                                        <label><input type='checkbox' name='ari_{$value.ari.key}' {if condition="isset($value.ari.checked)"}{$value.ari.checked}{/if}><?=_('End User Editable (Through ARI Module)')?></label>
+                                        <label><input type='checkbox' name='ari_{$value.ari.key}' {if condition="isset($value.ari.checked)"}{$value.ari.checked}{/if}>End User Editable (<a href="http://projects.colsolgrp.net/documents/29" target="_blank">Through ARI Module</a>)</label>
 						{/if}
                                     </td>
                                 </tr>
@@ -112,5 +112,5 @@
             {if condition="!isset($in_ari)"}
             <input type="submit" name="button_save_template" value="<?=_('Save Template');?>">
         </form>
+        {include="global_footer"}
         {/if}
-{include="global_footer"}

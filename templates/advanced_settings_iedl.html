@@ -1,4 +1,6 @@
-<center><h3>{$message}</h3></center>
+{if condition="isset($show_error_box)"}
+    {include="message_box"}
+{/if}
 <p><?=_('Export CSV file of devices')?>:
   <br>
   <a href="{$exporter_address}"><?=_('Export CSV')?></a></p>

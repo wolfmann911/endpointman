@@ -1,27 +1,11 @@
 <?PHP
-//ini_set('display_errors', 1);
-//error_reporting(E_ALL);
-/*
-Endpoint Manager V2
-Copyright (C) 2009-2010  Ed Macri, John Mullinix and Andrew Nagy
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
-http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
-*/
-
+/**
+ * Endpoint Manager Installer
+ *
+ * @author Andrew Nagy
+ * @license MPL / GPLv2 / LGPL
+ * @package Endpoint Manager
+ */
 if (! function_exists("out")) {
     function out($text) {
         echo $text."<br />";
@@ -69,7 +53,7 @@ if(!file_exists(PHONE_MODULES_PATH)) {
 }
 
 if(!file_exists(PHONE_MODULES_PATH."setup.php")) {
-	copy(LOCAL_PATH."Install/setup.php",PHONE_MODULES_PATH."setup.php");
+	copy(LOCAL_PATH."install/setup.php",PHONE_MODULES_PATH."setup.php");
         out("Moving Auto Provisioner Class");
 }
 
@@ -92,7 +76,7 @@ function ep_table_exists ($table) {
     return FALSE;
 }
 
-$version = "2.2.8";
+$version = "2.2.9";
 
 if(ep_table_exists("endpointman_global_vars")) {
         $global_cfg =& $db->getAssoc("SELECT var_name, value FROM endpointman_global_vars");
@@ -141,7 +125,13 @@ if(!isset($global_cfg['version'])) {
 } elseif($global_cfg['version'] == '2.2.7') {
     $ver = "2.2.7";
 } elseif($global_cfg['version'] == '2.2.8') {
-	$ver = "2.2.8";
+    $ver = "2.2.8";
+} elseif($global_cfg['version'] == '2.2.9') {
+    $ver = "2.2.9";
+} elseif($global_cfg['version'] == '2.3.0') {
+    $ver = "2.3.0";
+} elseif($global_cfg['version'] == '2.3.1') {
+    $ver = "2.3.1";
 } else {
     $ver = "1000";
     $new_install = TRUE;
@@ -152,8 +142,9 @@ if($new_install) {
 } else {
     out('Version Identified as '. $ver);
 }
+if(!$new_install) {
 
-if(($ver < "1.9.0") AND ($ver > 0)) {
+    if(($ver < "1.9.0") AND ($ver > 0)) {
         out("Please Wait While we upgrade your old setup");
         //Expand the value option
         $sql = 'ALTER TABLE `endpointman_global_vars` CHANGE `value` `value` VARCHAR(100) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT \'Data\'';
@@ -325,9 +316,9 @@ if(($ver < "1.9.0") AND ($ver > 0)) {
         $db->query($sql);
 
         out("DONE! You can now use endpoint manager!");
-}
+    }
 
-if ($ver <= "1.9.0") {
+    if ($ver <= "1.9.0") {
         out("Locating NMAP + ARP + ASTERISK Executables");
 
         $nmap = find_exec("nmap");
@@ -396,8 +387,8 @@ if ($ver <= "1.9.0") {
         out('Alter custom_cfg_data');
         $sql = "ALTER TABLE endpointman_mac_list CHANGE custom_cfg_data custom_cfg_data TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL";
         $db->query($sql);
-}
-if ($ver <= "1.9.1") {
+    }
+    if ($ver <= "1.9.1") {
         out("Create Custom Configs Table");
         $sql = "CREATE TABLE IF NOT EXISTS `endpointman_custom_configs` (
 	  `id` int(11) NOT NULL auto_increment,
@@ -451,12 +442,12 @@ if ($ver <= "1.9.1") {
         out('Alter custom_cfg_data');
         $sql = "ALTER TABLE endpointman_mac_list CHANGE custom_cfg_data custom_cfg_data TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL";
         $db->query($sql);
-}
- if ($ver <= "1.9.2") {
+    }
+    if ($ver <= "1.9.2") {
         out('Updating Global Variables');
- }
+    }
 
-if ($ver <= "1.9.9") {
+    if ($ver <= "1.9.9") {
         out("Adding Custom Field to OUI List");
         $sql = 'ALTER TABLE `endpointman_oui_list` ADD `custom` INT(1) NOT NULL DEFAULT \'0\'';
         $db->query($sql);
@@ -499,23 +490,8 @@ if ($ver <= "1.9.9") {
         out("Add Automatic Update Check [Can be Disabled]");
         $sql = "INSERT INTO cronmanager (module, id, time, freq, lasttime, command) VALUES ('endpointman', 'UPDATES', '23', '24', '0', 'php ".LOCAL_PATH. "includes/update_check.php')";
         $db->query($sql);
-}
-if($ver <= "2.0.0") {
-        if(file_exists($amp_conf['AMPWEBROOT']."/recordings")) {
-            out("Installing ARI Module");
-            copy(LOCAL_PATH. "Install/phonesettings.module", $amp_conf['AMPWEBROOT']."/recordings/modules/phonesettings.module");
-
-            copy(LOCAL_PATH. "templates/javascript/jquery.coda-slider-2.0.js", $amp_conf['AMPWEBROOT']."/recordings/theme/js/jquery.coda-slider-2.0.js");
-
-            copy(LOCAL_PATH. "templates/javascript/jquery.easing.1.3.js", $amp_conf['AMPWEBROOT']."/recordings/theme/js/jquery.easing.1.3.js");
-
-            copy(LOCAL_PATH. "templates/stylesheets/coda-slider-2.0a.css", $amp_conf['AMPWEBROOT']."/recordings/theme/coda-slider-2.0a.css");
-
-
-            out("Fixing permissions on ARI module");
-            chmod($amp_conf['AMPWEBROOT']."/recordings/modules/phonesettings.module", 0664);
-        }
-
+    }
+    if($ver <= "2.0.0") {
         out("Locating NMAP + ARP + ASTERISK Executables");
         $nmap = find_exec("nmap");
         $arp = find_exec("arp");
@@ -585,68 +561,68 @@ if($ver <= "2.0.0") {
         $data =& $db->getAll("SELECT * FROM `endpointman_mac_list",array(), DB_FETCHMODE_ASSOC);
 
         $new_model_list = array(
-            "2" => "1-2-11",
-            "3" => "1-2-10",
-            "4" => "1-2-9",
-            "6" => "4-2-3",
-            "7" => "4-3-7",
-            "8" => "6-1-1",
-            "9" => "6-1-2",
-            "10" => "6-1-3",
-            "11" => "6-1-4",
-            "12"  => "6-1-5",
-            "13"  => "6-1-6",
-            "15" => "2-1-3",
-            "22"  => "4-2-4",
-            "23" => "2-1-2",
-            "24" => "2-1-1",
-            "25" => "2-1-4",
-            "26" => "2-1-5",
-            "27" => "2-2-1",
-            "28" => "2-2-2",
-            "29" => "4-2-1",
-            "30" => "4-2-5",
-            "31" => "4-2-6",
-            "32" => "4-2-7",
-            "33" => "4-2-2",
-            "34" => "4-3-1",
-            "35" => "4-3-2",
-            "36" => "4-3-3",
-            "37" => "4-3-4",
-            "38" => "4-3-5",
-            "39" => "4-3-6",
-            "40" => "4-3-8",
-            "41" => "4-3-9",
-            "42" => "4-3-10",
-            "43" => "4-3-11",
-            "44" => "4-3-12",
-            "45" => "4-1-1",
-            "46" => "4-1-2",
-            "47" => "1-2-1",
-            "48" => "1-2-2",
-            "49" => "1-1-1",
-            "50" => "1-1-2",
-            "51" => "1-2-3",
-            "52" => "1-2-4",
-            "53" => "1-2-5",
-            "54" => "1-2-6",
-            "55" => "1-2-7",
-            "56" => "1-2-8",
-            "57" => "",
-            "58" => "",
-            "59" => "",
-            "60" => "7-1-1",
-            "61" => "7-1-2",
-            "62" => "8-1-1",
-            "63" => "8-1-2",
-            "64" => "8-1-3",
-            "65" => "8-1-4",
-            "67" => "7-2-1",
-            "68" => "7-2-2",
-            "69" => "7-2-3",
-            "70" => "7-2-4",
-            "71" => "7-2-5",
-            "72" => "7-2-6"
+                "2" => "1-2-11",
+                "3" => "1-2-10",
+                "4" => "1-2-9",
+                "6" => "4-2-3",
+                "7" => "4-3-7",
+                "8" => "6-1-1",
+                "9" => "6-1-2",
+                "10" => "6-1-3",
+                "11" => "6-1-4",
+                "12"  => "6-1-5",
+                "13"  => "6-1-6",
+                "15" => "2-1-3",
+                "22"  => "4-2-4",
+                "23" => "2-1-2",
+                "24" => "2-1-1",
+                "25" => "2-1-4",
+                "26" => "2-1-5",
+                "27" => "2-2-1",
+                "28" => "2-2-2",
+                "29" => "4-2-1",
+                "30" => "4-2-5",
+                "31" => "4-2-6",
+                "32" => "4-2-7",
+                "33" => "4-2-2",
+                "34" => "4-3-1",
+                "35" => "4-3-2",
+                "36" => "4-3-3",
+                "37" => "4-3-4",
+                "38" => "4-3-5",
+                "39" => "4-3-6",
+                "40" => "4-3-8",
+                "41" => "4-3-9",
+                "42" => "4-3-10",
+                "43" => "4-3-11",
+                "44" => "4-3-12",
+                "45" => "4-1-1",
+                "46" => "4-1-2",
+                "47" => "1-2-1",
+                "48" => "1-2-2",
+                "49" => "1-1-1",
+                "50" => "1-1-2",
+                "51" => "1-2-3",
+                "52" => "1-2-4",
+                "53" => "1-2-5",
+                "54" => "1-2-6",
+                "55" => "1-2-7",
+                "56" => "1-2-8",
+                "57" => "",
+                "58" => "",
+                "59" => "",
+                "60" => "7-1-1",
+                "61" => "7-1-2",
+                "62" => "8-1-1",
+                "63" => "8-1-2",
+                "64" => "8-1-3",
+                "65" => "8-1-4",
+                "67" => "7-2-1",
+                "68" => "7-2-2",
+                "69" => "7-2-3",
+                "70" => "7-2-4",
+                "71" => "7-2-5",
+                "72" => "7-2-6"
         );
 
         foreach($data as $list) {
@@ -657,17 +633,17 @@ if($ver <= "2.0.0") {
 
 
         $new_product_list = array(
-            "6" => array("product_id" => "1-1", "model_id" => "1-1-1"),
-            "7" => array("product_id" => "1-2", "model_id" => "1-2-1"),
-            "1" => array("product_id" => "2-1", "model_id" => "2-1-1"),
-            "2" => array("product_id" => "2-2", "model_id" => "2-2-1"),
-            "3" => array("product_id" => "4-2", "model_id" => "4-2-1"),
-            "5" => array("product_id" => "4-1", "model_id" => "4-1-1"),
-            "4" => array("product_id" => "4-3", "model_id" => "4-3-1"),
-            "8" => array("product_id" => "6-1", "model_id" => "6-1-1"),
-            "9" => array("product_id" => "7-1", "model_id" => "7-1-1"),
-            "11" => array("product_id" => "7-2", "model_id" => "7-2-1"),
-            "10" => array("product_id" => "8-1", "model_id" => "8-1-1")
+                "6" => array("product_id" => "1-1", "model_id" => "1-1-1"),
+                "7" => array("product_id" => "1-2", "model_id" => "1-2-1"),
+                "1" => array("product_id" => "2-1", "model_id" => "2-1-1"),
+                "2" => array("product_id" => "2-2", "model_id" => "2-2-1"),
+                "3" => array("product_id" => "4-2", "model_id" => "4-2-1"),
+                "5" => array("product_id" => "4-1", "model_id" => "4-1-1"),
+                "4" => array("product_id" => "4-3", "model_id" => "4-3-1"),
+                "8" => array("product_id" => "6-1", "model_id" => "6-1-1"),
+                "9" => array("product_id" => "7-1", "model_id" => "7-1-1"),
+                "11" => array("product_id" => "7-2", "model_id" => "7-2-1"),
+                "10" => array("product_id" => "8-1", "model_id" => "8-1-1")
         );
 
         $data = array();
@@ -684,112 +660,97 @@ if($ver <= "2.0.0") {
             $db->query($sql);
         }
 
-        $data = array();
-        $data =& $db->getAll("SELECT * FROM  endpointman_custom_configs",array(), DB_FETCHMODE_ASSOC);
-        $variable_change = array(
-          "{\$srvip}" => "{\$server.ip.1}",
-          "{\$ext}" => "{\$ext.line.1}",
-          "{\$pass}" => "{\$pass.line.1}",
-          "{\$secret}" => "{\$pass.line.1}",
-          "{\$displayname}" => "{\$displayname.line.1}"
-        );
+        out('WARNING: Config Files have changed MUCH. We have to remove all of your old custom config files. Sorry :-(');
+        $db->query('TRUNCATE TABLE `endpointman_custom_configs`');
 
-        foreach($data as $list) {
-            foreach($variable_change as $key => $value) {
-                $list['data'] = str_replace($key, $value, $list['data']);
-            }
-            $sql = "UPDATE endpointman_custom_configs SET data = '".addslashes($list['data'])."' WHERE id = ". $list['id'];
-            $db->query($sql);
-        }
 
         exec("rm -Rf ".PHONE_MODULES_PATH);
 
         if(!file_exists(PHONE_MODULES_PATH)) {
-                mkdir(PHONE_MODULES_PATH, 0764);
-                out("Creating Phone Modules Directory");
+            mkdir(PHONE_MODULES_PATH, 0764);
+            out("Creating Phone Modules Directory");
         }
 
         if(!file_exists(PHONE_MODULES_PATH."setup.php")) {
-                copy(LOCAL_PATH."Install/setup.php",PHONE_MODULES_PATH."setup.php");
-                out("Moving Auto Provisioner Class");
+            copy(LOCAL_PATH."install/setup.php",PHONE_MODULES_PATH."setup.php");
+            out("Moving Auto Provisioner Class");
         }
 
         if(!file_exists(PHONE_MODULES_PATH."temp/")) {
-                mkdir(PHONE_MODULES_PATH."temp/", 0764);
-                out("Creating temp folder");
+            mkdir(PHONE_MODULES_PATH."temp/", 0764);
+            out("Creating temp folder");
         }
-}
-if ($ver <= "2.2.1") {
-}
+    }
+    if ($ver <= "2.2.1") {
+    }
 
-if ($ver <= "2.2.2") {
+    if ($ver <= "2.2.2") {
 
-    out("Remove all Dashes in IDs");
-    $data = array();
-    $data =& $db->getAll("SELECT * FROM `endpointman_model_list",array(), DB_FETCHMODE_ASSOC);
-    foreach($data as $list) {
-        $new_model_id = str_replace("-", "", $list['id']);
-        $sql = "UPDATE endpointman_model_list SET id = '".$new_model_id."' WHERE id = ". $list['id'];
+        out("Remove all Dashes in IDs");
+        $data = array();
+        $data =& $db->getAll("SELECT * FROM `endpointman_model_list",array(), DB_FETCHMODE_ASSOC);
+        foreach($data as $list) {
+            $new_model_id = str_replace("-", "", $list['id']);
+            $sql = "UPDATE endpointman_model_list SET id = '".$new_model_id."' WHERE id = ". $list['id'];
+            $db->query($sql);
+        }
+
+        $data = array();
+        $data =& $db->getAll("SELECT * FROM `endpointman_product_list",array(), DB_FETCHMODE_ASSOC);
+        foreach($data as $list) {
+            $new_product_id = str_replace("-", "", $list['id']);
+            $sql = "UPDATE endpointman_product_list SET id = '".$new_product_id."' WHERE id = ". $list['id'];
+            $db->query($sql);
+        }
+
+        $data = array();
+        $data =& $db->getAll("SELECT * FROM `endpointman_mac_list",array(), DB_FETCHMODE_ASSOC);
+        foreach($data as $list) {
+            $new_model_id = str_replace("-", "", $list['model']);
+            $sql = "UPDATE endpointman_mac_list SET model = '".$new_model_id."' WHERE id = ". $list['id'];
+            $db->query($sql);
+        }
+
+        $data = array();
+        $data =& $db->getAll("SELECT * FROM endpointman_template_list",array(), DB_FETCHMODE_ASSOC);
+        foreach($data as $list) {
+            $new_model_id = str_replace("-", "", $list['model_id']);
+            $new_product_id = str_replace("-", "", $list['product_id']);
+            $sql = "UPDATE endpointman_template_list SET model_id = '".$new_model_id."', product_id = '".$new_product_id."' WHERE id = ". $list['id'];
+            $db->query($sql);
+        }
+
+        $data = array();
+        $data =& $db->getAll("SELECT * FROM endpointman_custom_configs",array(), DB_FETCHMODE_ASSOC);
+        foreach($data as $list) {
+            $new_product_id = str_replace("-", "", $list['product_id']);
+            $sql = "UPDATE endpointman_custom_configs SET product_id = '".$new_product_id."' WHERE id = ". $list['id'];
+            $db->query($sql);
+        }
+    } if
+    ($ver <= "2.2.3") {
+        $sql = "UPDATE endpointman_global_vars SET value = 'http://www.provisioner.net/release/' WHERE var_name = 'update_server'";
         $db->query($sql);
     }
 
-    $data = array();
-    $data =& $db->getAll("SELECT * FROM `endpointman_product_list",array(), DB_FETCHMODE_ASSOC);
-    foreach($data as $list) {
-        $new_product_id = str_replace("-", "", $list['id']);
-        $sql = "UPDATE endpointman_product_list SET id = '".$new_product_id."' WHERE id = ". $list['id'];
+    if ($ver <= "2.2.4") {
+
+    }
+
+    if ($ver <= "2.2.5") {
+        out("Fixing Permissions of Phone Modules Directory");
+        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(PHONE_MODULES_PATH), RecursiveIteratorIterator::SELF_FIRST);
+        foreach($iterator as $item) {
+            chmod($item, 0764);
+        }
+
+        out("Creating Endpoint Version Row");
+        $sql = 'INSERT INTO `asterisk`.`endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (NULL, \'endpoint_vers\', \'\');';
         $db->query($sql);
     }
 
-    $data = array();
-    $data =& $db->getAll("SELECT * FROM `endpointman_mac_list",array(), DB_FETCHMODE_ASSOC);
-    foreach($data as $list) {
-        $new_model_id = str_replace("-", "", $list['model']);
-        $sql = "UPDATE endpointman_mac_list SET model = '".$new_model_id."' WHERE id = ". $list['id'];
-		$db->query($sql);
-    }
-
-    $data = array();
-    $data =& $db->getAll("SELECT * FROM endpointman_template_list",array(), DB_FETCHMODE_ASSOC);
-    foreach($data as $list) {
-        $new_model_id = str_replace("-", "", $list['model_id']);
-        $new_product_id = str_replace("-", "", $list['product_id']);
-        $sql = "UPDATE endpointman_template_list SET model_id = '".$new_model_id."', product_id = '".$new_product_id."' WHERE id = ". $list['id'];
-        $db->query($sql);
-    }
-
-    $data = array();
-    $data =& $db->getAll("SELECT * FROM endpointman_custom_configs",array(), DB_FETCHMODE_ASSOC);
-    foreach($data as $list) {
-        $new_product_id = str_replace("-", "", $list['product_id']);
-        $sql = "UPDATE endpointman_custom_configs SET product_id = '".$new_product_id."' WHERE id = ". $list['id'];
-        $db->query($sql);
-    }
-} if ($ver <= "2.2.3") {
-	$sql = 'UPDATE `asterisk`.`endpointman_global_vars` SET `value` = \'http://www.provisioner.net/release/\' WHERE `endpointman_global_vars`.`idnum` = 6 LIMIT 1;';
-	$db->query($sql);
-}
-
-if ($ver <= "2.2.4") {
-    out("Fix Debug Left on Error, this turns off debug.");
-    $sql = 'UPDATE `asterisk`.`endpointman_global_vars` SET `value` = \'1\' WHERE `endpointman_global_vars`.`idnum` = 9 LIMIT 1;';
-    $db->query($sql);
-}
-
-if ($ver <= "2.2.5") {  
-    out("Fixing Permissions of Phone Modules Directory");
-    $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(PHONE_MODULES_PATH), RecursiveIteratorIterator::SELF_FIRST);
-    foreach($iterator as $item) {
-        chmod($item, 0764);
-    }
-
-    out("Creating Endpoint Version Row");
-    $sql = 'INSERT INTO `asterisk`.`endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (NULL, \'endpoint_vers\', \'\');';
-    $db->query($sql);
-}
-
-if ($ver <= "2.2.6") {
-    $sql = "CREATE TABLE IF NOT EXISTS `endpointman_line_list` (
+    if ($ver <= "2.2.6") {
+        $sql = "CREATE TABLE IF NOT EXISTS `endpointman_line_list` (
   `luid` int(11) NOT NULL AUTO_INCREMENT,
   `mac_id` int(11) NOT NULL,
   `line` smallint(2) NOT NULL,
@@ -799,55 +760,64 @@ if ($ver <= "2.2.6") {
   `user_cfg_data` longblob NOT NULL,
   PRIMARY KEY (`luid`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;";
-    $db->query($sql);
+        $db->query($sql);
 
-    $data = array();
-    $data =& $db->getAll("SELECT * FROM endpointman_mac_list",array(), DB_FETCHMODE_ASSOC);
-    foreach($data as $list) {
-        $sql = "INSERT INTO endpointman_line_list (mac_id, line, ext, description) VALUES ('".$list['id']."', '1', '".$list['ext']."', '".$list['description']."')";
+        $data = array();
+        $data =& $db->getAll("SELECT * FROM endpointman_mac_list",array(), DB_FETCHMODE_ASSOC);
+        foreach($data as $list) {
+            $sql = "INSERT INTO endpointman_line_list (mac_id, line, ext, description) VALUES ('".$list['id']."', '1', '".$list['ext']."', '".$list['description']."')";
+            $db->query($sql);
+        }
+
+        $sql = 'ALTER TABLE `endpointman_custom_configs` CHANGE `data` `data` LONGBLOB NOT NULL';
+        $db->query($sql);
+
+        $sql = 'ALTER TABLE `endpointman_mac_list` DROP `description`';
+        $db->query($sql);
+
+        $sql = 'ALTER TABLE `endpointman_mac_list` DROP `ext`';
+        $db->query($sql);
+
+        $sql = 'ALTER TABLE `endpointman_mac_list` CHANGE `custom_cfg_template` `template_id` INT(11) NOT NULL';
+        $db->query($sql);
+
+        $sql = 'ALTER TABLE `endpointman_mac_list` CHANGE `cfg_template_data` `global_template_id` LONGBLOB NOT NULL';
+        $db->query($sql);
+
+        $sql = 'ALTER TABLE `endpointman_mac_list` CHANGE `user_cfg_data` `global_user_cfg_data` LONGBLOB NOT NULL';
+        $db->query($sql);
+
+        $sql = 'ALTER TABLE `endpointman_model_list` ADD `max_lines` SMALLINT(2) NOT NULL AFTER `model`;';
+        $db->query($sql);
+
+        $sql = 'ALTER TABLE `endpointman_model_list` CHANGE `template_data` `template_data` LONGBLOB NOT NULL';
+        $db->query($sql);
+
+        $sql = 'ALTER TABLE `endpointman_template_list` CHANGE `custom_cfg_data` `global_custom_cfg_data` LONGBLOB NULL DEFAULT NULL';
+        $db->query($sql);
+
+        $sql = 'ALTER TABLE `endpointman_mac_list` CHANGE `custom_cfg_data` `global_custom_cfg_data` LONGBLOB NOT NULL';
+        $db->query($sql);
+
+    }
+
+    if ($ver <= "2.2.7") {
+
+    }
+
+    if ($ver <= "2.2.8") {
+        out("Fix Debug Left on Error, this turns off debug.");
+        $sql = "UPDATE endpointman_global_vars SET value = '0' WHERE var_name = 'debug'";
+        $db->query($sql);
+
+        $sql = 'ALTER TABLE  endpointman_mac_list CHANGE global_user_cfg_data  global_user_cfg_data LONGBLOB NOT NULL';
         $db->query($sql);
     }
 
-    $sql = 'ALTER TABLE `endpointman_custom_configs` CHANGE `data` `data` LONGBLOB NOT NULL';
-    $db->query($sql);
-
-    $sql = 'ALTER TABLE `endpointman_mac_list` DROP `description`';
-    $db->query($sql);
-
-    $sql = 'ALTER TABLE `endpointman_mac_list` DROP `ext`';
-    $db->query($sql);
-
-    $sql = 'ALTER TABLE `endpointman_mac_list` CHANGE `custom_cfg_template` `template_id` INT(11) NOT NULL';
-    $db->query($sql);
-
-    $sql = 'ALTER TABLE `endpointman_mac_list` CHANGE `cfg_template_data` `global_template_id` LONGBLOB NOT NULL';
-    $db->query($sql);
-
-    $sql = 'ALTER TABLE `endpointman_mac_list` CHANGE `user_cfg_data` `global_user_cfg_data` LONGBLOB NOT NULL';
-    $db->query($sql);
-
-    $sql = 'ALTER TABLE `endpointman_model_list` ADD `max_lines` SMALLINT(2) NOT NULL AFTER `model`;';
-    $db->query($sql);
-
-    $sql = 'ALTER TABLE `endpointman_model_list` CHANGE `template_data` `template_data` LONGBLOB NOT NULL';
-    $db->query($sql);
-
-    $sql = 'ALTER TABLE `endpointman_template_list` CHANGE `custom_cfg_data` `global_custom_cfg_data` LONGBLOB NULL DEFAULT NULL';
-    $db->query($sql);
-
-    $sql = 'ALTER TABLE `endpointman_mac_list` CHANGE `custom_cfg_data` `global_custom_cfg_data` LONGBLOB NOT NULL';
-    $db->query($sql);
-
+    if ($ver <= '2.2.9') {
+        
+    }
 }
-
-if ($ver <= "2.2.7") {
-
-}
-
-if ($ver <= "2.2.8") {
-
-}
-
 
 
 if ($new_install) {
@@ -919,7 +889,7 @@ if ($new_install) {
   `model` varchar(11) NOT NULL,
   `template_id` int(11) NOT NULL,
   `global_custom_cfg_data` longblob NOT NULL,
-  `global_user_cfg_data` blob NOT NULL,
+  `global_user_cfg_data` longblob NOT NULL,
   `config_files_override` text NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `mac` (`mac`)
@@ -1121,22 +1091,42 @@ if ($new_install) {
         ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1";
         $db->query($sql);
 
-        if(file_exists($amp_conf['AMPWEBROOT']."/recordings")) {
-            out("Installing ARI Module");
-            copy(LOCAL_PATH. "Install/phonesettings.module", $amp_conf['AMPWEBROOT']."/recordings/modules/phonesettings.module");
+    if(file_exists($amp_conf['AMPWEBROOT']."/recordings")) {
+        out("Installing ARI Module");
+        copy(LOCAL_PATH. "install/phonesettings.module", $amp_conf['AMPWEBROOT']."/recordings/modules/phonesettings.module");
 
-            copy(LOCAL_PATH. "templates/javascript/jquery.coda-slider-2.0.js", $amp_conf['AMPWEBROOT']."/recordings/theme/js/jquery.coda-slider-2.0.js");
+        mkdir($amp_conf['AMPWEBROOT']."/recordings/theme/js/");
 
-            copy(LOCAL_PATH. "templates/javascript/jquery.easing.1.3.js", $amp_conf['AMPWEBROOT']."/recordings/theme/js/jquery.easing.1.3.js");
+        copy(LOCAL_PATH. "templates/javascript/jquery.coda-slider-2.0.js", $amp_conf['AMPWEBROOT']."/recordings/theme/js/jquery.coda-slider-2.0.js");
 
-            copy(LOCAL_PATH. "templates/stylesheets/coda-slider-2.0a.css", $amp_conf['AMPWEBROOT']."/recordings/theme/coda-slider-2.0a.css");
+        copy(LOCAL_PATH. "templates/javascript/jquery.easing.1.3.js", $amp_conf['AMPWEBROOT']."/recordings/theme/js/jquery.easing.1.3.js");
+
+        copy(LOCAL_PATH. "templates/stylesheets/coda-slider-2.0a.css", $amp_conf['AMPWEBROOT']."/recordings/theme/coda-slider-2.0a.css");
 
 
-            out("Fixing permissions on ARI module");
-            chmod($amp_conf['AMPWEBROOT']."/recordings/modules/phonesettings.module", 0664);
-        }
+        out("Fixing permissions on ARI module");
+        chmod($amp_conf['AMPWEBROOT']."/recordings/modules/phonesettings.module", 0664);
+    }
+
 } else {
     out("Update Version Number");
     $sql = "UPDATE endpointman_global_vars SET value = '".$version."' WHERE var_name = 'version'";
     $db->query($sql);
+
+    if(file_exists($amp_conf['AMPWEBROOT']."/recordings")) {
+        out("Installing ARI Module");
+        copy(LOCAL_PATH. "install/phonesettings.module", $amp_conf['AMPWEBROOT']."/recordings/modules/phonesettings.module");
+
+        mkdir($amp_conf['AMPWEBROOT']."/recordings/theme/js/");
+
+        copy(LOCAL_PATH. "templates/javascript/jquery.coda-slider-2.0.js", $amp_conf['AMPWEBROOT']."/recordings/theme/js/jquery.coda-slider-2.0.js");
+
+        copy(LOCAL_PATH. "templates/javascript/jquery.easing.1.3.js", $amp_conf['AMPWEBROOT']."/recordings/theme/js/jquery.easing.1.3.js");
+        
+        copy(LOCAL_PATH. "templates/stylesheets/coda-slider-2.0a.css", $amp_conf['AMPWEBROOT']."/recordings/theme/coda-slider-2.0a.css");
+
+
+        out("Fixing permissions on ARI module");
+        chmod($amp_conf['AMPWEBROOT']."/recordings/modules/phonesettings.module", 0664);
+    }
 }

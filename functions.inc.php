@@ -1,4 +1,11 @@
 <?PHP
+/**
+ * Endpoint Manager FreePBX Hooks File
+ *
+ * @author Andrew Nagy
+ * @license MPL / GPLv2 / LGPL
+ * @package Endpoint Manager
+ */
 
 function endpointman_get_config($engine) {
   global $db;

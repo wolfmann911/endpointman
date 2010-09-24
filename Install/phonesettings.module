@@ -1,4 +1,12 @@
-<?php
+<?PHP
+
+/**
+ * Endpoint Manager ARI File
+ *
+ * @author Andrew Nagy
+ * @license MPL / GPLv2 / LGPL
+ * @package Endpoint Manager
+ */
 
 
 
@@ -26,7 +34,7 @@ class phonesettings {
    */
   function init() {
   }
- 
+
   /*
    * Adds menu item to nav menu
    *
@@ -57,31 +65,28 @@ class phonesettings {
    * @param $a
    *   action
    */
-  function action($args) {	
+  function action($args) {
+	error_reporting(E_ALL);
+	ini_set('display_errors', 1);
 	global $endpoint, $global_cfg;
 
 	$doc_root =	$_SERVER["DOCUMENT_ROOT"] ."/admin/modules/endpointman/";
 	require($doc_root . "includes/functions.inc");
-	
+
 	$endpoint = new endpointmanager();
-	
-	$sql = "SELECT id FROM endpointman_mac_list WHERE ext = '".$_SESSION['ari_user']['extension']."' ";
-	$results = mysql_query($sql);
-	$row = mysql_fetch_assoc($results);
-	
 
-	$id = $row['id'];
+	$sql = "SELECT mac_id, line FROM endpointman_line_list WHERE ext = '".$_SESSION['ari_user']['extension']."' ";
+    $mac_row =& $endpoint->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
 
-	$row = $endpoint->get_phone_info($id);
-	
-	$cfg_data = unserialize($row['cfg_data']);
-	
-	
-	if($row['custom_cfg_template'] > 0) {
-		$row['custom_cfg_data'] = $row['template_data']['custom_cfg_data'];
-	}
-	$custom_cfg_data2 = unserialize($row['custom_cfg_data']);
-	
+	$mac_id = $mac_row['mac_id'];
+	$line = $mac_row['line'];
+
+	$row = $endpoint->get_phone_info($mac_id);
+
+	$cfg_data = unserialize($row['template_data']);
+
+	$custom_cfg_data2 = unserialize($row['global_custom_cfg_data']);
+
 	$count = count($cfg_data);
 	for($i=0;$i<=$count;$i++) {
 		$temping = str_replace('$','',$cfg_data[$i]['variable']);
@@ -89,19 +94,18 @@ class phonesettings {
 			$custom_cfg_data[$temping]['value'] = $_REQUEST[$temping];
 		}
 	}
-		
-	$custom_cfg_data = serialize($custom_cfg_data);
-	
-	$sql = "UPDATE endpointman_mac_list SET user_cfg_data = '".$custom_cfg_data."' WHERE id = ". $id;
-	mysql_query($sql);
-	
-	require(PHONE_MODULES_PATH.$row['directory'].'/'.$row['cfg_dir'].'/functions.inc');
 
-	$phone_config = new $row['cfg_dir']();
-	$phone_config->generate_config($id);
-	
+	$custom_cfg_data = serialize($custom_cfg_data);
+
+	$sql = "UPDATE endpointman_mac_list SET global_user_cfg_data = '".$custom_cfg_data."' WHERE id = ". $mac_id;
+	$endpoint->db->query($sql);
+
+	//refresh the data before we prepare so we get acurate data
+	$row['global_user_cfg_data'] = $custom_cfg_data;
+	$endpoint->prepare_configs($row);
+
 	$m = "phonesettings";
-	
+
 	$ret .= "
       <head>
         <script>
@@ -110,7 +114,7 @@ class phonesettings {
         // -->
         </script>
     </head>";
-	
+
     return $ret;
   }
 
@@ -128,74 +132,61 @@ class phonesettings {
 	if (!isset($_SESSION['dbh_asterisk'])) {
 		die('No Database?');
     }
-	
+
 	$doc_root =	$_SERVER["DOCUMENT_ROOT"] ."/admin/modules/endpointman/";
 	require($doc_root . "includes/functions.inc");
-	
+
 	$endpoint = new endpointmanager();
-	
-	$sql = "SELECT id FROM endpointman_mac_list WHERE ext = '".$_SESSION['ari_user']['extension']."' ";
-	$results = mysql_query($sql);
-	$row = mysql_fetch_assoc($results);
-	
-	global $global_cfg;
 
-	$row = $endpoint->get_phone_info($row['id']);
-	
+	$sql = "SELECT mac_id, line FROM endpointman_line_list WHERE ext = '".$_SESSION['ari_user']['extension']."' ";
+    $mac_row =& $endpoint->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
 
-	
+	$mac_id = $mac_row['mac_id'];
+	$line = $mac_row['line'];
 
-	if(!$endpoint->sync_product($row['product_id'])) {
-		die("unable to sync local template files". $custom);
+	$row = $endpoint->get_phone_info($mac_id);
+
+	if(!$endpoint->sync_model($row['model_id'])) {
+		die("unable to sync local template files");
 	}
-	
-	//Get default template config data from the database for this product
-	$sql = "SELECT cfg_data FROM endpointman_product_list WHERE id=". $row['product_id'];
-	$result=mysql_query($sql);
-	$product_row=mysql_fetch_array($result);		
-	
-	//inset it into our usable row
-	$row['cfg_data'] = $product_row['cfg_data'];
 
 	$brand_name = $row['directory'];
 	$model_name = $row['cfg_dir'];
 
-		
-	//Start the display of the html file in the product folder
-	
-	$template .=  '<h3>Hello '. $row['description'] . ', You are currently editing phone settings for extension '.$row['ext'].'</h3><br />';
-	
-	if($row['custom_cfg_template'] > 0) {
-		$row['custom_cfg_data'] = $row['template_data']['custom_cfg_data'];
-	} 
 
-	$out = $endpoint->generate_gui_html($row['cfg_data'],$row['custom_cfg_data'],FALSE,$row['user_cfg_data']);
-	
-	$out[0]['data'] = array_values($out[0]['data']);
-	
-	$out[0]['title'] = "Your Phone Settings";
-	
+	//Start the display of the html file in the product folder
+
+	$template =  '<h3>Hello '. $row['line'][$line]['description'] . ', You are currently editing phone settings for extension '.$row['line'][$line]['ext'].'</h3><br />';
+
+	$out = $endpoint->generate_gui_html($row['template_data'],$row['global_custom_cfg_data'],FALSE,$row['global_user_cfg_data']);
+
+	if(!empty($out)) {
+		$out[0]['data'] = array_values($out[0]['data']);
+		$out[0]['title'] = "Your Phone Settings";
+		$button = "<input name='submit' type='submit' value='Save & Reboot'>";
+
+	} else {
+		$out[0]['title'] = "Your Phone Settings have not been enabled. Please talk to your administrator.";
+		$out[0]['data'] = NULL;
+		$button = "";
+	}
+
 	$tpl = new RainTPL( LOCAL_PATH.'templates' );
-	
+
 	$tpl->assign("in_ari", 1);
 	$tpl->assign("template_editor", $out);
-	$tpl->assign("hidden_id", $row['id']);
-	$tpl->assign("hidden_custom", $custom);
+	$tpl->assign("hidden_id", $row['line'][$line]['luid']);
 	$template .= $tpl->draw( 'template_editor', TRUE );
-	
+
 
 	$m = "phonesettings";
-	$ret .= "<form class='phonesettings' name='ari_settings' action='' method='GET'>
+	$ret = "<form class='phonesettings' name='ari_settings' action='' method='GET'>
 	<input type=hidden name=m value=" . $m . ">
 	<input type=hidden name=f value='action'>
 	<input type=hidden name=a value='update'>
 	<br>
 	" . $template . "
-	<br>
-	<input name='submit' type='submit' value='Save & Reboot'>
-	</form>";
+	<br>". $button ."</form>";
 	return($ret);
   }
 } // class
-
-?>

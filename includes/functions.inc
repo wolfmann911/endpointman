@@ -24,23 +24,25 @@ class endpointmanager {
 
         date_default_timezone_set('America/Los_Angeles');
 
-        $this->db = $db;
+        if(isset($_SESSION['dbh_asterisk'])) {
+            $this->db = $_SESSION['dbh_asterisk'];
+            $_SERVER["SCRIPT_FILENAME"] = str_replace("recordings/", "admin/", $_SERVER["SCRIPT_FILENAME"]);
+        } else {
+            $this->db = $db;
+        }
         $this->amp_conf = $amp_conf;
         $this->error = array();
 
+        $this->global_cfg =& $this->db->getAssoc("SELECT var_name, value FROM endpointman_global_vars");
 
+        define("UPDATE_PATH", $this->global_cfg['update_server']);
+        define("VER", $this->global_cfg['version']);
         //Define the location of phone modules, keeping it outside of the module directory so that when the user updates endpointmanager they don't lose all of their phones
         define("PHONE_MODULES_PATH", dirname($_SERVER["SCRIPT_FILENAME"])."/modules/_ep_phone_modules/");
 
         //Get local path information
         define("WEB_PATH", dirname($_SERVER['SCRIPT_NAME'])."/modules/endpointman/");
         define("LOCAL_PATH", dirname($_SERVER["SCRIPT_FILENAME"])."/modules/endpointman/");
-
-
-        $this->global_cfg =& $this->db->getAssoc("SELECT var_name, value FROM endpointman_global_vars");
-
-        define("UPDATE_PATH", $this->global_cfg['update_server']);
-        define("VER", $this->global_cfg['version']);
        
         //Define error reporting
         if($this->global_cfg['debug']) {
@@ -48,10 +50,43 @@ class endpointmanager {
             ini_set('display_errors', 1);
         } else {
             ini_set('display_errors', 0);
-        }     
+        }
+
+        //Check writable
+        if(isset($this->global_cfg['config_location'])) {
+            if(is_dir($this->global_cfg['config_location'])) {
+                if(!is_writeable($this->global_cfg['config_location'])) {
+                    $user = exec('whoami');
+                    $this->error['config_location'] = "Configuration Directory is not writable!".
+                        "<br />Please change the location: <a href='config.php?type=tool&display=epm_advanced'>Here</a>".
+                        "<br />Or run this command on SSH: 'chown -R ".$user.":".$user." ".$this->global_cfg['config_location']."' then 'chmod -R 777 ".$this->global_cfg['config_location']."'";
+                }
+            } else {
+                $this->error['config_location'] = "Configuration Directory is not a directory or does not exist! Please change the location here: <a href='config.php?type=tool&display=epm_advanced'>Here</a>";
+            }
+        }
 
         //include the local template class
         include LOCAL_PATH."includes/rain.tpl.class.php";
+    }
+
+    function submit_config($brand,$product,$orig_name,$data) {
+        $posturl = 'http://www.provisioner.net/submit_config.php';
+        $postvars = 'brand=&product=&origname='.htmlentities(addslashes($orig_name)).'&config_data='.base64_encode($data);
+
+        $ch = curl_init($posturl);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postvars);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt($ch, CURLOPT_HEADER, 0);  // DO NOT RETURN HTTP HEADERS
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);  // RETURN THE CONTENTS OF THE CALL
+        $Rec_Data = curl_exec($ch);
+
+        ob_start();
+        header("Content-Type: text/html");
+        $Final_Out=ob_get_clean();
+        curl_close($ch);
+
     }
 
     /**
@@ -192,12 +227,12 @@ class endpointmanager {
             $this->error['get_phone_info'] = "Mac ID is not set";
             return(FALSE);
         }
-        $sql = "SELECT id,mac,model FROM  endpointman_mac_list WHERE model > 0 AND id =".$mac_id;
+        $sql = "SELECT id FROM endpointman_mac_list WHERE model > 0 AND id =".$mac_id;
 
         $res =& $this->db->query($sql);
         if($res->numRows()) {
             //Returns Brand Name, Brand Directory, Model Name, Mac Address, Extension (FreePBX), Custom Configuration Template, Custom Configuration Data, Product Name, Product ID, Product Configuration Directory, Product Configuration Version, Product XML name,
-            $sql = "SELECT endpointman_mac_list.config_files_override, endpointman_mac_list.global_user_cfg_data, endpointman_model_list.id as model_id, endpointman_brand_list.id as brand_id, endpointman_brand_list.name, endpointman_brand_list.directory, endpointman_model_list.model, endpointman_mac_list.mac, endpointman_line_list.ext, endpointman_mac_list.template_id, endpointman_mac_list.global_custom_cfg_data, endpointman_product_list.long_name, endpointman_product_list.id as product_id, endpointman_product_list.cfg_dir, endpointman_product_list.cfg_ver, endpointman_model_list.template_data, endpointman_model_list.enabled, devices.description, sip.data as secret FROM endpointman_line_list, endpointman_mac_list, endpointman_model_list, endpointman_brand_list, endpointman_product_list, sip, devices WHERE endpointman_mac_list.model = endpointman_model_list.id AND endpointman_brand_list.id = endpointman_model_list.brand AND endpointman_product_list.id = endpointman_model_list.product_id AND endpointman_line_list.ext = sip.id AND sip.keyword = 'secret' AND endpointman_line_list.ext = devices.id AND endpointman_mac_list.id = endpointman_line_list.mac_id AND endpointman_mac_list.id = ". $mac_id;
+            $sql = "SELECT endpointman_mac_list.config_files_override, endpointman_mac_list.global_user_cfg_data, endpointman_model_list.id as model_id, endpointman_brand_list.id as brand_id, endpointman_brand_list.name, endpointman_brand_list.directory, endpointman_model_list.model, endpointman_mac_list.mac, endpointman_mac_list.template_id, endpointman_mac_list.global_custom_cfg_data, endpointman_product_list.long_name, endpointman_product_list.id as product_id, endpointman_product_list.cfg_dir, endpointman_product_list.cfg_ver, endpointman_model_list.template_data, endpointman_model_list.enabled FROM endpointman_line_list, endpointman_mac_list, endpointman_model_list, endpointman_brand_list, endpointman_product_list WHERE endpointman_mac_list.model = endpointman_model_list.id AND endpointman_brand_list.id = endpointman_model_list.brand AND endpointman_product_list.id = endpointman_model_list.product_id AND endpointman_mac_list.id = endpointman_line_list.mac_id AND endpointman_mac_list.id = ". $mac_id;
 
             $phone_info =& $this->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
 
@@ -212,6 +247,14 @@ class endpointmanager {
                 $phone_info['template_data'] =& $this->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
 
             }
+
+            $sql = "SELECT endpointman_line_list.*, sip.data as secret, devices.* FROM endpointman_line_list, sip, devices WHERE endpointman_line_list.ext = devices.id AND endpointman_line_list.ext = sip.id AND sip.keyword = 'secret' AND mac_id = ".$mac_id;
+            $lines_info =& $this->db->getAll($sql, array(), DB_FETCHMODE_ASSOC);
+            foreach($lines_info as $line) {
+                $phone_info['line'][$line['line']] = $line;
+            }
+
+
         } else {
             $sql = "SELECT id, mac, ext FROM endpointman_mac_list WHERE id =".$mac_id;
             //Phone is unknown, we need to display this to the end user so that they can make corrections
@@ -438,13 +481,16 @@ class endpointmanager {
                                 }
                             }
                             $items[$i] = $items;
-                            $template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($i,$items,$key,$custom_cfg_data);
+                            $template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($i,$items,$key,$custom_cfg_data,$admin,$user_cfg_data);
                             $template_variables_array[$group_count]['data'][$variables_count]['looping'] = TRUE;
                             $variables_count++;
                         }
                     }
                 } else {
-                    $template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($i,$cfg_data,$key,$custom_cfg_data);
+                    if(!isset($variables_count)) {
+                        $variables_count = 0;
+                    }
+                    $template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($i,$cfg_data,$key,$custom_cfg_data,$admin,$user_cfg_data);
                     $variables_count++;
                 }
             }
@@ -460,8 +506,7 @@ class endpointmanager {
      * @param array $custom_cfg_data
      * @return array
      */
-    function generate_form_data ($i,$cfg_data,$key,$custom_cfg_data) {
-        $admin = TRUE;
+    function generate_form_data ($i,$cfg_data,$key,$custom_cfg_data,$admin=FALSE,$user_cfg_data) {
         if ($cfg_data[$i]['type'] == "input") {
             if((!$admin) && (isset($user_cfg_data[$key]['value']))) {
                 $custom_cfg_data[$key]['value'] = $user_cfg_data[$key]['value'];
@@ -509,6 +554,7 @@ class endpointmanager {
             $template_variables_array['type'] = "break";
         }
         if(($this->global_cfg['enable_ari']) AND ($admin) AND ($cfg_data[$i]['type'] != "break") AND ($cfg_data[$i]['type'] != "group")) {
+           
             $template_variables_array['aried'] = 1;
             $template_variables_array['ari']['key'] = $key;
             if(isset($custom_cfg_data[$key]['ari'])) {
@@ -672,19 +718,28 @@ class endpointmanager {
             }
         }
 
-        //Pretend we have three lines, we could just have one line or 20...whatever the phone supports
-        $provisioner_lib->lines[1] = array('ext' => $phone_info['ext'], 'secret' => $phone_info['secret'], 'displayname' => $phone_info['description']);
+        //Loop through Lines!
+        foreach($phone_info['line'] as $line) {
+            $provisioner_lib->lines[$line['line']] = array('ext' => $line['ext'], 'secret' => $line['secret'], 'displayname' => $line['description']);
+        }
+
+        $global_user_cfg_data = unserialize($phone_info['global_user_cfg_data']);
 
         if(is_array($phone_info['template_data'])) {
             $template_data = unserialize($phone_info['template_data']['global_custom_cfg_data']);
         } else {
             $template_data = unserialize($phone_info['global_custom_cfg_data']);
         }
+
         $new_template_data = array();
         if(is_array($template_data)) {
             foreach($template_data as $key => $data) {
                 if(array_key_exists('value', $data)) {
-                    $new_template_data[$key] = $data['value'];
+                    if((isset($template_data[$key]['ari'])) && (isset($global_user_cfg_data[$key]['value']))) {
+                       $new_template_data[$key] = $global_user_cfg_data[$key]['value'];
+                    } else {
+                       $new_template_data[$key] = $data['value'];
+                    }
                 } else {
                     $key = explode('_',$key);
                     $new_template_data[$key[0]][$key[2]][$key[1]] = $data[$key[2]];
@@ -696,12 +751,21 @@ class endpointmanager {
         //template_data_custom.xml which will get included or template_data_<model_name>_custom.xml which will also get included
         //line 'global' will set variables that aren't line dependant
         $provisioner_lib->options = $new_template_data;
+
         //Setting a line variable here...these aren't defined in the template_data.xml file yet. however they will still be parsed
         //and if they have defaults assigned in a future template_data.xml or in the config file using pipes (|) those will be used, pipes take precedence
+        $provisioner_lib->processor_info = "EndPoint Manager Version ".$this->global_cfg['version'];
 
         // Because every brand is an extension (eventually) of endpoint, you know this function will exist regardless of who it is
+        //Start timer
+        $time_start = microtime(true);
         $returned_data = $provisioner_lib->generate_config();
-
+        //End timer
+        $time_end = microtime(true);
+        $time = $time_end - $time_start;
+        if($time > 360) {
+            $this->error['generate_time'] = "It's taking a awfully long time to generate configs...(".round($time,2)." seconds)";
+        }
         //Create Directory Structure (If needed)
         if(isset($provisioner_lib->directory_structure)) {
             foreach($provisioner_lib->directory_structure as $data) {
@@ -742,8 +806,6 @@ class endpointmanager {
                 }
             }
         }
-
-        $provisioner_lib->processor_info = "EndPoint Manager Version ".$this->global_cfg['version'];
 
         //Generate Files
         foreach($returned_data as $key => $data) {
@@ -827,7 +889,7 @@ class endpointmanager {
 
     /**
      * Remove firmware from the Hard Drive
-     * @param int $id Procut ID
+     * @param int $id Product ID
      */
     function remove_firmware($id=NULL) {
         $sql = "SELECT firmware_files FROM  endpointman_product_list WHERE  id =". $id;
@@ -835,9 +897,10 @@ class endpointmanager {
 
         $file_list = explode(",",$files);
         $i = 0;
-        while($i < count($file_list)) {
-            unlink($this->global_cfg['config_location'].$file_list[$i]);
-            $i++;
+        foreach($file_list as $file) {
+            if(file_exists($this->global_cfg['config_location'].$file)) {
+                unlink($this->global_cfg['config_location'].$file);
+            }
         }
         $sql = 'UPDATE endpointman_product_list SET firmware_files = "", firmware_vers = "" WHERE id = '.$id;
         $this->db->query($sql);
@@ -845,7 +908,7 @@ class endpointmanager {
 
     /**
      * Install Firmware for the specified Product Line
-     * @param <type> $product_id
+     * @param <type> $product_id Product ID
      */
     function install_firmware($product_id) {
         $sql = 'SELECT endpointman_product_list.*, endpointman_brand_list.directory FROM endpointman_product_list, endpointman_brand_list WHERE endpointman_product_list.brand = endpointman_brand_list.id AND endpointman_product_list.id = '.$product_id;
@@ -1022,7 +1085,7 @@ class endpointmanager {
                         //in database already!
                     }
                 } else {
-                    $this->error['brand_update_check_local_file'] = "<br/>Error: No Local File for ".$data['name']."!";
+                    $this->error['brand_update_check_local_file'] = "<br/>Error: No Local File for ".$data['name']."!<br /><br />Learn how to manually upload packages here (it's easy!): <a href='http://projects.colsolgrp.net/documents/28' target='_blank'>Click Here!</a>";
                 }
             }
 
@@ -1044,7 +1107,7 @@ class endpointmanager {
                 }
             }
         } else {
-            $this->error['brand_update_check_master_file'] = "<br/>Aborting Brand Downloads. Can't Get Master File, Assuming Timeout Issues!";
+            $this->error['brand_update_check_master_file'] = "<br/>Aborting Brand Downloads. Can't Get Master File, Assuming Timeout Issues!<br /><br />Learn how to manually upload packages here (it's easy!): <a href='http://projects.colsolgrp.net/documents/28' target='_blank'>Click Here!</a>";
         }
 
         return $out;
@@ -1841,10 +1904,13 @@ class endpointmanager {
         }
     }
 
-    function displayExtension($ext = NULL) {
-        if(!isset($ext)) {
+    function displayExtension($line_id = NULL) {
+        if(!isset($line_id)) {
+            $ext = NULL;
             $not_added="SELECT devices.id, devices.description FROM devices WHERE tech='sip' AND devices.id not in (SELECT devices.id FROM devices, endpointman_line_list WHERE tech='sip' AND devices.id = endpointman_line_list.ext ) ORDER BY devices.id";
         } else {
+            $sql = 'SELECT ext FROM endpointman_line_list WHERE luid = '.$line_id;
+            $ext = $this->db->getOne($sql);
             $not_added="SELECT devices.id, devices.description FROM devices WHERE tech='sip' AND devices.id not in (SELECT devices.id FROM devices, endpointman_line_list WHERE tech='sip' AND devices.id = endpointman_line_list.ext AND endpointman_line_list.ext !=".$ext." ) ORDER BY devices.id";
         }
         $result =& $this->db->getAll($not_added,array(), DB_FETCHMODE_ASSOC);

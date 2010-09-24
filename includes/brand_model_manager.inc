@@ -17,8 +17,13 @@ if((isset($_REQUEST['button_install'])) OR (isset($_REQUEST['button_update']))) 
 	if(isset($_REQUEST['brand'])) {
 		$installer = array("type" => 'brand', "id" => $_REQUEST['brand']);		
 	}
-} elseif((isset($_REQUEST['button_install_firmware'])) OR (isset($_REQUEST['button_update_firmware'])) AND (isset($_REQUEST['product']))) {
+} elseif(isset($_REQUEST['product'])) {
+    if(isset($_REQUEST['button_install_firmware'])) {
+        $installer = array("type" => 'firmware', "id" => $_REQUEST['product']);
+    } elseif(isset($_REQUEST['button_update_firmware'])) {
+        $endpoint->remove_firmware($_REQUEST['product']);
 	$installer = array("type" => 'firmware', "id" => $_REQUEST['product']);
+    }
 } elseif((isset($_REQUEST['button_remove_firmware'])) AND (isset($_REQUEST['product']))) {
 	$endpoint->remove_firmware($_REQUEST['product']);
 } elseif(isset($_REQUEST['button_disable'])) {
@@ -81,7 +86,7 @@ foreach($brand_list as $row) {
                 foreach($product_list as $row2) {
 			$row_out[$i]['products'][$j] = $row2;
 			if($check_for_updates) {
-				if(($temp = $endpoint->firmware_update_check($row2['id'])) AND (array_key_exists('firmware_vers', $row)) AND ($row['firmware_vers'] > 0)) {
+				if(($temp = $endpoint->firmware_update_check($row2['id'])) AND (array_key_exists('firmware_vers', $row2)) AND ($row2['firmware_vers'] > 0)) {
 					$row_out[$i]['products'][$j]['update_fw'] = 1;
 					$row_out[$i]['products'][$j]['update_vers_fw'] = $temp['data']['version'];
 					//$endpoint->add_freepbx_notification("PU_".$row2['long_name'], '', "There is a firmware update for phone module ".$row2['long_name'], "Old Version: ".$row2['firmware_vers']." New Version: ".$temp['data']['version'].$note, "");

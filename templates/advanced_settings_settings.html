@@ -52,7 +52,7 @@
   </label></td>
 </tr>
 <tr>
-  <td align='right'><?=_("Enable FreePBX ARI Module")?></td>
+  <td align='right'><?=_("Enable FreePBX ARI Module")?> (<a href="http://projects.colsolgrp.net/documents/29" target="_blank">What?</a>)</td>
   <td align='left'><label>
     <input type=checkbox name="enable_ari" {$ari_selected}>
   </label></td>
@@ -63,12 +63,14 @@
     <input type=checkbox name="enable_debug" {$debug_selected}>
   </label></td>
 </tr>
+<!--
 <tr>
   <td align='right'><?=_("Enable Nightly Phone Module Updates Check")?></td>
   <td align='left'><label>
     <input type=checkbox name="enable_updates" {$updates_selected}>
   </label></td>
 </tr>
+-->
 <tr>
 <td colspan='2' align='center'><input type='Submit' name='button_update_globals' value='<?=_('Update Globals')?>'></td>
 </tr>
