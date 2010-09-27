@@ -22,21 +22,32 @@ class endpointmanager {
     function __construct() {
         global $amp_conf, $db, $global_cfg;
 
+        //TODO: Need to have this change when the user changes timezones, for now we keep it set to my timezone
         date_default_timezone_set('America/Los_Angeles');
 
+        //The only time dbh_asterisk is set is when we are inside the ARI Recording interface
         if(isset($_SESSION['dbh_asterisk'])) {
             $this->db = $_SESSION['dbh_asterisk'];
+            //We don't want to reference the recordings directory when in the recording interface.
             $_SERVER["SCRIPT_FILENAME"] = str_replace("recordings/", "admin/", $_SERVER["SCRIPT_FILENAME"]);
         } else {
             $this->db = $db;
         }
+
+        //Move all information from the global $amp_conf into our public space. This will help prevent security concerns
         $this->amp_conf = $amp_conf;
+
+        //Generate empty array
         $this->error = array();
 
+        //Get all global variables
         $this->global_cfg =& $this->db->getAssoc("SELECT var_name, value FROM endpointman_global_vars");
 
+        //TODO: Possibly remove these as I don't believe anything uses them anymore
         define("UPDATE_PATH", $this->global_cfg['update_server']);
         define("VER", $this->global_cfg['version']);
+        //end possible removal
+
         //Define the location of phone modules, keeping it outside of the module directory so that when the user updates endpointmanager they don't lose all of their phones
         define("PHONE_MODULES_PATH", dirname($_SERVER["SCRIPT_FILENAME"])."/modules/_ep_phone_modules/");
 
@@ -52,7 +63,7 @@ class endpointmanager {
             ini_set('display_errors', 0);
         }
 
-        //Check writable
+        //Check if config location is writable and/or exists!
         if(isset($this->global_cfg['config_location'])) {
             if(is_dir($this->global_cfg['config_location'])) {
                 if(!is_writeable($this->global_cfg['config_location'])) {
@@ -70,16 +81,25 @@ class endpointmanager {
         include LOCAL_PATH."includes/rain.tpl.class.php";
     }
 
+    /**
+     * Used to send sample configurations to provisioner.net
+     * NOTE: The user has to explicitly click a link that states they are sending the configuration to the project
+     * We don't take configs on our own accord!!
+     * @param <type> $brand Brand Directory
+     * @param <type> $product Product Directory
+     * @param <type> $orig_name The file's original name we are sending
+     * @param <type> $data The config file's data
+     */
     function submit_config($brand,$product,$orig_name,$data) {
         $posturl = 'http://www.provisioner.net/submit_config.php';
-        $postvars = 'brand=&product=&origname='.htmlentities(addslashes($orig_name)).'&config_data='.base64_encode($data);
+        $postvars = 'brand='.$brand.'&product='.$product.'&origname='.htmlentities(addslashes($orig_name)).'&config_data='.base64_encode($data);
 
         $ch = curl_init($posturl);
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $postvars);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
         curl_setopt($ch, CURLOPT_HEADER, 0);  // DO NOT RETURN HTTP HEADERS
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);  // RETURN THE CONTENTS OF THE CALL
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);  // RETURN THE CONTENTS OF THE CALL, probably not needed
         $Rec_Data = curl_exec($ch);
 
         ob_start();
@@ -143,7 +163,7 @@ class endpointmanager {
     }
 
     /**
-     * Get the brand from any mac sent
+     * Get the brand from any mac sent to this function
      * @param string $mac
      * @return array
      */
@@ -273,33 +293,60 @@ class endpointmanager {
             $phone_info['model_id'] = 0;
             $phone_info['product_id'] = 0;
             $phone_info['custom_cfg_template'] = 0;
-            $phone_info['ext'] = $row['ext'];
             $phone_info['mac'] = $row['mac'];
+            $sql = "SELECT endpointman_line_list.*, sip.data as secret, devices.* FROM endpointman_line_list, sip, devices WHERE endpointman_line_list.ext = devices.id AND endpointman_line_list.ext = sip.id AND sip.keyword = 'secret' AND mac_id = ".$mac_id;
+            $lines_info =& $this->db->getAll($sql, array(), DB_FETCHMODE_ASSOC);
+            foreach($lines_info as $line) {
+                $phone_info['line'][$line['line']] = $line;
+            }
         }
 
-        //Final Output needs to look like this:
-        //$this['mac_id']
-        //$this['model_id']
-        //$this['brand_id']
-        //$this['template_id']
-        //$this['product_id']
-        //$this['mac']
-        //$this['cfg_dir']
-        //$this['cfg_ver']
-        //$this['model_name']
-        //$this['brand_name']
-        //$this['long_name']
-        //$this['config_files_override']
-        //$this['global_custom_cfg_data']
-        //$this['global_user_cfg_data']
-        //$this['template_data']
-        //$this['enabled']
-        //$this['line'][1]['ext']
-        //$this['line'][1]['description']
-        //$this['line'][1]['secret']
-        //$this['line'][1]['custom_cfg_data']
-        //$this['line'][1]['user_cfg_data']
-        //
+        //Final Output will look something similar to this
+        /**Array
+            (
+                [config_files_override] =>
+                [global_user_cfg_data] => N;
+                [model_id] => 213
+                [brand_id] => 2
+                [name] => Grandstream
+                [directory] => grandstream
+                [model] => GXP2000
+                [mac] => 000B820D0050
+                [template_id] => 0
+                [global_custom_cfg_data] => Serialized Data (Changed Template Values)
+                [long_name] => GXP Enterprise IP series [280,1200,2000,2010,2020]
+                [product_id] => 21
+                [cfg_dir] => gxp
+                [cfg_ver] => 1.5
+                [template_data] => Serialized Data (The default Template Values)
+                [enabled] => 1
+                [line] => Array
+                    (
+                        [1] => Array
+                            (
+                                [luid] => 2
+                                [mac_id] => 2
+                                [line] => 1
+                                [ext] => 1000
+                                [description] => Description
+                                [custom_cfg_data] =>
+                                [user_cfg_data] =>
+                                [secret] => secret
+                                [id] => 1000
+                                [tech] => sip
+                                [dial] => SIP/1000
+                                [devicetype] => fixed
+                                [user] => 1000
+                                [emergency_cid] =>
+                            )
+
+                    )
+
+            )
+        */
+
+        echo "<pre>";
+        print_r($phone_info);
         return $phone_info;
     }
 
@@ -670,7 +717,7 @@ class endpointmanager {
 
     /**
      * Prepare and then send the data that Provisioner expects, then take what provisioner gives us and do what it says
-     * @param array $phone_info
+     * @param array $phone_info Everything from get_phone_info
      */
     function prepare_configs($phone_info) {
         if(!class_exists('ProvisionerConfig')) {
