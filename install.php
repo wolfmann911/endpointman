@@ -76,7 +76,7 @@ function ep_table_exists ($table) {
     return FALSE;
 }
 
-$version = "2.2.9";
+$version = "2.3.0";
 
 if(ep_table_exists("endpointman_global_vars")) {
         $global_cfg =& $db->getAssoc("SELECT var_name, value FROM endpointman_global_vars");
@@ -815,6 +815,10 @@ if(!$new_install) {
     }
 
     if ($ver <= '2.2.9') {
+        
+    }
+
+    if ($ver <= '2.3.0') {
         
     }
 }
