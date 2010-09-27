@@ -344,9 +344,6 @@ class endpointmanager {
 
             )
         */
-
-        echo "<pre>";
-        print_r($phone_info);
         return $phone_info;
     }
 
