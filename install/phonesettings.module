@@ -66,8 +66,6 @@ class phonesettings {
    *   action
    */
   function action($args) {
-	error_reporting(E_ALL);
-	ini_set('display_errors', 1);
 	global $endpoint, $global_cfg;
 
 	$doc_root =	$_SERVER["DOCUMENT_ROOT"] ."/admin/modules/endpointman/";
