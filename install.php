@@ -1139,7 +1139,9 @@ if ($new_install) {
         out("Installing ARI Module");
         copy(LOCAL_PATH. "install/phonesettings.module", $amp_conf['AMPWEBROOT']."/recordings/modules/phonesettings.module");
 
-        mkdir($amp_conf['AMPWEBROOT']."/recordings/theme/js/");
+        if(!file_exists($amp_conf['AMPWEBROOT']."/recordings/theme/js/")) {
+            mkdir($amp_conf['AMPWEBROOT']."/recordings/theme/js/");
+        }
 
         copy(LOCAL_PATH. "templates/javascript/jquery.coda-slider-2.0.js", $amp_conf['AMPWEBROOT']."/recordings/theme/js/jquery.coda-slider-2.0.js");
 
