@@ -12,8 +12,8 @@ if( ini_get('safe_mode') ){
 	die(_('Turn Off Safe Mode'));
 }
 
-if(phpversion < '5.1.0') {
-    die(_('PHP Version MUST be greater than 5.1.0!'));
+if(PHP_VERSION < '5.1.0') {
+    die(_('PHP Version MUST be greater than'). ' 5.1.0!');
 }
 
 include 'includes/functions.inc';

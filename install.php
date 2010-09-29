@@ -76,7 +76,7 @@ function ep_table_exists ($table) {
     return FALSE;
 }
 
-$version = "2.3.1";
+$version = "2.3.2";
 
 if(ep_table_exists("endpointman_global_vars")) {
         $global_cfg =& $db->getAssoc("SELECT var_name, value FROM endpointman_global_vars");
@@ -132,6 +132,20 @@ if(!isset($global_cfg['version'])) {
     $ver = "2.3.0";
 } elseif($global_cfg['version'] == '2.3.1') {
     $ver = "2.3.1";
+} elseif($global_cfg['version'] == '2.3.2') {
+    $ver = "2.3.2";
+} elseif($global_cfg['version'] == '2.3.3') {
+    $ver = "2.3.3";
+} elseif($global_cfg['version'] == '2.3.4') {
+    $ver = "2.3.4";
+} elseif($global_cfg['version'] == '2.3.5') {
+    $ver = "2.3.5";
+} elseif($global_cfg['version'] == '2.3.6') {
+    $ver = "2.3.6";
+} elseif($global_cfg['version'] == '2.3.7') {
+    $ver = "2.3.7";
+} elseif($global_cfg['version'] == '2.3.8') {
+    $ver = "2.3.8";
 } else {
     $ver = "1000";
     $new_install = TRUE;
@@ -1117,7 +1131,7 @@ if ($new_install) {
     }
 
 } else {
-    out("Update Version Number");
+    out("Update Version Number to ".$version);
     $sql = "UPDATE endpointman_global_vars SET value = '".$version."' WHERE var_name = 'version'";
     $db->query($sql);
 

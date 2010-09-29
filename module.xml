@@ -1,7 +1,7 @@
 <module>
 	<rawname>endpointman</rawname>
 	<name>PBX End Point Manager</name>
-	<version>2.3.1</version>
+	<version>2.3.2</version>
 	<type>tool</type>
 	<category>End Point Manager</category>
 	<publisher>Andrew Nagy</publisher>
@@ -14,14 +14,17 @@
 	</menuitems>
 	 <description>PBX End Point Manager supports automated deployment of multiple manufacturers IP telephones.</description>
 	 <changelog>
+                *2.3.2* Various Bug Fixes
+                *2.3.1* Install directory case corrections
+                *2.3.0* No Changes
 	 	*2.2.9* Fixed ARI module &amp Update Local Description on Rebuild &amp Fix Firmware Updater
-        *2.2.8* Fixed User & Devices error.
-        *2.2.6* Fixed download progress so that it displays. 
+                *2.2.8* Fixed User & Devices error.
+                *2.2.6* Fixed download progress so that it displays.
 		*2.2.5* Fixed Debug Always on Error &amp File download errors &amp Fix float error on install
 		*2.2.0* Stopped using iframe installer, switched to freepbx version
         </changelog>
 	<info>http://projects.colsolgrp.net/projects/show/endpointman</info>
 	<location>contributed_modules/release/endpointman-2.3.1.tgz</location>
 
-<md5sum>b5eb587083d369c377ee7a88ff812f37</md5sum>
+<md5sum>ba0fbcdf2fc49e6bc43c2cf4dd4398bc</md5sum>
 </module>
