@@ -24,7 +24,7 @@
 		*2.2.0* Stopped using iframe installer, switched to freepbx version
         </changelog>
 	<info>http://projects.colsolgrp.net/projects/show/endpointman</info>
-	<location>contributed_modules/release/endpointman-2.3.2.tgz</location>
+	<location>release/2.9/endpointman-2.3.2.tgz</location>
 
-<md5sum>50bb933c6dc1b069362868a575e60de0</md5sum>
+<md5sum>067dfd0530655d25d0d241f90a35310a</md5sum>
 </module>
