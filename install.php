@@ -18,6 +18,21 @@ if (! function_exists("outn")) {
     }
 }
 
+function epm_rmrf($dir) {
+    if(file_exists($dir)) {
+        $iterator = new RecursiveDirectoryIterator($dir);
+        foreach (new RecursiveIteratorIterator($iterator, RecursiveIteratorIterator::CHILD_FIRST) as $file) {
+            if ($file->isDir()) {
+                @rmdir($file->getPathname());
+            } else {
+                @unlink($file->getPathname());
+            }
+        }
+        //Remove parent path as the last step
+        @rmdir($dir);
+    }
+}
+
 function find_exec($exec) {
     $usr_bin = glob("/usr/bin/".$exec);
     $usr_sbin = glob("/usr/sbin/".$exec);
@@ -76,7 +91,7 @@ function ep_table_exists ($table) {
     return FALSE;
 }
 
-$version = "2.3.2";
+$version = "2.4.1";
 
 if(ep_table_exists("endpointman_global_vars")) {
         $global_cfg =& $db->getAssoc("SELECT var_name, value FROM endpointman_global_vars");
@@ -146,6 +161,12 @@ if(!isset($global_cfg['version'])) {
     $ver = "2.3.7";
 } elseif($global_cfg['version'] == '2.3.8') {
     $ver = "2.3.8";
+} elseif($global_cfg['version'] == '2.4.0') {
+    $ver = "2.4.0";
+} elseif($global_cfg['version'] == '2.4.1') {
+    $ver = "2.4.1";
+} elseif($global_cfg['version'] == '2.4.2') {
+    $ver = "2.4.2";
 } else {
     $ver = "1000";
     $new_install = TRUE;
@@ -174,7 +195,7 @@ if(!$new_install) {
         //Add new Vars into database
         $sql_update_vars = "INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES
 		(5, 'config_location', '/tftpboot/'),
-		(6, 'update_server', 'http://www.provisioner.net/release/'),
+		(6, 'update_server', 'http://www.provisioner.net/release3/'),
 		(7, 'version', '2.0.0'),
 		(8, 'enable_ari', '0'),
 		(9, 'debug', '0'),
@@ -741,8 +762,8 @@ if(!$new_install) {
             $sql = "UPDATE endpointman_custom_configs SET product_id = '".$new_product_id."' WHERE id = ". $list['id'];
             $db->query($sql);
         }
-    } if
-    ($ver <= "2.2.3") {
+    }
+    if ($ver <= "2.2.3") {
         $sql = "UPDATE endpointman_global_vars SET value = 'http://www.provisioner.net/release/' WHERE var_name = 'update_server'";
         $db->query($sql);
     }
@@ -765,15 +786,15 @@ if(!$new_install) {
 
     if ($ver <= "2.2.6") {
         $sql = "CREATE TABLE IF NOT EXISTS `endpointman_line_list` (
-  `luid` int(11) NOT NULL AUTO_INCREMENT,
-  `mac_id` int(11) NOT NULL,
-  `line` smallint(2) NOT NULL,
-  `ext` varchar(15) NOT NULL,
-  `description` varchar(20) NOT NULL,
-  `custom_cfg_data` longblob NOT NULL,
-  `user_cfg_data` longblob NOT NULL,
-  PRIMARY KEY (`luid`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;";
+              `luid` int(11) NOT NULL AUTO_INCREMENT,
+              `mac_id` int(11) NOT NULL,
+              `line` smallint(2) NOT NULL,
+              `ext` varchar(15) NOT NULL,
+              `description` varchar(20) NOT NULL,
+              `custom_cfg_data` longblob NOT NULL,
+              `user_cfg_data` longblob NOT NULL,
+              PRIMARY KEY (`luid`)
+            ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;";
         $db->query($sql);
 
         $data = array();
@@ -828,17 +849,33 @@ if(!$new_install) {
         $db->query($sql);
     }
 
-    if ($ver <= '2.2.9') {
-        
+    if ($ver <= "2.4.0") {
+        out("Uninstalling All Installed Brands (You'll just simply have to update again, no loss of data)");
+        $db->query("UPDATE endpointman_brand_list SET  installed =  '0'");
+        out("Changing update server");
+        $sql = "UPDATE endpointman_global_vars SET value = 'http://www.provisioner.net/release3/' WHERE var_name ='update_server'";
+        $db->query($sql);
+        $sql = "UPDATE  endpointman_model_list SET  enabled =  '0'";
+        $db->query($sql);
+
+        exec("rm -Rf ".PHONE_MODULES_PATH);
+
+        if(!file_exists(PHONE_MODULES_PATH)) {
+            mkdir(PHONE_MODULES_PATH, 0764);
+            out("Creating Phone Modules Directory");
+        }
+
+        if(!file_exists(PHONE_MODULES_PATH."setup.php")) {
+            copy(LOCAL_PATH."install/setup.php",PHONE_MODULES_PATH."setup.php");
+            out("Moving Auto Provisioner Class");
+        }
+
+        if(!file_exists(PHONE_MODULES_PATH."temp/")) {
+            mkdir(PHONE_MODULES_PATH."temp/", 0764);
+            out("Creating temp folder");
+        }
     }
 
-    if ($ver <= '2.3.0') {
-        
-    }
-
-    if ($ver <= '2.3.1') {
-
-    }
 }
 
 
@@ -891,7 +928,7 @@ if ($new_install) {
             (3, 'gmtoff', ''),
             (4, 'gmthr', ''),
             (5, 'config_location', '/tftpboot/'),
-            (6, 'update_server', 'http://www.provisioner.net/release/'),
+            (6, 'update_server', 'http://www.provisioner.net/release3/'),
             (7, 'version', '".$version."'),
             (8, 'enable_ari', '0'),
             (9, 'debug', '0'),
@@ -1152,5 +1189,8 @@ if ($new_install) {
 
         out("Fixing permissions on ARI module");
         chmod($amp_conf['AMPWEBROOT']."/recordings/modules/phonesettings.module", 0664);
+
     }
+    $sql = "UPDATE endpointman_global_vars SET value = 'http://www.provisioner.net/release3/' WHERE var_name = 'update_server'";
+    $db->query($sql);
 }

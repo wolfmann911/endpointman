@@ -4,7 +4,7 @@
 /**
  * Project: RainTPL, compile HTML template to PHP.
  *  
- * File: raintpl.class.php
+ * File: rain.tpl.class.php
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,10 +21,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * @link http://www.raintpl.com
- * @author Federico Ulfo <info@rainelemental.net>
- * @version 1.7.5
- * @copyright 2006 - 2009 Federico Ulfo | www.RainElemental.net
- * @package RainTPL
+ * @author Federico Ulfo <rainelemental@gmail.com>
+ * @version 1.9.1
+ * @copyright 2006 - 2010 Federico Ulfo | www.federicoulfo.it
+ * @package Rain
  */
 
 
@@ -40,6 +40,7 @@
 define( "TPL_CACHE_ENABLED", true );
 
 
+
 /**
  * Extension of template
  *
@@ -49,18 +50,14 @@ define( "TPL_EXT", "html" );
 
 
 
-/**
- * Questa costante serve per la sicurezza dei template, in modo che un template non pu˜ essere eseguito senza questa classe.
- *
- */
-	
+// DO NOT CHANGE!!! In each compiled template there's a check that this constant is declared, to deny the direct execution of compiled template
 define( "IN_RAINTPL", true );
 
 
 
 /**
  * RainTPL Template class.
- * Questa classe permette di caricare e visualizzare i template
+ * Load and draw templates
  * 
  * @access public
  * 
@@ -69,7 +66,7 @@ define( "IN_RAINTPL", true );
 class RainTPL{
 	
 	/**
-	 * Contiene tutte le variabili assegnate al template
+	 * All templates variables
 	 * @access private
 	 * @var array
 	 */
@@ -77,28 +74,30 @@ class RainTPL{
 	
 
 	/**
-	 * Directory dove sono i templates
+	 * Template directory
 	 * @access private
 	 * @var string
 	 */
-	var $tpl_dir = "themes/";
+	static $tpl_dir 		= "tpl",
+		   $tpl_compile_dir = "tmp/",
+		   $base_dir 		= null;
 	
 	
 	
 	/**
-	 * Inizializza la classe. 
+	 * Constructor
 	 *
-	 * @param string $tpl_dir Setta la directory da cui prendere i template. E' sufficente settarla al primo utilizzo del template engine
+	 * @param string $tpl_dir Template directory. It must be set the first time you use the class
 	 * @return RainTPL
 	 */
 
-	function RainTPL( $tpl_dir = null ){
-
+	function RainTPL( $tpl_dir = null, $tpl_compile_dir = null, $base_dir = null ){
 		if( $tpl_dir )
-			$this->tpl_dir = $GLOBALS[ 'RainTPL_tpl_dir' ] = $tpl_dir . ( substr($tpl_dir,-1,1) != "/" ? "/" : "" );
-		elseif( isset( $GLOBALS[ 'RainTPL_tpl_dir' ] ) )
-			$this->tpl_dir = $GLOBALS[ 'RainTPL_tpl_dir' ];
-			
+			RainTPL::$tpl_dir = $tpl_dir . ( substr($tpl_dir,-1,1) != "/" ? "/" : "" );
+		if( $tpl_compile_dir )
+			RainTPL::$tpl_compile_dir = $tpl_compile_dir;
+		if( $base_dir )
+			RainTPL::$base_dir = $base_dir;
 	}
 		
 	/**
@@ -136,7 +135,7 @@ class RainTPL{
 	 *
 	 * echo $tpl->draw( $tpl_name, TRUE );
 	 *
-	 * @param string $tpl_name Nome del template da caricare
+	 * @param string $tpl_name template to load
 	 * @return string
 	 */
 	
@@ -150,10 +149,10 @@ class RainTPL{
 		else
 			$tpl_dir = null;
 
-		//var is the variabile che si trova in ogni template
+		//var of all template
 		$var = $this->variables;
 
-		if( !file_exists( $template_file = $this->tpl_dir . $tpl_dir . $tpl_name . '.' . TPL_EXT ) ){
+		if( !file_exists( $template_file = RainTPL::$tpl_dir . $tpl_dir . $tpl_name . '.' . TPL_EXT ) ){
 			trigger_error( "Template not found: $tpl_name" );
 			if( $return_string )
 				return "<div style=\"background-color:#f8f8ff; border: 1px solid #aaaaff; padding:10px;\">Template <b>$tpl_name</b> not found</div>";
@@ -162,22 +161,20 @@ class RainTPL{
 				return null;
 			}
 		}
-		elseif( !is_writable( $this->tpl_dir ) )
-			$compiled_filename = $this->tpl_dir . $tpl_dir . "/compiled/" . $tpl_name . "_def.php";
-		elseif( TPL_CACHE_ENABLED && file_exists( $this->tpl_dir . $tpl_dir . "/compiled/" . $tpl_name . "_" . ( $filetime = filemtime( $template_file ) ) . ".php" ) )
-			$compiled_filename = $this->tpl_dir . $tpl_dir . "/compiled/" . $tpl_name . "_" . $filetime . ".php";
+		elseif( is_dir( RainTPL::$tpl_compile_dir . RainTPL::$tpl_dir ) && !is_writable( RainTPL::$tpl_compile_dir."/" ) )
+			$compiled_filename = RainTPL::$tpl_compile_dir."/" . $tpl_dir . $tpl_name . ".php";
+		elseif( TPL_CACHE_ENABLED && file_exists( RainTPL::$tpl_compile_dir."/" . $tpl_dir . $tpl_name . "_" . ( $filetime = filemtime( $template_file ) ) . ".php" ) )
+			$compiled_filename = RainTPL::$tpl_compile_dir."/" . $tpl_dir . $tpl_name . "_" . $filetime . ".php";
 		else{
 			include_once "rain.tpl.compile.class.php";
 			$RainTPLCompile_obj = new RainTPLCompile( );
-			$RainTPLCompile_obj->compileFile( $tpl_name, $this->tpl_dir . $tpl_dir );
+			$RainTPLCompile_obj->compileFile( $tpl_name, RainTPL::$tpl_dir . $tpl_dir, RainTPL::$tpl_compile_dir."/", RainTPL::$base_dir );
 			// template last update date
-			$filetime = filemtime( $this->tpl_dir . $tpl_dir . '/' . $tpl_name . '.' . TPL_EXT );
-			$compiled_filename = $this->tpl_dir . $tpl_dir . "/compiled/" . $tpl_name . "_" . $filetime . ".php";
-		}			
+			$filetime = filemtime( RainTPL::$tpl_dir . $tpl_dir . '/' . $tpl_name . '.' . TPL_EXT );
+			$compiled_filename = RainTPL::$tpl_compile_dir."/". $tpl_dir . $tpl_name . "_" . $filetime . ".php";
+		}
 
 
-
-		
 		//if return_string is true, the function return the output as a string
 		if( $return_string ){
 			ob_start();
@@ -190,7 +187,6 @@ class RainTPL{
 			include( $compiled_filename );
 		
 	}
-		
 
 }
 

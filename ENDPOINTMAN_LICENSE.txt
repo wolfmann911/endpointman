@@ -11,7 +11,7 @@ WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
 for the specific language governing rights and limitations under the
 License.
 
-The Original Code is Endpoint Manager for PBX in a Flash.
+The Original Code is Endpoint Manager for FreePBX.
 
 The Initial Developer of the Original Code is Ed Macri and John Mullinix.
 Portions created by the Initial Developer are Copyright (C) 2010
@@ -23,6 +23,7 @@ Contributor(s):
 	Tony Shiffer
 	Andrew Nagy
 	Darren Schreiber
+        Philippe Lindheimer
 
 Alternatively, the contents of this file may be used under the terms of
 either the GNU General Public License Version 2 or later (the "GPL"), or

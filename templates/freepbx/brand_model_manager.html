@@ -110,7 +110,7 @@ function generateHiddenFieldsForTree(treeId) {
 <script>
 function process_module_actions(actions) {
 	freepbx_modal_show('moduleBox');
-	urlStr = "config.php?type=tool&amp;display=epm_config&amp;quietmode=1&amp;handler=file&amp;file=installer.html.php&amp;module=endpointman&amp;type={$installer.type}&amp;id={$installer.id}";
+	urlStr = "config.php?display=epm_config&amp;quietmode=1&amp;handler=file&amp;file=installer.html.php&amp;module=endpointman&amp;type={$installer.type}&amp;id={$installer.id}";
 	urlStr += "&amp;rand="+Math.random ( );
 	for (var i in actions) {
 		urlStr += "&amp;moduleaction["+i+"]="+actions[i];
@@ -134,7 +134,7 @@ process_module_actions();
     {loop name="brand2_list"}
         <table width="100%" class="brand" border="0" cellspacing="0" cellpadding="0">
             <tr>
-                <td colspan="2">{$value.name} (<?=_('Package Last Modified')?> [{$value.cfg_ver}]) <form action='config.php{$web_var}&display=epm_config' method='POST'><input type="hidden" name="brand" value="{$value.id}"><input type="submit" name="button_{if condition="$value.installed == '1'"}uninstall{else}install{/if}" class="button_{if condition="$value.installed == '1'"}Disable{else}Enable{/if}" value="{if condition="$value.installed == '1'"}<?=_('Uninstall')?>{else}<?=_('Install')?>{/if}">{if condition="array_key_exists('update',$value)"}{if condition="$value.update == 1"}New Package Modified [{$value.update_vers}]<input type="submit" name="button_update" class="button_update" value="<?=_('Update')?>">{/if}{/if}</form></td>
+                <td colspan="2">{$value.name} {if condition="$value.installed == '1'"}(<?=_('Package Last Modified')?> [{$value.cfg_ver}]) {/if}<form action='config.php{$web_var}&display=epm_config' method='POST'><input type="hidden" name="brand" value="{$value.id}"><input type="submit" name="button_{if condition="$value.installed == '1'"}uninstall{else}install{/if}" class="button_{if condition="$value.installed == '1'"}Disable{else}Enable{/if}" value="{if condition="$value.installed == '1'"}<?=_('Uninstall')?>{else}<?=_('Install')?>{/if}">{if condition="array_key_exists('update',$value)"}{if condition="$value.update == 1"}New Package Modified [{$value.update_vers}]<input type="submit" name="button_update" class="button_update" value="<?=_('Update')?>">{/if}{/if}</form></td>
             </tr>
             <tr>
                 <td width="3%">&nbsp;</td>

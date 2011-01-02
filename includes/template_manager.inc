@@ -68,12 +68,24 @@ if($default_display) {
         $i++;
     }
 
-    $sql = 'SELECT endpointman_mac_list.id, endpointman_mac_list.mac, endpointman_mac_list.model, endpointman_line_list.description, endpointman_model_list.model as model_clone, endpointman_product_list.short_name as model_class FROM endpointman_mac_list, endpointman_model_list, endpointman_product_list, endpointman_line_list WHERE endpointman_mac_list.id = endpointman_line_list.mac_id AND endpointman_product_list.id = endpointman_model_list.product_id AND endpointman_mac_list.global_custom_cfg_data IS NOT NULL AND endpointman_model_list.id = endpointman_mac_list.model AND endpointman_mac_list.template_id = 0';
+    $sql = 'SELECT endpointman_mac_list.mac, endpointman_mac_list.id, endpointman_mac_list.model, endpointman_model_list.model as model_clone, endpointman_product_list.short_name as model_class FROM endpointman_mac_list, endpointman_model_list, endpointman_product_list WHERE  endpointman_product_list.id = endpointman_model_list.product_id AND endpointman_mac_list.global_custom_cfg_data IS NOT NULL AND endpointman_model_list.id = endpointman_mac_list.model AND endpointman_mac_list.template_id = 0';
+
     $template_list =& $db->getAll($sql, array(), DB_FETCHMODE_ASSOC);
     foreach($template_list as $row) {
+        $sql = 'SELECT  description , line FROM  endpointman_line_list WHERE  mac_id ='. $row['id'].' ORDER BY line ASC';
+        $line_list =& $db->getAll($sql, array(), DB_FETCHMODE_ASSOC);
+        $description = "";
+        $c = 0;
+        foreach($line_list as $line_row) {
+            if($c > 0) {
+              $description .= ", ";
+            }
+            $description .= $line_row['description'];
+            $c++;
+        }
         $row_out[$i] = $row;
         $row_out[$i]['custom'] = 1;
-        $row_out[$i]['name'] = $row['mac'] . "-(" .$row['description'].")";
+        $row_out[$i]['name'] = $row['mac'] . "-(" .$description.")";
         $i++;
     }
 
@@ -88,12 +100,12 @@ if($default_display) {
         $class_row[$i]['text'] = $row['short_name'];
         $i++;
     }
-    $tpl = new RainTPL( LOCAL_PATH.'templates' );
-    $tpl->assign("amp_conf_serial", "1");
-    $tpl->assign("templates_list", $row_out);
-    $tpl->assign("class_list", $class_row);
-    $tpl->assign("no_add", $no_add);
-    $tpl->assign("debug", $debug);
+    $endpoint->tpl->assign("amp_conf_serial", "1");
+    $endpoint->tpl->assign("templates_list", $row_out);
+    $endpoint->tpl->assign("class_list", $class_row);
+    $endpoint->tpl->assign("no_add", $no_add);
+    $endpoint->tpl->assign("debug", $debug);
+    $endpoint->tpl->assign("web_path", WEB_PATH);
 
     foreach($endpoint->error as $key => $error) {
         $error_message .= $error;
@@ -103,11 +115,11 @@ if($default_display) {
         $error_message .= "<br />";
     }
     if(isset($error_message)) {
-        $endpoint->display_message_box($error_message,$tpl,1);
+        $endpoint->display_message_box($error_message,$endpoint->tpl,1);
     }
     if(isset($message)) {
-        $endpoint->display_message_box($message,$tpl,0);
+        $endpoint->display_message_box($message,$endpoint->tpl,0);
     }
 
-    echo $tpl->draw( 'template_manager' );
+    echo $endpoint->tpl->draw( 'template_manager' );
 }

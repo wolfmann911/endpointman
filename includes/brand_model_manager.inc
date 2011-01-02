@@ -10,9 +10,6 @@
 $check_for_updates = FALSE;
 global $type;
 
-//initialize a Rain TPL object
-$tpl = new RainTPL( LOCAL_PATH.'templates' );
-
 if((isset($_REQUEST['button_install'])) OR (isset($_REQUEST['button_update']))) {
 	if(isset($_REQUEST['brand'])) {
 		$installer = array("type" => 'brand', "id" => $_REQUEST['brand']);		
@@ -23,9 +20,10 @@ if((isset($_REQUEST['button_install'])) OR (isset($_REQUEST['button_update']))) 
     } elseif(isset($_REQUEST['button_update_firmware'])) {
         $endpoint->remove_firmware($_REQUEST['product']);
 	$installer = array("type" => 'firmware', "id" => $_REQUEST['product']);
+    } elseif(isset($_REQUEST['button_remove_firmware'])) {
+        $endpoint->remove_firmware($_REQUEST['product']);
+        $message = "Firmware Removed";
     }
-} elseif((isset($_REQUEST['button_remove_firmware'])) AND (isset($_REQUEST['product']))) {
-	$endpoint->remove_firmware($_REQUEST['product']);
 } elseif(isset($_REQUEST['button_disable'])) {
 	if(isset($_REQUEST['model'])) {
 		$sql = "UPDATE endpointman_model_list SET enabled = 0 WHERE id = '".$_REQUEST['model']."'";
@@ -46,7 +44,7 @@ if((isset($_REQUEST['button_install'])) OR (isset($_REQUEST['button_update']))) 
 	}
 } elseif(isset($_REQUEST['button_check_for_updates'])) {
 	$brand_up = $endpoint->brand_update_check();
-        $tpl->assign("update_check", 1);
+        $endpoint->tpl->assign("update_check", 1);
 
 	$check_for_updates = TRUE;
 } elseif(isset($_REQUEST['install-jstree'])) {
@@ -126,12 +124,12 @@ if (!isset($_POST['brand'])) {
 }
 
 if (isset($installer)) {
-	$tpl->assign("brand", $brand);
-        $tpl->assign("installer", $installer);	
+	$endpoint->tpl->assign("brand", $brand);
+        $endpoint->tpl->assign("installer", $installer);
 }
 
-$tpl->assign("web_var", "?type=$type");
-$tpl->assign("brand2_list", $row_out);
+$endpoint->tpl->assign("web_var", "?type=$type");
+$endpoint->tpl->assign("brand2_list", $row_out);
 
 $error_message = NULL;
 foreach($endpoint->error as $key => $error) {
@@ -142,8 +140,10 @@ foreach($endpoint->error as $key => $error) {
     $error_message .= "<br />";
 }
 if(isset($error_message)) {
-    $endpoint->display_message_box($error_message,$tpl,1);
+    $endpoint->display_message_box($error_message,$endpoint->tpl,1);
+} elseif(isset($message)) {
+    $endpoint->display_message_box($message,$endpoint->tpl,0);
 }
 
 //draw the template	
-echo $tpl->draw( 'brand_model_manager' );
+echo $endpoint->tpl->draw( 'brand_model_manager' );

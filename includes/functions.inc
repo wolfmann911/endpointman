@@ -13,6 +13,8 @@ class endpointmanager {
     public $amp_conf;
     public $global_cfg;
     public $error;
+    public $endpoint_data;
+    public $tpl;
 
     /**
      *
@@ -20,28 +22,21 @@ class endpointmanager {
      * @global object $db Pear DB information, we move this into a public variable
      */
     function __construct() {
-        global $amp_conf, $db, $global_cfg;
+        require('abstraction/freepbx.inc');
+        $this->endpoint_data = new epm_data_abstraction();
+
+        $this->global_cfg = $this->endpoint_data->get_stored_globals();
+
+        $this->db = $this->endpoint_data->db;
 
         //TODO: Need to have this change when the user changes timezones, for now we keep it set to my timezone
         date_default_timezone_set('America/Los_Angeles');
 
-        //The only time dbh_asterisk is set is when we are inside the ARI Recording interface
-        if(isset($_SESSION['dbh_asterisk'])) {
-            $this->db = $_SESSION['dbh_asterisk'];
-            //We don't want to reference the recordings directory when in the recording interface.
-            $_SERVER["SCRIPT_FILENAME"] = str_replace("recordings/", "admin/", $_SERVER["SCRIPT_FILENAME"]);
-        } else {
-            $this->db = $db;
-        }
-
-        //Move all information from the global $amp_conf into our public space. This will help prevent security concerns
+                //Move all information from the global $amp_conf into our public space. This will help prevent security concerns
         $this->amp_conf = $amp_conf;
 
         //Generate empty array
         $this->error = array();
-
-        //Get all global variables
-        $this->global_cfg =& $this->db->getAssoc("SELECT var_name, value FROM endpointman_global_vars");
 
         //TODO: Possibly remove these as I don't believe anything uses them anymore
         define("UPDATE_PATH", $this->global_cfg['update_server']);
@@ -54,7 +49,7 @@ class endpointmanager {
         //Get local path information
         define("WEB_PATH", dirname($_SERVER['SCRIPT_NAME'])."/modules/endpointman/");
         define("LOCAL_PATH", dirname($_SERVER["SCRIPT_FILENAME"])."/modules/endpointman/");
-       
+
         //Define error reporting
         if($this->global_cfg['debug']) {
             error_reporting(E_ALL);
@@ -78,7 +73,10 @@ class endpointmanager {
         }
 
         //include the local template class
-        include LOCAL_PATH."includes/rain.tpl.class.php";
+        require(LOCAL_PATH."includes/rain.tpl.class.php");
+
+        $this->tpl = new RainTPL( LOCAL_PATH.'templates/freepbx', LOCAL_PATH.'templates/freepbx/compiled', '/admin/modules/endpointman/templates/images' );
+
     }
 
     /**
@@ -264,11 +262,11 @@ class endpointmanager {
             if ($phone_info['template_id'] > 0) {
                 $sql = "SELECT name, global_custom_cfg_data, config_files_override FROM endpointman_template_list WHERE id = ".$phone_info['template_id'];
 
-                $phone_info['template_data'] =& $this->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
+                $phone_info['template_data_info'] =& $this->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
 
             }
 
-            $sql = "SELECT endpointman_line_list.*, sip.data as secret, devices.* FROM endpointman_line_list, sip, devices WHERE endpointman_line_list.ext = devices.id AND endpointman_line_list.ext = sip.id AND sip.keyword = 'secret' AND mac_id = ".$mac_id;
+            $sql = "SELECT endpointman_line_list.*, sip.data as secret, devices.* FROM endpointman_line_list, sip, devices WHERE endpointman_line_list.ext = devices.id AND endpointman_line_list.ext = sip.id AND sip.keyword = 'secret' AND mac_id = ".$mac_id." ORDER BY endpointman_line_list.line ASC";
             $lines_info =& $this->db->getAll($sql, array(), DB_FETCHMODE_ASSOC);
             foreach($lines_info as $line) {
                 $phone_info['line'][$line['line']] = $line;
@@ -354,6 +352,9 @@ class endpointmanager {
      * @param integer $custom
      */
     function edit_template_display($id, $custom) {
+        //endpointman_flush_buffers();
+
+
         $alt_configs = NULL;
 
         if($custom == 0) {
@@ -372,32 +373,36 @@ class endpointmanager {
 
         //Determine if we are dealing with a general template or a specific [for that phone only] template (custom =0 means general)
         if($custom == 0) {
-            $sql = "SELECT endpointman_model_list.model as model_name, endpointman_template_list.global_custom_cfg_data,  endpointman_product_list.config_files, endpointman_product_list.short_name, endpointman_product_list.id as product_id, endpointman_model_list.template_data, endpointman_model_list.id as model_id, endpointman_template_list.* FROM endpointman_product_list, endpointman_model_list, endpointman_template_list WHERE endpointman_product_list.id = endpointman_template_list.product_id AND endpointman_template_list.model_id = endpointman_model_list.id AND endpointman_template_list.id = ".$id;
+            $sql = "SELECT endpointman_model_list.max_lines, endpointman_model_list.model as model_name, endpointman_template_list.global_custom_cfg_data,  endpointman_product_list.config_files, endpointman_product_list.short_name, endpointman_product_list.id as product_id, endpointman_model_list.template_data, endpointman_model_list.id as model_id, endpointman_template_list.* FROM endpointman_product_list, endpointman_model_list, endpointman_template_list WHERE endpointman_product_list.id = endpointman_template_list.product_id AND endpointman_template_list.model_id = endpointman_model_list.id AND endpointman_template_list.id = ".$id;
         } else {
-            $sql = "SELECT endpointman_model_list.model as model_name, endpointman_mac_list.global_custom_cfg_data, endpointman_product_list.config_files, endpointman_mac_list.*, endpointman_line_list.*, endpointman_model_list.id as model_id, endpointman_model_list.template_data, endpointman_product_list.id as product_id, endpointman_product_list.short_name, endpointman_product_list.cfg_dir, endpointman_brand_list.directory FROM endpointman_brand_list, endpointman_mac_list, endpointman_model_list, endpointman_product_list, endpointman_line_list WHERE endpointman_mac_list.id=".$id." AND endpointman_mac_list.id = endpointman_line_list.mac_id AND endpointman_mac_list.model = endpointman_model_list.id AND endpointman_model_list.brand = endpointman_brand_list.id AND endpointman_model_list.product_id = endpointman_product_list.id";
+            $sql = "SELECT endpointman_model_list.max_lines, endpointman_model_list.model as model_name, endpointman_mac_list.global_custom_cfg_data, endpointman_product_list.config_files, endpointman_mac_list.*, endpointman_line_list.*, endpointman_model_list.id as model_id, endpointman_model_list.template_data, endpointman_product_list.id as product_id, endpointman_product_list.short_name, endpointman_product_list.cfg_dir, endpointman_brand_list.directory FROM endpointman_brand_list, endpointman_mac_list, endpointman_model_list, endpointman_product_list, endpointman_line_list WHERE endpointman_mac_list.id=".$id." AND endpointman_mac_list.id = endpointman_line_list.mac_id AND endpointman_mac_list.model = endpointman_model_list.id AND endpointman_model_list.brand = endpointman_brand_list.id AND endpointman_model_list.product_id = endpointman_product_list.id";
         }
 
         $row =& $this->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
 
-        $tpl = new RainTPL( LOCAL_PATH.'templates' );
-        $tpl->assign("template_editor_display", 1);
-
-        echo $tpl->draw( 'global_header' );
+        $this->tpl->assign("template_editor_display", 1);
+        echo $this->tpl->draw( 'global_header' );
         //Let the template system know if we are working with a general template or a specific [for that phone only] template
-        $tpl->assign("custom", $custom);
+        $this->tpl->assign("custom", $custom);
         if($custom) {
-            $tpl->assign("ext", $row['ext']);
+            $this->tpl->assign("ext", $row['ext']);
         } else {
-            $tpl->assign("template_name", $row['name']);
+            $this->tpl->assign("template_name", $row['name']);
         }
-        $tpl->assign("product", $row['short_name']);
-        $tpl->assign("model", $row['model_name']);
+        $this->tpl->assign("product", $row['short_name']);
+        $this->tpl->assign("model", $row['model_name']);
 
-        if($ma = $this->modelsAvailable($row['model_id'], NULL, NULL, $row['product_id'])) {
-            $tpl->assign("models_ava", $ma);
+        if($ma = $this->models_available($row['model_id'], NULL, $row['product_id'])) {
+            $this->tpl->assign("models_ava", $ma);
         }
 
-        $tpl->assign("area_ava", $this->areaAvailable($row['model_id']));
+        if(isset($_REQUEST['maxlines'])) {
+            $areas = $this->areaAvailable($row['model_id'],$_REQUEST['maxlines']);
+        } else {
+            $areas = $this->areaAvailable($row['model_id'], 3);
+        }
+
+        $this->tpl->assign("area_ava", $areas);
         //Start the display of the html file in the product folder
         if($row['config_files_override'] == "") {
             $config_files_saved = "";
@@ -407,45 +412,56 @@ class endpointmanager {
         $config_files_list = explode(",",$row['config_files']);
         $i = 0;
         $alt = 0;
-        //TODO: Perhaps fix this alternative files list
+
+        $i=0;
+        $b=0;
+        $only_configs = array();
         foreach($config_files_list as $files) {
             $sql = "SELECT * FROM  endpointman_custom_configs WHERE product_id = '".$row['product_id']."' AND original_name = '".$files."'";
             $alt_configs_list_count =& $this->db->query($sql);
             if($alt_configs_list_count->numRows() > 0) {
                 $alt_configs_list =& $this->db->getAll($sql, array(), DB_FETCHMODE_ASSOC);
-                $alt_configs .= $files;
-                $alt_configs .= '<select name="'.$files.'">';
-                $alt_configs .= '<option value="0">'.$files.' (Original)</option>';
+                $alt_configs[$i]['name'] = $files;
                 $files = str_replace(".","_",$files);
+                $h=0;
                 foreach($alt_configs_list as $ccf) {
-                    $alt_configs .= '<option value="'.$ccf['id'].'" ';
+                    $alt_configs[$i]['list'][$h]['id'] = $ccf['id'];
                     $cf_key = $files;
-                    if((is_array($config_files_saved)) AND ($config_files_saved[$cf_key] == $ccf['id'])) {
-                        $alt_configs .= 'selected';
+                    if((isset($config_files_saved[$cf_key])) AND (is_array($config_files_saved)) AND ($config_files_saved[$cf_key] == $ccf['id'])) {
+                        $alt_configs[$i]['list'][$h]['selected'] = 'selected';
                     }
-                    $alt_configs .= '>'.$ccf['name'].'</option>';
+                    $alt_configs[$i]['list'][$h]['name'] = $ccf['name'];
+                    $h++;
                 }
-                $alt_configs .= "</select>";
                 $alt = 1;
+            } else {
+                $only_configs[$b]['name'] = $files;
+                $b++;
             }
             $i++;
         }
 
-        $tpl->assign("alt_configs", $alt_configs);
-        $tpl->assign("alt", $alt);
-
+        $this->tpl->assign("only_configs", $only_configs);
+        $this->tpl->assign("alt_configs", $alt_configs);
+        $this->tpl->assign("alt", $alt);
+        if(!isset($_REQUEST['maxlines'])) {
+            $maxlines = $row['max_lines'];
+        } else {
+            $maxlines = $_REQUEST['maxlines'];
+        }
         if($row['template_data'] != "") {
-            $out = $this->generate_gui_html($row['template_data'],$row['global_custom_cfg_data'],TRUE);
+            $out = $this->generate_gui_html($row['template_data'],$row['global_custom_cfg_data'],TRUE, NULL, $maxlines);
         } else {
             echo "No Template Data has been defined for this Product<br />";
         }
+        $this->tpl->assign("web_path", WEB_PATH);
 
-        $tpl->assign("template_editor", $out);
-        $tpl->assign("hidden_id", $row['id']);
-        $tpl->assign("hidden_custom", $custom);
-        echo $tpl->draw( 'template_editor' );
+        $this->tpl->assign("template_editor", $out);
+        $this->tpl->assign("hidden_id", $row['id']);
+        $this->tpl->assign("hidden_custom", $custom);
+        echo $this->tpl->draw( 'template_editor' );
 
-        $tpl->assign("debug", "");
+        $this->tpl->assign("debug", "");
 
     }
 
@@ -457,85 +473,191 @@ class endpointmanager {
      * @param <type> $user_cfg_data
      * @return <type>
      */
-    function generate_gui_html($cfg_data,$custom_cfg_data=NULL, $admin=FALSE, $user_cfg_data=NULL) {
+    function generate_gui_html($cfg_data,$custom_cfg_data=NULL, $admin=FALSE, $user_cfg_data=NULL,$max_lines=3,$ext=NULL) {
         //take the data out of the database and turn it back into an array for use
         $cfg_data = unserialize($cfg_data);
 
         $count = count($cfg_data);
 
         //Check to see if there is a custom template for this phone already listed in the endpointman_mac_list database
-        if (isset($custom_cfg_data)) {
+        if (!empty($custom_cfg_data)) {
             $custom_cfg_data = unserialize($custom_cfg_data);
-        } else {
-            //No custom template so let's pull the default values for this model into the custom_cfg_data array and populate it from there so that we won't have to make two completely different functions below
-            foreach($cfg_data as $key => $data) {
-                if(($data['type'] != 'group') && ($data['type'] != 'break') && ($data['type'] != 'loop')) {
-                    $key_default = str_replace('$','',$data['variable']);
-                    if(!is_array($data['default_value'])) {
-                        $custom_cfg_data[$key_default]['value'] = $data['default_value'];
-                    } else {
-                        $custom_cfg_data[$key_default]['value'] = "";
-                    }
-                }
+            if(array_key_exists('data', $custom_cfg_data)) {
+                $custom_cfg_data_ari = $custom_cfg_data['ari'];
+                $custom_cfg_data = $custom_cfg_data['data'];
+            } else {
+                $custom_cfg_data_ari = array();
             }
+        } else {
+            $custom_cfg_data = array();
+            $custom_cfg_data_ari = array();
         }
         if(isset($user_cfg_data)) {
             $user_cfg_data = unserialize($user_cfg_data);
         }
 
         $template_variables_array = array();
-
         $group_count = 0;
-        //Fill the html form data with values from either the database or the default values to display to the end user
-        for($i=0;$i<$count;$i++) {
-            if(array_key_exists('variable',$cfg_data[$i])) {
-                $key = str_replace('$','',$cfg_data[$i]['variable']);
-            } else {
-                $key = "";
-            }
-            if(($admin) OR (isset($custom_cfg_data[$key]['ari']))) {
-                //Checks to see if values are defined in the database, if not then we assume this is a new option and we need a default value here!
-                if(!isset($custom_cfg_data[$key]['value'])) {
-                    //xml2array will take values that have no data and turn them into arrays, we want to avoid the word 'array' as a default value, so we blank it out here if we are an array
-                    if((array_key_exists('default_value',$cfg_data[$i])) AND (is_array($cfg_data[$i]['default_value']))) {
-                        $custom_cfg_data[$key]['value'] = "";
-                    } elseif((array_key_exists('default_value',$cfg_data[$i])) AND (!is_array($cfg_data[$i]['default_value']))) {
-                        $custom_cfg_data[$key]['value'] = $cfg_data[$i]['default_value'];
-                    }
-                }
-                if ($cfg_data[$i]['type'] == "group") {
-                    $group_count++;
-                    $template_variables_array[$group_count]['title'] = $cfg_data[$i]['description'];
-                    $variables_count = 0;
-                } elseif ($cfg_data[$i]['type'] == "loop") {
-                    $group_count++;
-                    $template_variables_array[$group_count]['title'] = $cfg_data[$i]['description'];
-                    $loop_start = $cfg_data[$i]['loop_start'];
-                    $loop_end = $cfg_data[$i]['loop_end'];
-                    $variables_count = 0;
-                    for($a=$loop_start;$a<=$loop_end;$a++) {
-                        foreach($cfg_data[$i]['data']['item'] as $items) {
-                            if(isset($items['description'])) {
-                                $items['description'] = str_replace('{$count}',$a,$items['description']);
-                                $key = str_replace('$','',$items['variable'])."_".$a;
-                                if(array_key_exists($key,$custom_cfg_data)) {
-                                    $custom_cfg_data[$key]['value'] = $custom_cfg_data[$key][$a];
-                                } else {
-                                    $custom_cfg_data[$key]['value'] = '';
-                                }
-                            }
-                            $items[$i] = $items;
-                            $template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($i,$items,$key,$custom_cfg_data,$admin,$user_cfg_data);
-                            $template_variables_array[$group_count]['data'][$variables_count]['looping'] = TRUE;
-                            $variables_count++;
+        $variables_count = 0;
+
+        foreach($cfg_data as $data) {
+            $data = $this->fix_single_array_keys($data['category']);
+            foreach($data as $cats) {
+                //We force the start of a new 'section' by increasing group_count and resetting variables_count to zero
+                if($cats['name'] != 'lines') {
+                    $key = $this->arraysearchrecursive($cats['name'], $template_variables_array, 'title');
+                    if(is_array($key)) {
+                        $group_count == $key[0];
+                        $num = count($this->fix_single_array_keys($template_variables_array[$group_count]['data']));
+                        $variables_count == $num;
+                    } else {
+                        if($admin) {
+                            $group_count++;
+                            $variables_count = 0;
                         }
+                    }                    
+                    $template_variables_array[$group_count]['title'] = $cats['name'];
+                }
+                $cats = $this->fix_single_array_keys($cats['subcategory']);
+                foreach($cats as $subcats) {
+                    $items = $this->fix_single_array_keys($subcats['item']);
+                    foreach($items as $config_options) {
+                        if($admin) {
+                            //Administration View Only
+                            switch ($config_options['type']) {
+                                case "loop_line_options":
+                                    for($a=1;$a <= $max_lines; $a++) {
+                                        $group_count++;
+                                        $variables_count = 0;
+                                        $template_variables_array[$group_count]['title'] = "Line Options for Line ".$a;
+                                        foreach($config_options['data']['item'] as $items) {
+                                            if(isset($items['description'])) {
+                                                $items['description'] = str_replace('{$count}',$a,$items['description']);
+                                                $key = "line|".$a."|".str_replace('$','',$items['variable']);
+                                                if(array_key_exists($key,$custom_cfg_data)) {
+                                                    $custom_cfg_data[$key] = $custom_cfg_data[$key];
+                                                } else {
+                                                    $custom_cfg_data[$key] = str_replace('{$count}', $a, $this->fix_single_array_keys($items['default_value']));
+                                                }
+                                            }
+                                            $items[$variables_count] = $items;
+                                            $template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($variables_count,$items,$key,$custom_cfg_data,$admin,$user_cfg_data,$custom_cfg_data_ari);
+                                            $template_variables_array[$group_count]['data'][$variables_count]['looping'] = TRUE;
+                                            $variables_count++;
+                                        }
+                                    }
+                                    continue 2;
+                                case "loop":
+                                    //We force the start of a new 'section' by increasing group_count and resetting variables_count to zero
+                                    $loop_start = $config_options['loop_start'];
+                                    $loop_end = $config_options['loop_end'];
+                                    for($a=$loop_start;$a<=$loop_end;$a++) {
+                                        foreach($config_options['data']['item'] as $items) {
+                                            if(isset($items['description'])) {
+                                                $items['description'] = str_replace('{$count}',$a,$items['description']);
+                                                $key = "loop|".str_replace('$','',$items['variable'])."_".$a;
+                                                if(array_key_exists($key,$custom_cfg_data)) {
+                                                    $custom_cfg_data[$key] = $custom_cfg_data[$key];
+                                                } else {
+                                                    $custom_cfg_data[$key] = str_replace('{$count}', $a, $this->fix_single_array_keys($items['default_value']));
+                                                }
+                                            }
+                                            $items[$variables_count] = $items;
+                                            $template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($variables_count,$items,$key,$custom_cfg_data,$admin,$user_cfg_data,$custom_cfg_data_ari);
+                                            $template_variables_array[$group_count]['data'][$variables_count]['looping'] = TRUE;
+                                            $variables_count++;
+                                        }
+                                    }
+                                    continue 2;
+                            }
+                        } else {
+                            //ARI View Only
+                            $template_variables_array[$group_count]['title'] = "Your Phone Settings";
+                            switch ($config_options['type']) {
+                                case "loop_line_options":
+                                        //$a is the line number
+                                        $sql = "SELECT line FROM endpointman_line_list WHERE  ext = ".$ext;
+                                        $a = $this->db->getOne($sql);
+                                        $template_variables_array[$group_count]['title'] = "Line Options for Line ".$a;
+                                        foreach($config_options['data']['item'] as $items) {
+                                            if(isset($items['description'])) {
+                                                $items['description'] = str_replace('{$count}',$a,$items['description']);
+                                                $key = "line|".$a."|".str_replace('$','',$items['variable']);
+                                                if(array_key_exists($key,$custom_cfg_data)) {
+                                                    $custom_cfg_data[$key] = $custom_cfg_data[$key];
+                                                } else {
+                                                    $custom_cfg_data[$key] = str_replace('{$count}', $a, $this->fix_single_array_keys($items['default_value']));
+                                                }
+                                            }
+                                            if(isset($custom_cfg_data_ari[$key])) {
+                                                $items[$variables_count] = $items;
+                                                $template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($variables_count,$items,$key,$custom_cfg_data,$admin,$user_cfg_data,$custom_cfg_data_ari);
+                                                $template_variables_array[$group_count]['data'][$variables_count]['looping'] = TRUE;
+                                                $variables_count++;
+                                            }
+                                        }
+                                        $template_variables_array[$group_count]['data'][$variables_count]['type'] = "break";
+                                        $variables_count++;
+                                    continue 2;
+                                case "loop":
+                                    $template_variables_array[$group_count]['data'][$variables_count]['type'] = "break";
+                                    $variables_count++;
+                                    $loop_start = $config_options['loop_start'];
+                                    $loop_end = $config_options['loop_end'];
+                                    for($a=$loop_start;$a<=$loop_end;$a++) {
+                                        foreach($config_options['data']['item'] as $items) {
+                                            if(isset($items['description'])) {
+                                                $items['description'] = str_replace('{$count}',$a,$items['description']);
+                                                $key = "loop|".str_replace('$','',$items['variable'])."_".$a;
+                                                if(array_key_exists($key,$custom_cfg_data)) {
+                                                    $custom_cfg_data[$key] = $custom_cfg_data[$key];
+                                                } else {
+                                                    $custom_cfg_data[$key] = '';
+                                                }
+                                            }
+                                            if(isset($custom_cfg_data_ari[$key])) {
+                                                $items[$variables_count] = $items;
+                                                $template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($variables_count,$items,$key,$custom_cfg_data,$admin,$user_cfg_data,$custom_cfg_data_ari);
+                                                $template_variables_array[$group_count]['data'][$variables_count]['looping'] = TRUE;
+                                                $variables_count++;
+                                            }
+                                        }
+                                    }
+                                    continue 2;
+                            }
+                        }
+                        //Both Views
+                        switch ($config_options['type']) {
+                            case "break":
+                                $template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($variables_count,$config_options,$key,$custom_cfg_data,$admin,$user_cfg_data,$custom_cfg_data_ari);
+                                $variables_count++;
+                                break;
+                            default:
+                                if(array_key_exists('variable',$config_options)) {
+                                    $key = str_replace('$','',$config_options['variable']);
+                                    //TODO: Move this into the sync function
+                                    //Checks to see if values are defined in the database, if not then we assume this is a new option and we need a default value here!
+                                    if(!isset($custom_cfg_data[$key])) {
+                                        //xml2array will take values that have no data and turn them into arrays, we want to avoid the word 'array' as a default value, so we blank it out here if we are an array
+                                        if((array_key_exists('default_value',$config_options)) AND (is_array($config_options['default_value']))) {                                
+                                            $custom_cfg_data[$key] = "";
+                                        } elseif((array_key_exists('default_value',$config_options)) AND (!is_array($config_options['default_value']))) {
+                                            $custom_cfg_data[$key] = $config_options['default_value'];
+                                        }
+                                    }
+                                    if((!$admin) AND (isset($custom_cfg_data_ari[$key]))) {
+                                        $custom_cfg_data[$key] = $user_cfg_data[$key];
+                                        $template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($variables_count,$config_options,$key,$custom_cfg_data,$admin,$user_cfg_data,$custom_cfg_data_ari);
+                                        $variables_count++;
+                                    } elseif($admin) {
+                                        $template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($variables_count,$config_options,$key,$custom_cfg_data,$admin,$user_cfg_data,$custom_cfg_data_ari);
+                                        $variables_count++;
+                                    }
+                                }
+                                break;
+                        }
+                        continue;
                     }
-                } else {
-                    if(!isset($variables_count)) {
-                        $variables_count = 0;
-                    }
-                    $template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($i,$cfg_data,$key,$custom_cfg_data,$admin,$user_cfg_data);
-                    $variables_count++;
                 }
             }
         }
@@ -550,58 +672,94 @@ class endpointmanager {
      * @param array $custom_cfg_data
      * @return array
      */
-    function generate_form_data ($i,$cfg_data,$key,$custom_cfg_data,$admin=FALSE,$user_cfg_data) {
-        if ($cfg_data[$i]['type'] == "input") {
-            if((!$admin) && (isset($user_cfg_data[$key]['value']))) {
-                $custom_cfg_data[$key]['value'] = $user_cfg_data[$key]['value'];
-            }
-            $template_variables_array['type'] = "input";
-            $template_variables_array['key'] = $key;
-            $template_variables_array['value'] = $custom_cfg_data[$key]['value'];
-            $template_variables_array['description'] = $cfg_data[$i]['description'];
-        } elseif ($cfg_data[$i]['type'] == "radio") {
-            if((!$admin) && (isset($user_cfg_data[$key]['value']))) {
-                $custom_cfg_data[$key]['value'] = $user_cfg_data[$key]['value'];
-            }
-            $num = $custom_cfg_data[$key]['value'];
-            $template_variables_array['type'] = "radio";
-            $template_variables_array['key'] = $key;
-            $template_variables_array['description'] = $cfg_data[$i]['description'];
-            $z = 0;
-            while($z < count($cfg_data[$i]['data'])) {
-                $template_variables_array['data'][$z]['key'] = $key;
-                $template_variables_array['data'][$z]['value'] = $cfg_data[$i]['data'][$z]['value'];
-                $template_variables_array['data'][$z]['description'] = $cfg_data[$i]['data'][$z]['text'];
-                if ($cfg_data[$i]['data'][$z]['value'] == $num) {
-                    $template_variables_array['data'][$z]['checked'] = 'checked';
+    function generate_form_data ($i,$cfg_data,$key=NULL,$custom_cfg_data=NULL,$admin=FALSE,$user_cfg_data=NULL,$custom_cfg_data_ari=NULL) {
+        switch ($cfg_data['type']) {
+            case "input":
+                if((!$admin) && (isset($user_cfg_data[$key]))) {
+                    $custom_cfg_data[$key] = $user_cfg_data[$key];
                 }
-                $z++;
-            }
-        } elseif ($cfg_data[$i]['type'] == "list") {
-            if((!$admin) && (isset($user_cfg_data[$key]['value']))) {
-                $custom_cfg_data[$key]['value'] = $user_cfg_data[$key]['value'];
-            }
-            $num = $custom_cfg_data[$key]['value'];
-            $template_variables_array['type'] = "list";
-            $template_variables_array['key'] = $key;
-            $template_variables_array['description'] = $cfg_data[$i]['description'];
-            $z = 0;
-            while($z < count($cfg_data[$i]['data'])) {
-                $template_variables_array['data'][$z]['value'] = $cfg_data[$i]['data'][$z]['value'];
-                $template_variables_array['data'][$z]['description'] = $cfg_data[$i]['data'][$z]['text'];
-                if ($cfg_data[$i]['data'][$z]['value'] == $num) {
-                    $template_variables_array['data'][$z]['selected'] = 'selected';
+                $template_variables_array['type'] = "input";
+                if(isset($cfg_data['max_chars'])) {
+                    $template_variables_array['max_chars'] = $cfg_data['max_chars'];
                 }
-                $z++;
-            }
-        } elseif ($cfg_data[$i]['type'] == "break") {
-            $template_variables_array['type'] = "break";
+                $template_variables_array['key'] = $key;
+                $template_variables_array['value'] = $custom_cfg_data[$key];
+                $template_variables_array['description'] = $cfg_data['description'];
+                break;
+            case "radio":
+                if((!$admin) && (isset($user_cfg_data[$key]))) {
+                    $custom_cfg_data[$key] = $user_cfg_data[$key];
+                }
+                $num = $custom_cfg_data[$key];
+                $template_variables_array['type'] = "radio";
+                $template_variables_array['key'] = $key;
+                $template_variables_array['description'] = $cfg_data['description'];
+                $z = 0;
+                while($z < count($cfg_data['data'])) {
+                    $template_variables_array['data'][$z]['key'] = $key;
+                    $template_variables_array['data'][$z]['value'] = $cfg_data['data'][$z]['value'];
+                    $template_variables_array['data'][$z]['description'] = $cfg_data['data'][$z]['text'];
+                    if ($cfg_data['data'][$z]['value'] == $num) {
+                        $template_variables_array['data'][$z]['checked'] = 'checked';
+                    }
+                    $z++;
+                }
+                break;
+            case "list":
+                if((!$admin) && (isset($user_cfg_data[$key]))) {
+                    $custom_cfg_data[$key] = $user_cfg_data[$key];
+                }
+                $num = $custom_cfg_data[$key];
+                $template_variables_array['type'] = "list";
+                $template_variables_array['key'] = $key;
+                $template_variables_array['description'] = $cfg_data['description'];
+                $z = 0;
+                while($z < count($cfg_data['data'])) {
+                    $template_variables_array['data'][$z]['value'] = $cfg_data['data'][$z]['value'];
+                    $template_variables_array['data'][$z]['description'] = $cfg_data['data'][$z]['text'];
+                    if (isset($cfg_data['data'][$z]['disable'])) {
+                        $cfg_data['data'][$z]['disable'] = str_replace('{$count}', $z, $cfg_data['data'][$z]['disable']);
+                        $template_variables_array['data'][$z]['disables'] = explode(",", $cfg_data['data'][$z]['disable']);
+                    }
+                    if (isset($cfg_data['data'][$z]['enable'])) {
+                        $cfg_data['data'][$z]['enable'] = str_replace('{$count}', $z, $cfg_data['data'][$z]['enable']);
+                        $template_variables_array['data'][$z]['enables'] = explode(",", $cfg_data['data'][$z]['enable']);
+                    }
+                    if ($cfg_data['data'][$z]['value'] == $num) {
+                        $template_variables_array['data'][$z]['selected'] = 'selected';
+                    }
+                    $z++;
+                }
+                break;
+            case "checkbox":
+                $template_variables_array['type'] = "NA";
+                break;
+            case "file";
+                $template_variables_array['type'] = "NA";
+                break;
+            case "textarea":
+                $template_variables_array['type'] = "NA";
+                break;
+            case "file":
+                $template_variables_array['type'] = "NA";
+                break;
+            case "break":
+               if($admin) {
+                    $template_variables_array['type'] = "break";
+               } else {
+                    $template_variables_array['type'] = "NA";
+               }
+               break;
+            default:
+                $template_variables_array['type'] = "NA";
+                break;
         }
-        if(($this->global_cfg['enable_ari']) AND ($admin) AND ($cfg_data[$i]['type'] != "break") AND ($cfg_data[$i]['type'] != "group")) {
+
+        if(($this->global_cfg['enable_ari']) AND ($admin) AND ($cfg_data['type'] != "break") AND ($cfg_data['type'] != "group")) {
            
             $template_variables_array['aried'] = 1;
             $template_variables_array['ari']['key'] = $key;
-            if(isset($custom_cfg_data[$key]['ari'])) {
+            if(isset($custom_cfg_data_ari[$key])) {
                 $template_variables_array['ari']['checked'] = "checked";
             }
         }
@@ -629,33 +787,63 @@ class endpointmanager {
 
         $cfg_data = unserialize($row['template_data']);
         $count = count($cfg_data);
-        for($i=0;$i<$count;$i++) {
-            if(array_key_exists('variable',$cfg_data[$i])) {
-                $temping = str_replace('$','',$cfg_data[$i]['variable']);
-                $temping_ari = "ari_" . $temping;
-                if(array_key_exists($temping, $_REQUEST)) {
-                    $custom_cfg_data[$temping]['value'] = $_REQUEST[$temping];
-                    if(array_key_exists($temping_ari, $_REQUEST)) {
-                        if($_REQUEST[$temping_ari] == "on") {
-                            $custom_cfg_data[$temping]['ari'] = 1;
-                        }
-                    }
-                }
-            } elseif ($cfg_data[$i]['type'] == 'loop') {
-                $loop_start = $cfg_data[$i]['loop_start'];
-                $loop_end = $cfg_data[$i]['loop_end'];
-                $variables_count = 0;
-                for($a=$loop_start;$a<=$loop_end;$a++) {
-                    foreach($cfg_data[$i]['data']['item'] as $items) {
-                        if(isset($items['description'])) {
-                            $items['description'] = str_replace('{$count}',$a,$items['description']);
-                            $temping = str_replace('$','',$items['variable'])."_".$a;
+
+        $custom_cfg_data_ari = array();
+
+        foreach($cfg_data as $data) {
+            $data = $this->fix_single_array_keys($data['category']);
+            foreach($data as $cats) {
+                $cats = $this->fix_single_array_keys($cats['subcategory']);
+                foreach($cats as $subcats) {
+                    $items = $this->fix_single_array_keys($subcats['item']);
+                    foreach($items as $config_options) {
+                        if(array_key_exists('variable',$config_options)) {
+                            $temping = str_replace('$','',$config_options['variable']);
                             $temping_ari = "ari_" . $temping;
                             if(array_key_exists($temping, $_REQUEST)) {
-                                $custom_cfg_data[$temping][$a] = $_REQUEST[$temping];
+                                $custom_cfg_data[$temping] = $_REQUEST[$temping];
                                 if(array_key_exists($temping_ari, $_REQUEST)) {
                                     if($_REQUEST[$temping_ari] == "on") {
-                                        $custom_cfg_data[$temping]['ari'] = 1;
+                                        $custom_cfg_data_ari[$temping] = 1;
+                                    }
+                                }
+                            }
+                        } elseif ($config_options['type'] == 'loop') {
+                            $loop_start = $config_options['loop_start'];
+                            $loop_end = $config_options['loop_end'];
+                            $variables_count = 0;
+                            for($a=$loop_start;$a<=$loop_end;$a++) {
+                                foreach($config_options['data']['item'] as $items) {
+                                    if(isset($items['description'])) {
+                                        $items['description'] = str_replace('{$count}',$a,$items['description']);
+                                        $temping = "loop|".str_replace('$','',$items['variable'])."_".$a;
+                                        $temping_ari = "ari_" . $temping;
+                                        if(array_key_exists($temping, $_REQUEST)) {
+                                            $custom_cfg_data[$temping] = $_REQUEST[$temping];
+                                            if(array_key_exists($temping_ari, $_REQUEST)) {
+                                                if($_REQUEST[$temping_ari] == "on") {
+                                                    $custom_cfg_data_ari[$temping] = 1;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        } elseif ($config_options['type'] == 'loop_line_options') {
+                            for($a=1;$a<=3;$a++) {
+                                foreach($config_options['data']['item'] as $items) {
+                                    if(isset($items['description'])) {
+                                        $items['description'] = str_replace('{$count}',$a,$items['description']);
+                                        $temping = "line|".$a."|".str_replace('$','',$items['variable']);
+                                        $temping_ari = "ari_" . $temping;
+                                        if(array_key_exists($temping, $_REQUEST)) {
+                                            $custom_cfg_data[$temping] = $_REQUEST[$temping];
+                                            if(array_key_exists($temping_ari, $_REQUEST)) {
+                                                if($_REQUEST[$temping_ari] == "on") {
+                                                    $custom_cfg_data_ari[$temping] = 1;
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -666,22 +854,28 @@ class endpointmanager {
         }
 
         $config_files = explode(",",$row['config_files']);
+
         $i = 0;
         while($i < count($config_files)) {
             $config_files[$i] = str_replace(".","_",$config_files[$i]);
             if(isset($_REQUEST[$config_files[$i]])) {
+                $_REQUEST[$config_files[$i]] = explode("_",$_REQUEST[$config_files[$i]], 2);
+                $_REQUEST[$config_files[$i]] = $_REQUEST[$config_files[$i]][0];
                 if($_REQUEST[$config_files[$i]] > 0) {
                     $config_files_selected[$config_files[$i]] = $_REQUEST[$config_files[$i]];
                 }
             }
             $i++;
         }
+
         if(!isset($config_files_selected)) {
             $config_files_selected = "";
         } else {
             $config_files_selected = serialize($config_files_selected);
         }
-        $save = serialize($custom_cfg_data);
+        $custom_cfg_data_temp['data'] = $custom_cfg_data;
+        $custom_cfg_data_temp['ari'] = $custom_cfg_data_ari;
+        $save = serialize($custom_cfg_data_temp);
 
         if($custom == "0") {
             $sql = 'UPDATE endpointman_template_list SET config_files_override = \''.addslashes($config_files_selected).'\', global_custom_cfg_data = \''.addslashes($save).'\' WHERE id ='.$id;
@@ -708,7 +902,11 @@ class endpointmanager {
             }
         }
 
-        return($location);
+        if(isset($_REQUEST['silent_mode'])) {
+            echo '<script language="javascript" type="text/javascript">window.close();</script>';
+        } else {
+            return($location);
+        }
 
     }
 
@@ -716,7 +914,7 @@ class endpointmanager {
      * Prepare and then send the data that Provisioner expects, then take what provisioner gives us and do what it says
      * @param array $phone_info Everything from get_phone_info
      */
-    function prepare_configs($phone_info) {
+    function prepare_configs($phone_info,$reboot=TRUE) {
         if(!class_exists('ProvisionerConfig')) {
             require(PHONE_MODULES_PATH.'setup.php');
         }
@@ -728,6 +926,7 @@ class endpointmanager {
         //Tell the system who we are and were to find the data.
         $provisioner_lib->root_dir = PHONE_MODULES_PATH;
         $provisioner_lib->engine = 'asterisk';
+        $provisioner_lib->engine_location = $this->global_cfg['asterisk_location'];
         $provisioner_lib->system = 'unix';
 
         //have to because of versions less than php5.3
@@ -748,16 +947,79 @@ class endpointmanager {
         $provisioner_lib->server[1]['ip'] = $this->global_cfg['srvip'];
         $provisioner_lib->server[1]['port'] = 5060;
 
-        //Provide alternate Configuration file instead of the one from the hard drive
         $temp = "";
-        if(!empty($phone_info['config_files_override'])) {
-            $temp = unserialize($phone_info['config_files_override']);
-            foreach($temp as $list) {
-                $sql = "SELECT original_name,data FROM endpointman_custom_configs WHERE id = ".$list;
-                $res =& $this->db->query($sql);
-                if($res->numRows()) {
-                    $data = $this->db->getRow($sql, array(),DB_FETCHMODE_ASSOC);
-                    $provisioner_lib->config_files_override[$data['original_name']] = $data['data'];
+        $template_data = unserialize($phone_info['template_data']);
+        $global_user_cfg_data = unserialize($phone_info['global_user_cfg_data']);
+        if($phone_info['template_id'] > 0) {
+            $global_custom_cfg_data = unserialize($phone_info['template_data_info']['global_custom_cfg_data']);
+            //Provide alternate Configuration file instead of the one from the hard drive
+            if(!empty($phone_info['template_data_info']['config_files_override'])) {
+                $temp = unserialize($phone_info['template_data_info']['config_files_override']);
+                foreach($temp as $list) {
+                    $sql = "SELECT original_name,data FROM endpointman_custom_configs WHERE id = ".$list;
+                    $res =& $this->db->query($sql);
+                    if($res->numRows()) {
+                        $data = $this->db->getRow($sql, array(),DB_FETCHMODE_ASSOC);
+                        $provisioner_lib->config_files_override[$data['original_name']] = $data['data'];
+                    }
+                }
+            }
+        } else {
+            $global_custom_cfg_data = unserialize($phone_info['global_custom_cfg_data']);
+            //Provide alternate Configuration file instead of the one from the hard drive
+            if(!empty($phone_info['config_files_override'])) {
+                $temp = unserialize($phone_info['config_files_override']);
+                foreach($temp as $list) {
+                    $sql = "SELECT original_name,data FROM endpointman_custom_configs WHERE id = ".$list;
+                    $res =& $this->db->query($sql);
+                    if($res->numRows()) {
+                        $data = $this->db->getRow($sql, array(),DB_FETCHMODE_ASSOC);
+                        $provisioner_lib->config_files_override[$data['original_name']] = $data['data'];
+                    }
+                }
+            }
+        }
+
+        if (!empty($global_custom_cfg_data)) {
+            if(array_key_exists('data', $global_custom_cfg_data)) {
+                $global_custom_cfg_ari = $global_custom_cfg_data['ari'];
+                $global_custom_cfg_data = $global_custom_cfg_data['data'];
+            } else {
+                $global_custom_cfg_data = array();
+                $global_custom_cfg_ari = array();
+            }
+        }
+
+        $new_template_data = array();
+        $line_ops = array();
+        if(is_array($global_custom_cfg_data)) {
+            foreach($global_custom_cfg_data as $key => $data) {
+                $full_key = $key;
+                $key = explode('|',$key);
+                $count = count($key);
+                switch($count) {
+                    case 1:
+                        if(($this->global_cfg['enable_ari'] == 1) AND (isset($global_custom_cfg_ari[$full_key])) AND (isset($global_user_cfg_data[$full_key]))) {
+                            $new_template_data[$full_key] = $global_user_cfg_data[$full_key];
+                        } else {
+                            $new_template_data[$full_key] = $global_custom_cfg_data[$full_key];
+                        }
+                    break;
+                    case 2:
+                        $breaks = explode('_',$key[1]);
+                        if(($this->global_cfg['enable_ari'] == 1) AND (isset($global_custom_cfg_ari[$full_key])) AND (isset($global_user_cfg_data[$full_key]))) {
+                            $new_template_data[$breaks[0]][$breaks[2]][$breaks[1]] = $global_user_cfg_data[$full_key];
+                        } else {
+                            $new_template_data[$breaks[0]][$breaks[2]][$breaks[1]] = $global_custom_cfg_data[$full_key];
+                        }
+                    break;
+                    case 3:
+                        if(($this->global_cfg['enable_ari'] == 1) AND (isset($global_custom_cfg_ari[$full_key])) AND (isset($global_user_cfg_data[$full_key]))) {
+                            $line_ops[$key[1]][$key[2]] = $global_user_cfg_data[$full_key];
+                        } else {
+                            $line_ops[$key[1]][$key[2]] = $global_custom_cfg_data[$full_key];
+                        }
+                    break;
                 }
             }
         }
@@ -765,35 +1027,15 @@ class endpointmanager {
         //Loop through Lines!
         foreach($phone_info['line'] as $line) {
             $provisioner_lib->lines[$line['line']] = array('ext' => $line['ext'], 'secret' => $line['secret'], 'displayname' => $line['description']);
-        }
-
-        $global_user_cfg_data = unserialize($phone_info['global_user_cfg_data']);
-
-        if(is_array($phone_info['template_data'])) {
-            $template_data = unserialize($phone_info['template_data']['global_custom_cfg_data']);
-        } else {
-            $template_data = unserialize($phone_info['global_custom_cfg_data']);
-        }
-
-        $new_template_data = array();
-        if(is_array($template_data)) {
-            foreach($template_data as $key => $data) {
-                if(array_key_exists('value', $data)) {
-                    if((isset($template_data[$key]['ari'])) && (isset($global_user_cfg_data[$key]['value']))) {
-                       $new_template_data[$key] = $global_user_cfg_data[$key]['value'];
-                    } else {
-                       $new_template_data[$key] = $data['value'];
-                    }
-                } else {
-                    $key = explode('_',$key);
-                    $new_template_data[$key[0]][$key[2]][$key[1]] = $data[$key[2]];
-                }
+            if(isset($line_ops[$line['line']])) {
+                $provisioner_lib->lines[$line['line']]['options'] = $line_ops[$line['line']];
             }
         }
 
         //Set Variables according to the template_data files included. We can include different template.xml files within family_data.xml also one can create
         //template_data_custom.xml which will get included or template_data_<model_name>_custom.xml which will also get included
         //line 'global' will set variables that aren't line dependant
+
         $provisioner_lib->options = $new_template_data;
 
         //Setting a line variable here...these aren't defined in the template_data.xml file yet. however they will still be parsed
@@ -826,7 +1068,9 @@ class endpointmanager {
                 if(((file_exists($this->global_cfg['config_location'].$data)) AND (!in_array($data,$provisioner_lib->protected_files))) OR (!file_exists($this->global_cfg['config_location'].$data))) {
                     if(is_dir(PHONE_MODULES_PATH."endpoint/".$phone_info['directory']."/".$phone_info['cfg_dir']."/".$data)) {
                         if(!file_exists($this->global_cfg['config_location'].$data)) {
-                            mkdir($this->global_cfg['config_location'].$data, 0777);
+                            if (!@mkdir($this->global_cfg['config_location'].$data, 0777)) {
+                                $this->error['parse_configs'] = "Could Not Create Directory: ".$data;
+                            }
                         }
                         $dir_iterator = new RecursiveDirectoryIterator(PHONE_MODULES_PATH."endpoint/".$phone_info['directory']."/".$phone_info['cfg_dir']."/".$data."/");
                         $iterator = new RecursiveIteratorIterator($dir_iterator, RecursiveIteratorIterator::SELF_FIRST);
@@ -835,12 +1079,17 @@ class endpointmanager {
                             if(is_dir($file)) {
                                 $dir = str_replace(PHONE_MODULES_PATH."endpoint/".$phone_info['directory']."/".$phone_info['cfg_dir']."/".$data."/", "", $file);
                                 if(!file_exists($this->global_cfg['config_location'].$data."/".$dir)) {
-                                    mkdir($this->global_cfg['config_location'].$data."/".$dir, 0777);
+                                    if (!@mkdir($this->global_cfg['config_location'].$data."/".$dir, 0777)) {
+                                        $this->error['parse_configs'] = "Could Not Create Directory: ".$data."/".$dir;
+                                    }
                                 }
                             } else {
                                 $dir = str_replace(PHONE_MODULES_PATH."endpoint/".$phone_info['directory']."/".$phone_info['cfg_dir']."/".$data."/", "", $file);
-                                copy($file, $this->global_cfg['config_location'].$data."/".$dir);
-                                chmod($this->global_cfg['config_location'].$data."/".$dir, 0777);
+                                if(!@copy($file, $this->global_cfg['config_location'].$data."/".$dir)) {
+                                   $this->error['parse_configs'] = "Could Not Copy File: ".$data."/".$dir;
+                                } else {
+                                    chmod($this->global_cfg['config_location'].$data."/".$dir, 0777);
+                                }
                             }
                         }
                     } else {
@@ -862,7 +1111,9 @@ class endpointmanager {
                 }
             }
         }
-        $provisioner_lib->reboot();
+        if($reboot) {
+            $provisioner_lib->reboot();
+        }
     }
 
     /**
@@ -935,7 +1186,7 @@ class endpointmanager {
      * Remove firmware from the Hard Drive
      * @param int $id Product ID
      */
-    function remove_firmware($id=NULL) {
+    function remove_firmware($id) {
         $sql = "SELECT firmware_files FROM  endpointman_product_list WHERE  id =". $id;
         $files = $this->db->getOne($sql);
 
@@ -973,13 +1224,22 @@ class endpointmanager {
             foreach (glob(PHONE_MODULES_PATH."endpoint/".$row['directory']."/".$row['cfg_dir']."/firmware/*.*") as $filename) {
                 $file = basename($filename);
                 $list[$i] = $file;
-                copy($filename, $this->global_cfg['config_location'].$file);
+                if (!@copy($filename, $this->global_cfg['config_location'].$file)) {
+                    echo "<BR />--Failed To Copy $file...<BR />";
+                    $copy_error = TRUE;
+                }
                 $i++;
             }
             $list = implode(",", $list);
             $sql = "UPDATE endpointman_product_list SET firmware_vers = '".$temp['data']['firmware_ver']."', firmware_files = '".$list."' WHERE id = ". $row['id'];
             $this->db->query($sql);
-            echo "Done!";
+            if(isset($copy_error)) {
+                echo "Copy Error Detected! Aborting Install!";
+                $this->remove_firmware($product_id);
+                echo "<BR />Please Check Directory/Permissions";
+            } else {
+                echo "Done!";
+            }
         } else {
             echo "Your Firmware is already up to date";
 
@@ -1157,104 +1417,202 @@ class endpointmanager {
         return $out;
     }
 
+    function download_brand($id) {
+        $row =& $this->db->getAll('SELECT * FROM  endpointman_brand_list WHERE id ='.$id, array(), DB_FETCHMODE_ASSOC);
+        echo "Downloading Brand XML.....";
+        $result = $this->download_xml(UPDATE_PATH .$row[0]['directory']. "/".$row[0]['directory'].".xml","endpoint/".$row[0]['directory']);
+        if($result) {
+            echo "Done!<br/>";
+            $temp = $this->xml2array(PHONE_MODULES_PATH.'/endpoint/'.$row[0]['directory'].'/brand_data.xml');
+            $this->update_brand($temp);
+        } else {
+            echo "<br/>Error Connecting to the Package Repository. Module not installed. Please Try again later.<br/>You Can Also Manually Update The Repository By Downloading Files here: <a href='http://www.provisioner.net/release.html' target='_blank'>Release Repo</a><br />Then Use Manual Upload in Advanced Settings";
+        }
+    }
+
     /**
      * This will install or updated a brand package (which is the same thing to this)
      * Still needs way to determine when models move...perhaps another function?
      * @param <type> $id
      */
-    function update_brand($id = NULL) {
-        $row =& $this->db->getAll('SELECT * FROM  endpointman_brand_list WHERE id ='.$id, array(), DB_FETCHMODE_ASSOC);
+    function update_brand($temp) {
+        $row[0]['directory'] = $temp['data']['brands']['directory'];
+        $brand_name = $temp['data']['brands']['name'];
+        $brand_id = $temp['data']['brands']['brand_id'];
+        $brand_version = $temp['data']['brands']['version'];
+        $brand_last_mod = $temp['data']['brands']['last_modified'];
+        $package = $temp['data']['brands']['package'];
 
-        echo "Downloading Brand XML.....";
-        $result = $this->download_xml(UPDATE_PATH .$row[0]['directory']. "/".$row[0]['directory'].".xml","endpoint/".$row[0]['directory']);
-        if($result) {
-            echo "Done!<br/>";
+        echo "<div style='float: left'>Downloading Brand Package...</div><div style='float: left' id=\"DivExample\">.</div>";
+        $this->download_file_with_progress_bar(UPDATE_PATH.$row[0]['directory'].'/'.$package, PHONE_MODULES_PATH."temp/".$package);
+        echo "<script type='text/javascript'>document.getElementById('DivExample').innerHTML='Done!';</script><br />";
 
-            $temp = $this->xml2array(PHONE_MODULES_PATH.'/endpoint/'.$row[0]['directory'].'/brand_data.xml');
+        echo "Extracting Tarball........";
+        exec("tar -xvf ".PHONE_MODULES_PATH.'temp/'. $package ." -C ".PHONE_MODULES_PATH."temp/");
+        echo "Done!<br />";
 
-            $brand_name = $temp['data']['brands']['name'];
-            $brand_id = $temp['data']['brands']['brand_id'];
-            $brand_version = $temp['data']['brands']['version'];
-            $brand_last_mod = $temp['data']['brands']['last_modified'];
-            $package = $temp['data']['brands']['package'];
+        echo "Creating Directory Structure/Moving Files...............";
+        $dir_iterator = new RecursiveDirectoryIterator(PHONE_MODULES_PATH."temp/".$row[0]['directory']."/");
+        $iterator = new RecursiveIteratorIterator($dir_iterator, RecursiveIteratorIterator::SELF_FIRST);
+        // could use CHILD_FIRST if you so wish
 
-            echo "<div style='float: left'>Downloading Brand Package...</div><div style='float: left' id=\"DivExample\">.</div>";
-            $this->download_file_with_progress_bar(UPDATE_PATH.$row[0]['directory'].'/'.$package, PHONE_MODULES_PATH."temp/".$package);
-            echo "<script type='text/javascript'>document.getElementById('DivExample').innerHTML='Done!';</script><br />";
-            
-            echo "Extracting Tarball........";
-            exec("tar -xvf ".PHONE_MODULES_PATH.'temp/'. $package ." -C ".PHONE_MODULES_PATH."temp/");
-            echo "Done!<br />";
-
-            echo "Creating Directory Structure/Moving Files...............";
-            $dir_iterator = new RecursiveDirectoryIterator(PHONE_MODULES_PATH."temp/".$row[0]['directory']."/");
-            $iterator = new RecursiveIteratorIterator($dir_iterator, RecursiveIteratorIterator::SELF_FIRST);
-            // could use CHILD_FIRST if you so wish
-
-            foreach ($iterator as $file) {
-                if(is_dir($file)) {
+        foreach ($iterator as $file) {
+            if(is_dir($file)) {
+                $dir = str_replace(PHONE_MODULES_PATH."temp/".$row[0]['directory']."/", "", $file);
+                if(!file_exists(PHONE_MODULES_PATH."endpoint/".$row[0]['directory']."/".$dir)) {
+                    mkdir(PHONE_MODULES_PATH."endpoint/".$row[0]['directory']."/".$dir,0764);
+                }
+            } else {
+                if(basename($file) != "brand_data.xml") {
                     $dir = str_replace(PHONE_MODULES_PATH."temp/".$row[0]['directory']."/", "", $file);
-                    if(!file_exists(PHONE_MODULES_PATH."endpoint/".$row[0]['directory']."/".$dir)) {
-                        mkdir(PHONE_MODULES_PATH."endpoint/".$row[0]['directory']."/".$dir,0764);
-                    }
-                } else {
-                    if(basename($file) != "brand_data.xml") {
-                        $dir = str_replace(PHONE_MODULES_PATH."temp/".$row[0]['directory']."/", "", $file);
-                        rename($file, PHONE_MODULES_PATH."endpoint/".$row[0]['directory']."/".$dir);
-                        chmod(PHONE_MODULES_PATH."endpoint/".$row[0]['directory']."/".$dir,0764);
-                    }
+                    rename($file, PHONE_MODULES_PATH."endpoint/".$row[0]['directory']."/".$dir);
+                    chmod(PHONE_MODULES_PATH."endpoint/".$row[0]['directory']."/".$dir,0764);
                 }
             }
-            echo "Done!<br />";
-
-            echo "Removing Temporary Files..............";
-            $this->deltree(PHONE_MODULES_PATH."temp/" .$row[0]['directory']);
-            unlink(PHONE_MODULES_PATH.'temp/'. $package);
-            echo "Done!<br />";
-
-            $last_mod = "";
-            $temp['data']['brands']['family_list']['family'] = $this->fix_single_array_keys($temp['data']['brands']['family_list']['family']);
-            foreach($temp['data']['brands']['family_list']['family'] as $family_list) {
-                echo "Updating Family Lines.................<br/>";
-                $last_mod = max($last_mod, $family_list['last_modified']);
-
-                $family_line_xml = $this->xml2array(PHONE_MODULES_PATH.'/endpoint/'.$row[0]['directory'].'/'.$family_list['directory'].'/family_data.xml');
-                $data =& $this->db->getOne("SELECT id FROM endpointman_product_list WHERE id='".$brand_id.$family_line_xml['data']['id']."'", array(), DB_FETCHMODE_ASSOC);
-                $short_name = preg_replace("/\[(.*?)\]/si", "", $family_line_xml['data']['name']);
-                if($data) {
-                    $sql = "UPDATE endpointman_product_list SET short_name = '".$short_name."', long_name = '".$family_line_xml['data']['name']."', cfg_ver = '".$family_line_xml['data']['version']."', config_files='".$family_line_xml['data']['configuration_files']."' WHERE id = '".$brand_id.$family_line_xml['data']['id']."'";
-                } else {
-                    $sql = "INSERT INTO endpointman_product_list (`id`, `brand`, `short_name`, `long_name`, `cfg_dir`, `cfg_ver`, `config_files`, `hidden`) VALUES ('".$brand_id.$family_line_xml['data']['id']."', '".$brand_id."', '".$short_name."', '".$family_line_xml['data']['name']."', '".$family_line_xml['data']['directory']."', '".$family_line_xml['data']['version']."','".$family_line_xml['data']['configuration_files']."', '0')";
-                }
-
-                $this->db->query($sql);
-                $family_line_xml['data']['model_list'] = $this->fix_single_array_keys($family_line_xml['data']['model_list']);
-                echo "--Updating Model Lines................<br/>";
-                foreach($family_line_xml['data']['model_list'] as $model_list) {
-                    if(is_array($model_list['template_data']['files'])) {
-                        $template_list = implode(",",$model_list['template_data']['files']);
-                    } else {
-                        $template_list = $model_list['template_data']['files'];
-                    }
-                    $m_data =& $this->db->getOne("SELECT id FROM endpointman_model_list WHERE id='".$brand_id.$family_line_xml['data']['id'].$model_list['id']."'", array(), DB_FETCHMODE_ASSOC);
-                    if($m_data) {
-                        $sql = "UPDATE endpointman_model_list SET max_lines = '".$model_list['lines']."', model = '".$model_list['model']."', template_list = '".$template_list."' WHERE id = '".$brand_id.$family_line_xml['data']['id'].$model_list['id']."'";
-                    } else {
-                        $sql = "INSERT INTO endpointman_model_list (`id`, `brand`, `model`, `max_lines`, `product_id`, `template_list`, `enabled`, `hidden`) VALUES ('".$brand_id.$family_line_xml['data']['id'].$model_list['id']."', '".$brand_id."', '".$model_list['model']."', '".$model_list['lines']."', '".$brand_id.$family_line_xml['data']['id']."', '".$template_list."', '0', '0')";
-                    }
-                    $this->db->query($sql);
-                }
-            }
-
-            $brand_version = max($last_mod, $brand_last_mod);
-            echo "Updating data..........";
-            $sql = "UPDATE endpointman_brand_list SET name = '".$brand_name."', cfg_ver = '".$brand_version."', installed = 1, hidden = 0 WHERE id = ".$id;
-            $this->db->query($sql);
-            echo "Done!<br/>";
-            
-        } else {
-            echo "<br/>Error Connecting to the Package Repository. Module not installed. Please Try again later.<br/>You Can Also Manually Update The Repository By Downloading Files here: <a href='http://www.provisioner.net/release.html' target='_blank'>Release Repo</a><br />Then Use Manual Upload in Advanced Settings";
         }
+        echo "Done!<br />";
+
+        echo "Removing Temporary Files..............";
+        $this->deltree(PHONE_MODULES_PATH."temp/" .$row[0]['directory']);
+        unlink(PHONE_MODULES_PATH.'temp/'. $package);
+        echo "Done!<br />";
+
+        $last_mod = "";
+        $temp['data']['brands']['family_list']['family'] = $this->fix_single_array_keys($temp['data']['brands']['family_list']['family']);
+        foreach($temp['data']['brands']['family_list']['family'] as $family_list) {
+            echo "Updating Family Lines.................<br/>";
+            $last_mod = max($last_mod, $family_list['last_modified']);
+
+            $family_line_xml = $this->xml2array(PHONE_MODULES_PATH.'/endpoint/'.$row[0]['directory'].'/'.$family_list['directory'].'/family_data.xml');
+            $data =& $this->db->getOne("SELECT id FROM endpointman_product_list WHERE id='".$brand_id.$family_line_xml['data']['id']."'", array(), DB_FETCHMODE_ASSOC);
+            $short_name = preg_replace("/\[(.*?)\]/si", "", $family_line_xml['data']['name']);
+            if($data) {
+                $sql = "UPDATE endpointman_product_list SET short_name = '".$short_name."', long_name = '".$family_line_xml['data']['name']."', cfg_ver = '".$family_line_xml['data']['version']."', config_files='".$family_line_xml['data']['configuration_files']."' WHERE id = '".$brand_id.$family_line_xml['data']['id']."'";
+            } else {
+                $sql = "INSERT INTO endpointman_product_list (`id`, `brand`, `short_name`, `long_name`, `cfg_dir`, `cfg_ver`, `config_files`, `hidden`) VALUES ('".$brand_id.$family_line_xml['data']['id']."', '".$brand_id."', '".$short_name."', '".$family_line_xml['data']['name']."', '".$family_line_xml['data']['directory']."', '".$family_line_xml['data']['version']."','".$family_line_xml['data']['configuration_files']."', '0')";
+            }
+
+            $this->db->query($sql);
+            $family_line_xml['data']['model_list'] = $this->fix_single_array_keys($family_line_xml['data']['model_list']);
+            echo "--Updating Model Lines................<br/>";
+            foreach($family_line_xml['data']['model_list'] as $model_list) {
+                if(is_array($model_list['template_data']['files'])) {
+                    $template_list = implode(",",$model_list['template_data']['files']);
+                } else {
+                    $template_list = $model_list['template_data']['files'];
+                }
+
+                $model_final_id = $brand_id.$family_line_xml['data']['id'].$model_list['id'];
+                $sql = 'SELECT id, global_custom_cfg_data, global_user_cfg_data FROM endpointman_mac_list WHERE model = '.$model_final_id;
+                $old_data = NULL;
+                $old_data = $this->db->getAll($sql, array(), DB_FETCHMODE_ASSOC);
+                foreach($old_data as $data) {
+                    $global_custom_cfg_data = unserialize($data['global_custom_cfg_data']);
+                    if((is_array($global_custom_cfg_data)) AND (!array_key_exists('data', $global_custom_cfg_data))) {
+                        echo "----Old Data Detected! Migrating......";
+                        $new_data = array();
+                        $new_ari = array();
+                        foreach($global_custom_cfg_data as $key => $old_keys) {
+                            if(array_key_exists('value', $old_keys)) {
+                                $new_data[$key] = $old_keys['value'];
+                            } else {
+                                $breaks = explode("_", $key);
+                                $new_data["loop|".$key] = $old_keys[$breaks[2]];
+                            }
+                            if(array_key_exists('ari', $old_keys)) {
+                                $new_ari[$key] = 1;
+                            }
+                        }
+                        $final_data = array();
+                        $final_data['data'] = $new_data;
+                        $final_data['ari'] = $new_ari;
+                        $final_data = serialize($final_data);
+                        $sql = "UPDATE endpointman_mac_list SET  global_custom_cfg_data =  '".$final_data."' WHERE  id =".$data['id'];
+                        $this->db->query($sql);
+                        echo "Done!<br/>";
+                    }
+
+                    $global_user_cfg_data = unserialize($data['global_user_cfg_data']);
+                    $old_check = FALSE;
+                    if(is_array($global_user_cfg_data)) {
+                        foreach($global_user_cfg_data as $stuff) {
+                            if(is_array($stuff)) {
+                                if(array_key_exists('value', $stuff)) {
+                                    $old_check = TRUE;
+                                    break;
+                                } else {
+                                    break;
+                                }
+                            } else {
+                                break;
+                            }
+                        }
+                    }
+                    if((is_array($global_user_cfg_data)) AND ($old_check)) {
+                        echo "Old Data Detected! Migrating......";
+                        $new_data = array();
+                        foreach($global_user_cfg_data as $key => $old_keys) {
+                            if(array_key_exists('value', $old_keys)) {
+                                $exploded = explode("_",$key);
+                                $counted = count($exploded);
+                                $counted = $counted - 1;
+                                if(is_numeric($exploded[$counted])) {
+                                    $key = "loop|".$key;
+                                }
+                                $new_data[$key] = $old_keys['value'];
+                            }
+                        }
+                        $final_data = serialize($new_data);
+                        $sql = "UPDATE endpointman_mac_list SET  global_user_cfg_data =  '".$final_data."' WHERE  id =".$data['id'];
+                        $this->db->query($sql);
+                        echo "Done!<br/>";
+                    }
+                }
+                $old_data = NULL;
+                $sql = 'SELECT id, global_custom_cfg_data FROM endpointman_template_list WHERE model_id = '.$model_final_id;
+                $old_data = $this->db->getAll($sql, array(), DB_FETCHMODE_ASSOC);
+                foreach($old_data as $data) {
+                    $global_custom_cfg_data = unserialize($data['global_custom_cfg_data']);
+                    if((is_array($global_custom_cfg_data)) AND (!array_key_exists('data', $global_custom_cfg_data))) {
+                        echo "Old Data Detected! Migrating......";
+                        $new_data = array();
+                        $new_ari = array();
+                        foreach($global_custom_cfg_data as $key => $old_keys) {
+                            if(array_key_exists('value', $old_keys)) {
+                                $new_data[$key] = $old_keys['value'];
+                            } else {
+                                $breaks = explode("_", $key);
+                                $new_data["loop|".$key] = $old_keys[$breaks[2]];
+                            }
+                            if(array_key_exists('ari', $old_keys)) {
+                                $new_ari[$key] = 1;
+                            }
+                        }
+                        $final_data = array();
+                        $final_data['data'] = $new_data;
+                        $final_data['ari'] = $new_ari;
+                        $final_data = serialize($final_data);
+                        $sql = "UPDATE endpointman_template_list SET  global_custom_cfg_data =  '".$final_data."' WHERE  id =".$data['id'];
+                        $this->db->query($sql);
+                        echo "Done!<br/>";
+                    }
+                }
+
+                $m_data =& $this->db->getOne("SELECT id FROM endpointman_model_list WHERE id='".$brand_id.$family_line_xml['data']['id'].$model_list['id']."'", array(), DB_FETCHMODE_ASSOC);
+                if($m_data) {
+                    $sql = "UPDATE endpointman_model_list SET max_lines = '".$model_list['lines']."', model = '".$model_list['model']."', template_list = '".$template_list."' WHERE id = '".$brand_id.$family_line_xml['data']['id'].$model_list['id']."'";
+                } else {
+                    $sql = "INSERT INTO endpointman_model_list (`id`, `brand`, `model`, `max_lines`, `product_id`, `template_list`, `enabled`, `hidden`) VALUES ('".$brand_id.$family_line_xml['data']['id'].$model_list['id']."', '".$brand_id."', '".$model_list['model']."', '".$model_list['lines']."', '".$brand_id.$family_line_xml['data']['id']."', '".$template_list."', '0', '0')";
+                }
+                $this->db->query($sql);
+            }
+        }
+
+        $brand_version = max($last_mod, $brand_last_mod);
+        echo "Updating data..........";
+        $sql = "UPDATE endpointman_brand_list SET name = '".$brand_name."', cfg_ver = '".$brand_version."', installed = 1, hidden = 0 WHERE id = ".$brand_id;
+        $this->db->query($sql);
+        echo "Done!<br/>";
     }
 
     /**
@@ -1263,6 +1621,7 @@ class endpointmanager {
      */
     function remove_brand($id=NULL) {
         $brand_dir =& $this->db->getOne("SELECT directory FROM endpointman_brand_list WHERE id=".$id);
+        $this->rmrf(PHONE_MODULES_PATH."endpoint/".$brand_dir);
 
         $sql = "DELETE FROM endpointman_model_list WHERE brand = '". $id."'";
         $this->db->query($sql);
@@ -1284,7 +1643,7 @@ class endpointmanager {
      * @param int $model Model ID
      * @return boolean True on sync completed. False on sync failed
      */
-    function sync_model($model=NULL) {
+    function sync_model($model) {
 
         //TODO: combine these queries
 
@@ -1319,7 +1678,7 @@ class endpointmanager {
                 }
             }
 
-            $sql = "UPDATE endpointman_model_list SET template_list = '".$template_list."' WHERE id = '".$model."'";
+            $sql = "UPDATE endpointman_model_list SET max_lines = '".$family_line_xml['data']['model_list'][$key[0]]['lines']."', template_list = '".$template_list."' WHERE id = '".$model."'";
             $this->db->query($sql);
 
             $version = $family_line_xml['data']['version'];
@@ -1334,7 +1693,7 @@ class endpointmanager {
             foreach($template_list_array as $data) {
                 if(file_exists(PHONE_MODULES_PATH.'/endpoint/'.$brand_row['directory'].'/'.$product_row['cfg_dir'].'/'.$data)) {
                     $template_data_xml = $this->xml2array(PHONE_MODULES_PATH.'/endpoint/'.$brand_row['directory'].'/'.$product_row['cfg_dir'].'/'.$data);
-                    $template_data_xml = $this->fix_single_array_keys($template_data_xml['template_data']['item']);
+                    $template_data_xml = $this->fix_single_array_keys($template_data_xml['template_data']);
                     $template_data_array = array_merge($template_data_array, $template_data_xml);
                 }
             }
@@ -1531,18 +1890,23 @@ class endpointmanager {
     }
 
     /**
-     * A function to quickly remove a directory (works in seconds for a hundred thousand files)
-     * @author http://www.php.net/manual/en/function.glob.php#93669
+     * The RecursiveIteratorIterator must be told to provide children (files and subdirectories) before parents with its CHILD_FIRST constant.
+     * Using RecursiveIteratorIterator is the only way PHP is able to see hidden files.
+     * @author http://www.webcheatsheet.com/PHP/working_with_directories.php
      * @param string $dir Full Directory path to delete
      */
     function rmrf($dir) {
-        foreach (glob($dir) as $file) {
-            if (is_dir($file)) {
-                $this->rmrf("$file/*");
-                rmdir($file);
-            } else {
-                unlink($file);
+        if(file_exists($dir)) {
+            $iterator = new RecursiveDirectoryIterator($dir);
+            foreach (new RecursiveIteratorIterator($iterator, RecursiveIteratorIterator::CHILD_FIRST) as $file) {
+                if ($file->isDir()) {
+                    @rmdir($file->getPathname());
+                } else {
+                    @unlink($file->getPathname());
+                }
             }
+            //Remove parent path as the last step
+            @rmdir($dir);
         }
     }
 
@@ -1696,14 +2060,14 @@ class endpointmanager {
         if ((strlen($mac) == "17") OR (strlen($mac) == "12")) {
             //It might be better to use switch here instead of these IF statements...
 
-            //Is the mac separated by colons(:)?
+            //Is the mac separated by colons(:) or dashes(-)?
             if (preg_match("/[0-9a-f][0-9a-f][:-]".
             "[0-9a-f][0-9a-f][:-]".
             "[0-9a-f][0-9a-f][:-]".
             "[0-9a-f][0-9a-f][:-]".
             "[0-9a-f][0-9a-f][:-]".
             "[0-9a-f][0-9a-f]/i", $mac)) {
-                return(strtoupper(str_replace(":", "", $mac)));
+                return(strtoupper(str_replace(":", "", str_replace("-", "", $mac))));
                 //Is the string exactly 12 characters?
             } elseif(strlen($mac) == "12") {
                 //Now is the string a valid HEX mac address?
@@ -1784,6 +2148,7 @@ class endpointmanager {
                 "[0-9a-f][0-9a-f]/i", $arp_array)));
 
         //Go through each row of valid arp entries and pull out the information and add it into a nice array!
+        $z = 0;
         foreach ($temp as $key => &$value) {
 
             //Pull out the IP address from row. It's always the first entry in the row and it can only be a max of 15 characters with the delimiters
@@ -1830,11 +2195,12 @@ class endpointmanager {
                 }
 
                 //Add into a final array
-                $final[$key] = array("ip" => $ip, "mac" => $mac, "mac_strip" => $mac_strip, "oui" => $oui, "brand" => $brand['name'], "brand_id" => $brand['id'], "endpoint_managed" => $epm);
+                $final[$z] = array("ip" => $ip, "mac" => $mac, "mac_strip" => $mac_strip, "oui" => $oui, "brand" => $brand['name'], "brand_id" => $brand['id'], "endpoint_managed" => $epm);
+                $z++;
             }
         }
 
-        $final = array_values($final);
+        //$final = array_values($final);
 
         if(!is_array($final)) {
             return(FALSE);
@@ -1844,32 +2210,35 @@ class endpointmanager {
     }
 
     function areaAvailable($model,$area=NULL) {
-
-        $temp[0]['value'] = 'GLOBAL';
-        $temp[0]['text'] = 'GLOBAL';
-        $temp[0]['selected'] = 0;
-
-        $temp[1]['value'] = 'ALL';
-        $temp[1]['text'] = 'ALL LINES';
-        $temp[1]['selected'] = 0;
-
         $sql = "SELECT max_lines FROM endpointman_model_list WHERE id = '". $model."'";
-
         $count = $this->db->getOne($sql);
+
+        //TODO: FIX this
+        /**
+        if($count == 0) {
+           $this->sync_model($model);
+           $sql = "SELECT max_lines FROM endpointman_model_list WHERE id = '". $model."'";
+           $count = $this->db->getOne($sql);
+           if($count == 0) {
+               die("Can't Reset Lines to more than 0! ['areaAvailble']");
+           }
+        }
+         * 
+         */
         for($z=0;$z<$count;$z++) {
             $result[$z]['id'] = $z + 1;
             $result[$z]['model'] = $z + 1;
         }
 
-        $i = 2;
+        $i = 1;
         foreach($result as $row) {
-            if ($row['id'] == $model) {
+            if ($row['id'] == $area) {
                 $temp[$i]['value'] = $row['id'];
-                $temp[$i]['text'] = 'Line '.$row['model'];
+                $temp[$i]['text'] = $row['model'];
                 $temp[$i]['selected'] = 'selected';
             }else {
                 $temp[$i]['value'] = $row['id'];
-                $temp[$i]['text'] = 'Line '.$row['model'];
+                $temp[$i]['text'] = $row['model'];
                 $temp[$i]['selected'] = 0;
             }
             $i++;
@@ -1878,22 +2247,24 @@ class endpointmanager {
         return($temp);
     }
 
-    function modelsAvailable($model=NULL, $macAdd=NULL, $brand=NULL, $product=NULL) {
-        if (isset($macAdd)) {
-            $oui=substr($macAdd,0,6);
-        }
+    /**
+     *
+     * @param integer $model model ID
+     * @param integer $brand brand ID
+     * @param integer $product product ID
+     * @return array
+     */
+    function models_available($model=NULL, $brand=NULL, $product=NULL) {
+        
         if ((!isset($oui)) && (!isset($brand)) && (!isset($model))) {
-            $sql="SELECT endpointman_model_list.* FROM endpointman_model_list, endpointman_product_list WHERE endpointman_model_list.product_id = endpointman_product_list.id AND endpointman_model_list.enabled = 1 AND endpointman_product_list.hidden = 0";
+            $result1 =& $this->endpoint_data->all_models();
         }elseif((isset($brand)) && ($brand !=0)) {
-            $sql="SELECT endpointman_model_list.* FROM endpointman_model_list, endpointman_product_list WHERE endpointman_model_list.product_id = endpointman_product_list.id AND endpointman_model_list.enabled = 1 AND endpointman_product_list.hidden = 0 AND endpointman_model_list.brand = " . $brand;
+            $result1 =& $this->endpoint_data->all_models_by_brand($brand);
         }elseif((isset($product)) && ($product !=0)) {
-            $sql="SELECT * FROM endpointman_model_list WHERE product_id = ".$product;
+            $result1 =& $this->endpoint_data->all_models_by_product($product);
         } else {
-            $sql="SELECT endpointman_model_list.* FROM endpointman_model_list, endpointman_product_list WHERE endpointman_model_list.product_id = endpointman_product_list.id AND endpointman_model_list.enabled = 1 AND endpointman_product_list.hidden = 0";
+            $result1 =& $this->endpoint_data->all_models();
         }
-
-
-        $result1 =& $this->db->getAll($sql, array(),DB_FETCHMODE_ASSOC);
 
         $i = 1;
         foreach($result1 as $row) {
@@ -1917,58 +2288,81 @@ class endpointmanager {
         }
     }
 
-    function linesAvailable($model=NULL, $macid=NULL) {
+    function in_array_recursive($needle, $haystack) {
 
-        if(isset($model)) {
-            $sql="SELECT  `max_lines` FROM  `endpointman_model_list` WHERE  `id` LIKE";
-        }
+        $it = new RecursiveIteratorIterator(new RecursiveArrayIterator($haystack));
 
-
-        $result1 =& $this->db->getAll($sql, array(),DB_FETCHMODE_ASSOC);
-
-        $i = 1;
-        foreach($result1 as $row) {
-            if ($row['id'] == $model) {
-                $temp[$i]['value'] = $row['id'];
-                $temp[$i]['text'] = $row['model'];
-                $temp[$i]['selected'] = 'selected';
-            }else {
-                $temp[$i]['value'] = $row['id'];
-                $temp[$i]['text'] = $row['model'];
-                $temp[$i]['selected'] = 0;
+        foreach($it AS $element) {
+            if($element == $needle) {
+                return TRUE;
             }
-            $i++;
+        } 
+        return FALSE;
+    }
+
+    function linesAvailable($lineid=NULL,$macid=NULL) {
+        if(isset($lineid)) {
+            $sql="SELECT max_lines FROM endpointman_model_list WHERE id = (SELECT endpointman_mac_list.model FROM endpointman_mac_list, endpointman_line_list WHERE endpointman_line_list.luid = ".$lineid." AND endpointman_line_list.mac_id = endpointman_mac_list.id)";
+
+            $sql_l = "SELECT line, mac_id FROM `endpointman_line_list` WHERE luid = ".$lineid;
+            $line =& $this->db->getRow($sql_l, array(), DB_FETCHMODE_ASSOC);
+
+            $sql_lu = "SELECT line FROM endpointman_line_list WHERE mac_id = ".$line['mac_id'];
+        } elseif(isset($macid)) {
+            $sql="SELECT max_lines FROM endpointman_model_list WHERE id = (SELECT model FROM endpointman_mac_list WHERE id =".$macid.")";
+            $sql_lu = "SELECT line FROM endpointman_line_list WHERE mac_id = ".$macid;
+            
+            $line['line'] = 0;
         }
 
-        if(!isset($temp)) {
-            $this->error['modelsAvailable'] = "You need to enable at least ONE model";
-            return(FALSE);
-        } else {
+        $max_lines = $this->db->getOne($sql);
+        $lines_used =& $this->db->getAll($sql_lu);
+
+        for($i = 1; $i <= $max_lines; $i++) {    
+            if($i == $line['line']) {
+                $temp[$i]['value'] = $i;
+                $temp[$i]['text'] = $i;
+                $temp[$i]['selected'] = "selected";
+            } else {
+                if(!$this->in_array_recursive($i,$lines_used)) {
+                    $temp[$i]['value'] = $i;
+                    $temp[$i]['text'] = $i;
+                }
+            }
+        }
+        if(isset($temp)) {
             return($temp);
+        } else {
+            return FALSE;
         }
     }
 
-    function displayExtension($line_id = NULL) {
-        if(!isset($line_id)) {
-            $ext = NULL;
-            $not_added="SELECT devices.id, devices.description FROM devices WHERE tech='sip' AND devices.id not in (SELECT devices.id FROM devices, endpointman_line_list WHERE tech='sip' AND devices.id = endpointman_line_list.ext ) ORDER BY devices.id";
-        } else {
-            $sql = 'SELECT ext FROM endpointman_line_list WHERE luid = '.$line_id;
-            $ext = $this->db->getOne($sql);
-            $not_added="SELECT devices.id, devices.description FROM devices WHERE tech='sip' AND devices.id not in (SELECT devices.id FROM devices, endpointman_line_list WHERE tech='sip' AND devices.id = endpointman_line_list.ext AND endpointman_line_list.ext !=".$ext." ) ORDER BY devices.id";
-        }
-        $result =& $this->db->getAll($not_added,array(), DB_FETCHMODE_ASSOC);
+    /**
+     * Display all unused registrations from whatever manager we are using!
+     * @return <type>
+     */
+    function display_registration_list($line_id=NULL) {
 
+        if(isset($line_id)) {
+            $result =& $this->endpoint_data->all_unused_registrations();
+            $line_data =& $this->endpoint_data->get_line_information($line_id);
+        } else {
+            $result =& $this->endpoint_data->all_unused_registrations();
+            $line_data = NULL;
+        }
 
         $i = 1;
         $temp = array();
         foreach($result as $row) {
             $temp[$i]['value'] = $row['id'];
             $temp[$i]['text'] = $row['id'] . " --- " . $row['description'];
-            if ($row['id'] == $ext) {
-                $temp[$i]['selected'] = "selected";
-            }
             $i++;
+        }
+
+        if(isset($line_data)) {
+            $temp[$i]['value'] = $line_data['ext'];
+            $temp[$i]['text'] = $line_data['ext'] . " --- " . $line_data['description'];
+            $temp[$i]['selected'] = "selected";
         }
 
         return($temp);
@@ -1979,13 +2373,15 @@ class endpointmanager {
      * @param integer $selected ID Number of the brand that is supposed to be selected in a drop-down list box
      * @return array Number array used to generate a select box
      */
-    function brandAvailable ($selected = NULL) {
-        $sql="SELECT DISTINCT endpointman_brand_list.name, endpointman_brand_list.id FROM  endpointman_brand_list,endpointman_model_list WHERE endpointman_model_list.brand = endpointman_brand_list.id AND endpointman_model_list.enabled = 1 AND endpointman_model_list.hidden = 0 AND endpointman_brand_list.installed = 1 AND endpointman_brand_list.hidden = 0";
-       
-        $data =& $this->db->getAll($sql,array(), DB_FETCHMODE_ASSOC);
-        $temp[0]['value'] = "";
-        $temp[0]['text'] = "";
-        $i = 1;
+    function brands_available ($selected = NULL,$show_blank=TRUE) {
+        $data =& $this->endpoint_data->all_active_brands();
+        if($show_blank) {
+            $temp[0]['value'] = "";
+            $temp[0]['text'] = "";
+            $i = 1;
+        } else {
+            $i = 0;
+        }
         foreach($data as $row) {
             $temp[$i]['value'] = $row['id'];
             $temp[$i]['text'] = $row['name'];

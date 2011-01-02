@@ -1,11 +1,11 @@
 <module>
 	<rawname>endpointman</rawname>
 	<name>PBX End Point Manager</name>
-	<version>2.9.0.0</version>
+	<version>2.9.0.1</version>
 	<type>tool</type>
 	<category>End Point Manager</category>
 	<publisher>Andrew Nagy</publisher>
-	<license>GPLv2</license>
+	<license>MPLv1.1</license>
 	<menuitems>
 		<epm_devices sort="1">End Point Device List</epm_devices>
 		<epm_templates sort="2">End Point Template Manager</epm_templates>
@@ -14,18 +14,13 @@
 	</menuitems>
 	 <description>PBX End Point Manager supports automated deployment of multiple manufacturers IP telephones.</description>
 	 <changelog>
-		*2.9.0.0* bumped for 2.9, removed errors in module.xml causing erors for online xml parsing
-		*2.3.2* Various Bug Fixes
-		*2.3.1* Install directory case corrections
-		*2.3.0* No Changes
-		*2.2.9* Fixed ARI module, Update Local Description on Rebuild, Fix Firmware Updater
-		*2.2.8* Fixed User &amp; Devices error.
-		*2.2.6* Fixed download progress so that it displays.
-		*2.2.5* Fixed Debug Always on Error, File download errors, Fix float error on install
-		*2.2.0* Stopped using iframe installer, switched to freepbx version
-	</changelog>
+				*2.9.0.0* bumped for 2.9, removed errors in module.xml causing erors for online xml parsing
+                *2.3.2* Various Bug Fixes
+                *2.3.1* Install directory case corrections
+                *2.3.0* No Changes
+        </changelog>
 	<info>http://projects.colsolgrp.net/projects/show/endpointman</info>
-	<location>release/2.9/endpointman-2.9.0.0.tgz</location>
+	<location>contributed_modules/release/endpointman-2.3.2.tgz</location>
 
-<md5sum>a11032a057cef3da4e915d1600dbf811</md5sum>
+<md5sum>b0e3a14a20449b0441d1a9f432f19559</md5sum>
 </module>
