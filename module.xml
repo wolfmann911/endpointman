@@ -20,7 +20,7 @@
                 *2.3.0* No Changes
         </changelog>
 	<info>http://projects.colsolgrp.net/projects/show/endpointman</info>
-	<location>contributed_modules/release/endpointman-2.3.2.tgz</location>
+	<location>release/2.9/endpointman-2.9.0.3RC2.tgz</location>
 
-<md5sum>b0e3a14a20449b0441d1a9f432f19559</md5sum>
+<md5sum>01a514ba10fc8e964760e2faef4e3bf2</md5sum>
 </module>
