@@ -110,6 +110,13 @@ function endpointman_configpageinit($pagename) {
 
                                 $sql = "UPDATE  endpointman_mac_list SET model = ".$model.", template_id =  ".$temp." WHERE id = ".$macid;
                                 $endpoint->db->query($sql);
+
+                                $row = $endpoint->get_phone_info($macid);
+                                if(isset($reboot)) {
+                                    $endpoint->prepare_configs($row);
+                                } else {
+                                    $endpoint->prepare_configs($row,FALSE);
+                                }
                             }
                         } elseif(!isset($delete)) {
                             //Add Extension/Phone to database
@@ -126,6 +133,9 @@ function endpointman_configpageinit($pagename) {
 
                             $sql = "INSERT INTO `endpointman_line_list` (`mac_id`, `ext`, `line`, `description`) VALUES ('".$ext_id."', '".$extdisplay."', '".$line."', '".$name."')";
                             $endpoint->db->query($sql);
+
+                            $row = $endpoint->get_phone_info($ext_id);
+                            $endpoint->prepare_configs($row,FALSE);
                         }
                     }
                 } else {
