@@ -6,6 +6,10 @@
  * @license MPL / GPLv2 / LGPL
  * @package Endpoint Manager
  */
+
+// Leaving these conditional functions for now since this module is used
+// by some earlier releases of FreePBX which may not have them.
+//
 if (! function_exists("out")) {
     function out($text) {
         echo $text."<br />";
