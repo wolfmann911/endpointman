@@ -1,6 +1,6 @@
 <module>
 	<rawname>endpointman</rawname>
-	<repo>standard</repo>
+	<repo>extended</repo>
 	<name>PBX End Point Manager</name>
 	<version>2.9.0.3RC4</version>
 	<type>tool</type>
