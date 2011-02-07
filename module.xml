@@ -1,8 +1,8 @@
 <module>
 	<rawname>endpointman</rawname>
-	<repo>extended</repo>
+	<repo>standard</repo>
 	<name>PBX End Point Manager</name>
-	<version>2.9.0.3RC4</version>
+	<version>2.9.0.3RC5</version>
 	<type>tool</type>
 	<category>End Point Manager</category>
 	<publisher>Andrew Nagy</publisher>
@@ -21,7 +21,7 @@
                 *2.3.0* No Changes
         </changelog>
 	<info>http://projects.colsolgrp.net/projects/show/endpointman</info>
-	<location>release/2.9/endpointman-2.9.0.3RC4.tgz</location>
+	<location>release/2.9/endpointman-2.9.0.3RC2.tgz</location>
 
-<md5sum>05062b33d72877058e3a058974ebf1bb</md5sum>
+<md5sum>f4aed8221b1398a65438454786ce8089</md5sum>
 </module>
