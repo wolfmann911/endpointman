@@ -279,21 +279,30 @@ class endpointmanager {
 
     function add_device($mac,$model,$ext,$template=NULL,$line=NULL,$displayname=NULL) {
         $mac = $this->mac_check_clean($mac);
-
         if($mac) {
-            $sql = "SELECT id FROM endpointman_mac_list WHERE mac = '".$mac."'";
-            $dup = $this->db->getOne($sql);
-
-            if($dup) {
-                $this->add_line($dup, $line, $ext);
+            if(empty($model)) {
+                $this->error['add_device'] = _("You Must Select A Model From the Drop Down")."!";
+                return(FALSE);
+            } elseif(empty($ext)) {
+                $this->error['add_device'] = _("You Must Select an Extension/Device From the Drop Down")."!";
+                return(FALSE);
             } else {
                 if($this->sync_model($model)) {
-                    if(empty($model)) {
-                        $this->error['add_device'] = _("You Must Select A Model From the Drop Down")."!";
-                        return(FALSE);
-                    } elseif(empty($ext)) {
-                        $this->error['add_device'] = _("You Must Select an Extension/Device From the Drop Down")."!";
-                        return(FALSE);
+                    $sql = "SELECT id,template_id FROM endpointman_mac_list WHERE mac = '".$mac."'";
+                    $dup = $this->db->getRow($sql,array(),DB_FETCHMODE_ASSOC);
+
+                    if($dup) {
+                        if(!isset($template)) {
+                            $template = $dup['template_id'];
+                        }
+                        $sql = "UPDATE endpointman_mac_list SET model = ".$model.", template_id =  ".$template." WHERE id = ".$dup['id'];
+                        $this->db->query($sql);
+                        $return = $this->add_line($dup['id'], $line, $ext);
+                        if($return) {
+                            return($return);
+                        } else {
+                            return(FALSE);
+                        }
                     } else {
                         if(!isset($template)) {
                             $template = 0;
@@ -324,15 +333,14 @@ class endpointmanager {
                         $sql = 'SELECT last_insert_id()';
                         $ext_id =& $this->db->getOne($sql);
 
-                        if($line > 1) {
-                            $this->message['add_device'] = "You can't add a phone without the first line set!";
+                        if(empty($line)) {
+                            $line = 1;
                         }
-                        $line = 1;
 
                         $sql = "INSERT INTO `endpointman_line_list` (`mac_id`, `ext`, `line`, `description`) VALUES ('".$ext_id."', '".$ext."', '".$line."', '".$name."')";
                         $this->db->query($sql);
 
-                        $this->message['add_device'] = "Added!";
+                        $this->message['add_device'] = "Added ".$name." to line ".$line;
                         return($ext_id);
                     }
                 } else {
@@ -341,7 +349,7 @@ class endpointmanager {
                 }
             }
         } else {
-            $this->message['add_device'] = _("Invalid MAC Address")."!";
+            $this->error['add_device'] = _("Invalid MAC Address")."!";
             return(FALSE);
         }
     }
@@ -380,6 +388,24 @@ class endpointmanager {
                 $this->error['add_line'] = _("No Lines Left to Add")."!";
                 return(FALSE);
             }
+        } elseif((!isset($line)) AND (isset($ext))) {
+            if($this->linesAvailable(NULL,$mac_id)) {
+                if($this->endpoint_data->all_unused_registrations()) {
+                    $lines = array_values($this->linesAvailable(NULL,$mac_id));
+
+                    $sql = "INSERT INTO `endpointman_line_list` (`mac_id`, `ext`, `line`, `description`) VALUES ('".$mac_id."', '".$ext."', '".$lines[0]['value']."', '".$displayname."')";
+                    $this->db->query($sql);
+
+                    $this->message['add_line'] = "Added '<i>".$name."</i>' to line '<i>".$lines[0]['value']."</i>' on device '<i>".$reg[0]['value']."</i>' <br/> Configuration Files will not be Generated until you click Save!";
+                    return($mac_id);
+                } else {
+                    $this->error['add_line'] = _("No Devices/Extensions Left to Add")."!";
+                    return(FALSE);
+                }
+            } else {
+                $this->error['add_line'] = _("No Lines Left to Add")."!";
+                return(FALSE);
+            }
         } elseif((isset($line)) AND (isset($ext))) {
             $sql = "SELECT luid FROM endpointman_line_list WHERE line = '".$line."' AND mac_id = ".$mac_id;
             $luid = $this->db->getOne($sql);
@@ -396,32 +422,54 @@ class endpointmanager {
 
                 $sql = "INSERT INTO `endpointman_line_list` (`mac_id`, `ext`, `line`, `description`) VALUES ('".$mac_id."', '".$ext."', '".$line."', '".$name."')";
                 $this->db->query($sql);
-                $this->message['add_line'] = "Added ".$name." to line ".$line;
+                $this->message['add_line'] .= "Added ".$name." to line ".$line . "<br/>";
                 return($mac_id);
             }
 
         }
     }
 
-    function update_device($mac_id,$model,$ext,$template,$line=NULL,$name=NULL) {
+    function update_device($macid,$model,$template,$luid=NULL,$name=NULL,$line=NULL,$update_lines=TRUE) {
         $sql = "UPDATE endpointman_mac_list SET model = ".$model.", template_id =  ".$temp." WHERE id = ".$macid;
         $this->db->query($sql);
-        if(!isset($line)) {
-            return(TRUE);
-        } else {
-            $this->update_line($line, $name,NULL,$macid);
-            return(TRUE);
+        if($update_lines) {
+            if(!isset($luid)) {
+                $this->update_line($luid,NULL,$name,$line);
+                return(TRUE);
+            } else {
+                $this->update_line(NULL,$macid);
+                return(TRUE);
+            }
         }
     }
 
-    function update_line($line,$name,$luid=NULL,$macid=NULL) {
+    function update_line($luid=NULL,$macid=NULL,$name=NULL,$line=NULL) {
         if(isset($luid)) {
-            $sql = "UPDATE endpointman_line_list SET line = ".$line.", description =  '".$name."' WHERE  luid =" . $luid;
+            $sql = "SELECT * FROM endpointman_line_list WHERE luid = ".$luid;
+            $row = $this->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
+
+            if(!isset($name)) {
+                $sql = "SELECT description FROM devices WHERE id = ".$row['ext'];
+                $name=$this->db->getOne($sql);
+            }
+
+            if(!isset($line)) {
+                $line = $row['line'];
+            }
+
+            $sql = "UPDATE endpointman_line_list SET line = '".$line."', ext = ".$row['ext'].", description = '".$name."' WHERE luid =  ". $row['luid'];
             $this->db->query($sql);
             return(TRUE);
         } else {
-            $sql = "UPDATE endpointman_line_list SET line = ".$line.", description =  '".$name."' WHERE  luid =" . $luid;
-            $this->db->query($sql);
+            $sql = "SELECT * FROM endpointman_line_list WHERE mac_id = ".$macid;
+            $lines_info = $this->db->getAll($sql, array(), DB_FETCHMODE_ASSOC);
+            foreach($lines_info as $row) {
+                $sql = "SELECT description FROM devices WHERE id = ".$row['ext'];
+                $name=$this->db->getOne($sql);
+
+                $sql = "UPDATE endpointman_line_list SET line = '".$row['line']."', ext = ".$row['ext'].", description = '".$name."' WHERE luid =  ". $row['luid'];
+                $this->db->query($sql);
+            }
             return(TRUE);
         }
     }

@@ -54,7 +54,7 @@ switch ($sub_type) {
         switch ($sub_type_sub) {
             case "add_line_x":
                 $_REQUEST['id'] = $_REQUEST['edit_id'];
-                $endpoint->add_line($_REQUEST['id']);
+                $mac_id = $endpoint->add_line($_REQUEST['id']);
                 break;
             case "button_edit":
                 if(empty($_REQUEST['edit_id'])) {
@@ -73,11 +73,11 @@ switch ($sub_type) {
             case "button_save":
                 $sql = 'SELECT * FROM endpointman_line_list WHERE mac_id = '. $_REQUEST['edit_id'];
 
-                $lines_list =& $endpoint->db->getAll($sql,array(),DB_FETCHMODE_ASSOC);
+                $lines_list = $endpoint->db->getAll($sql,array(),DB_FETCHMODE_ASSOC);
 
                 foreach($lines_list as $row) {
                     $sql = "SELECT description FROM devices WHERE id = ".$_REQUEST['ext_list_'.$row['luid']];
-                    $name=$endpoint->db->getOne($sql);
+                    $name = $endpoint->db->getOne($sql);
 
                     $sql = "UPDATE endpointman_line_list SET line = '".$_REQUEST['line_list_'.$row['luid']]."', ext = ".$_REQUEST['ext_list_'.$row['luid']].", description = '".$name."' WHERE luid =  ". $row['luid'];
                     $endpoint->db->query($sql);
@@ -93,7 +93,7 @@ switch ($sub_type) {
                 break;
             case "delete":
                 $sql = 'SELECT mac_id FROM endpointman_line_list WHERE luid = '.$_REQUEST['edit_id'] ;
-                $mac_id =& $endpoint->db->getOne($sql,array(),DB_FETCHMODE_ASSOC);
+                $mac_id = $endpoint->db->getOne($sql,array(),DB_FETCHMODE_ASSOC);
                 $row = $endpoint->get_phone_info($mac_id);
 
                 $endpoint->delete_line($_REQUEST['edit_id'],FALSE);
@@ -106,8 +106,10 @@ switch ($sub_type) {
         break;
     case "add" :
         $mac_id = $endpoint->add_device($_REQUEST['mac'],$_REQUEST['model_list'],$_REQUEST['ext_list'],$_REQUEST['template_list'],$_REQUEST['line_list']);
-        $phone_info = $endpoint->get_phone_info($mac_id);
-        $endpoint->prepare_configs($phone_info);
+        if($mac_id === TRUE) {
+            $phone_info = $endpoint->get_phone_info($mac_id);
+            $endpoint->prepare_configs($phone_info);
+        }
         break;
     case "edit_template" :
         if(empty($_REQUEST['edit_id'])) {

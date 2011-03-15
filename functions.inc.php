@@ -107,11 +107,7 @@ function endpointman_configpageinit($pagename) {
                             $lines_list =& $endpoint->db->getRow($sql,array(),DB_FETCHMODE_ASSOC);
                             if(($lines_list) AND (isset($model)) AND (isset($line)) AND (!isset($delete)) AND (isset($temp))) {
                                 //Modifying line already in the database
-                                $sql = "UPDATE endpointman_line_list SET line = ".$lines_list['line'].", description =  '".$name."' WHERE  luid =" . $lines_list['luid'];
-                                $endpoint->db->query($sql);
-
-                                $sql = "UPDATE  endpointman_mac_list SET model = ".$model.", template_id =  ".$temp." WHERE id = ".$macid;
-                                $endpoint->db->query($sql);
+                                $endpoint->update_device($macid, $model, $temp, $lines_list['luid'],$name,$lines_list['line']);
 
                                 $row = $endpoint->get_phone_info($macid);
                                 if(isset($reboot)) {
@@ -121,11 +117,14 @@ function endpointman_configpageinit($pagename) {
                                 }
                             } elseif((isset($model)) AND (!isset($delete)) AND (isset($line)) AND (isset($temp))) {
                                 //Add line to the database
-                                $sql = "INSERT INTO endpointman_line_list (mac_id, line, ext, description) VALUES (".$macid.",  ".$line.",  ".$extdisplay.",  '".$name."')";
-                                $endpoint->db->query($sql);
 
-                                $sql = "UPDATE  endpointman_mac_list SET model = ".$model.", template_id =  ".$temp." WHERE id = ".$macid;
-                                $endpoint->db->query($sql);
+                                if(empty($line)) {
+                                    $endpoint->add_line($macid, NULL, $extdisplay, $name);
+                                } else {
+                                   $endpoint->add_line($macid, $line, $extdisplay, $name);
+                                }
+                                
+                                $endpoint->update_device($macid, $model, $temp, NULL, NULL, NULL, FALSE);
 
                                 $row = $endpoint->get_phone_info($macid);
                                 if(isset($reboot)) {

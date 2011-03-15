@@ -91,7 +91,7 @@ function ep_table_exists ($table) {
     return FALSE;
 }
 
-$version = "2.9.0.6";
+$version = "2.9.0.7";
 
 if(ep_table_exists("endpointman_global_vars")) {
     $global_cfg =& $db->getAssoc("SELECT var_name, value FROM endpointman_global_vars");
@@ -179,6 +179,26 @@ if(!isset($global_cfg['version'])) {
     $ver = "2.9.0.4";
 } elseif($global_cfg['version'] == '2.9.0.5') {
     $ver = "2.9.0.5";
+} elseif($global_cfg['version'] == '2.9.0.6') {
+    $ver = "2.9.0.6";
+} elseif($global_cfg['version'] == '2.9.0.7') {
+    $ver = "2.9.0.7";
+} elseif($global_cfg['version'] == '2.9.0.8') {
+    $ver = "2.9.0.8";
+} elseif($global_cfg['version'] == '2.9.0.9') {
+    $ver = "2.9.0.9";
+} elseif($global_cfg['version'] == '2.9.1.0') {
+    $ver = "2.9.1.0";
+} elseif($global_cfg['version'] == '2.9.1.1') {
+    $ver = "2.9.1.1";
+} elseif($global_cfg['version'] == '2.9.1.2') {
+    $ver = "2.9.1.2";
+} elseif($global_cfg['version'] == '2.9.1.3') {
+    $ver = "2.9.1.3";
+} elseif($global_cfg['version'] == '2.9.1.4') {
+    $ver = "2.9.1.4";
+} elseif($global_cfg['version'] == '2.9.1.5') {
+    $ver = "2.9.1.5";
 } else {
     $ver = "1000";
     $new_install = TRUE;
@@ -900,12 +920,18 @@ if(!$new_install) {
     }
 
     if($ver <= "2.9.0.4") {
+        out("Adding 'local' column to brand_list");
         $sql = 'ALTER TABLE  `endpointman_brand_list` ADD  `local` INT( 1 ) NOT NULL DEFAULT  \'0\' AFTER  `cfg_ver`';
         $db->query($sql);
     }
 
-    if($ver <= "2.9.0.5") {
-        $sql = "INSERT INTO  `asterisk`.`endpointman_global_vars` (`idnum` ,`var_name` ,`value`)VALUES (NULL ,  'show_all_registrations',  '0')";
+    if($ver <= "2.9.0.7") {
+        out("Adding UNIQUE key to table global_vars for var_name");
+        $sql = "ALTER TABLE `asterisk`.`endpointman_global_vars` ADD UNIQUE `unique` (`var_name`)";
+        $db->query($sql);
+
+        out("Adding show_all_registrations to global_vars table");
+        $sql = 'INSERT INTO asterisk.endpointman_global_vars (idnum, var_name, value) VALUES (NULL, "show_all_registrations", "0")';
         $db->query($sql);
     }
 
