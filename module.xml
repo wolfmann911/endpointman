@@ -15,6 +15,7 @@
 	</menuitems>
 	 <description>PBX End Point Manager supports automated deployment of multiple manufacturers IP telephones.</description>
 	 <changelog>
+	 			*2.9.0.8* Fixed #5068, Took off RC status. Fixed Version Numbering.
                 *2.9.0.3RC9* Fixed #4878, #4956, #4946, #4950
                 *2.9.0.3RC6* Fixed Device + User Mode (http://www.freepbx.org/forum/freepbx/users/device-user-mode), #4792
 		*2.9.0.0* bumped for 2.9, removed errors in module.xml causing erors for online xml parsing
