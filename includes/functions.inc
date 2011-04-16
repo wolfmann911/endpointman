@@ -1215,7 +1215,7 @@ class endpointmanager {
 			$base_class = "endpoint_" . $phone_info['directory']. '_base';
 			$master_class = "endpoint_base";
 			/**Quick Fix for FreePBX Distro
-			* I seriously want to figure out why ONLY the FreePBX Distro can't do autoloads. What the hell?
+			* I seriously want to figure out why ONLY the FreePBX Distro can't do autoloads.
 			**/
 			if(!class_exists($master_class)) {
 				ProvisionerConfig::endpointsAutoload($master_class);

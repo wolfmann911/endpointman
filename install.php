@@ -91,7 +91,7 @@ function ep_table_exists ($table) {
     return FALSE;
 }
 
-$version = "2.9.0.7";
+$version = "2.9.0.8";
 
 if(ep_table_exists("endpointman_global_vars")) {
     $global_cfg =& $db->getAssoc("SELECT var_name, value FROM endpointman_global_vars");

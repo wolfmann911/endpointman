@@ -188,6 +188,21 @@ switch ($sub_type) {
                     $phone_info = $endpoint->get_phone_info($row['id']);
 
                     $class = "endpoint_" . $phone_info['directory'] . "_" . $phone_info['cfg_dir'] . '_phone';
+					$base_class = "endpoint_" . $phone_info['directory']. '_base'; 
+					$master_class = "endpoint_base"; 
+					/**Fix for FreePBX Distro 
+					* I seriously want to figure out why ONLY the FreePBX Distro can't do autoloads.
+					**/ 
+					if(!class_exists($master_class)) { 
+						ProvisionerConfig::endpointsAutoload($master_class); 
+					} 
+					if(!class_exists($base_class)) { 
+						ProvisionerConfig::endpointsAutoload($base_class); 
+					} 
+					if(!class_exists($class)) { 
+						ProvisionerConfig::endpointsAutoload($class); 
+					} 
+					//end quick fix 
 
                     $provisioner_lib = new $class();
 
