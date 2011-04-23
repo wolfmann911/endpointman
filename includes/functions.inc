@@ -432,8 +432,9 @@ class endpointmanager {
     function update_device($macid,$model,$template,$luid=NULL,$name=NULL,$line=NULL,$update_lines=TRUE) {
         $sql = "UPDATE endpointman_mac_list SET model = ".$model.", template_id =  ".$temp." WHERE id = ".$macid;
         $this->db->query($sql);
+
         if($update_lines) {
-            if(!isset($luid)) {
+            if(isset($luid)) {
                 $this->update_line($luid,NULL,$name,$line);
                 return(TRUE);
             } else {
@@ -456,8 +457,7 @@ class endpointmanager {
             if(!isset($line)) {
                 $line = $row['line'];
             }
-
-            $sql = "UPDATE endpointman_line_list SET line = '".$line."', ext = ".$row['ext'].", description = '".$name."' WHERE luid =  ". $row['luid'];
+            $sql = "UPDATE endpointman_line_list SET line = '".$line."', ext = '".$row['ext']."', description = '".$name."' WHERE luid =  ". $row['luid'];
             $this->db->query($sql);
             return(TRUE);
         } else {
@@ -467,7 +467,7 @@ class endpointmanager {
                 $sql = "SELECT description FROM devices WHERE id = ".$row['ext'];
                 $name=$this->db->getOne($sql);
 
-                $sql = "UPDATE endpointman_line_list SET line = '".$row['line']."', ext = ".$row['ext'].", description = '".$name."' WHERE luid =  ". $row['luid'];
+                $sql = "UPDATE endpointman_line_list SET line = '".$row['line']."', ext = '".$row['ext']."', description = '".$name."' WHERE luid =  ". $row['luid'];
                 $this->db->query($sql);
             }
             return(TRUE);
@@ -597,10 +597,11 @@ class endpointmanager {
 
             }
 
-            $sql = "SELECT endpointman_line_list.*, sip.data as secret, devices.* FROM endpointman_line_list, sip, devices WHERE endpointman_line_list.ext = devices.id AND endpointman_line_list.ext = sip.id AND sip.keyword = 'secret' AND mac_id = ".$mac_id." ORDER BY endpointman_line_list.line ASC";
+            $sql = "SELECT endpointman_line_list.*, sip.data as secret, devices.*, endpointman_line_list.description AS epm_description FROM endpointman_line_list, sip, devices WHERE endpointman_line_list.ext = devices.id AND endpointman_line_list.ext = sip.id AND sip.keyword = 'secret' AND mac_id = ".$mac_id." ORDER BY endpointman_line_list.line ASC";
             $lines_info = $this->db->getAll($sql, array(), DB_FETCHMODE_ASSOC);
             foreach($lines_info as $line) {
                 $phone_info['line'][$line['line']] = $line;
+                $phone_info['line'][$line['line']]['description'] = $line['epm_description'];
             }
 
 
@@ -1212,21 +1213,21 @@ class endpointmanager {
 
             //Load Provisioner
             $class = "endpoint_" . $phone_info['directory'] . "_" . $phone_info['cfg_dir'] . '_phone';
-			$base_class = "endpoint_" . $phone_info['directory']. '_base';
-			$master_class = "endpoint_base";
-			/**Quick Fix for FreePBX Distro
+            $base_class = "endpoint_" . $phone_info['directory']. '_base';
+            $master_class = "endpoint_base";
+            /**Quick Fix for FreePBX Distro
 			* I seriously want to figure out why ONLY the FreePBX Distro can't do autoloads.
 			**/
-			if(!class_exists($master_class)) {
-				ProvisionerConfig::endpointsAutoload($master_class);
-			}
-			if(!class_exists($base_class)) {
-				ProvisionerConfig::endpointsAutoload($base_class);
-			}
-			if(!class_exists($class)) {
-				ProvisionerConfig::endpointsAutoload($class);
-			}
-			//end quick fix
+            if(!class_exists($master_class)) {
+                ProvisionerConfig::endpointsAutoload($master_class);
+            }
+            if(!class_exists($base_class)) {
+                ProvisionerConfig::endpointsAutoload($base_class);
+            }
+            if(!class_exists($class)) {
+                ProvisionerConfig::endpointsAutoload($class);
+            }
+            //end quick fix
             if(class_exists($class)) {
                 $provisioner_lib = new $class();
 
@@ -1338,6 +1339,12 @@ class endpointmanager {
                         $provisioner_lib->lines[$line['line']]['options'] = $line_ops[$line['line']];
                     }
                 }
+
+				if(!$write) {
+					$provisioner_lib->server_type = 'dynamic';
+					$provisioner_lib->provisioning_type = 'http';
+					$new_template_data['provisioning_path'] = "provisioning";
+				}
 
                 //Set Variables according to the template_data files included. We can include different template.xml files within family_data.xml also one can create
                 //template_data_custom.xml which will get included or template_data_<model_name>_custom.xml which will also get included

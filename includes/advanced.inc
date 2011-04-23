@@ -353,12 +353,27 @@ switch($_REQUEST['subpage']) {
             } else {
                 $sql_file_list = NULL;
             }
-
             require(PHONE_MODULES_PATH.'setup.php');
 
             $class = "endpoint_" . $row['directory'] . "_" . $row['cfg_dir'] . '_phone';
+            $base_class = "endpoint_" . $row['directory']. '_base';
+            $master_class = "endpoint_base";
+            /**Quick Fix for FreePBX Distro
+            * I seriously want to figure out why ONLY the FreePBX Distro can't do autoloads.
+            **/
+            if(!class_exists($master_class)) {
+                ProvisionerConfig::endpointsAutoload($master_class);
+            }
+            if(!class_exists($base_class)) {
+                ProvisionerConfig::endpointsAutoload($base_class);
+            }
+            if(!class_exists($class)) {
+                ProvisionerConfig::endpointsAutoload($class);
+            }
+            //end quick fix
 
             $phone_config = new $class();
+
 
             if((method_exists($phone_config,'display_options')) AND (method_exists($phone_config,'process_options'))) {
                 if(isset($_REQUEST['phone_options'])) {

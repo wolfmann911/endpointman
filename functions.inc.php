@@ -33,7 +33,7 @@ function endpointman_get_config($engine) {
     }
 }
 function endpointman_configpageinit($pagename) {
-    global $currentcomponent, $amp_conf;
+    global $currentcomponent, $amp_conf, $db;
 
     $display = isset($_REQUEST['display'])?$_REQUEST['display']:null;
 
@@ -44,11 +44,7 @@ function endpointman_configpageinit($pagename) {
             $extdisplay = isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:null;
         }
     } elseif($display == "devices") {
-        if(isset($_REQUEST['deviceid'])) {
-            $extdisplay = isset($_REQUEST['deviceid'])?$_REQUEST['deviceid']:null;
-        } else {
-            $extdisplay = isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:null;
-        }
+        $extdisplay = isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:null;
     }
 
     $action = isset($_REQUEST['action'])?$_REQUEST['action']:null;
@@ -96,6 +92,15 @@ function endpointman_configpageinit($pagename) {
                     } else {
                         $name = isset($_REQUEST['description'])?$_REQUEST['description']:null;
                     }
+                    if(isset($_REQUEST['deviceid'])) {
+                        if($_REQUEST['devicetype'] == "fixed") {
+                            //SQL to get the Description of the  extension from the extension table
+                            $sql = "SELECT name FROM users WHERE extension = '".$_REQUEST['deviceuser']."'";
+                            $name = $db->getOne($sql);
+
+                        }
+                    }
+
                     $reboot = isset($_REQUEST['epm_reboot'])?$_REQUEST['epm_reboot']:null;
 
                     if($endpoint->mac_check_clean($mac)) {
@@ -136,14 +141,10 @@ function endpointman_configpageinit($pagename) {
                         } elseif(!isset($delete)) {
                             //Add Extension/Phone to database
                             $mac_id = $endpoint->add_device($mac, $model, $extdisplay, $temp);
-                            
-                            if($mac_id === TRUE) {
+
+                            if($mac_id) {
                                 $row = $endpoint->get_phone_info($mac_id);
-                                if(isset($reboot)) {
-                                    $endpoint->prepare_configs($row);
-                                } else {
-                                    $endpoint->prepare_configs($row,FALSE);
-                                }
+                                $endpoint->prepare_configs($row);
                             }
                         }
                     }
@@ -285,6 +286,8 @@ function endpointman_configpageload() {
             $currentcomponent->addguielem($section, new gui_selectbox('epm_model', $model_list, $info['model_id'], 'Model', 'The Model of this Phone.', false, 'frm_'.$display.'_model_change(this.options[this.selectedIndex].value,document.getElementById(\'epm_mac\').value)', false),9);
             $currentcomponent->addguielem($section, new gui_selectbox('epm_line', $line_list, $line_info['line'], 'Line', 'The Line of this Extension/Device.', false, '', false),9);
             $currentcomponent->addguielem($section, new gui_selectbox('epm_temps', $template_list, $info['template_id'], 'Template', 'The Template of this Phone.', false, '', false),9);
+            $currentcomponent->addguielem($section, new guitext('epm_note','Note: This might reboot the phone if it\'s already registered to Asterisk'));
+
         }
     }
 }

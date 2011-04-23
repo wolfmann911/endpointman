@@ -97,6 +97,7 @@ if($_REQUEST['pop_type'] == "alt_cfg_edit") {
                 fclose($handle);
                 $contents = $endpoint->display_htmlspecialchars($contents);
                 $endpoint->tpl->assign("config_data", $contents);
+                $endpoint->tpl->assign("location", $file);
             }
         }
 
@@ -127,13 +128,13 @@ if($_REQUEST['pop_type'] == "alt_cfg_edit") {
                 $endpoint->submit_config($row['directory'],$row['cfg_dir'],$config_files[$_REQUEST['cfg_file']],$contents);
                 $message = 'Sent! Thanks :-)';
             }
-
             $endpoint->tpl->assign("save_as_name_value", $config_files[$_REQUEST['cfg_file']]);
             $endpoint->tpl->assign("config_data", $contents);
             $endpoint->tpl->assign("filename", $config_files[$_REQUEST['cfg_file']]);
             $endpoint->tpl->assign('sendid', $_REQUEST['cfg_file']);
             $endpoint->tpl->assign("type", 'file');
             $endpoint->tpl->assign("location", $file);
+
 
         } elseif(isset($_REQUEST['sql'])) {
             if(isset($_REQUEST['config_text'])) {

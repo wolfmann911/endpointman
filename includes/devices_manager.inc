@@ -71,6 +71,7 @@ switch ($sub_type) {
                 }
                 break;
             case "button_save":
+                
                 $sql = 'SELECT * FROM endpointman_line_list WHERE mac_id = '. $_REQUEST['edit_id'];
 
                 $lines_list = $endpoint->db->getAll($sql,array(),DB_FETCHMODE_ASSOC);
@@ -79,17 +80,18 @@ switch ($sub_type) {
                     $sql = "SELECT description FROM devices WHERE id = ".$_REQUEST['ext_list_'.$row['luid']];
                     $name = $endpoint->db->getOne($sql);
 
-                    $sql = "UPDATE endpointman_line_list SET line = '".$_REQUEST['line_list_'.$row['luid']]."', ext = ".$_REQUEST['ext_list_'.$row['luid']].", description = '".$name."' WHERE luid =  ". $row['luid'];
+                    $sql = "UPDATE endpointman_line_list SET line = '".$_REQUEST['line_list_'.$row['luid']]."', ext = '".$_REQUEST['ext_list_'.$row['luid']]."', description = '".$name."' WHERE luid =  ". $row['luid'];
                     $endpoint->db->query($sql);
                 }
 
                 $sql = "UPDATE endpointman_mac_list SET template_id = '".$_REQUEST['template_list']."', model = '".$_REQUEST['model_list']."' WHERE id =  ". $_REQUEST['edit_id'];
                 $endpoint->db->query($sql);
 
+
                 $row = $endpoint->get_phone_info($_REQUEST['edit_id']);
                 $endpoint->prepare_configs($row);
 
-                $message = _("Saved")."!";
+                $endpoint->message['edit_save'] = _("Saved")."!";
                 break;
             case "delete":
                 $sql = 'SELECT mac_id FROM endpointman_line_list WHERE luid = '.$_REQUEST['edit_id'] ;
