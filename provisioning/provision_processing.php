@@ -18,13 +18,42 @@ if(!$mac_id) {
 		case "y000000000004.cfg":
 			echo "#left blank";
 			break;
-		case "aastra.cfg"	:
+		case "aastra.cfg":
 			echo "#left blank";
 			break;
+                case "security.tuz":
+                    if(file_exists("/var/www/html/admin/modules/_ep_phone_modules/endpoint/aastra/security.tuz")) {
+                        $handle = fopen("/var/www/html/admin/modules/_ep_phone_modules/endpoint/aastra/security.tuz", "rb");
+                        $contents = stream_get_contents($handle);
+                        fclose($handle);
+                        echo $contents;
+                    }else {
+                        header("HTTP/1.0 404 Not Found");
+                    }
+                    break;
+                case "aastra.tuz":
+                    if(file_exists("/var/www/html/admin/modules/_ep_phone_modules/endpoint/aastra/aastra.tuz")) {
+                        $handle = fopen("/var/www/html/admin/modules/_ep_phone_modules/endpoint/aastra/aastra.tuz", "rb");
+                        $contents = stream_get_contents($handle);
+                        fclose($handle);
+                        echo $contents;
+                    } else {
+                        header("HTTP/1.0 404 Not Found");
+                    }
+                    break;
+                default:
+                    header("HTTP/1.0 404 Not Found");
+                    break;
+
 	}
 } else {
+        
 	$phone_info = $endpoint->get_phone_info($mac_id);
 	$files = $endpoint->prepare_configs($phone_info,FALSE,FALSE);
-	echo $files[$_REQUEST['request']];
+        if(key_exists($_REQUEST['request'], $files)) {
+            echo $files[$_REQUEST['request']];
+        } else {
+           header("HTTP/1.0 404 Not Found");
+        }
 }
 ?>
