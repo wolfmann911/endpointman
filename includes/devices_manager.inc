@@ -108,7 +108,7 @@ switch ($sub_type) {
         break;
     case "add" :
         $mac_id = $endpoint->add_device($_REQUEST['mac'],$_REQUEST['model_list'],$_REQUEST['ext_list'],$_REQUEST['template_list'],$_REQUEST['line_list']);
-        if($mac_id === TRUE) {
+        if($mac_id) {
             $phone_info = $endpoint->get_phone_info($mac_id);
             $endpoint->prepare_configs($phone_info);
         }

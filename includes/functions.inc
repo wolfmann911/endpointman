@@ -181,6 +181,7 @@ class endpointmanager {
     }
 
     function prepare_message_box() {
+        $error_message = NULL;
         foreach($this->error as $key => $error) {
             $error_message .= $error;
             if($this->global_cfg['debug']) {
@@ -188,7 +189,7 @@ class endpointmanager {
             }
             $error_message .= "<br />";
         }
-
+        $message = NULL;
         foreach($this->message as $key => $error) {
             $message .= $error;
             if($this->global_cfg['debug']) {
@@ -1371,7 +1372,7 @@ class endpointmanager {
                         foreach($provisioner_lib->directory_structure as $data) {
                             $dir = $this->global_cfg['config_location'] . $data;
                             if(!file_exists($dir)) {
-                                mkdir($dir, 0777);
+                                mkdir($dir, 0755);
                             }
                         }
                     }
@@ -1382,7 +1383,7 @@ class endpointmanager {
                             if(((file_exists($this->global_cfg['config_location'].$data)) AND (!in_array($data,$provisioner_lib->protected_files))) OR (!file_exists($this->global_cfg['config_location'].$data))) {
                                 if(is_dir(PHONE_MODULES_PATH."endpoint/".$phone_info['directory']."/".$phone_info['cfg_dir']."/".$data)) {
                                     if(!file_exists($this->global_cfg['config_location'].$data)) {
-                                        if (!@mkdir($this->global_cfg['config_location'].$data, 0777)) {
+                                        if (!@mkdir($this->global_cfg['config_location'].$data, 0666)) {
                                             $this->error['parse_configs'] = "Could Not Create Directory: ".$data;
                                             return(FALSE);
                                         }
@@ -1394,7 +1395,7 @@ class endpointmanager {
                                         if(is_dir($file)) {
                                             $dir = str_replace(PHONE_MODULES_PATH."endpoint/".$phone_info['directory']."/".$phone_info['cfg_dir']."/".$data."/", "", $file);
                                             if(!file_exists($this->global_cfg['config_location'].$data."/".$dir)) {
-                                                if (!@mkdir($this->global_cfg['config_location'].$data."/".$dir, 0777)) {
+                                                if (!@mkdir($this->global_cfg['config_location'].$data."/".$dir, 0666)) {
                                                     $this->error['parse_configs'] = "Could Not Create Directory: ".$data."/".$dir;
                                                     return(FALSE);
                                                 }
@@ -1405,13 +1406,13 @@ class endpointmanager {
                                                 $this->error['parse_configs'] = "Could Not Copy File: ".$data."/".$dir;
                                                 return(FALSE);
                                             } else {
-                                                chmod($this->global_cfg['config_location'].$data."/".$dir, 0777);
+                                                chmod($this->global_cfg['config_location'].$data."/".$dir, 0666);
                                             }
                                         }
                                     }
                                 } else {
                                     copy(PHONE_MODULES_PATH."endpoint/".$phone_info['directory']."/".$phone_info['cfg_dir']."/".$data,$this->global_cfg['config_location'].$data);
-                                    chmod($this->global_cfg['config_location'].$data, 0777);
+                                    chmod($this->global_cfg['config_location'].$data, 0666);
                                 }
                             }
                         }
@@ -1423,6 +1424,7 @@ class endpointmanager {
                             $fp = fopen($this->global_cfg['config_location'].$key, 'w');
                             fwrite($fp, $data);
                             fclose($fp);
+                            chmod($this->global_cfg['config_location'].$key, 0666);
                             if(!file_exists($this->global_cfg['config_location'].$key)) {
                                 $this->error['parse_configs'] = "File not written to hard drive!";
                                 return(FALSE);
@@ -1662,103 +1664,111 @@ class endpointmanager {
         $sql = "SELECT value FROM endpointman_global_vars WHERE var_name LIKE 'endpoint_vers'";
         $data = $this->db->getOne($sql);
 
-        if(($data == "") OR ($data <= $endpoint_last_mod)) {
-            if((!$master_result) OR (!$this->download_file_no_progress_bar(UPDATE_PATH.'/'.$endpoint_package, PHONE_MODULES_PATH."temp/".$endpoint_package))) {
-                $this->error['brand_update_check_xml'] = "<br/>Not able to connect to repository. Using local Provisioner.net Package";
+        $handle = fopen(UPDATE_PATH."/update_status", "rb");
+        $contents = stream_get_contents($handle);
+        fclose($handle);
+
+        if($contents != '1') {
+            if(($data == "") OR ($data <= $endpoint_last_mod)) {
+                if((!$master_result) OR (!$this->download_file_no_progress_bar(UPDATE_PATH.'/'.$endpoint_package, PHONE_MODULES_PATH."temp/".$endpoint_package))) {
+                    $this->error['brand_update_check_xml'] = "<br/>Not able to connect to repository. Using local Provisioner.net Package";
+                } else {
+                    exec("tar -xvf ".PHONE_MODULES_PATH.'temp/'. $endpoint_package ." -C ".PHONE_MODULES_PATH."temp/");
+
+                    if(!file_exists(PHONE_MODULES_PATH."endpoint")) {
+                        mkdir(PHONE_MODULES_PATH."endpoint");
+                    }
+
+                    unlink(PHONE_MODULES_PATH."temp/setup.php");
+                    rename(PHONE_MODULES_PATH."temp/endpoint/base.php", PHONE_MODULES_PATH."endpoint/base.php");
+
+                    $sql = "UPDATE endpointman_global_vars SET value = '".$endpoint_last_mod."' WHERE var_name = 'endpoint_vers'";
+                    $this->db->query($sql);
+                }
+            }
+
+
+            $out = $temp['data']['brands'];
+
+            //Assume that if we can't connect and find the master.xml file then why should we try to find every other file.
+            if($master_result) {
+                $row = $this->db->getAll('SELECT * FROM  endpointman_brand_list WHERE id > 0', array(), DB_FETCHMODE_ASSOC);
+
+                foreach($out as $data) {
+
+                    $local = $this->db->getOne("SELECT local FROM endpointman_brand_list WHERE  directory =  '".$data['directory']."'");
+
+                    if(!$local) {
+                        $result = $this->download_xml(UPDATE_PATH .$data['directory']."/".$data['directory'].".xml","endpoint/".$data['directory']);
+                        if(!$result) {
+                            $this->error['brand_update_check'] = "<br/>Not able to connect to repository. Using local brand [".$data['name']."] file instead.";
+                        }
+                    }
+
+                    if(file_exists(PHONE_MODULES_PATH."endpoint/".$data['directory']."/brand_data.xml")) {
+                        $temp = $this->xml2array(PHONE_MODULES_PATH."endpoint/".$data['directory']."/brand_data.xml");
+
+                        $temp = $temp['data']['brands'];
+
+                        $temp['oui_list']['oui'] = $this->fix_single_array_keys($temp['oui_list']['oui']);
+
+                        foreach($temp['oui_list']['oui'] as $oui) {
+                            $sql = "INSERT INTO endpointman_oui_list (`oui`, `brand`, `custom`) VALUES ('".$oui."', '".$temp['brand_id']."', '0')";
+                            $this->db->query($sql);
+
+                        }
+
+                        $brand_name = $temp['directory'];
+                        $version[$brand_name] = $temp['last_modified'];
+
+                        $last_mod = "";
+
+                        $temp['family_list']['family'] = $this->fix_single_array_keys($temp['family_list']['family']);
+
+                        foreach($temp['family_list']['family'] as $list) {
+                            $last_mod = max($last_mod, $list['last_modified']);
+                        }
+                        $last_mod = max($last_mod, $version[$brand_name]);
+
+                        $version[$brand_name] = $last_mod;
+
+                        if(!($this->arraysearchrecursive($brand_name, $row, 'directory'))) {
+                            //insert row
+                            $sql = "INSERT INTO endpointman_brand_list (id, name, directory, cfg_ver) VALUES ('".$temp['brand_id']."', '".$temp['name']."', '".$temp['directory']."', '".$version[$brand_name]."')";
+                            $this->db->query($sql);
+                        } else {
+                            //in database already!
+                        }
+                    } else {
+                        $this->error['brand_update_check_local_file'] = "<br/>Error: No Local File for ".$data['name']."!<br /><br />Learn how to manually upload packages here (it's easy!): <a href='http://projects.colsolgrp.net/documents/28' target='_blank'>Click Here!</a>";
+                    }
+                }
+
+                foreach($row as $ava_brands) {
+                    $key = $this->arraysearchrecursive($ava_brands['directory'], $out, 'directory');
+                    if($key === FALSE) {
+                        $this->remove_brand($ava_brands['id']);
+                    } else {
+                        $key = $key[0];
+
+                        $brand_name = $ava_brands['directory'];
+
+                        if($ava_brands['cfg_ver'] < $version[$brand_name]) {
+                            $out[$key]['update'] = 1;
+                            $out[$key]['update_vers'] = $version[$brand_name];
+                        } else {
+                            $out[$key]['update'] = NULL;
+                        }
+                    }
+                }
             } else {
-                exec("tar -xvf ".PHONE_MODULES_PATH.'temp/'. $endpoint_package ." -C ".PHONE_MODULES_PATH."temp/");
-
-                if(!file_exists(PHONE_MODULES_PATH."endpoint")) {
-                    mkdir(PHONE_MODULES_PATH."endpoint");
-                }
-
-                unlink(PHONE_MODULES_PATH."temp/setup.php");
-                rename(PHONE_MODULES_PATH."temp/endpoint/base.php", PHONE_MODULES_PATH."endpoint/base.php");
-
-                $sql = "UPDATE endpointman_global_vars SET value = '".$endpoint_last_mod."' WHERE var_name = 'endpoint_vers'";
-                $this->db->query($sql);
-            }
-        }
-
-
-        $out = $temp['data']['brands'];
-
-        //Assume that if we can't connect and find the master.xml file then why should we try to find every other file.
-        if($master_result) {
-            $row = $this->db->getAll('SELECT * FROM  endpointman_brand_list WHERE id > 0', array(), DB_FETCHMODE_ASSOC);
-
-            foreach($out as $data) {
-
-                $local = $this->db->getOne("SELECT local FROM endpointman_brand_list WHERE  directory =  '".$data['directory']."'");
-
-                if(!$local) {
-                    $result = $this->download_xml(UPDATE_PATH .$data['directory']."/".$data['directory'].".xml","endpoint/".$data['directory']);
-                    if(!$result) {
-                        $this->error['brand_update_check'] = "<br/>Not able to connect to repository. Using local brand [".$data['name']."] file instead.";
-                    }
-                }
-
-                if(file_exists(PHONE_MODULES_PATH."endpoint/".$data['directory']."/brand_data.xml")) {
-                    $temp = $this->xml2array(PHONE_MODULES_PATH."endpoint/".$data['directory']."/brand_data.xml");
-
-                    $temp = $temp['data']['brands'];
-
-                    $temp['oui_list']['oui'] = $this->fix_single_array_keys($temp['oui_list']['oui']);
-
-                    foreach($temp['oui_list']['oui'] as $oui) {
-                        $sql = "INSERT INTO endpointman_oui_list (`oui`, `brand`, `custom`) VALUES ('".$oui."', '".$temp['brand_id']."', '0')";
-                        $this->db->query($sql);
-
-                    }
-
-                    $brand_name = $temp['directory'];
-                    $version[$brand_name] = $temp['last_modified'];
-
-                    $last_mod = "";
-
-                    $temp['family_list']['family'] = $this->fix_single_array_keys($temp['family_list']['family']);
-
-                    foreach($temp['family_list']['family'] as $list) {
-                        $last_mod = max($last_mod, $list['last_modified']);
-                    }
-                    $last_mod = max($last_mod, $version[$brand_name]);
-
-                    $version[$brand_name] = $last_mod;
-
-                    if(!($this->arraysearchrecursive($brand_name, $row, 'directory'))) {
-                        //insert row
-                        $sql = "INSERT INTO endpointman_brand_list (id, name, directory, cfg_ver) VALUES ('".$temp['brand_id']."', '".$temp['name']."', '".$temp['directory']."', '".$version[$brand_name]."')";
-                        $this->db->query($sql);
-                    } else {
-                        //in database already!
-                    }
-                } else {
-                    $this->error['brand_update_check_local_file'] = "<br/>Error: No Local File for ".$data['name']."!<br /><br />Learn how to manually upload packages here (it's easy!): <a href='http://projects.colsolgrp.net/documents/28' target='_blank'>Click Here!</a>";
-                }
+                $this->error['brand_update_check_master_file'] = "<br/>Aborting Brand Downloads. Can't Get Master File, Assuming Timeout Issues!<br /><br />Learn how to manually upload packages here (it's easy!): <a href='http://projects.colsolgrp.net/documents/28' target='_blank'>Click Here!</a>";
             }
 
-            foreach($row as $ava_brands) {
-                $key = $this->arraysearchrecursive($ava_brands['directory'], $out, 'directory');
-                if($key === FALSE) {
-                    $this->remove_brand($ava_brands['id']);
-                } else {
-                    $key = $key[0];
-
-                    $brand_name = $ava_brands['directory'];
-
-                    if($ava_brands['cfg_ver'] < $version[$brand_name]) {
-                        $out[$key]['update'] = 1;
-                        $out[$key]['update_vers'] = $version[$brand_name];
-                    } else {
-                        $out[$key]['update'] = NULL;
-                    }
-                }
-            }
+            return $out;
         } else {
-            $this->error['brand_update_check_master_file'] = "<br/>Aborting Brand Downloads. Can't Get Master File, Assuming Timeout Issues!<br /><br />Learn how to manually upload packages here (it's easy!): <a href='http://projects.colsolgrp.net/documents/28' target='_blank'>Click Here!</a>";
+            $this->error['remote_server'] = "The Remote Server Is Currently Syncing With the Master Server, Please try again later";
         }
-
-        return $out;
     }
 
     /**

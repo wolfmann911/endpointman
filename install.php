@@ -851,6 +851,14 @@ if(!$new_install) {
         out("Mirgrated to FreePBX Mirror");
     }
 
+    if($ver <= "2.9.1.0") {
+        out("Fix again to the 'Allow Duplicate Extensions' Error");
+        $sql = 'ALTER TABLE `endpointman_global_vars` ADD UNIQUE `var_name` (`var_name`)';
+        $db->query($sql);
+        $sql = 'INSERT INTO `asterisk`.`endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (NULL, \'show_all_registrations\', \'0\');';
+        $db->query($sql);
+    }
+
 }
 
 
@@ -888,7 +896,8 @@ if ($new_install) {
                   `idnum` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Index',
                   `var_name` varchar(25) NOT NULL COMMENT 'Variable Name',
                   `value` text NOT NULL COMMENT 'Data',
-                  PRIMARY KEY (`idnum`)
+                  PRIMARY KEY (`idnum`),
+                  UNIQUE KEY `var_name` (`var_name`)
                 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=17";
     $db->query($sql);
 
@@ -916,7 +925,7 @@ if ($new_install) {
             (15, 'disable_htaccess', ''),
             (16, 'endpoint_vers', '0'),
             (17, 'disable_help', '0'),
-            (17, 'show_all_registrations', '0')";
+            (18, 'show_all_registrations', '0')";
     $db->query($sql);
 
     out("Creating mac list Table");
