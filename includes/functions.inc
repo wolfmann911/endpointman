@@ -1336,10 +1336,19 @@ class endpointmanager {
                 //Loop through Lines!
                 foreach($phone_info['line'] as $line) {
                     $provisioner_lib->lines[$line['line']] = array('ext' => $line['ext'], 'secret' => $line['secret'], 'displayname' => $line['description']);
+					/***
                     if(isset($line_ops[$line['line']])) {
                         $provisioner_lib->lines[$line['line']]['options'] = $line_ops[$line['line']];
                     }
+					*/
                 }
+
+				//testing this out
+				foreach($line_ops as $key => $data) {
+					if(isset($line_ops[$key])) {
+					 	$provisioner_lib->lines[$key]['options'] = $line_ops[$key];
+					}
+				}
 
 				if(!$write) {
 					$provisioner_lib->server_type = 'dynamic';

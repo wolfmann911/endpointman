@@ -6,8 +6,9 @@ require('/var/www/html/admin/modules/endpointman/includes/functions.inc');
 $endpoint = new endpointmanager();
 
 $path_parts = explode(".", $_REQUEST['request']);
+$path_parts2 = explode("_", $path_parts[0]);
 
-$mac = $path_parts[0];
+$mac = $path_parts2[0];
 
 $sql = 'SELECT id FROM `endpointman_mac_list` WHERE `mac` LIKE CONVERT(_utf8 \'%'.$mac.'%\' USING latin1) COLLATE latin1_swedish_ci';
 

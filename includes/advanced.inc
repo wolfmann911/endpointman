@@ -100,6 +100,8 @@ switch($_REQUEST['subpage']) {
         $provisioner_ver = $endpoint->db->getOne($sql);
         $provisioner_ver = date("n-j-y",$provisioner_ver) . " at " . date("g:ia",$provisioner_ver);
         $endpoint->tpl->assign("provisioner_ver", $provisioner_ver);
+        $endpoint->tpl->assign("brand_ava", $endpoint->brands_available());
+
 
         //$provisioner_ver = filemtime(PHONE_MODULES_PATH."master.xml");
         //$provisioner_ver = date("n-j-y",$provisioner_ver) . " at " . date("g:ia",$provisioner_ver);
@@ -152,6 +154,10 @@ switch($_REQUEST['subpage']) {
                 $endpoint->tpl->assign("package", $files_list[0]);
                 $endpoint->tpl->assign("type", "upload_brand");
             } 
+        } elseif(isset($_REQUEST['export_brand'])) {
+            $endpoint->tpl->assign("show_installer", 1);
+            $endpoint->tpl->assign("type", "export_brand");
+            $endpoint->tpl->assign("package", $_REQUEST['exp_brand']);
         }
         $endpoint->prepare_message_box();
         echo $endpoint->tpl->draw( 'advanced_settings_manual_upload' );
