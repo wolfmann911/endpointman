@@ -62,9 +62,9 @@ class phonesettings {
    *   action
     */
     function action($args) {
-        global $amp_conf;
+        global $endpoint, $global_cfg;
 
-        $doc_root = $amp_conf['AMPWEBROOT'] ."/admin/modules/endpointman/";
+        $doc_root =	$_SERVER["DOCUMENT_ROOT"] ."/admin/modules/endpointman/";
         require($doc_root . "includes/functions.inc");
 
         $endpoint = new endpointmanager();
@@ -109,12 +109,13 @@ class phonesettings {
         $sql = "UPDATE endpointman_mac_list SET global_user_cfg_data = '".$custom_cfg_data."' WHERE id = ". $mac_id;
         $endpoint->db->query($sql);
 
-        $reboot = isset($_REQUEST['epm_reboot'])?$_REQUEST['epm_reboot']:null;
-
         //refresh the data before we prepare so we get acurate data
         $row['global_user_cfg_data'] = $custom_cfg_data;
+
+        $reboot = isset($_REQUEST['epm_reboot'])?$_REQUEST['epm_reboot']:null;
+
         if(isset($reboot)) {
-            $endpoint->prepare_configs($row,TRUE);
+            $endpoint->prepare_configs($row);
         } else {
             $endpoint->prepare_configs($row,FALSE);
         }
@@ -148,9 +149,7 @@ class phonesettings {
             die('No Database?');
         }
 
-	global $amp_conf;
-
-        $doc_root =	$amp_conf['AMPWEBROOT'] ."/admin/modules/endpointman/";
+        $doc_root =	$_SERVER["DOCUMENT_ROOT"] ."/admin/modules/endpointman/";
         require($doc_root . "includes/functions.inc");
 
         $endpoint = new endpointmanager();
@@ -192,7 +191,7 @@ class phonesettings {
 
                 if(!empty($out)) {
                     $out[0]['data'] = array_values($out[0]['data']);
-                    $button = "<input type='checkbox' name='epm_reboot'>Reboot Device<br /><input name='submit' type='submit' value='Save & Reboot'>";
+                    $button = "<input type='checkbox' NAME='epm_reboot'>Reboot Device<br /><input name='submit' type='submit' value='Save & Reboot'>";
                 } else {
                     $out[0]['title'] = "Your Phone Settings have not been enabled. Please talk to your administrator.";
                     $out[0]['data'] = NULL;
