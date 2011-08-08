@@ -27,7 +27,7 @@
                 *2.9.0.0* bumped for 2.9, removed errors in module.xml causing erors for online xml parsing
         </changelog>
 	<info>http://projects.colsolgrp.net/projects/show/endpointman</info>
-	<location>release/2.9/endpointman-2.9.2.2.tgz</location>
+	<location>release/2.9/endpointman-2.9.2.3.tgz</location>
 	<depends>
 		<version>2.8.0</version>
 	</depends>
@@ -35,5 +35,5 @@
 		<module>core</module>
 		<module>fw_ari</module>
 	</requirements>
-<md5sum>c4cb32f2a6121acbb3d0405c9ae6867b</md5sum>
+<md5sum>fa5e3ed171cbb7e042b3431bf3a01cf6</md5sum>
 </module>
