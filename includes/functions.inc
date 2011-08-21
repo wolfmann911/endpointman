@@ -55,8 +55,8 @@ class endpointmanager {
         define("VER", $this->global_cfg['version']);
         //end possible removal
 
-	define("MODULES_PATH", $this->get_modules_dir());
-        
+	define("MODULES_PATH", $amp_conf['AMPWEBROOT'] . '/admin/modules/');
+                
         //Determine if local path is correct!
         if(file_exists(MODULES_PATH."endpointman/")) {
             define("LOCAL_PATH", MODULES_PATH."endpointman/");
@@ -139,12 +139,6 @@ class endpointmanager {
         $contents = str_replace("&#039;", "&amp;#039;", $contents);
         return($contents);
     }
-
-    function get_modules_dir() {
-        $stripped_path = str_replace("endpointman/includes", "", dirname(__FILE__));
-        return $stripped_path;
-    }
-	
 
     /**
      * Used to send sample configurations to provisioner.net
