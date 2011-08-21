@@ -56,6 +56,13 @@ class endpointmanager {
         //end possible removal
 
 	define("MODULES_PATH", $this->get_modules_dir());
+        
+        //Determine if local path is correct!
+        if(file_exists(MODULES_PATH."endpointman/")) {
+            define("LOCAL_PATH", MODULES_PATH."endpointman/");
+        } else {
+            die("Can't Load Local Endpoint Manager Directory!");
+        }
 
         //Define the location of phone modules, keeping it outside of the module directory so that when the user updates endpointmanager they don't lose all of their phones
         if(file_exists(MODULES_PATH."_ep_phone_modules/")) {
@@ -76,13 +83,6 @@ class endpointmanager {
             if(!file_exists(MODULES_PATH."_ep_phone_modules/")) {
                 die('Endpoint Manager can not create the modules folder!');
             }
-        }
-
-        //Determine if local path is correct!
-        if(file_exists(MODULES_PATH."endpointman/")) {
-                define("LOCAL_PATH", MODULES_PATH."endpointman/");
-        } else {
-                die("Can't Load Local Endpoint Manager Directory!");
         }
 
         //include the local template class
