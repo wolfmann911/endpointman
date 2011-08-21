@@ -141,19 +141,7 @@ class endpointmanager {
     }
 
     function get_modules_dir() {
-
-        $file_name = "endpointman/includes/functions.inc";
-
-        $includes = get_included_files();
-        foreach($includes as $key => $data) {
-            if(strripos($data,$file_name)) {
-                $keyout = $key;
-                break;
-            }
-        }
-
-        $stripped_path = str_replace("endpointman/includes/functions.inc", "", $includes[$keyout]);
-
+        $stripped_path = str_replace("endpointman/includes", "", dirname(__FILE__));
         return $stripped_path;
     }
 	
