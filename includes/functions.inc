@@ -69,6 +69,7 @@ class endpointmanager {
             define("PHONE_MODULES_PATH", MODULES_PATH."_ep_phone_modules/");
         } else {	
             define("PHONE_MODULES_PATH", MODULES_PATH."_ep_phone_modules/");
+dbug('MODULES_PATH', MODULES_PATH);
             if (!file_exists(PHONE_MODULES_PATH)) {
                 mkdir(PHONE_MODULES_PATH, 0764);
             }
