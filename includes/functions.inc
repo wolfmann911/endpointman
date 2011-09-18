@@ -1313,11 +1313,8 @@ class endpointmanager {
                 $provisioner_lib->model = $phone_info['model'];
 
                 //Timezone
-                $timezone_array = $this->timezone_array();
-                $tz = explode(".", $settings['tz']);
-                $tz_key = $tz[0];
-                $tz_subkey = $tz[1];
-                $provisioner_lib->timezone = $timezone_array[$tz_key]['offset'];
+                require('timezone.php');
+                $endpoint->DateTimeZone = new DateTimeZone($settings['tz']);;
 
                 //Network Time Server
                 $provisioner_lib->ntp = $settings['ntp'];
@@ -1406,25 +1403,20 @@ class endpointmanager {
                 //Loop through Lines!
                 foreach($phone_info['line'] as $line) {
                     $provisioner_lib->lines[$line['line']] = array('ext' => $line['ext'], 'secret' => $line['secret'], 'displayname' => $line['description']);
-					/***
-                    if(isset($line_ops[$line['line']])) {
-                        $provisioner_lib->lines[$line['line']]['options'] = $line_ops[$line['line']];
-                    }
-					*/
                 }
 
-				//testing this out
-				foreach($line_ops as $key => $data) {
-					if(isset($line_ops[$key])) {
-					 	$provisioner_lib->lines[$key]['options'] = $line_ops[$key];
-					}
-				}
+		//testing this out
+                foreach ($line_ops as $key => $data) {
+                    if (isset($line_ops[$key])) {
+                        $provisioner_lib->lines[$key]['options'] = $line_ops[$key];
+                    }
+                }
 
-				if(!$write) {
-					$provisioner_lib->server_type = 'dynamic';
-					$provisioner_lib->provisioning_type = 'http';
-					$new_template_data['provisioning_path'] = "provisioning";
-				}
+                if (!$write) {
+                    $provisioner_lib->server_type = 'dynamic';
+                    $provisioner_lib->provisioning_type = 'http';
+                    $new_template_data['provisioning_path'] = $_SERVER["SERVER_ADDR"]."/provisioning/";
+                }
 
                 //Set Variables according to the template_data files included. We can include different template.xml files within family_data.xml also one can create
                 //template_data_custom.xml which will get included or template_data_<model_name>_custom.xml which will also get included
@@ -2202,22 +2194,33 @@ class endpointmanager {
             $family_line_xml = $this->xml2array(PHONE_MODULES_PATH.'/endpoint/'.$brand_row['directory'].'/'.$product_row['cfg_dir'].'/family_data.xml');
 
             if($product_row['cfg_ver'] <= $family_line_xml['data']['version']) {
-                $key = $this->arraysearchrecursive($model_row['model'], $family_line_xml['data']['model_list'], 'model');
-
-                if($key === FALSE) {
-                    $this->error['sync_model'] = "Can't locate model in family XML file";
-                    return(FALSE);
-                } else {
-                    if(is_array($family_line_xml['data']['model_list'][$key[0]]['template_data']['files'])) {
-                        $template_list = implode(",",$family_line_xml['data']['model_list'][$key[0]]['template_data']['files']);
-                        $template_list_array = $family_line_xml['data']['model_list'][$key[0]]['template_data']['files'];
+                if(array_key_exists('template_data', $family_line_xml['data']['model_list'])) {
+                    if (is_array($family_line_xml['data']['model_list']['template_data']['files'])) {
+                        $template_list = implode(",", $family_line_xml['data']['model_list']['template_data']['files']);
+                        $template_list_array = $family_line_xml['data']['model_list']['template_data']['files'];
                     } else {
-                        $template_list = $family_line_xml['data']['model_list'][$key[0]]['template_data']['files'];
-                        $template_list_array[0] = $family_line_xml['data']['model_list'][$key[0]]['template_data']['files'];
+                        $template_list = $family_line_xml['data']['model_list']['template_data']['files'];
+                        $template_list_array[0] = $family_line_xml['data']['model_list']['template_data']['files'];
                     }
+                    $maxlines = $family_line_xml['data']['model_list']['lines'];
+                } else {
+                    $key = $this->arraysearchrecursive($model_row['model'], $family_line_xml['data']['model_list'], 'model');
+                    if($key === FALSE) {
+                        $this->error['sync_model'] = "Can't locate model in family XML file";
+                        return(FALSE);
+                    } else {
+                        if(is_array($family_line_xml['data']['model_list'][$key[0]]['template_data']['files'])) {
+                            $template_list = implode(",",$family_line_xml['data']['model_list'][$key[0]]['template_data']['files']);
+                            $template_list_array = $family_line_xml['data']['model_list'][$key[0]]['template_data']['files'];
+                        } else {
+                            $template_list = $family_line_xml['data']['model_list'][$key[0]]['template_data']['files'];
+                            $template_list_array[0] = $family_line_xml['data']['model_list'][$key[0]]['template_data']['files'];
+                        }
+                    }
+                    $maxlines = $family_line_xml['data']['model_list'][$key[0]]['lines'];
                 }
 
-                $sql = "UPDATE endpointman_model_list SET max_lines = '".$family_line_xml['data']['model_list'][$key[0]]['lines']."', template_list = '".$template_list."' WHERE id = '".$model."'";
+                $sql = "UPDATE endpointman_model_list SET max_lines = '".$maxlines."', template_list = '".$template_list."' WHERE id = '".$model."'";
                 $this->db->query($sql);
 
                 $version = $family_line_xml['data']['version'];
@@ -2463,22 +2466,23 @@ class endpointmanager {
 
     /**
      * xml2array() will convert the given XML text to an array in the XML structure.
-     * @author http://www.php.net/manual/en/function.xml-parse.php#87920
-     * @param sting $url the XML url (usually a local file)
-     * @param boolean $get_attributes 1 or 0. If this is 1 the function will get the attributes as well as the tag values - this results in a different array structure in the return value.
-     * @param string $priority Can be 'tag' or 'attribute'. This will change the way the resulting array sturcture. For 'tag', the tags are given more importance.
-     * @return array The parsed XML in an array form.
+     * @author http://www.bin-co.com/php/scripts/xml2array/
+     * @param <type> $url The XML file
+     * @param <type> $get_attributes 1 or 0. If this is 1 the function will get the attributes as well as the tag values - this results in a different array structure in the return value.
+     * @param <type> $priority Can be 'tag' or 'attribute'. This will change the way the resulting array structure. For 'tag', the tags are given more importance.
+     * @param <type> $array_tags - any tag names listed here will allways be returned as an array, even if there is only one of them.
+     * @return <type> The parsed XML in an array form. Use print_r() to see the resulting array structure.
      */
-    function xml2array($url, $get_attributes = 1, $priority = 'tag') {
+    function xml2array($url, $get_attributes = 1, $priority = 'tag', $array_tags=array()) {
         $contents = "";
         if (!function_exists('xml_parser_create')) {
-            return array ();
+            return array();
         }
         $parser = xml_parser_create('');
-        if(!($fp = @ fopen($url, 'rb'))) {
-            return array ();
+        if (!($fp = @ fopen($url, 'rb'))) {
+            return array();
         }
-        while(!feof($fp)) {
+        while (!feof($fp)) {
             $contents .= fread($fp, 8192);
         }
         fclose($fp);
@@ -2487,88 +2491,87 @@ class endpointmanager {
         xml_parser_set_option($parser, XML_OPTION_SKIP_WHITE, 1);
         xml_parse_into_struct($parser, trim($contents), $xml_values);
         xml_parser_free($parser);
-        if(!$xml_values) {
+        if (!$xml_values) {
             return; //Hmm...
         }
-        $xml_array = array ();
-        $parents = array ();
-        $opened_tags = array ();
-        $arr = array ();
+        $xml_array = array();
+        $parents = array();
+        $opened_tags = array();
+        $arr = array();
         $current = & $xml_array;
-        $repeated_tag_index = array ();
+        $repeated_tag_index = array();
         foreach ($xml_values as $data) {
-            unset ($attributes, $value);
+            unset($attributes, $value);
             extract($data);
-            $result = array ();
-            $attributes_data = array ();
-            if (isset ($value)) {
-                if($priority == 'tag') {
+            $result = array();
+            $attributes_data = array();
+            if (isset($value)) {
+                if ($priority == 'tag') {
                     $result = $value;
-                }
-                else {
+                } else {
                     $result['value'] = $value;
                 }
             }
-            if(isset($attributes) and $get_attributes) {
-                foreach($attributes as $attr => $val) {
-                    if($priority == 'tag') {
+            if (isset($attributes) and $get_attributes) {
+                foreach ($attributes as $attr => $val) {
+                    if ($priority == 'tag') {
                         $attributes_data[$attr] = $val;
-                    }
-                    else {
+                    } else {
                         $result['attr'][$attr] = $val; //Set all the attributes in a array called 'attr'
                     }
                 }
             }
             if ($type == "open") {
-                $parent[$level -1] = & $current;
-                if(!is_array($current) or (!in_array($tag, array_keys($current)))) {
-                    $current[$tag] = $result;
-                    if($attributes_data) {
-                        $current[$tag . '_attr'] = $attributes_data;
-                    }
-                    $repeated_tag_index[$tag . '_' . $level] = 1;
-                    $current = & $current[$tag];
-                }
-                else {
-                    if (isset ($current[$tag][0])) {
+                $parent[$level - 1] = & $current;
+		if (!is_array($current) or (!in_array($tag, array_keys($current)))) {
+		    if (in_array($tag,$array_tags)) {
+                        $current[$tag][0] = $result;
+                        $repeated_tag_index[$tag . '_' . $level]=1;
+                    	$current = & $current[$tag][0];
+		    } else {
+			$current[$tag] = $result;
+			if ($attributes_data) {
+				$current[$tag . '_attr'] = $attributes_data;
+			}
+			$repeated_tag_index[$tag . '_' . $level] = 1;
+			$current = & $current[$tag];
+		   }
+                } else {
+                    if (isset($current[$tag][0])) {
                         $current[$tag][$repeated_tag_index[$tag . '_' . $level]] = $result;
                         $repeated_tag_index[$tag . '_' . $level]++;
-                    }
-                    else {
-                        $current[$tag] = array($current[$tag],$result);
+                    } else {
+                        $current[$tag] = array($current[$tag], $result);
                         $repeated_tag_index[$tag . '_' . $level] = 2;
-                        if(isset($current[$tag . '_attr'])) {
+                        if (isset($current[$tag . '_attr'])) {
                             $current[$tag]['0_attr'] = $current[$tag . '_attr'];
-                            unset ($current[$tag . '_attr']);
+                            unset($current[$tag . '_attr']);
                         }
                     }
                     $last_item_index = $repeated_tag_index[$tag . '_' . $level] - 1;
                     $current = & $current[$tag][$last_item_index];
                 }
-            }
-            else if($type == "complete") {
-                if(!isset ($current[$tag])) {
+            } else if ($type == "complete") {
+                if (!isset($current[$tag])) {
                     $current[$tag] = $result;
                     $repeated_tag_index[$tag . '_' . $level] = 1;
-                    if($priority == 'tag' and $attributes_data) {
+                    if ($priority == 'tag' and $attributes_data) {
                         $current[$tag . '_attr'] = $attributes_data;
                     }
-                }
-                else {
-                    if (isset ($current[$tag][0]) and is_array($current[$tag])) {
+                } else {
+                    if (isset($current[$tag][0]) and is_array($current[$tag])) {
                         $current[$tag][$repeated_tag_index[$tag . '_' . $level]] = $result;
                         if ($priority == 'tag' and $get_attributes and $attributes_data) {
                             $current[$tag][$repeated_tag_index[$tag . '_' . $level] . '_attr'] = $attributes_data;
                         }
                         $repeated_tag_index[$tag . '_' . $level]++;
-                    }
-                    else {
-                        $current[$tag] = array($current[$tag],$result);
+                    } else {
+                        $current[$tag] = array($current[$tag], $result);
                         $repeated_tag_index[$tag . '_' . $level] = 1;
                         if ($priority == 'tag' and $get_attributes) {
-                            if (isset ($current[$tag . '_attr'])) {
+                            if (isset($current[$tag . '_attr'])) {
                                 $current[$tag]['0_attr'] = $current[$tag . '_attr'];
-                                unset ($current[$tag . '_attr']);
+                                unset($current[$tag . '_attr']);
                             }
                             if ($attributes_data) {
                                 $current[$tag][$repeated_tag_index[$tag . '_' . $level] . '_attr'] = $attributes_data;
@@ -2577,9 +2580,8 @@ class endpointmanager {
                         $repeated_tag_index[$tag . '_' . $level]++; //0 and 1 index is already taken
                     }
                 }
-            }
-            else if($type == 'close') {
-                $current = & $parent[$level -1];
+            } else if ($type == 'close') {
+                $current = & $parent[$level - 1];
             }
         }
         return ($xml_array);
@@ -2954,45 +2956,23 @@ class endpointmanager {
          *
          *
          */
-        $data = $this->timezone_array();
+        
+        require('timezone.php');        
+        $data = DateTimeZone::listIdentifiers();
         $i = 0;
         foreach($data as $key => $row) {
-            foreach($row['info'] as $subkey => $subdata) {
-                $temp[$i]['value'] = $key.".".$subkey;
-                $temp[$i]['text'] = $row['gmt'] . " (".$subdata['name'].") [".$subdata['description']."]";
-                if ($temp[$i]['value'] == $selected) {
-                    $temp[$i]['selected'] = 1;
-                }else {
-                    $temp[$i]['selected'] = 0;
-                }
-                $i++;
+            $temp[$i]['value'] = $row;
+            $temp[$i]['text'] = $row;
+            if ($temp[$i]['value'] == $selected) {
+                $temp[$i]['selected'] = 1;
+            }else {
+                $temp[$i]['selected'] = 0;
             }
+            $i++;
         }
 
         return($temp);
     }
-
-    function timezone_array() {
-        $sql = "SELECT * FROM endpointman_time_zones_desc, endpointman_time_zones_new WHERE endpointman_time_zones_desc.tid = endpointman_time_zones_new.id";
-        $tz_list = $this->db->getAll($sql,array(),DB_FETCHMODE_ASSOC);
-
-        $tz_list2 = array();
-        foreach($tz_list as $key => $data) {
-            if(array_key_exists($data['tid'], $tz_list2)) {
-                $c++;
-                $tz_list2[$data['tid']]['info'][$c]['name'] = $data['name'];
-                $tz_list2[$data['tid']]['info'][$c]['description'] = $data['description'];
-            } else {
-                $c=0;
-                $tz_list2[$data['tid']]['gmt'] = $data['gmt'];
-                $tz_list2[$data['tid']]['offset'] = $data['offset'];
-                $tz_list2[$data['tid']]['info'][$c]['name'] = $data['name'];
-                $tz_list2[$data['tid']]['info'][$c]['description'] = $data['description'];
-            }
-        }
-        return($tz_list2);
-    }
-
 }
 
 function endpointman_flush_buffers(){
