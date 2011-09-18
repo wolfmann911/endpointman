@@ -1314,7 +1314,7 @@ class endpointmanager {
 
                 //Timezone
                 require('timezone.php');
-                $endpoint->DateTimeZone = new DateTimeZone($settings['tz']);;
+                $endpoint->DateTimeZone = new DateTimeZone($settings['tz']);
 
                 //Network Time Server
                 $provisioner_lib->ntp = $settings['ntp'];
