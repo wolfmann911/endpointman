@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 <?PHP
+=======
+ <?PHP
+>>>>>>> develop
 /**
  * Endpoint Manager Brand Model Manager File
  *
@@ -51,6 +55,10 @@ if((isset($_REQUEST['button_install'])) OR (isset($_REQUEST['button_update']))) 
         $installer = array("type" => 'js-multiple', "id" => $_REQUEST['hidden']);
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> develop
 $sql="SELECT * from endpointman_brand_list WHERE id > 0 AND hidden = 0 ORDER BY id ASC ";
 $brand_list =& $endpoint->db->getAll($sql,array(),DB_FETCHMODE_ASSOC);
 $i = 0;
@@ -146,4 +154,8 @@ if(isset($error_message)) {
 }
 
 //draw the template	
+<<<<<<< HEAD
+=======
+
+>>>>>>> develop
 echo $endpoint->tpl->draw( 'brand_model_manager' );

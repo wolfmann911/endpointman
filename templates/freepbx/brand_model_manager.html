@@ -114,6 +114,7 @@ function generateHiddenFieldsForTree(treeId) {
 {/if}
 {if condition="isset($installer)"}
 <script>
+<<<<<<< HEAD
 
 function process_module_actions(actions) {
         if ($.browser.msie) {
@@ -150,6 +151,37 @@ function close_module_actions(goback) {
 	if (goback) {
   		location.href = 'config.php?display=epm_config&amp;type=tool';
 	}
+=======
+var box;
+function process_module_actions(actions) {
+    $(document).ready(function() {
+	urlStr = "config.php?display=epm_config&amp;quietmode=1&amp;handler=file&amp;file=installer.html.php&amp;module=endpointman&amp;type={$installer.type}&amp;id={$installer.id}";
+	urlStr += "&amp;rand="+Math.random ( );
+        for (var i in actions) {
+            urlStr += "&amp;moduleaction["+i+"]="+actions[i];
+        }
+        box = $('<div></div>')
+        .html('<iframe height="100%" frameBorder="0" src="'+urlStr+'"></iframe>')
+        .dialog({
+            title: 'Status - Please Wait',
+            resizable: false,
+            modal: true,
+            position: ['center', 50],
+            width: '400px',
+            height: 230,
+            close: function (e) {
+                close_module_actions(true);
+                $(e.target).dialog("destroy").remove();
+            }
+        });
+    });
+}
+function close_module_actions(goback) {
+        box.dialog("destroy").remove();
+        if (goback) {
+            location.href = 'config.php?display=epm_config';
+        }
+>>>>>>> develop
 }
 process_module_actions();
 </script>
@@ -184,7 +216,12 @@ process_module_actions();
         <br />
     {/loop}
 {/if}
+<<<<<<< HEAD
 
+=======
+<hr>
+<h6 align='center'>Want to participate? Add new phones? Join us at <a href="http://provisioner.net" target="_blank">http://www.provisioner.net</a></h6>
+>>>>>>> develop
 {include="global_footer"}
 
   
