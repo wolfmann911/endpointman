@@ -356,6 +356,7 @@ foreach($devices_list as $devices_row) {
         $z++;
     }
     $status = shell_exec($endpoint->global_cfg['asterisk_location']." -rx 'sip show peer ".$list[$i]['line'][0]['ext']."'");
+    
     preg_match('/Addr->IP(.*)/i', $status, $matches);
     preg_match('/Status(.*)/i', $status, $matches2);
 
