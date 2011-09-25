@@ -178,7 +178,7 @@ if(!$new_install) {
 		  `installed` int(1) NOT NULL default '0',
 		  `hidden` int(1) NOT NULL default '0',
 		  PRIMARY KEY  (`id`)
-		) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=22";
+		) ENGINE=MyISAM  DEFAULT utf-8=latin1 AUTO_INCREMENT=22";
         $db->query($sql);
 
         out("Updating Models table");
@@ -193,7 +193,7 @@ if(!$new_install) {
 		  `enabled` int(1) NOT NULL default '0',
 		  `hidden` int(1) NOT NULL default '0',
 		  PRIMARY KEY  (`id`)
-		) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=48";
+		) ENGINE=MyISAM  DEFAULT utf-8=latin1 AUTO_INCREMENT=48";
         $db->query($sql);
 
         out("Updating OUI table");
@@ -206,7 +206,7 @@ if(!$new_install) {
 		  `oui` varchar(30) default NULL,
 		  `brand` int(11) default NULL,
 		  PRIMARY KEY  (`id`)
-		) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=57";
+		) ENGINE=MyISAM  DEFAULT utf-8=latin1 AUTO_INCREMENT=57";
         $db->query($sql);
 
         out("Updating Products table");
@@ -228,7 +228,7 @@ if(!$new_install) {
 		  `firmware_files` text NOT NULL,
 		  `config_files` text,
 		  PRIMARY KEY  (`id`)
-		) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=8";
+		) ENGINE=MyISAM  DEFAULT utf-8=latin1 AUTO_INCREMENT=8";
         $db->query($sql);
 
         out("Updating templates table");
@@ -243,7 +243,7 @@ if(!$new_install) {
 		  `custom_cfg_data` text,
 		  `config_files_override` text,
 		  PRIMARY KEY  (`id`)
-		) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=8";
+		) ENGINE=MyISAM  DEFAULT utf-8=latin1 AUTO_INCREMENT=8";
         $db->query($sql);
 
         $sql = "CREATE TABLE IF NOT EXISTS `endpointman_custom_configs` (
@@ -253,7 +253,7 @@ if(!$new_install) {
 		  `product_id` int(11) NOT NULL,
 		  `data` longtext NOT NULL,
 		  PRIMARY KEY  (`id`)
-		) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=11";
+		) ENGINE=MyISAM  DEFAULT utf-8=latin1 AUTO_INCREMENT=11";
         $db->query($sql);
 
         $old_models = array(
@@ -358,7 +358,7 @@ if(!$new_install) {
 		  `product_id` int(11) NOT NULL,
 		  `data` longtext NOT NULL,
 		  PRIMARY KEY  (`id`)
-		) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=11";
+		) ENGINE=MyISAM  DEFAULT utf-8=latin1 AUTO_INCREMENT=11";
         $db->query($sql);
 
         out('Alter custom_cfg_data');
@@ -374,7 +374,7 @@ if(!$new_install) {
 	  `product_id` int(11) NOT NULL,
 	  `data` longtext NOT NULL,
 	  PRIMARY KEY  (`id`)
-	) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=11";
+	) ENGINE=MyISAM  DEFAULT utf-8=latin1 AUTO_INCREMENT=11";
         $db->query($sql);
 
         out("Locating NMAP + ARP + ASTERISK Executables");
@@ -736,7 +736,7 @@ if(!$new_install) {
               `custom_cfg_data` longblob NOT NULL,
               `user_cfg_data` longblob NOT NULL,
               PRIMARY KEY (`luid`)
-            ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;";
+            ) ENGINE=MyISAM  DEFAULT utf-8=latin1 AUTO_INCREMENT=2 ;";
         $db->query($sql);
 
         $data = array();
@@ -879,7 +879,7 @@ if(!$new_install) {
   `name` varchar(255) NOT NULL,
   `description` varchar(255) NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=32";
+) ENGINE=MyISAM  DEFAULT utf-8=latin1 AUTO_INCREMENT=32";
         $db->query($sql);
 
         $sql = "INSERT INTO `endpointman_time_zones_desc` (`id`, `tid`, `name`, `description`) VALUES
@@ -921,7 +921,7 @@ if(!$new_install) {
   `gmt` varchar(255) NOT NULL,
   `offset` int(11) NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=28";
+) ENGINE=MyISAM  DEFAULT utf-8=latin1 AUTO_INCREMENT=28";
         $db->query($sql);
 
         $sql = "INSERT INTO `endpointman_time_zones_new` (`id`, `gmt`, `offset`) VALUES
@@ -990,7 +990,7 @@ if ($new_install) {
                     `local` int(1) NOT NULL DEFAULT '0',
                   `hidden` int(1) NOT NULL DEFAULT '0',
                   PRIMARY KEY (`id`)
-                ) ENGINE=MyISAM DEFAULT CHARSET=latin1";
+                ) ENGINE=MyISAM DEFAULT utf-8=latin1";
     $db->query($sql);
 
     out("Creating Line List Table");
@@ -1004,7 +1004,7 @@ if ($new_install) {
   `custom_cfg_data` longblob NOT NULL,
   `user_cfg_data` longblob NOT NULL,
   PRIMARY KEY (`luid`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;";
+) ENGINE=MyISAM  DEFAULT utf-8=latin1 AUTO_INCREMENT=2 ;";
     $db->query($sql);
 
     out("Creating Global Variables Table");
@@ -1014,7 +1014,7 @@ if ($new_install) {
                   `value` text NOT NULL COMMENT 'Data',
                   PRIMARY KEY (`idnum`),
                   UNIQUE KEY `var_name` (`var_name`)
-                ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=17";
+                ) ENGINE=MyISAM  DEFAULT utf-8=latin1 AUTO_INCREMENT=17";
     $db->query($sql);
 
     out("Locating NMAP + ARP + ASTERISK Executables");
@@ -1059,7 +1059,7 @@ if ($new_install) {
     `specific_settings` longblob,
   PRIMARY KEY (`id`),
   UNIQUE KEY `mac` (`mac`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1";
+) ENGINE=MyISAM  DEFAULT utf-8=latin1 AUTO_INCREMENT=1";
     $db->query($sql);
 
     out("Creating model List Table");
@@ -1074,7 +1074,7 @@ if ($new_install) {
   `enabled` int(1) NOT NULL DEFAULT '0',
   `hidden` int(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1";
+) ENGINE=MyISAM DEFAULT utf-8=latin1";
     $db->query($sql);
 
     out("Creating oui List Table");
@@ -1085,7 +1085,7 @@ if ($new_install) {
           `custom` int(1) NOT NULL DEFAULT '0',
           PRIMARY KEY (`id`),
           UNIQUE KEY `oui` (`oui`)
-        ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1";
+        ) ENGINE=MyISAM  DEFAULT utf-8=latin1 AUTO_INCREMENT=1";
     $db->query($sql);
 
     out("Creating product List Table");
@@ -1102,7 +1102,7 @@ if ($new_install) {
   `config_files` text,
   `special_cfgs` blob NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1";
+) ENGINE=MyISAM DEFAULT utf-8=latin1";
     $db->query($sql);
 
     out("Creating Template List Table");
@@ -1115,7 +1115,7 @@ if ($new_install) {
   `config_files_override` text,
   `global_settings_override` longblob,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1";
+) ENGINE=MyISAM  DEFAULT utf-8=latin1 AUTO_INCREMENT=1";
     $db->query($sql);
 
     out("Creating Time Zone List Tables");
@@ -1125,7 +1125,7 @@ if ($new_install) {
   `name` varchar(255) NOT NULL,
   `description` varchar(255) NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=32";
+) ENGINE=MyISAM  DEFAULT utf-8=latin1 AUTO_INCREMENT=32";
         $db->query($sql);
 
         $sql = "INSERT INTO `endpointman_time_zones_desc` (`id`, `tid`, `name`, `description`) VALUES
@@ -1167,7 +1167,7 @@ if ($new_install) {
   `gmt` varchar(255) NOT NULL,
   `offset` int(11) NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=28";
+) ENGINE=MyISAM  DEFAULT utf-8=latin1 AUTO_INCREMENT=28";
         $db->query($sql);
 
         $sql = "INSERT INTO `endpointman_time_zones_new` (`id`, `gmt`, `offset`) VALUES
@@ -1208,7 +1208,7 @@ if ($new_install) {
           `product_id` varchar(11) NOT NULL,
           `data` longblob NOT NULL,
           PRIMARY KEY (`id`)
-        ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1";
+        ) ENGINE=MyISAM  DEFAULT utf-8=latin1 AUTO_INCREMENT=1";
     $db->query($sql);
 
     out('Creating symlink to web provisioner');
