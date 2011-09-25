@@ -2,9 +2,9 @@
 	<rawname>endpointman</rawname>
 	<repo>standard</repo>
 	<name>PBX End Point Manager</name>
-	<version>2.9.2.4</version>
-	<type>tool</type>
-	<category>End Point Manager</category>
+	<version>2.10.0.0</version>
+	<type>setup</type>
+	<category>connectivity</category>
 	<publisher>Andrew Nagy</publisher>
 	<license>MPLv1.1</license>
 	<menuitems>

@@ -1,4 +1,4 @@
-<?PHP
+ <?PHP
 /**
  * Endpoint Manager Brand Model Manager File
  *
@@ -50,6 +50,7 @@ if((isset($_REQUEST['button_install'])) OR (isset($_REQUEST['button_update']))) 
 } elseif(isset($_REQUEST['install-jstree'])) {
         $installer = array("type" => 'js-multiple', "id" => $_REQUEST['hidden']);
 }
+
 
 $sql="SELECT * from endpointman_brand_list WHERE id > 0 AND hidden = 0 ORDER BY id ASC ";
 $brand_list =& $endpoint->db->getAll($sql,array(),DB_FETCHMODE_ASSOC);
@@ -146,4 +147,5 @@ if(isset($error_message)) {
 }
 
 //draw the template	
+
 echo $endpoint->tpl->draw( 'brand_model_manager' );

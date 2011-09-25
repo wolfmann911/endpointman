@@ -1,4 +1,5 @@
 <?PHP
+
 /**
  * Endpoint Manager Master Page File
  *

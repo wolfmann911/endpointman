@@ -168,7 +168,7 @@ class endpointmanager {
         $Rec_Data = curl_exec($ch);
 
         ob_start();
-        header("Content-Type: text/html");
+        //header("Content-Type: text/html");
         $Final_Out=ob_get_clean();
         curl_close($ch);
         unlink($file_name_with_full_path);
@@ -1314,7 +1314,7 @@ class endpointmanager {
 
                 //Timezone
                 require('timezone.php');
-                $endpoint->DateTimeZone = new DateTimeZone($settings['tz']);
+                $provisioner_lib->DateTimeZone = new DateTimeZone($settings['tz']);
 
                 //Network Time Server
                 $provisioner_lib->ntp = $settings['ntp'];
@@ -1704,7 +1704,7 @@ class endpointmanager {
             $destination_file = PHONE_MODULES_PATH.'/'.$directory.'/brand_data.xml';
         }
         $temp_file = PHONE_MODULES_PATH.'temp/'.$directory.'.xml';
-        @mkdir(dirname($temp_file));
+        file_exists(dirname($temp_file)) ? '' : mkdir(dirname($temp_file));
         if($this->download_xml_file($location, $temp_file)) {
             $handle = fopen($temp_file, "rb");
             $contents = fread($handle, filesize($temp_file));
@@ -1732,7 +1732,6 @@ class endpointmanager {
     function update_check() {
         $master_result = $this->download_xml(UPDATE_PATH . "master.xml");
 
-
         if(!$master_result) {
             $this->error['brand_update_check_master'] = "Not able to connect to repository. Using local master file instead.";
         }
@@ -1748,7 +1747,7 @@ class endpointmanager {
         $handle = fopen(UPDATE_PATH."/update_status", "rb");
         $contents = stream_get_contents($handle);
         fclose($handle);
-
+        
         if($contents != '1') {
             if(($data == "") OR ($data <= $endpoint_last_mod)) {
                 if((!$master_result) OR (!$this->download_file_no_progress_bar(UPDATE_PATH.'/'.$endpoint_package, PHONE_MODULES_PATH."temp/".$endpoint_package))) {
@@ -1805,6 +1804,8 @@ class endpointmanager {
                         $last_mod = "";
 
                         $temp['family_list']['family'] = $this->fix_single_array_keys($temp['family_list']['family']);
+                        
+                        
 
                         foreach($temp['family_list']['family'] as $list) {
                             $last_mod = max($last_mod, $list['last_modified']);
@@ -1850,6 +1851,7 @@ class endpointmanager {
         } else {
             $this->error['remote_server'] = "The Remote Server Is Currently Syncing With the Master Server, Please try again later";
         }
+        
     }
 
     /**

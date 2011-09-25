@@ -52,6 +52,6 @@ if (isset($_REQUEST['page'])) {
 	$page = "";
 }
 
-if($global_cfg['debug']) {
+if($endpoint->global_cfg['debug']) {
 	$debug .= "Request Variables: \n".print_r($_REQUEST, TRUE);
 }
