@@ -140,10 +140,6 @@ class RainTPL{
 	 */
 	
 	function draw( $tpl_name, $return_string = false ){
-<<<<<<< HEAD
-
-=======
->>>>>>> develop
 		if( count( $a = explode('/', $tpl_name) ) > 1 ){
 			$temp = $tpl_name;
 			$tpl_name = end( $a );	
@@ -184,24 +180,10 @@ class RainTPL{
 			include( $compiled_filename );		
 			$contents = ob_get_contents();
 			ob_end_clean();
-<<<<<<< HEAD
-			return $contents;		
-=======
 			return $contents;
-                        
->>>>>>> develop
 		}
 		else
 			include( $compiled_filename );
 		
 	}
-
-<<<<<<< HEAD
 }
-
-
-
-?>
-=======
-}
->>>>>>> develop
