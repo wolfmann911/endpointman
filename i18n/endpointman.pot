@@ -14,15 +14,6 @@
 #    along with FreePBX.  If not, see <http://www.gnu.org/licenses/>.
 #
 # FreePBX language template for endpointman
-<<<<<<< HEAD
-# Copyright (C) 2008, 2009, 2010 Bandwith.com
-#
-msgid ""
-msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-09-23 09:52+0000\n"
-=======
 # Copyright (C) 2008, 2009, 2010, 2011 Bandwith.com
 #
 msgid ""
@@ -30,7 +21,6 @@ msgstr ""
 "Project-Id-Version: FreePBX\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-03-10 22:46+0100\n"
->>>>>>> develop
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -50,18 +40,6 @@ msgstr ""
 msgid "PBX End Point Manager"
 msgstr ""
 
-<<<<<<< HEAD
-msgid "Admin"
-=======
-msgid "End Point Manager"
->>>>>>> develop
-msgstr ""
-
-msgid ""
-"PBX End Point Manager supports automated deployment of multiple "
-"manufacturers IP telephones."
-msgstr ""
-
 msgid "End Point Device List"
 msgstr ""
 
@@ -73,9 +51,7 @@ msgstr ""
 
 msgid "End Point Advanced Settings"
 msgstr ""
-<<<<<<< HEAD
 
 msgid "End Point Manager"
 msgstr ""
-=======
->>>>>>> develop
+

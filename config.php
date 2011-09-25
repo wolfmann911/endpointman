@@ -52,10 +52,7 @@ if (isset($_REQUEST['page'])) {
 	$page = "";
 }
 
-<<<<<<< HEAD
-if($global_cfg['debug']) {
-=======
+
 if($endpoint->global_cfg['debug']) {
->>>>>>> develop
 	$debug .= "Request Variables: \n".print_r($_REQUEST, TRUE);
 }
