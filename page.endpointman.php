@@ -1,8 +1,4 @@
 <?PHP
-<<<<<<< HEAD
-=======
-
->>>>>>> develop
 /**
  * Endpoint Manager Master Page File
  *

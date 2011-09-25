@@ -2,17 +2,6 @@
 	<rawname>endpointman</rawname>
 	<repo>standard</repo>
 	<name>PBX End Point Manager</name>
-<<<<<<< HEAD
-	<version>2.9.2.4</version>
-	<category>Admin</category>
-	<publisher>Andrew Nagy</publisher>
-	<license>MPLv1.1</license>
-	<menuitems>
-		<epm_devices>End Point Device List</epm_devices>
-		<epm_templates>End Point Template Manager</epm_templates>
-		<epm_config>End Point Configuration</epm_config>
-		<epm_advanced>End Point Advanced Settings</epm_advanced>
-=======
 	<version>2.10.0.1</version>
 	<type>setup</type>
 	<category>connectivity</category>
@@ -23,7 +12,6 @@
 		<epm_templates sort="2">End Point Template Manager</epm_templates>
 		<epm_config sort="3">End Point Configuration</epm_config>
 		<epm_advanced sort="4">End Point Advanced Settings</epm_advanced>
->>>>>>> develop
 	</menuitems>
 	 <description>PBX End Point Manager supports automated deployment of multiple manufacturers IP telephones.</description>
 	 <changelog>
