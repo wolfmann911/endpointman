@@ -179,115 +179,120 @@ function endpointman_configpageload() {
     // Init vars from $_REQUEST[]
     $action = isset($_REQUEST['action'])?$_REQUEST['action']:null;
     $extdisplay = isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:null;
+    $tech = isset($_REQUEST['tech_hardware']) ? $_REQUEST['tech_hardware'] : null;
 
+    dbug($_REQUEST);
+    
+    if((isset($tech)) && ($tech == 'sip_generic')) {
     // Don't display this stuff it it's on a 'This xtn has been deleted' page.
-    if ($action != 'del') {
-
-        $js = "
-                    $.ajaxSetup({ cache: false });
-
-                    $.getJSON(\"config.php?type=tool&quietmode=1&handler=file&module=endpointman&file=ajax_select.html.php&atype=model\",{id: value}, function(j){
-                            var options = '';
-                            for (var i = 0; i < j.length; i++) {
-                                    options += '<option value=\"' + j[i].optionValue + '\">' + j[i].optionDisplay + '</option>';
-                            }
-                            $('#epm_model').html(options);
-                            $('#epm_model option:first').attr('selected', 'selected');
-                            $('#epm_temps').html('<option></option>');
-                            $('#epm_temps option:first').attr('selected', 'selected');
-                            $('#epm_line').html('<option></option>');
-                            $('#epm_line option:first').attr('selected', 'selected');
-                    })
-                ";
-        $currentcomponent->addjsfunc('brand_change(value)', $js);
-
-        $section = _('End Point Manager');
-
-        $sql = "SELECT mac_id,luid,line FROM endpointman_line_list WHERE ext = '".$extdisplay."' ";
-        $line_info =& $db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
-        if($line_info) {
+        if ($action != 'del') {
 
             $js = "
-                    $.ajaxSetup({ cache: false });
-                    $.getJSON('config.php?type=tool&quietmode=1&handler=file&module=endpointman&file=ajax_select.html.php&atype=template2',{id: value}, function(j){
-                            var options = '';
-                            for (var i = 0; i < j.length; i++) {
-                                    options += '<option value=\"' + j[i].optionValue + '\">' + j[i].optionDisplay + '</option>';
-                            }
-                            $('#epm_temps').html(options);
-                            $('#epm_temps option:first').attr('selected', 'selected');
-                    }),
-                    $.ajaxSetup({ cache: false });
-                    $.getJSON('config.php?type=tool&quietmode=1&handler=file&module=endpointman&file=ajax_select.html.php&macid='+ macid +'&atype=lines',{id: value}, function(j){
-                            var options = '';
-                            for (var i = 0; i < j.length; i++) {
-                                    options += '<option value=\"' + j[i].optionValue + '\">' + j[i].optionDisplay + '</option>';
-                            }
-                            $('#epm_line').html(options);
-                            $('#epm_line option:first').attr('selected', 'selected');
-                    })
-                ";
-            $currentcomponent->addjsfunc('model_change(value,macid)', $js);
+                        $.ajaxSetup({ cache: false });
 
-            $info = $endpoint->get_phone_info($line_info['mac_id']);
+                        $.getJSON(\"config.php?type=tool&quietmode=1&handler=file&module=endpointman&file=ajax_select.html.php&atype=model\",{id: value}, function(j){
+                                var options = '';
+                                for (var i = 0; i < j.length; i++) {
+                                        options += '<option value=\"' + j[i].optionValue + '\">' + j[i].optionDisplay + '</option>';
+                                }
+                                $('#epm_model').html(options);
+                                $('#epm_model option:first').attr('selected', 'selected');
+                                $('#epm_temps').html('<option></option>');
+                                $('#epm_temps option:first').attr('selected', 'selected');
+                                $('#epm_line').html('<option></option>');
+                                $('#epm_line option:first').attr('selected', 'selected');
+                        })
+                    ";
+            $currentcomponent->addjsfunc('brand_change(value)', $js);
 
-            $brand_list = $endpoint->brands_available($info['brand_id'], true);
-            if(!empty($info['brand_id'])) {
-                $model_list = $endpoint->models_available(NULL,$info['brand_id']);
-                $line_list = $endpoint->linesAvailable($line_info['luid']);
-                $template_list = $endpoint->display_templates($info['product_id']);
+            $section = _('End Point Manager');
+
+            $sql = "SELECT mac_id,luid,line FROM endpointman_line_list WHERE ext = '".$extdisplay."' ";
+            $line_info =& $db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
+            if($line_info) {
+
+                $js = "
+                        $.ajaxSetup({ cache: false });
+                        $.getJSON('config.php?type=tool&quietmode=1&handler=file&module=endpointman&file=ajax_select.html.php&atype=template2',{id: value}, function(j){
+                                var options = '';
+                                for (var i = 0; i < j.length; i++) {
+                                        options += '<option value=\"' + j[i].optionValue + '\">' + j[i].optionDisplay + '</option>';
+                                }
+                                $('#epm_temps').html(options);
+                                $('#epm_temps option:first').attr('selected', 'selected');
+                        }),
+                        $.ajaxSetup({ cache: false });
+                        $.getJSON('config.php?type=tool&quietmode=1&handler=file&module=endpointman&file=ajax_select.html.php&macid='+ macid +'&atype=lines',{id: value}, function(j){
+                                var options = '';
+                                for (var i = 0; i < j.length; i++) {
+                                        options += '<option value=\"' + j[i].optionValue + '\">' + j[i].optionDisplay + '</option>';
+                                }
+                                $('#epm_line').html(options);
+                                $('#epm_line option:first').attr('selected', 'selected');
+                        })
+                    ";
+                $currentcomponent->addjsfunc('model_change(value,macid)', $js);
+
+                $info = $endpoint->get_phone_info($line_info['mac_id']);
+
+                $brand_list = $endpoint->brands_available($info['brand_id'], true);
+                if(!empty($info['brand_id'])) {
+                    $model_list = $endpoint->models_available(NULL,$info['brand_id']);
+                    $line_list = $endpoint->linesAvailable($line_info['luid']);
+                    $template_list = $endpoint->display_templates($info['product_id']);
+                } else {
+                    $model_list = array();
+                    $line_list = array();
+                    $template_list = array();
+                }
+
+                $checked = false;
+
+                $currentcomponent->addguielem($section, new gui_checkbox('epm_delete', $checked, 'Delete','Delete this Extension from Endpoint Manager'),9);
+                $currentcomponent->addguielem($section, new gui_textbox('epm_mac', $info['mac'], 'MAC Address', 'The MAC Address of the Phone Assigned to this Extension/Device. <br />(Leave Blank to Remove from Endpoint Manager)', '', 'Please enter a valid MAC Address', true, 17, false),9);
+                $currentcomponent->addguielem($section, new gui_selectbox('epm_brand', $brand_list, $info['brand_id'], 'Brand', 'The Brand of this Phone.', false, 'frm_'.$display.'_brand_change(this.options[this.selectedIndex].value)', false),9);
+                $currentcomponent->addguielem($section, new gui_selectbox('epm_model', $model_list, $info['model_id'], 'Model', 'The Model of this Phone.', false, 'frm_'.$display.'_model_change(this.options[this.selectedIndex].value,\''.$line_info['luid'].'\')', false),9);
+                $currentcomponent->addguielem($section, new gui_selectbox('epm_line', $line_list, $line_info['line'], 'Line', 'The Line of this Extension/Device.', false, '', false),9);
+                $currentcomponent->addguielem($section, new gui_selectbox('epm_temps', $template_list, $info['template_id'], 'Template', 'The Template of this Phone.', false, '', false),9);
+                $currentcomponent->addguielem($section, new gui_checkbox('epm_reboot', $checked, 'Reboot','Reboot this Phone on Submit'),9);
+
             } else {
+
+                $js = "
+                        $.ajaxSetup({ cache: false });
+                        $.getJSON('config.php?type=tool&quietmode=1&handler=file&module=endpointman&file=ajax_select.html.php&atype=template2',{id: value}, function(j){
+                                var options = '';
+                                for (var i = 0; i < j.length; i++) {
+                                        options += '<option value=\"' + j[i].optionValue + '\">' + j[i].optionDisplay + '</option>';
+                                }
+                                $('#epm_temps').html(options);
+                                $('#epm_temps option:first').attr('selected', 'selected');
+                        }),
+                        $.ajaxSetup({ cache: false });
+                        $.getJSON('config.php?type=tool&quietmode=1&handler=file&module=endpointman&file=ajax_select.html.php&mac='+ mac +'&atype=lines',{id: value}, function(j){
+                                var options = '';
+                                for (var i = 0; i < j.length; i++) {
+                                        options += '<option value=\"' + j[i].optionValue + '\">' + j[i].optionDisplay + '</option>';
+                                }
+                                $('#epm_line').html(options);
+                                $('#epm_line option:first').attr('selected', 'selected');
+                        })
+                    ";
+                $currentcomponent->addjsfunc('model_change(value,mac)', $js);
+
+                $brand_list = $endpoint->brands_available(NULL, true);
                 $model_list = array();
                 $line_list = array();
                 $template_list = array();
+
+                $currentcomponent->addguielem($section, new gui_textbox('epm_mac', $info['mac'], 'MAC Address', 'The MAC Address of the Phone Assigned to this Extension/Device. <br />(Leave Blank to Remove from Endpoint Manager)', '', 'Please enter a valid MAC Address', true, 17, false),9);
+                $currentcomponent->addguielem($section, new gui_selectbox('epm_brand', $brand_list, $info['brand_id'], 'Brand', 'The Brand of this Phone.', false, 'frm_'.$display.'_brand_change(this.options[this.selectedIndex].value)', false),9);
+                $currentcomponent->addguielem($section, new gui_selectbox('epm_model', $model_list, $info['model_id'], 'Model', 'The Model of this Phone.', false, 'frm_'.$display.'_model_change(this.options[this.selectedIndex].value,document.getElementById(\'epm_mac\').value)', false),9);
+                $currentcomponent->addguielem($section, new gui_selectbox('epm_line', $line_list, $line_info['line'], 'Line', 'The Line of this Extension/Device.', false, '', false),9);
+                $currentcomponent->addguielem($section, new gui_selectbox('epm_temps', $template_list, $info['template_id'], 'Template', 'The Template of this Phone.', false, '', false),9);
+                $currentcomponent->addguielem($section, new guitext('epm_note','Note: This might reboot the phone if it\'s already registered to Asterisk'));
+
             }
-
-            $checked = false;
-
-            $currentcomponent->addguielem($section, new gui_checkbox('epm_delete', $checked, 'Delete','Delete this Extension from Endpoint Manager'),9);
-            $currentcomponent->addguielem($section, new gui_textbox('epm_mac', $info['mac'], 'MAC Address', 'The MAC Address of the Phone Assigned to this Extension/Device. <br />(Leave Blank to Remove from Endpoint Manager)', '', 'Please enter a valid MAC Address', true, 17, false),9);
-            $currentcomponent->addguielem($section, new gui_selectbox('epm_brand', $brand_list, $info['brand_id'], 'Brand', 'The Brand of this Phone.', false, 'frm_'.$display.'_brand_change(this.options[this.selectedIndex].value)', false),9);
-            $currentcomponent->addguielem($section, new gui_selectbox('epm_model', $model_list, $info['model_id'], 'Model', 'The Model of this Phone.', false, 'frm_'.$display.'_model_change(this.options[this.selectedIndex].value,\''.$line_info['luid'].'\')', false),9);
-            $currentcomponent->addguielem($section, new gui_selectbox('epm_line', $line_list, $line_info['line'], 'Line', 'The Line of this Extension/Device.', false, '', false),9);
-            $currentcomponent->addguielem($section, new gui_selectbox('epm_temps', $template_list, $info['template_id'], 'Template', 'The Template of this Phone.', false, '', false),9);
-            $currentcomponent->addguielem($section, new gui_checkbox('epm_reboot', $checked, 'Reboot','Reboot this Phone on Submit'),9);
-
-        } else {
-
-            $js = "
-                    $.ajaxSetup({ cache: false });
-                    $.getJSON('config.php?type=tool&quietmode=1&handler=file&module=endpointman&file=ajax_select.html.php&atype=template2',{id: value}, function(j){
-                            var options = '';
-                            for (var i = 0; i < j.length; i++) {
-                                    options += '<option value=\"' + j[i].optionValue + '\">' + j[i].optionDisplay + '</option>';
-                            }
-                            $('#epm_temps').html(options);
-                            $('#epm_temps option:first').attr('selected', 'selected');
-                    }),
-                    $.ajaxSetup({ cache: false });
-                    $.getJSON('config.php?type=tool&quietmode=1&handler=file&module=endpointman&file=ajax_select.html.php&mac='+ mac +'&atype=lines',{id: value}, function(j){
-                            var options = '';
-                            for (var i = 0; i < j.length; i++) {
-                                    options += '<option value=\"' + j[i].optionValue + '\">' + j[i].optionDisplay + '</option>';
-                            }
-                            $('#epm_line').html(options);
-                            $('#epm_line option:first').attr('selected', 'selected');
-                    })
-                ";
-            $currentcomponent->addjsfunc('model_change(value,mac)', $js);
-
-            $brand_list = $endpoint->brands_available(NULL, true);
-            $model_list = array();
-            $line_list = array();
-            $template_list = array();
-
-            $currentcomponent->addguielem($section, new gui_textbox('epm_mac', $info['mac'], 'MAC Address', 'The MAC Address of the Phone Assigned to this Extension/Device. <br />(Leave Blank to Remove from Endpoint Manager)', '', 'Please enter a valid MAC Address', true, 17, false),9);
-            $currentcomponent->addguielem($section, new gui_selectbox('epm_brand', $brand_list, $info['brand_id'], 'Brand', 'The Brand of this Phone.', false, 'frm_'.$display.'_brand_change(this.options[this.selectedIndex].value)', false),9);
-            $currentcomponent->addguielem($section, new gui_selectbox('epm_model', $model_list, $info['model_id'], 'Model', 'The Model of this Phone.', false, 'frm_'.$display.'_model_change(this.options[this.selectedIndex].value,document.getElementById(\'epm_mac\').value)', false),9);
-            $currentcomponent->addguielem($section, new gui_selectbox('epm_line', $line_list, $line_info['line'], 'Line', 'The Line of this Extension/Device.', false, '', false),9);
-            $currentcomponent->addguielem($section, new gui_selectbox('epm_temps', $template_list, $info['template_id'], 'Template', 'The Template of this Phone.', false, '', false),9);
-            $currentcomponent->addguielem($section, new guitext('epm_note','Note: This might reboot the phone if it\'s already registered to Asterisk'));
-
         }
     }
 }
