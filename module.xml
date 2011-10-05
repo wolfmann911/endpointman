@@ -2,9 +2,9 @@
 	<rawname>endpointman</rawname>
 	<repo>standard</repo>
 	<name>PBX End Point Manager</name>
-	<version>2.10.0.3</version>
-	<type>setup</type>
-	<category>Connectivity</category>
+	<version>2.9.2.9</version>
+	<type>tool</type>
+	<category>End Point Manager</category>
 	<publisher>Andrew Nagy</publisher>
 	<license>MPLv1.1</license>
 	<menuitems>
@@ -15,7 +15,6 @@
 	</menuitems>
 	 <description>PBX End Point Manager supports automated deployment of multiple manufacturers IP telephones.</description>
 	 <changelog>
-		*2.10.0.2* Bump for 2.10
 		*2.9.2.2* Added status lights
                 *2.9.2.0* Fixes #5282, #5264, #4895, #5155, #4971, #5282, #5233
                 *2.9.1.3* Remove Firmware upon uninstall of Endpoint Manager, Force Firmware install for certain phones (#5155), Better Timezone Support (#4895)
@@ -28,7 +27,7 @@
                 *2.9.0.0* bumped for 2.9, removed errors in module.xml causing erors for online xml parsing
         </changelog>
 	<info>http://projects.colsolgrp.net/projects/show/endpointman</info>
-	<location>release/2.10/endpointman-2.10.0.1.tgz</location>
+	<location>release/2.9/endpointman-2.9.0.8.tgz</location>
 	<depends>
 		<version>2.7.0</version>
 	</depends>
@@ -36,5 +35,5 @@
 		<module>core</module>
 		<module>fw_ari</module>
 	</requirements>
-<md5sum>a388c02e2ae7fa732a72090a972d1736</md5sum>
+<md5sum>e6d7296848c9bd8c13b31dbe3b21f478</md5sum>
 </module>
