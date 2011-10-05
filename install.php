@@ -97,9 +97,11 @@ $version = $epm_module_xml['module']['version'];
 
 $sql = 'SELECT `version` FROM `modules` WHERE `modulename` = CONVERT(_utf8 \'endpointman\' USING latin1) COLLATE latin1_swedish_ci';
 
-$db_version = $db->getOne($sql);
+$full_vers = $db->getOne($sql);
 
-if($db_version) {
+$db_version = (float)preg_replace('/[^0-9]*/i', '', $full_vers);
+
+if($db->getOne($sql)) {
     $global_cfg =& $db->getAssoc("SELECT var_name, value FROM endpointman_global_vars");
     $global_cfg['version'] = $db_version;
 } else {
@@ -116,11 +118,11 @@ if($global_cfg['version'] != "?") {
 if($new_install) {
     out('New Installation Detected!');
 } else {
-    out('Version Identified as '. $ver);
+    out('Version Identified as '. $full_vers);
 }
 if(!$new_install) {
 
-    if(($ver < "1.9.0") AND ($ver > 0)) {
+    if(($ver < "190") AND ($ver > 0)) {
         out("Please Wait While we upgrade your old setup");
         //Expand the value option
         $sql = 'ALTER TABLE `endpointman_global_vars` CHANGE `value` `value` VARCHAR(100) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT \'Data\'';
@@ -295,7 +297,7 @@ if(!$new_install) {
         out("DONE! You can now use endpoint manager!");
     }
 
-    if ($ver <= "1.9.0") {
+    if ($ver <= "190") {
         out("Locating NMAP + ARP + ASTERISK Executables");
 
         $nmap = find_exec("nmap");
@@ -365,7 +367,7 @@ if(!$new_install) {
         $sql = "ALTER TABLE endpointman_mac_list CHANGE custom_cfg_data custom_cfg_data TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL";
         $db->query($sql);
     }
-    if ($ver <= "1.9.1") {
+    if ($ver <= "191") {
         out("Create Custom Configs Table");
         $sql = "CREATE TABLE IF NOT EXISTS `endpointman_custom_configs` (
 	  `id` int(11) NOT NULL auto_increment,
@@ -420,11 +422,11 @@ if(!$new_install) {
         $sql = "ALTER TABLE endpointman_mac_list CHANGE custom_cfg_data custom_cfg_data TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL";
         $db->query($sql);
     }
-    if ($ver <= "1.9.2") {
+    if ($ver <= "192") {
         out('Updating Global Variables');
     }
 
-    if ($ver <= "1.9.9") {
+    if ($ver <= "199") {
         out("Adding Custom Field to OUI List");
         $sql = 'ALTER TABLE `endpointman_oui_list` ADD `custom` INT(1) NOT NULL DEFAULT \'0\'';
         $db->query($sql);
@@ -468,7 +470,7 @@ if(!$new_install) {
         $sql = "INSERT INTO cronmanager (module, id, time, freq, lasttime, command) VALUES ('endpointman', 'UPDATES', '23', '24', '0', 'php ".LOCAL_PATH. "includes/update_check.php')";
         $db->query($sql);
     }
-    if($ver <= "2.0.0") {
+    if($ver <= "200") {
         out("Locating NMAP + ARP + ASTERISK Executables");
         $nmap = find_exec("nmap");
         $arp = find_exec("arp");
@@ -658,10 +660,10 @@ if(!$new_install) {
             out("Creating temp folder");
         }
     }
-    if ($ver <= "2.2.1") {
+    if ($ver <= "221") {
     }
 
-    if ($ver <= "2.2.2") {
+    if ($ver <= "222") {
 
         out("Remove all Dashes in IDs");
         $data = array();
@@ -705,16 +707,16 @@ if(!$new_install) {
             $db->query($sql);
         }
     }
-    if ($ver <= "2.2.3") {
+    if ($ver <= "223") {
         $sql = "UPDATE endpointman_global_vars SET value = 'http://www.provisioner.net/release/' WHERE var_name = 'update_server'";
         $db->query($sql);
     }
 
-    if ($ver <= "2.2.4") {
+    if ($ver <= "224") {
 
     }
 
-    if ($ver <= "2.2.5") {
+    if ($ver <= "225") {
         out("Fixing Permissions of Phone Modules Directory");
         $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(PHONE_MODULES_PATH), RecursiveIteratorIterator::SELF_FIRST);
         foreach($iterator as $item) {
@@ -726,7 +728,7 @@ if(!$new_install) {
         $db->query($sql);
     }
 
-    if ($ver <= "2.2.6") {
+    if ($ver <= "226") {
         $sql = "CREATE TABLE IF NOT EXISTS `endpointman_line_list` (
               `luid` int(11) NOT NULL AUTO_INCREMENT,
               `mac_id` int(11) NOT NULL,
@@ -778,11 +780,11 @@ if(!$new_install) {
 
     }
 
-    if ($ver <= "2.2.7") {
+    if ($ver <= "227") {
 
     }
 
-    if ($ver <= "2.2.8") {
+    if ($ver <= "228") {
         out("Fix Debug Left on Error, this turns off debug.");
         $sql = "UPDATE endpointman_global_vars SET value = '0' WHERE var_name = 'debug'";
         $db->query($sql);
@@ -791,7 +793,7 @@ if(!$new_install) {
         $db->query($sql);
     }
 
-    if ($ver <= "2.4.0") {
+    if ($ver <= "240") {
         out("Uninstalling All Installed Brands (You'll just simply have to update again, no loss of data)");
         $db->query("UPDATE endpointman_brand_list SET  installed =  '0'");
         out("Changing update server");
@@ -818,23 +820,23 @@ if(!$new_install) {
         }
     }
 
-    if ($ver <= "2.9.0.2") {
+    if ($ver <= "2902") {
         $sql = 'INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (NULL, \'disable_help\', \'0\');';
         $db->query($sql);
     }
 
-    if($ver <= "2.9.0.3") {
+    if($ver <= "2903") {
         $sql = 'ALTER TABLE  `endpointman_custom_configs` CHANGE  `data`  `data` LONGBLOB NOT NULL';
         $db->query($sql);
     }
 
-    if($ver <= "2.9.0.4") {
+    if($ver <= "2904") {
         out("Adding 'local' column to brand_list");
         $sql = 'ALTER TABLE  `endpointman_brand_list` ADD  `local` INT( 1 ) NOT NULL DEFAULT  \'0\' AFTER  `cfg_ver`';
         $db->query($sql);
     }
 
-    if($ver <= "2.9.0.7") {
+    if($ver <= "2907") {
         out("Adding UNIQUE key to table global_vars for var_name");
         $sql = "ALTER TABLE `endpointman_global_vars` ADD UNIQUE `unique` (`var_name`)";
         $db->query($sql);
@@ -844,14 +846,14 @@ if(!$new_install) {
         $db->query($sql);
     }
 
-    if($ver <= "2.9.0.9") {
+    if($ver <= "2909") {
         out("Successfully  Migrated to the new Installer!");
         $sql = "UPDATE endpointman_global_vars SET value = 'http://mirror.freepbx.org/provisioner/' WHERE var_name ='update_server'";
         $db->query($sql);
         out("Mirgrated to FreePBX Mirror");
     }
 
-    if($ver <= "2.9.1.0") {
+    if($ver <= "2910") {
         out("Fix again to the 'Allow Duplicate Extensions' Error");
         $sql = 'ALTER TABLE `endpointman_global_vars` ADD UNIQUE `var_name` (`var_name`)';
         $db->query($sql);
@@ -859,7 +861,7 @@ if(!$new_install) {
         $db->query($sql);
     }
 
-    if($ver <= "2.9.2.0") {
+    if($ver <= "2920") {
         out("Adding new Network Time Protocol Setting");
         $sql = "INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (NULL, 'ntp', '".$_SERVER["SERVER_ADDR"]."')";
         $db->query($sql);
@@ -1218,7 +1220,7 @@ if ($new_install) {
 }
 
 out("Update Version Number to ".$version);
-$sql = "UPDATE endpointman_global_vars SET value = '".$version."' WHERE var_name = 'version'";
+$sql = "UPDATE endpointman_global_vars SET value = '".$full_vers."' WHERE var_name = 'version'";
 $db->query($sql);
 
 $sql = "UPDATE endpointman_global_vars SET value = 'http://mirror.freepbx.org/provisioner/' WHERE var_name = 'update_server'";

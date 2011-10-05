@@ -126,8 +126,8 @@ class endpointmanager {
         }
 
         $sql = 'SELECT value FROM `admin` WHERE `variable` LIKE CONVERT(_utf8 \'version\' USING latin1) COLLATE latin1_swedish_ci';
-        $this->global_cfg['amp_ver'] = $this->db->getOne($sql);
-        $this->tpl->assign("amp_ver", (float)$this->global_cfg['amp_ver']);
+        $this->global_cfg['amp_ver'] = (int)substr(preg_replace('/[^0-9]*/i', '', $this->db->getOne($sql)),0,3);
+        $this->tpl->assign("amp_ver", $this->global_cfg['amp_ver']);
 
     }
 
