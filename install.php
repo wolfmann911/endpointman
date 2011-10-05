@@ -861,9 +861,9 @@ if(!$new_install) {
         $db->query($sql);
     }
 
-    if($ver <= "2920") {
+    if ($ver <= "2920") {
         out("Adding new Network Time Protocol Setting");
-        $sql = "INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (NULL, 'ntp', '".$_SERVER["SERVER_ADDR"]."')";
+        $sql = "INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (NULL, 'ntp', '" . $_SERVER["SERVER_ADDR"] . "')";
         $db->query($sql);
         out("Upgrading all timezone data to new improved simplified system");
 
@@ -957,24 +957,30 @@ if(!$new_install) {
         $db->query($sql);
 
         out('Creating symlink to web provisioner');
-        if(!symlink(LOCAL_PATH."provisioning",$amp_conf['AMPWEBROOT']."/provisioning")) {
-            out("<strong>Your permissions are wrong on ".$amp_conf['AMPWEBROOT'].", web provisioning link not created!</strong>");
+        if (!symlink(LOCAL_PATH . "provisioning", $amp_conf['AMPWEBROOT'] . "/provisioning")) {
+            out("<strong>Your permissions are wrong on " . $amp_conf['AMPWEBROOT'] . ", web provisioning link not created!</strong>");
         }
 
         $sql = 'SELECT `value` FROM `endpointman_global_vars` WHERE `var_name` = CONVERT(_utf8 \'gmthr\' USING latin1) COLLATE latin1_swedish_ci';
         $old_tz_gmt = $db->getOne($sql);
 
-        $sql = "SELECT id FROM `endpointman_time_zones_new` WHERE `gmt` LIKE '".$old_tz_gmt."'";
+        $sql = "SELECT id FROM `endpointman_time_zones_new` WHERE `gmt` LIKE '" . $old_tz_gmt . "'";
         $new_tz_id = $db->getOne($sql);
 
-        $sql = "UPDATE endpointman_global_vars SET value = '".$new_tz_id.".0' WHERE var_name = 'tz'";
+        $sql = "UPDATE endpointman_global_vars SET value = '" . $new_tz_id . ".0' WHERE var_name = 'tz'";
         $db->query($sql);
 
         $sql = 'INSERT INTO `endpointman_global_vars` (`var_name`, `value`) VALUES (\'allow_hdfiles\', \'0\');';
         $db->query($sql);
 
-	$sql = 'ALTER TABLE `endpointman_mac_list` ADD `specific_settings` LONGBLOB NULL;';
-	$db->query($sql);
+        $sql = 'ALTER TABLE `endpointman_mac_list` ADD `specific_settings` LONGBLOB NULL;';
+        $db->query($sql);
+    }
+    
+    if ($ver <= "21002") {
+        out('Updating Mirror Location...again');
+        $sql = "UPDATE endpointman_global_vars SET value = 'http://mirror.freepbx.org/provisioner/v2.5/' WHERE var_name ='update_server'";
+        $db->query($sql);
     }
 
 }
@@ -1031,7 +1037,7 @@ if ($new_install) {
             (3, 'gmtoff', ''),
             (4, 'gmthr', ''),
             (5, 'config_location', '/tftpboot/'),
-            (6, 'update_server', 'http://mirror.freepbx.org/provisioner/'),
+            (6, 'update_server', 'http://mirror.freepbx.org/provisioner/v2.5/'),
             (7, 'version', '".$version."'),
             (8, 'enable_ari', '0'),
             (9, 'debug', '0'),
@@ -1220,10 +1226,10 @@ if ($new_install) {
 }
 
 out("Update Version Number to ".$version);
-$sql = "UPDATE endpointman_global_vars SET value = '".$full_vers."' WHERE var_name = 'version'";
+$sql = "UPDATE endpointman_global_vars SET value = '".$version."' WHERE var_name = 'version'";
 $db->query($sql);
 
-$sql = "UPDATE endpointman_global_vars SET value = 'http://mirror.freepbx.org/provisioner/' WHERE var_name = 'update_server'";
+$sql = "UPDATE endpointman_global_vars SET value = 'http://mirror.freepbx.org/provisioner/v2.5/' WHERE var_name = 'update_server'";
 $db->query($sql);
 
 $sql = 'SELECT value FROM `admin` WHERE `variable` LIKE CONVERT(_utf8 \'version\' USING latin1) COLLATE latin1_swedish_ci';

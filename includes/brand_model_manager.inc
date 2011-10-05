@@ -6,7 +6,6 @@
  * @license MPL / GPLv2 / LGPL
  * @package Provisioner
  */
-
 $check_for_updates = FALSE;
 global $type;
 
@@ -43,6 +42,7 @@ if((isset($_REQUEST['button_install'])) OR (isset($_REQUEST['button_update']))) 
 		$endpoint->remove_brand($_REQUEST['brand']);
 	}
 } elseif(isset($_REQUEST['button_check_for_updates'])) {
+    //die('hi');
 	$brand_up = $endpoint->update_check();
         $endpoint->tpl->assign("update_check", 1);
 
@@ -145,5 +145,6 @@ if(isset($error_message)) {
     $endpoint->display_message_box($message,$endpoint->tpl,0);
 }
 
-//draw the template	
+//draw the template
+//echo "test";	
 echo $endpoint->tpl->draw( 'brand_model_manager' );
