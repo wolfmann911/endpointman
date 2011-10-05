@@ -114,7 +114,6 @@ function generateHiddenFieldsForTree(treeId) {
 {/if}
 {if condition="isset($installer)"}
 <script>
-{if condition="$amp_ver <= 29"}
 function process_module_actions(actions) {
         if ($.browser.msie) {
             //This is so ugly & it doesn't even really work right, but if I don't do this then the modal box will display offscreen
@@ -152,39 +151,6 @@ function close_module_actions(goback) {
 	}
 }
 process_module_actions();
-{elseif condition="$amp_ver >= 210"}
-var box;
-function process_module_actions(actions) {
-    $(document).ready(function() {
-	urlStr = "config.php?display=epm_config&amp;quietmode=1&amp;handler=file&amp;file=installer.html.php&amp;module=endpointman&amp;type={$installer.type}&amp;id={$installer.id}";
-	urlStr += "&amp;rand="+Math.random ( );
-        for (var i in actions) {
-            urlStr += "&amp;moduleaction["+i+"]="+actions[i];
-        }
-        box = $('<div></div>')
-        .html('<iframe height="100%" frameBorder="0" src="'+urlStr+'"></iframe>')
-        .dialog({
-            title: 'Status - Please Wait',
-            resizable: false,
-            modal: true,
-            position: ['center', 50],
-            width: '400px',
-            height: 230,
-            close: function (e) {
-                close_module_actions(true);
-                $(e.target).dialog("destroy").remove();
-            }
-        });
-    });
-}
-function close_module_actions(goback) {
-        box.dialog("destroy").remove();
-        if (goback) {
-            location.href = 'config.php?display=epm_config';
-        }
-}
-process_module_actions();
-{/if}
 </script>
 <div id="moduleBox" style="display:none;"></div> 
 {/if}
