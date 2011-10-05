@@ -417,8 +417,6 @@ switch($_REQUEST['subpage']) {
         $endpoint->prepare_message_box();
         echo $endpoint->tpl->draw( 'advanced_settings_poce' );
         break;
-    case "timezone_manager":
-        break;
     case "settings":
     default:
         if(isset($_REQUEST['button_update_globals'])) {
@@ -479,6 +477,10 @@ switch($_REQUEST['subpage']) {
             } else {
                 $_POST['allow_hdfiles'] = 0;
             }
+            
+            $sql="UPDATE endpointman_global_vars SET value='" . $_POST['package_server'] . "' WHERE var_name='update_server'";
+            $endpoint->db->query($sql);
+            
             $sql="UPDATE endpointman_global_vars SET value='" . $_POST['allow_hdfiles'] . "' WHERE var_name='allow_hdfiles'";
             $endpoint->db->query($sql);
 
@@ -553,6 +555,10 @@ switch($_REQUEST['subpage']) {
         } else {
             $debug_selected = "";
         }
+        
+        
+        $endpoint->tpl->assign("package_server", $endpoint->global_cfg['update_server']);
+
         $endpoint->tpl->assign("help_selected", $help_selected);
         $endpoint->tpl->assign("dupext_selected", $dupext_selected);
 
