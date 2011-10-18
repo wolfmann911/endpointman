@@ -51,8 +51,7 @@ function endpointman_configpageinit($pagename) {
     $delete = isset($_REQUEST['epm_delete'])?$_REQUEST['epm_delete']:null;
     $tech = isset($_REQUEST['tech_hardware'])?$_REQUEST['tech_hardware']:null;
 
-
-    if((($display == "extensions") OR ($display == "devices")) && (isset($extdisplay) OR ($tech == "sip_generic"))) {
+    if((($display == "extensions") OR ($display == "devices")) && (isset($extdisplay) OR ($tech == "sip_generic"))) {    
         global $endpoint;
 
         $doc_root =	$amp_conf['AMPWEBROOT'] ."/admin/modules/endpointman/";
@@ -180,10 +179,9 @@ function endpointman_configpageload() {
     $action = isset($_REQUEST['action'])?$_REQUEST['action']:null;
     $extdisplay = isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:null;
     $tech = isset($_REQUEST['tech_hardware']) ? $_REQUEST['tech_hardware'] : null;
-
-    dbug($_REQUEST);
-    
-    if((isset($tech)) && ($tech == 'sip_generic')) {
+	$tech = isset($tech) ? $tech : $_REQUEST['tech'];
+	
+    if((isset($tech)) && (($tech == 'sip_generic') OR ($tech == 'sip'))) {
     // Don't display this stuff it it's on a 'This xtn has been deleted' page.
         if ($action != 'del') {
 
