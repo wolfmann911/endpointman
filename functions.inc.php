@@ -180,10 +180,9 @@ function endpointman_configpageload() {
     $action = isset($_REQUEST['action'])?$_REQUEST['action']:null;
     $extdisplay = isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:null;
     $tech = isset($_REQUEST['tech_hardware']) ? $_REQUEST['tech_hardware'] : null;
+    $tech = isset($tech) ? $tech : $_REQUEST['tech'];
 
-    dbug($_REQUEST);
-    
-    if((isset($tech)) && ($tech == 'sip_generic')) {
+    if((isset($tech)) && (($tech == 'sip_generic') OR ($tech == 'sip'))) {
     // Don't display this stuff it it's on a 'This xtn has been deleted' page.
         if ($action != 'del') {
 
