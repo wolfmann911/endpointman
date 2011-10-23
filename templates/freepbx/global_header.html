@@ -133,15 +133,30 @@
                     })
                 })
             })
+            
+            function toggleDisplayAll(mode) {
+                $(".toggle_all").each(function (i) {
+                    var rowClass = 'rowGroup'+$(this).attr('id');
+                    if(mode == 'expand') {
+                        $("#img2"+rowClass).attr("src", "assets/endpointman/images/collapse.png");
+                        $("#img3"+rowClass).attr("src", "assets/endpointman/images/collapse.png");
+                        $('.'+rowClass).show();
+                        $('#expander').html('<a onclick="toggleDisplayAll(\'collapse\')"><img src="assets/endpointman/images/collapse.png" id="toggle_all_img" title="Click to Collapse All Line Information">Collapse All</a>');
+                    } else {
+                        $("#img2"+rowClass).attr("src", "assets/endpointman/images/expand.png");
+                        $("#img3"+rowClass).attr("src", "assets/endpointman/images/expand.png");
+                        $('.'+rowClass).hide();
+                        $('#expander').html('<a onclick="toggleDisplayAll(\'expand\')"><img src="assets/endpointman/images/expand.png" id="toggle_all_img" title="Click to Expand All Line Information">Expand All</a>');
+                    }
+                });
+            }
 
-            function toggleDisplay(tbl, tblClass, rowClass) {
-                if($("#img"+rowClass).attr("src") == 'assets/endpointman/images/bullet_plus.png') {
-                    $("#img"+rowClass).attr("src", "assets/endpointman/images/bullet_minus.png");
+            function toggleDisplay(tbl, rowClass) {
+                if($("#img2"+rowClass).attr("src") == 'assets/endpointman/images/expand.png') {
                     $("#img2"+rowClass).attr("src", "assets/endpointman/images/collapse.png");
                     $("#img3"+rowClass).attr("src", "assets/endpointman/images/collapse.png");
                     $('.'+rowClass).show();
                 } else {
-                    $("#img"+rowClass).attr("src", "assets/endpointman/images/bullet_plus.png");
                     $("#img2"+rowClass).attr("src", "assets/endpointman/images/expand.png");
                     $("#img3"+rowClass).attr("src", "assets/endpointman/images/expand.png");
                     $('.'+rowClass).hide();
