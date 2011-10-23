@@ -27,7 +27,7 @@
                 *2.9.0.3RC6* Fixed Device + User Mode (http://www.freepbx.org/forum/freepbx/users/device-user-mode), #4792
                 *2.9.0.0* bumped for 2.9, removed errors in module.xml causing erors for online xml parsing
         </changelog>
-	<info>http://projects.colsolgrp.net/projects/show/endpointman</info>
+	<info>http://www.provisioner.net</info>
 	<location>2.10/endpointman-2.10.0.3.tgz</location>
 	<depends>
 		<version>2.10alpha1</version>
