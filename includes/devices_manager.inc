@@ -330,6 +330,20 @@ $devices_list =& $endpoint->endpoint_data->all_devices();;
 
 $i = 0;
 $list = array();
+
+$device_statuses = shell_exec($endpoint->global_cfg['asterisk_location']." -rx 'sip show peers'");
+
+$device_statuses = explode("\n", $device_statuses);
+$devices_status = array();
+foreach($device_statuses as $key => $data) {
+    preg_match('/(\d*)\/[\d]*/i', $data, $extout);
+    if(preg_match('/OK \(.*\)/i', $data)) {
+       $devices_status[$extout[1]] = TRUE; 
+    } else {
+        $devices_status[$extout[1]] = FALSE;
+    }
+}
+
 foreach($devices_list as $devices_row) {
     $line_list =& $endpoint->endpoint_data->get_lines_from_device($devices_row['id']);
     $list[$i] = $devices_row;
@@ -355,16 +369,9 @@ foreach($devices_list as $devices_row) {
         $list[$i]['line'][$z]['master_id'] = $i;
         $z++;
     }
-    $status = shell_exec($endpoint->global_cfg['asterisk_location']." -rx 'sip show peer ".$list[$i]['line'][0]['ext']."'");
-    preg_match('/Addr->IP(.*)/i', $status, $matches);
-    preg_match('/Status(.*)/i', $status, $matches2);
-
-    $ip_info = trim(str_replace(": ","",$matches[1]));
-    $ip_info = explode(":",$ip_info);
-
-    $status = trim(preg_replace('/\((.*)\)/i', '', str_replace(": ","",$matches2[1])));
-
-    $list[$i]['status']['status'] = $status;
+    $ext = $list[$i]['line'][0]['ext'];
+    
+    $list[$i]['status']['status'] = $devices_status[$ext];
     $list[$i]['status']['ip'] = ($ip_info[0] != "(null)") ? $ip_info[0] : '';
     $list[$i]['status']['port'] = ($ip_info[0] != "(null)") ? $ip_info[1] : '';
     $i++;
