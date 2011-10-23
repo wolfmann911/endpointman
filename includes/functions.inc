@@ -126,8 +126,8 @@ class endpointmanager {
         }
 
         $sql = 'SELECT value FROM `admin` WHERE `variable` LIKE CONVERT(_utf8 \'version\' USING latin1) COLLATE latin1_swedish_ci';
-        $this->global_cfg['amp_ver'] = $this->db->getOne($sql);
-        $this->tpl->assign("amp_ver", (float)$this->global_cfg['amp_ver']);
+        $this->global_cfg['amp_ver'] = (int)substr(preg_replace('/[^0-9]*/i', '', $this->db->getOne($sql)),0,3);
+        $this->tpl->assign("amp_ver", $this->global_cfg['amp_ver']);
 
     }
 
@@ -1314,7 +1314,7 @@ class endpointmanager {
 
                 //Timezone
                 require('timezone.php');
-                $endpoint->DateTimeZone = new DateTimeZone($settings['tz']);
+                $provisioner_lib->DateTimeZone = new DateTimeZone($settings['tz']);
 
                 //Network Time Server
                 $provisioner_lib->ntp = $settings['ntp'];
@@ -1405,7 +1405,7 @@ class endpointmanager {
                     $provisioner_lib->lines[$line['line']] = array('ext' => $line['ext'], 'secret' => $line['secret'], 'displayname' => $line['description']);
                 }
 
-		//testing this out
+				//testing this out
                 foreach ($line_ops as $key => $data) {
                     if (isset($line_ops[$key])) {
                         $provisioner_lib->lines[$key]['options'] = $line_ops[$key];
@@ -1704,11 +1704,13 @@ class endpointmanager {
             $destination_file = PHONE_MODULES_PATH.'/'.$directory.'/brand_data.xml';
         }
         $temp_file = PHONE_MODULES_PATH.'temp/'.$directory.'.xml';
-        @mkdir(dirname($temp_file));
+        file_exists(dirname($temp_file)) ? '' : mkdir(dirname($temp_file));
+                
         if($this->download_xml_file($location, $temp_file)) {
             $handle = fopen($temp_file, "rb");
             $contents = fread($handle, filesize($temp_file));
             fclose($handle);
+            
             @$a = simplexml_load_string($contents);
             if($a===FALSE) {
                 //Error with the internet....ABORRRTTTT THEEEEE DOWNLOAAAAADDDDDDDD! SCOTTYYYY!;
@@ -1731,24 +1733,22 @@ class endpointmanager {
      */
     function update_check() {
         $master_result = $this->download_xml(UPDATE_PATH . "master.xml");
-
-
+        
+        
         if(!$master_result) {
             $this->error['brand_update_check_master'] = "Not able to connect to repository. Using local master file instead.";
         }
-
+        
         $temp = $this->xml2array(PHONE_MODULES_PATH.'master.xml');
-
         $endpoint_package = $temp['data']['package'];
         $endpoint_last_mod = $temp['data']['last_modified'];
 
         $sql = "SELECT value FROM endpointman_global_vars WHERE var_name LIKE 'endpoint_vers'";
         $data = $this->db->getOne($sql);
+        
+        $contents = file_get_contents(UPDATE_PATH."/update_status");
 
-        $handle = fopen(UPDATE_PATH."/update_status", "rb");
-        $contents = stream_get_contents($handle);
-        fclose($handle);
-
+        
         if($contents != '1') {
             if(($data == "") OR ($data <= $endpoint_last_mod)) {
                 if((!$master_result) OR (!$this->download_file_no_progress_bar(UPDATE_PATH.'/'.$endpoint_package, PHONE_MODULES_PATH."temp/".$endpoint_package))) {
@@ -2302,105 +2302,70 @@ class endpointmanager {
         }
         return false;
     }
+    
+    function run_in_background($Command, $Priority = 0) {
+        if ($Priority)
+            $PID = shell_exec("nohup nice -n $Priority $Command 2> /dev/null & echo $!");
+        else
+            $PID = shell_exec("nohup $Command > /dev/null 2> /dev/null & echo $!");
+        return($PID);
+    }
 
-    /**
-     * cURL function to download files with a progress bar and echo output while downloading to the screen
-     * @global <type> $ch
-     * @global <type> $fout
-     * @global <type> $file_size
-     * @global <type> $downloaded
-     * @global <type> $pkg_interface
-     * @global <type> $progress_bar
-     * @param <type> $url_file
-     * @param <type> $destination_file
-     * @return <type>
-     */
+    function is_process_running($PID) {
+        exec("ps $PID", $ProcessState);
+        return(count($ProcessState) >= 2);
+    }
+
     function download_file_with_progress_bar($url_file, $destination_file) {
-        global $ch, $fout, $file_size, $downloaded, $pkg_interface, $progress_bar;
         set_time_limit(0);
-        $progress_bar = 1;
-        $file_size  = 1;
-        $downloaded = 1;
-        echo "&nbsp;";
-        /* open destination file */
-        $fout = fopen($destination_file, "wb");
+        $headers = get_headers($url_file, 1); 
+        $size = $headers['Content-Length']; 
 
-        /*
-		 *	Originally by Author: Keyvan Minoukadeh
-		 *	Modified by Scott Ullrich to return Content-Length size
-        */
+        if(preg_match('/200/', $headers[0])) {
+            $pid = $this->run_in_background("wget ". $url_file . " -O " . $destination_file);
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url_file);
-        curl_setopt($ch, CURLOPT_HEADERFUNCTION, 'endpointmanager_read_header');
-        curl_setopt($ch, CURLOPT_WRITEFUNCTION, 'endpointmanager_read_body');
-        curl_setopt($ch, CURLOPT_NOPROGRESS, '1');
-        curl_setopt($ch, CURLOPT_TIMEOUT, 120);
+            while($this->is_process_running($pid)) { 
 
-        curl_exec($ch);
-        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        if($fout)
-            fclose($fout);
-        curl_close($ch);
-        return ($http_code == 200) ? true : $http_code;
+                $out = 100 * round(filesize($destination_file) / $size,2);
+                echo '<script type="text/javascript">document.getElementById(\'DivExample\').innerHTML="%'.$out.'";</script>';
+
+                usleep('500');
+                endpointman_flush_buffers();
+
+                clearstatcache(); // make sure PHP actually checks dest. file size 
+            }
+            return true;
+        } else {
+            return false;
+        }
     }
 
     function download_file_no_progress_bar($url_file, $destination_file) {
-        global $ch, $fout, $file_size, $downloaded, $pkg_interface, $progress_bar;
-        set_time_limit(0);
-        $progress_bar = 0;
-        $file_size  = 1;
-        $downloaded = 1;
-        /* open destination file */
-        $fout = fopen($destination_file, "wb");
-
-        /*
-		 *	Originally by Author: Keyvan Minoukadeh
-		 *	Modified by Scott Ullrich to return Content-Length size
-        */
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url_file);
-        curl_setopt($ch, CURLOPT_HEADERFUNCTION, 'endpointmanager_read_header');
-        curl_setopt($ch, CURLOPT_WRITEFUNCTION, 'endpointmanager_read_body');
-        curl_setopt($ch, CURLOPT_NOPROGRESS, '1');
-        curl_setopt($ch, CURLOPT_TIMEOUT, 120);
-
-        curl_exec($ch);
-        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        if($fout)
-            fclose($fout);
-        curl_close($ch);
-        return ($http_code == 200) ? true : $http_code;
+        $contents = file_get_contents($url_file);
+        if(preg_match('/200/', $http_response_header[0])) {
+            file_put_contents($destination_file,$contents);
+            //check file placement
+            if(!file_exists($destination_file)) {
+                return false;
+            }
+            return true;
+        } else {
+            return false;
+        }
     }
 
     function download_xml_file($url_file, $destination_file) {
-        global $ch, $fout, $file_size, $downloaded, $pkg_interface, $progress_bar;
-        set_time_limit(0);
-        $progress_bar = 0;
-        $file_size  = 1;
-        $downloaded = 1;
-        /* open destination file */
-        $fout = fopen($destination_file, "wb");
-
-        /*
-		 *	Originally by Author: Keyvan Minoukadeh
-		 *	Modified by Scott Ullrich to return Content-Length size
-        */
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url_file);
-        curl_setopt($ch, CURLOPT_HEADERFUNCTION, 'endpointmanager_read_header');
-        curl_setopt($ch, CURLOPT_WRITEFUNCTION, 'endpointmanager_read_body');
-        curl_setopt($ch, CURLOPT_NOPROGRESS, '1');
-        curl_setopt($ch, CURLOPT_TIMEOUT, 20);
-
-        curl_exec($ch);
-        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        if($fout)
-            fclose($fout);
-        curl_close($ch);
-        return ($http_code == 200) ? true : $http_code;
+        $contents = file_get_contents($url_file);
+        if(preg_match('/200/', $http_response_header[0])) {
+            file_put_contents($destination_file,$contents);
+            //check file placement
+            if(!file_exists($destination_file)) {
+                return false;
+            }
+            return true;
+        } else {
+            return false;
+        }
     }
 
     //This function looks in common linux directories for system executable files. Like ARP & NMAP
@@ -2980,40 +2945,4 @@ function endpointman_flush_buffers(){
     //ob_flush();
     flush();
     ob_start();
-}
-
-function endpointman_update_progress_bar($out) {
-    echo '<script type="text/javascript">document.getElementById(\'DivExample\').innerHTML="%'.$out.'";</script>';
-}
-
-function endpointmanager_read_header($ch, $string) {
-    global $file_size, $fout;
-    $length = strlen($string);
-    $regs = "";
-    preg_match("/(Content-Length:) (.*)/i", $string, $regs);
-    if((isset($regs[2])) AND ($regs[2] <> "")) {
-        $file_size = intval($regs[2]);
-    }
-    //ob_flush();
-    endpointman_flush_buffers();
-    return $length;
-}
-
-function endpointmanager_read_body($ch, $string) {
-    global $fout, $file_size, $downloaded, $lastseen, $progress_bar;
-    $length = strlen($string);
-    $downloaded += intval($length);
-    $downloadProgress = round(100 * (1 - $downloaded / $file_size), 0);
-    $downloadProgress = 100 - $downloadProgress;
-    if($lastseen <> $downloadProgress and $downloadProgress < 101) {
-        if($progress_bar) {
-            endpointman_update_progress_bar($downloadProgress);
-        }
-        $lastseen = $downloadProgress;
-    }
-    if($fout)
-        fwrite($fout, $string);
-    //ob_flush();
-    endpointman_flush_buffers();
-    return $length;
 }
