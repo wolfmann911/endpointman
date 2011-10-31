@@ -33,7 +33,7 @@ class endpointmanager {
 
         //$this->db = $this->eda->db;
 
-        $this->global_cfg['tz'] = !empty($this->global_cfg['tz']) ? $this->global_cfg['tz'] : 'Americas/Los_Angeles';
+        $this->global_cfg['tz'] = !empty($this->global_cfg['tz']) ? $this->global_cfg['tz'] : 'America/Los_Angeles';
         date_default_timezone_set($this->global_cfg['tz']);
 
         //Generate empty array
