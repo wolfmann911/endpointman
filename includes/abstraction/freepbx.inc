@@ -34,6 +34,8 @@ class epm_data_abstraction {
     }
     
     function sql_error($results) {
+        echo "<pre>";
+        var_dump(debug_backtrace());
         die($results->getDebugInfo() . "SQL - <br /> $sql");
     }
     

@@ -116,9 +116,13 @@ class endpointmanager {
         }
         
         $sql = 'SELECT value FROM `admin` WHERE `variable` LIKE CONVERT(_utf8 \'version\' USING latin1) COLLATE latin1_swedish_ci';
-        $this->global_cfg['amp_ver'] = (int)substr(preg_replace('/[^0-9]*/i', '', $this->eda->sql($sql,'getone')),0,3);
+        
+        preg_match('/^(\d*)\.(\d*)/', $this->eda->sql($sql, 'getone'), $versions);
 
-        $suffix = $this->global_cfg['amp_ver'] < '210' ? '29' : '';
+        $this->global_cfg['amp_ver']['major'] = $versions[1];
+        $this->global_cfg['amp_ver']['minor'] = $versions[2];
+
+        $suffix = $this->global_cfg['amp_ver']['minor'] < '10' ? '29' : '';
         $this->tpl = new RainTPL( LOCAL_PATH.'templates/freepbx'.$suffix, LOCAL_PATH.'templates/freepbx/compiled', '/admin/modules/endpointman/templates/images' );
 
 
@@ -127,7 +131,7 @@ class endpointmanager {
         }
 
 
-        $this->tpl->assign("amp_ver", $this->global_cfg['amp_ver']);
+        $this->tpl->assign("amp_ver", $this->global_cfg['amp_ver']['minor']);
 
     }
 
@@ -1794,7 +1798,7 @@ class endpointmanager {
                         $temp['oui_list']['oui'] = $this->fix_single_array_keys($temp['oui_list']['oui']);
 
                         foreach($temp['oui_list']['oui'] as $oui) {
-                            $sql = "INSERT INTO endpointman_oui_list (`oui`, `brand`, `custom`) VALUES ('".$oui."', '".$temp['brand_id']."', '0')";
+                            $sql = "REPLACE INTO endpointman_oui_list (`oui`, `brand`, `custom`) VALUES ('".$oui."', '".$temp['brand_id']."', '0')";
                             $this->eda->sql($sql);
 
                         }
@@ -1951,7 +1955,7 @@ class endpointmanager {
                 }
                 $brand_version = max($last_mod, $brand_last_mod);
 
-                $b_data = $this->eda->sql("SELECT id FROM endpointman_brand_list WHERE id='".$brand_id."'", 'getOne', DB_FETCHMODE_ASSOC);
+                $b_data = $this->eda->sql("SELECT id FROM endpointman_brand_list WHERE id = '".$brand_id."'", 'getOne');
                 if($b_data) {
                     echo "Updating data..........";
                     $sql = "UPDATE endpointman_brand_list SET local = '".$local."', name = '".$brand_name."', cfg_ver = '".$brand_version."', installed = 1, hidden = 0 WHERE id = ".$brand_id;
@@ -1970,14 +1974,14 @@ class endpointmanager {
                     $last_mod = max($last_mod, $family_list['last_modified']);
 
                     $family_line_xml = $this->xml2array(PHONE_MODULES_PATH.'/endpoint/'.$directory.'/'.$family_list['directory'].'/family_data.xml');
-                    
+                                        
                     $require_firmware = NULL;
                     if((key_exists('require_firmware', $family_line_xml['data'])) && ($remote) && ($family_line_xml['data']['require_firmware'] == "TRUE")) {
                         echo "Firmware Requirment Detected!..........<br/>";
                         $this->install_firmware($family_line_xml['data']['id']);
                     }
 
-                    $data = $this->eda->sql("SELECT id FROM endpointman_product_list WHERE id='".$brand_id.$family_line_xml['data']['id']."'", 'getOne', DB_FETCHMODE_ASSOC);
+                    $data = $this->eda->sql("SELECT id FROM endpointman_product_list WHERE id='".$brand_id.$family_line_xml['data']['id']."'", 'getOne');
                     $short_name = preg_replace("/\[(.*?)\]/si", "", $family_line_xml['data']['name']);
                     if($data) {
                         $sql = "UPDATE endpointman_product_list SET short_name = '".$short_name."', long_name = '".$family_line_xml['data']['name']."', cfg_ver = '".$family_line_xml['data']['version']."', config_files='".$family_line_xml['data']['configuration_files']."' WHERE id = '".$brand_id.$family_line_xml['data']['id']."'";
@@ -1998,7 +2002,7 @@ class endpointmanager {
                         $model_final_id = $brand_id.$family_line_xml['data']['id'].$model_list['id'];
                         $sql = 'SELECT id, global_custom_cfg_data, global_user_cfg_data FROM endpointman_mac_list WHERE model = '.$model_final_id;
                         $old_data = NULL;
-                        $old_data = $this->eda->sql($sql, array(), DB_FETCHMODE_ASSOC);
+                        $old_data = $this->eda->sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
                         foreach($old_data as $data) {
                             $global_custom_cfg_data = unserialize($data['global_custom_cfg_data']);
                             if((is_array($global_custom_cfg_data)) AND (!array_key_exists('data', $global_custom_cfg_data))) {
@@ -2091,7 +2095,7 @@ class endpointmanager {
                             }
                         }
 
-                        $m_data = $this->eda->sql("SELECT id FROM endpointman_model_list WHERE id='".$brand_id.$family_line_xml['data']['id'].$model_list['id']."'", 'getone', DB_FETCHMODE_ASSOC);
+                        $m_data = $this->eda->sql("SELECT id FROM endpointman_model_list WHERE id='".$brand_id.$family_line_xml['data']['id'].$model_list['id']."'", 'getone');
                         if($m_data) {
                             $sql = "UPDATE endpointman_model_list SET max_lines = '".$model_list['lines']."', model = '".$model_list['model']."', template_list = '".$template_list."' WHERE id = '".$brand_id.$family_line_xml['data']['id'].$model_list['id']."'";
                         } else {
@@ -2099,6 +2103,7 @@ class endpointmanager {
                         }
                         $this->eda->sql($sql);
 
+                        
                         if(!$this->sync_model($brand_id.$family_line_xml['data']['id'].$model_list['id'])) {
                             echo "System Error in Sync Model Function, Load Failure!<br />";
                         }
@@ -2107,7 +2112,7 @@ class endpointmanager {
                 }
 
                 foreach($temp['data']['brands']['oui_list']['oui'] as $oui) {
-                    $sql = "INSERT INTO endpointman_oui_list (`oui`, `brand`, `custom`) VALUES ('".$oui."', '".$brand_id."', '0')";
+                    $sql = "REPLACE INTO endpointman_oui_list (`oui`, `brand`, `custom`) VALUES ('".$oui."', '".$brand_id."', '0')";
                     $this->eda->sql($sql);
                 }
 
@@ -2163,38 +2168,38 @@ class endpointmanager {
      * @return boolean True on sync completed. False on sync failed
      */
     function sync_model($model) {
-        if((!empty($model)) OR ($model > 0)) {
-            $sql = "SELECT * FROM  endpointman_model_list WHERE id='".$model."'";
+        if ((!empty($model)) OR ($model > 0)) {
+            $sql = "SELECT * FROM  endpointman_model_list WHERE id='" . $model . "'";
 
-            $model_row = $this->eda->sql($sql, 'getrow',DB_FETCHMODE_ASSOC);
+            $model_row = $this->eda->sql($sql, 'getrow', DB_FETCHMODE_ASSOC);
 
-            $sql = "SELECT * FROM  endpointman_product_list WHERE id='".$model_row['product_id']."'";
+            $sql = "SELECT * FROM  endpointman_product_list WHERE id='" . $model_row['product_id'] . "'";
 
-            $product_row = $this->eda->sql($sql, 'getRow',DB_FETCHMODE_ASSOC);
+            $product_row = $this->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
 
-            $sql = "SELECT * FROM  endpointman_brand_list WHERE id=".$model_row['brand'];
+            $sql = "SELECT * FROM  endpointman_brand_list WHERE id=" . $model_row['brand'];
 
-            $brand_row = $this->eda->sql($sql, 'getRow',DB_FETCHMODE_ASSOC);
+            $brand_row = $this->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
 
-			if(!file_exists(PHONE_MODULES_PATH.'/endpoint/'.$brand_row['directory'])) {
-				$this->error['sync_model'] = "Brand Directory '".$brand_row['directory']."' Doesn't Exist! (".PHONE_MODULES_PATH.'/endpoint/'.$brand_row['directory'].")";
+            if (!file_exists(PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'])) {
+                $this->error['sync_model'] = "Brand Directory '" . $brand_row['directory'] . "' Doesn't Exist! (" . PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . ")";
                 return(FALSE);
-			}
+            }
 
-			if(!file_exists(PHONE_MODULES_PATH.'/endpoint/'.$brand_row['directory'].'/'.$product_row['cfg_dir'])) {
-				$this->error['sync_model'] = "Product Directory '".$product_row['cfg_dir']."' Doesn't Exist! (".PHONE_MODULES_PATH.'/endpoint/'.$brand_row['directory'].'/'.$product_row['cfg_dir'].")";
+            if (!file_exists(PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'])) {
+                $this->error['sync_model'] = "Product Directory '" . $product_row['cfg_dir'] . "' Doesn't Exist! (" . PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'] . ")";
                 return(FALSE);
-			}
+            }
 
-			if(!file_exists(PHONE_MODULES_PATH.'/endpoint/'.$brand_row['directory'].'/'.$product_row['cfg_dir'].'/family_data.xml')) {
-				$this->error['sync_model'] = "File 'family_data.xml Doesn't exist in directory: ".PHONE_MODULES_PATH.'/endpoint/'.$brand_row['directory'].'/'.$product_row['cfg_dir'];
+            if (!file_exists(PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'] . '/family_data.xml')) {
+                $this->error['sync_model'] = "File 'family_data.xml Doesn't exist in directory: " . PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'];
                 return(FALSE);
-			}
-						
-            $family_line_xml = $this->xml2array(PHONE_MODULES_PATH.'/endpoint/'.$brand_row['directory'].'/'.$product_row['cfg_dir'].'/family_data.xml');
+            }
 
-            if($product_row['cfg_ver'] <= $family_line_xml['data']['version']) {
-                if(array_key_exists('template_data', $family_line_xml['data']['model_list'])) {
+            $family_line_xml = $this->xml2array(PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'] . '/family_data.xml');
+
+            if ($product_row['cfg_ver'] <= $family_line_xml['data']['version']) {
+                if (array_key_exists('template_data', $family_line_xml['data']['model_list'])) {
                     if (is_array($family_line_xml['data']['model_list']['template_data']['files'])) {
                         $template_list = implode(",", $family_line_xml['data']['model_list']['template_data']['files']);
                         $template_list_array = $family_line_xml['data']['model_list']['template_data']['files'];
@@ -2205,12 +2210,12 @@ class endpointmanager {
                     $maxlines = $family_line_xml['data']['model_list']['lines'];
                 } else {
                     $key = $this->arraysearchrecursive($model_row['model'], $family_line_xml['data']['model_list'], 'model');
-                    if($key === FALSE) {
+                    if ($key === FALSE) {
                         $this->error['sync_model'] = "Can't locate model in family XML file";
                         return(FALSE);
                     } else {
-                        if(is_array($family_line_xml['data']['model_list'][$key[0]]['template_data']['files'])) {
-                            $template_list = implode(",",$family_line_xml['data']['model_list'][$key[0]]['template_data']['files']);
+                        if (is_array($family_line_xml['data']['model_list'][$key[0]]['template_data']['files'])) {
+                            $template_list = implode(",", $family_line_xml['data']['model_list'][$key[0]]['template_data']['files']);
                             $template_list_array = $family_line_xml['data']['model_list'][$key[0]]['template_data']['files'];
                         } else {
                             $template_list = $family_line_xml['data']['model_list'][$key[0]]['template_data']['files'];
@@ -2220,7 +2225,7 @@ class endpointmanager {
                     $maxlines = $family_line_xml['data']['model_list'][$key[0]]['lines'];
                 }
 
-                $sql = "UPDATE endpointman_model_list SET max_lines = '".$maxlines."', template_list = '".$template_list."' WHERE id = '".$model."'";
+                $sql = "UPDATE endpointman_model_list SET max_lines = '" . $maxlines . "', template_list = '" . $template_list . "' WHERE id = '" . $model . "'";
                 $this->eda->sql($sql);
 
                 $version = $family_line_xml['data']['version'];
@@ -2228,40 +2233,40 @@ class endpointmanager {
                 $short_name = preg_replace("/\[(.*?)\]/si", "", $family_line_xml['data']['name']);
                 $configuration_files = $family_line_xml['data']['configuration_files'];
 
-                $sql = "UPDATE endpointman_product_list SET long_name = '".$template_list."', short_name = '".$short_name."' , cfg_ver = '".$version."' WHERE id = '".$product_row['id']."'";   
+                $sql = "UPDATE endpointman_product_list SET long_name = '" . $long_name . "', short_name = '" . $short_name . "' , cfg_ver = '" . $version . "' WHERE id = '" . $product_row['id'] . "'";
                 $this->eda->sql($sql);
 
                 $template_data_array = array();
-                foreach($template_list_array as $data) {
-                    if(file_exists(PHONE_MODULES_PATH.'/endpoint/'.$brand_row['directory'].'/'.$product_row['cfg_dir'].'/'.$data)) {
-                        $template_data_xml = $this->xml2array(PHONE_MODULES_PATH.'/endpoint/'.$brand_row['directory'].'/'.$product_row['cfg_dir'].'/'.$data);
+                foreach ($template_list_array as $data) {
+                    if (file_exists(PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'] . '/' . $data)) {
+                        $template_data_xml = $this->xml2array(PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'] . '/' . $data);
                         $template_data_xml = $this->fix_single_array_keys($template_data_xml['template_data']);
                         $template_data_array = array_merge($template_data_array, $template_data_xml);
                     }
                 }
 
-                if (file_exists(PHONE_MODULES_PATH.'/endpoint/'.$brand_row['directory'].'/'.$product_row['cfg_dir'].'/template_data_custom.xml')) {
-                    $template_data_multi = $this->xml2array(PHONE_MODULES_PATH.'/endpoint/'.$brand_row['directory'].'/'.$product_row['cfg_dir'].'/template_data_custom.xml');
-                    if($template_data_multi) {
+                if (file_exists(PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'] . '/template_data_custom.xml')) {
+                    $template_data_multi = $this->xml2array(PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'] . '/template_data_custom.xml');
+                    if ($template_data_multi) {
                         $template_data_multi = $this->fix_single_array_keys($template_data_multi['template_data']['item']);
                         $template_data_array = array_merge($template_data_array, $template_data_multi);
                     }
                 }
 
-                if (file_exists(PHONE_MODULES_PATH.'/endpoint/'.$brand_row['directory'].'/'.$product_row['cfg_dir'].'/template_data_' . $model_row['model'] . '_custom.xml')) {
+                if (file_exists(PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'] . '/template_data_' . $model_row['model'] . '_custom.xml')) {
                     $template_data_multi = $this->xml2array(self::$modules_path . $this->brand_name . "/" . $this->family_line . "/template_data_" . $this->model . "_custom.xml");
-                    if($template_data_multi) {
+                    if ($template_data_multi) {
                         $template_data_multi = $this->fix_single_array_keys($template_data_multi['template_data']['item']);
                         $template_data_array = array_merge($template_data_array, $template_data_multi);
                     }
                 }
 
-                if(empty($template_data_array)) {
+                if (empty($template_data_array)) {
                     $this->error['sync_model'] = "No Template Data Found";
                     return(FALSE);
                 }
 
-                $sql = "UPDATE endpointman_model_list SET template_data = '".serialize($template_data_array)."' WHERE id = '".$model."'";
+                $sql = "UPDATE endpointman_model_list SET template_data = '" . serialize($template_data_array) . "' WHERE id = '" . $model . "'";
                 $this->eda->sql($sql);
             }
 
