@@ -34,7 +34,7 @@ if($_REQUEST['type'] == "brand") {
     switch($_REQUEST['install_type']) {
         case "export_brand":
             $sql = 'SELECT `name`, `directory` FROM `endpointman_brand_list` WHERE `id` = '.$_REQUEST['package'].'';
-            $row = $endpoint->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
+            $row = $endpoint->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
             echo "Exporting ". $row['name']."<br/>";
             if(!file_exists(PHONE_MODULES_PATH."/temp/export/")) {
                 mkdir(PHONE_MODULES_PATH."/temp/export/");
@@ -77,7 +77,7 @@ if($_REQUEST['type'] == "brand") {
 
                 echo "Updating Last Modified <br />";
                 $sql = "UPDATE endpointman_global_vars SET value = '".$endpoint_last_mod."' WHERE var_name = 'endpoint_vers'";
-                $endpoint->db->query($sql);
+                $endpoint->eda->sql($sql);
             }
             break;
         case "upload_brand":

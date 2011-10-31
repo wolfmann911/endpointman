@@ -16,7 +16,7 @@ if($_REQUEST['pop_type'] == 'edit_specifics') {
 	    $final['displayname_'.$line] = $_REQUEST['displayname_'.$line];
 	}
 	$sql = "UPDATE endpointman_mac_list SET specific_settings = '".serialize($final)."' WHERE id =". $_REQUEST['edit_id'];
-	$endpoint->db->query($sql);
+	$endpoint->eda->sql($sql);
     }
 
     $info = $endpoint->get_phone_info($_REQUEST['edit_id']);
@@ -47,7 +47,7 @@ if($_REQUEST['pop_type'] == 'edit_template') {
     } else {
         $template_editor = TRUE;
         $sql = "UPDATE  endpointman_mac_list SET  model =  '".$_REQUEST['model_list']."' WHERE  id =".$_REQUEST['edit_id'];
-        $endpoint->db->query($sql);
+        $endpoint->eda->sql($sql);
         $endpoint->tpl->assign("silent_mode", 1);
 
         if ($_REQUEST['template_list'] == 0) {
@@ -94,11 +94,11 @@ if($_REQUEST['pop_type'] == 'global_over') {
         if($_REQUEST['custom'] == 0) {
             //This is a group template
             $sql = "UPDATE endpointman_template_list SET global_settings_override = '".addslashes($settings_ser)."' WHERE id = ".$_REQUEST['tid'];
-            $endpoint->db->query($sql);
+            $endpoint->eda->sql($sql);
         } else {
             //This is an individual template
             $sql = "UPDATE endpointman_mac_list SET global_settings_override = '".addslashes($settings_ser)."' WHERE id = ".$_REQUEST['tid'];
-            $endpoint->db->query($sql);
+            $endpoint->eda->sql($sql);
         }
 
         $endpoint->message['advanced_settings'] = "Updated!";
@@ -107,22 +107,22 @@ if($_REQUEST['pop_type'] == 'global_over') {
         if($_REQUEST['custom'] == 0) {
             //This is a group template
             $sql = "UPDATE endpointman_template_list SET global_settings_override = NULL WHERE id = ".$_REQUEST['tid'];
-            $endpoint->db->query($sql);
+            $endpoint->eda->sql($sql);
         } else {
             //This is an individual template
             $sql = "UPDATE endpointman_mac_list SET global_settings_override = NULL WHERE id = ".$_REQUEST['tid'];
-            $endpoint->db->query($sql);
+            $endpoint->eda->sql($sql);
         }
         $endpoint->message['advanced_settings'] = "Globals Reset to Default!";
     }
     if($_REQUEST['custom'] == 0) {
         //This is a group template
         $sql = 'SELECT global_settings_override FROM endpointman_template_list WHERE id = '.$_REQUEST['tid'];
-        $settings = $endpoint->db->getOne($sql);
+        $settings = $endpoint->eda->sql($sql,'getOne');
     } else {
         //This is an individual template
         $sql = 'SELECT global_settings_override FROM endpointman_mac_list WHERE id = '.$_REQUEST['tid'];
-        $settings = $endpoint->db->getOne($sql);
+        $settings = $endpoint->eda->sql($sql,'getOne');
     }
     if(isset($settings)) {
         $settings = unserialize($settings);
@@ -134,7 +134,7 @@ if($_REQUEST['pop_type'] == 'global_over') {
         $settings['tz'] = $endpoint->listTZ($endpoint->global_cfg['tz']);
     }
     //Because we are working with global variables we probably updated them, so lets refresh those variables
-    $endpoint->global_cfg =& $endpoint->db->getAssoc("SELECT var_name, value FROM endpointman_global_vars");
+    $endpoint->global_cfg =& $endpoint->eda->sql("SELECT var_name, value FROM endpointman_global_vars",'getAssoc');
 
     $endpoint->tpl->assign("ip", $_SERVER["SERVER_ADDR"]);
     $endpoint->tpl->assign("srvip", $settings['srvip']);
@@ -157,11 +157,11 @@ if($_REQUEST['pop_type'] == "alt_cfg_edit") {
             //SQL Config Files
             if(isset($_REQUEST['button_save'])) {
                 $sql = "UPDATE endpointman_custom_configs SET data = '".addslashes($_REQUEST['config_text'])."' WHERE id = ".$res[0];
-                $endpoint->db->query($sql);
+                $endpoint->eda->sql($sql);
                 $message = "Saved to Database!";
             }
             $sql = 'SELECT * FROM endpointman_custom_configs WHERE id =' . $res[0];
-            $row =& $endpoint->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
+            $row =& $endpoint->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
             $endpoint->tpl->assign("save_as_name_value", $row['name']);
             $endpoint->tpl->assign("filename", $row['original_name']);
             $row['data'] = $endpoint->display_htmlspecialchars($row['data']);
@@ -172,7 +172,7 @@ if($_REQUEST['pop_type'] == "alt_cfg_edit") {
         } else {
             //HD Config Files
             $sql = "SELECT endpointman_brand_list.directory, endpointman_product_list.cfg_dir FROM endpointman_brand_list, endpointman_product_list WHERE endpointman_brand_list.id = endpointman_product_list.brand AND endpointman_product_list.id = (SELECT product_id FROM endpointman_template_list WHERE id = ".$_REQUEST['tid'].")";
-            $row =& $endpoint->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
+            $row =& $endpoint->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
             $file=PHONE_MODULES_PATH.'endpoint/'.$row['directory']."/".$row['cfg_dir']."/".$res[1];
 
             if((isset($_REQUEST['button_save'])) && ($endpoint->global_cfg['allow_hdfiles'])) {
@@ -186,15 +186,15 @@ if($_REQUEST['pop_type'] == "alt_cfg_edit") {
             } elseif((isset($_REQUEST['button_save'])) && (!$endpoint->global_cfg['allow_hdfiles'])) {
                 $time = time();
                 $sql = 'SELECT endpointman_template_list.name, endpointman_template_list.config_files_override, endpointman_template_list.product_id FROM endpointman_template_list WHERE endpointman_template_list.id = '.$_REQUEST['tid'];
-                $row = $endpoint->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
+                $row = $endpoint->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
                 $config_fs = unserialize($row['config_files_override']);
 
                 $sql = 'INSERT INTO endpointman_custom_configs (name, original_name, product_id, data) VALUES ("'.$row['name'].'_'.$time.'","'.addslashes($res[1]).'","'.$row['product_id'].'","'.addslashes($_REQUEST['config_text']).'")';
-                $endpoint->db->query($sql);
+                $endpoint->eda->sql($sql);
                 $message = "Saved to Database!";
-                $new_id =& $endpoint->db->getOne('SELECT last_insert_id()');
+                $new_id =& $endpoint->eda->sql('SELECT last_insert_id()','getOne');
                 $sql = 'SELECT * FROM endpointman_custom_configs WHERE id =' . $new_id;
-                $row =& $endpoint->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
+                $row =& $endpoint->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
 
                 $contents = $row['data'];
 
@@ -209,7 +209,7 @@ if($_REQUEST['pop_type'] == "alt_cfg_edit") {
                 $config_fs[$row['original_name']] = $new_id;
                 $config_files = serialize($config_fs);
                 $sql = "UPDATE endpointman_template_list SET config_files_override = '".$config_files."' WHERE id = ".$_REQUEST['tid'];
-                $endpoint->db->query($sql);
+                $endpoint->eda->sql($sql);
             } else {
                 $handle = fopen($file, "rb");
                 $contents = fread($handle, filesize($file));
@@ -228,11 +228,11 @@ if($_REQUEST['pop_type'] == "alt_cfg_edit") {
         if($res[0] != 0) {
             if(isset($_REQUEST['button_save'])) {
                 $sql = "UPDATE endpointman_custom_configs SET data = '".addslashes($_REQUEST['config_text'])."' WHERE id = ".$res[0];
-                $endpoint->db->query($sql);
+                $endpoint->eda->sql($sql);
                 $message = "Saved to Database!";
             }
             $sql = 'SELECT * FROM endpointman_custom_configs WHERE id =' . $res[0];
-            $row =& $endpoint->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
+            $row =& $endpoint->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
             $file = "SQL/".$row['original_name'];
             $endpoint->tpl->assign("file", basename($file));
             $endpoint->tpl->assign("save_as_name_value", $row['name']);
@@ -243,8 +243,7 @@ if($_REQUEST['pop_type'] == "alt_cfg_edit") {
             $endpoint->tpl->assign("value", $value);
         } else {
             $sql = "SELECT endpointman_brand_list.directory, endpointman_product_list.cfg_dir FROM endpointman_brand_list, endpointman_product_list WHERE endpointman_brand_list.id = endpointman_product_list.brand AND endpointman_product_list.id = (SELECT endpointman_model_list.product_id FROM endpointman_model_list, endpointman_mac_list WHERE endpointman_mac_list.model = endpointman_model_list.id AND endpointman_mac_list.id = ".$_REQUEST['tid'].")";
-            $row =& $endpoint->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
-            //$res[1] = escapeshellcmd($res[1]);
+            $row =& $endpoint->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
             $file=PHONE_MODULES_PATH.'endpoint/'.$row['directory']."/".$row['cfg_dir']."/".$res[1];
 
             if((isset($_REQUEST['button_save'])) && ($endpoint->global_cfg['allow_hdfiles'])) {
@@ -258,15 +257,15 @@ if($_REQUEST['pop_type'] == "alt_cfg_edit") {
             } elseif((isset($_REQUEST['button_save'])) && (!$endpoint->global_cfg['allow_hdfiles'])) {
                 $time = time();
                 $sql = 'SELECT endpointman_mac_list.mac, endpointman_mac_list.config_files_override, endpointman_model_list.product_id FROM endpointman_mac_list, endpointman_model_list WHERE endpointman_mac_list.model = endpointman_model_list.id AND endpointman_mac_list.id = '.$_REQUEST['tid'];
-                $row = $endpoint->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
+                $row = $endpoint->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
                 $config_fs = unserialize($row['config_files_override']);
 
                 $sql = 'INSERT INTO endpointman_custom_configs (name, original_name, product_id, data) VALUES ("'.$row['mac'].'_'.$time.'","'.addslashes($res[1]).'","'.$row['product_id'].'","'.addslashes($_REQUEST['config_text']).'")';
-                $endpoint->db->query($sql);
+                $endpoint->eda->sql($sql);
                 $message = "Saved to Database!";
-                $new_id =& $endpoint->db->getOne('SELECT last_insert_id()');
+                $new_id =& $endpoint->eda->sql('SELECT last_insert_id()');
                 $sql = 'SELECT * FROM endpointman_custom_configs WHERE id =' . $new_id;
-                $row =& $endpoint->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
+                $row =& $endpoint->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
                 
                 $contents = $row['data'];
 
@@ -281,7 +280,7 @@ if($_REQUEST['pop_type'] == "alt_cfg_edit") {
                 $config_fs[$row['original_name']] = $new_id;
                 $config_files = serialize($config_fs);
                 $sql = "UPDATE endpointman_mac_list SET config_files_override = '".$config_files."' WHERE id = ".$_REQUEST['tid'];
-                $endpoint->db->query($sql);
+                $endpoint->eda->sql($sql);
             } else {
                 $handle = fopen($file, "rb");
                 $contents = fread($handle, filesize($file));
@@ -301,7 +300,7 @@ if($_REQUEST['pop_type'] == "alt_cfg_edit") {
 
     if(isset($_REQUEST['cfg_file'])) {
         $sql = "SELECT cfg_dir,directory,config_files FROM endpointman_product_list,endpointman_brand_list WHERE endpointman_product_list.brand = endpointman_brand_list.id AND endpointman_product_list.id = '". $_REQUEST['product_select'] ."'";
-        $row =& $endpoint->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
+        $row =& $endpoint->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
 
         $config_files = explode(",",$row['config_files']);
         $file=PHONE_MODULES_PATH.'endpoint/'.$row['directory']."/".$row['cfg_dir']."/".$config_files[$_REQUEST['cfg_file']];
@@ -313,7 +312,7 @@ if($_REQUEST['pop_type'] == "alt_cfg_edit") {
                 $message = "Saved to Hard Drive!";
             }elseif(isset($_REQUEST['button_save_as'])) {
                 $sql = 'INSERT INTO endpointman_custom_configs (name, original_name, product_id, data) VALUES ("'.addslashes($_REQUEST['save_as_name']).'","'.addslashes($config_files[$_REQUEST['cfg_file']]).'","'.$_REQUEST['product_select'].'","'.addslashes($_REQUEST['config_text']).'")';
-                $endpoint->db->query($sql);
+                $endpoint->eda->sql($sql);
                 $message = "Saved to Database!";
             }
         }
@@ -338,25 +337,25 @@ if($_REQUEST['pop_type'] == "alt_cfg_edit") {
         if(isset($_REQUEST['config_text'])) {
             if(isset($_REQUEST['button_save'])) {
                 $sql = "UPDATE endpointman_custom_configs SET data = '".addslashes($_REQUEST['config_text'])."' WHERE id = ".$_REQUEST['sql'];
-                $endpoint->db->query($sql);
+                $endpoint->eda->sql($sql);
                 $message = "Saved to Database!";
             }elseif(isset($_REQUEST['button_save_as'])) {
                 $sql = 'SELECT original_name FROM endpointman_custom_configs WHERE id = '.$_REQUEST['sql'];
-                $file_name = $endpoint->db->getOne($sql);
+                $file_name = $endpoint->eda->sql($sql,'getOne');
 
                 $sql = "INSERT INTO endpointman_custom_configs (name, original_name, product_id, data) VALUES ('".addslashes($_REQUEST['save_as_name'])."','".addslashes($file_name)."','".$_REQUEST['product_select']."','".addslashes($_REQUEST['config_text'])."')";
-                $endpoint->db->query($sql);
+                $endpoint->eda->sql($sql);
                 $message = "Saved to Database!";
             }
         }
         if(isset($_REQUEST['sendid'])) {
             $sql = "SELECT cfg_dir,directory,config_files FROM endpointman_product_list,endpointman_brand_list WHERE endpointman_product_list.brand = endpointman_brand_list.id AND endpointman_product_list.id = '". $_REQUEST['product_select'] ."'";
-            $row22 =& $endpoint->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
+            $row22 =& $endpoint->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
             $endpoint->submit_config($row22['directory'],$row22['cfg_dir'],$config_files[$_REQUEST['cfg_file']],$contents);
             $message = 'Sent! Thanks! :-)';
         }
         $sql = 'SELECT * FROM endpointman_custom_configs WHERE id =' . $_REQUEST['sql'];
-        $row =& $endpoint->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
+        $row =& $endpoint->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
         $endpoint->tpl->assign("save_as_name_value", $row['name']);
         $endpoint->tpl->assign("filename", $row['original_name']);
         $endpoint->tpl->assign('sendid', $_REQUEST['sql']);
@@ -366,7 +365,7 @@ if($_REQUEST['pop_type'] == "alt_cfg_edit") {
     if(isset($_REQUEST['product_select'])) {
         $sql = "SELECT cfg_dir,directory,config_files FROM endpointman_product_list,endpointman_brand_list WHERE endpointman_product_list.brand = endpointman_brand_list.id AND endpointman_product_list.id ='" . $_REQUEST['product_select'] . "'";
 
-        $row =& $endpoint->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
+        $row =& $endpoint->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
         $config_files = explode(",",$row['config_files']);
         $i = 0;
         foreach($config_files as $config_files_data) {
@@ -375,10 +374,10 @@ if($_REQUEST['pop_type'] == "alt_cfg_edit") {
             $i++;
         }
         $sql = "SELECT * FROM endpointman_custom_configs WHERE product_id = '". $_REQUEST['product_select'] . "'";
-        $res =& $endpoint->db->query($sql);
+        $res =& $endpoint->eda->sql($sql);
         $i = 0;
         if($res->numRows()) {
-            $data =& $endpoint->db->getAll($sql, array(), DB_FETCHMODE_ASSOC);
+            $data =& $endpoint->eda->sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
             foreach($data as $row2) {
                 $sql_file_list[$i]['value'] = $row2['id'];
                 $sql_file_list[$i]['text'] = $row2['name'];
@@ -409,7 +408,7 @@ if($_REQUEST['pop_type'] == "alt_cfg_edit") {
         $template_file_list[0]['text'] = "template_data_custom.xml";
 
         $sql = 'SELECT model FROM `endpointman_model_list` WHERE `product_id` LIKE CONVERT(_utf8 \'1-2\' USING latin1) COLLATE latin1_swedish_ci AND `enabled` = 1 AND `hidden` = 0';
-        $data =& $endpoint->db->getAll($sql, array(), DB_FETCHMODE_ASSOC);
+        $data =& $endpoint->eda->sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
         $i = 1;
         foreach($data as $list) {
             $template_file_list[$i]['value'] = "template_data_" . $list['model'] . "_custom.xml";
