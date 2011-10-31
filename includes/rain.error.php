@@ -104,6 +104,3 @@
 	// set my error handler as default error handler
 	set_error_handler( "myErrorHandler" );
 	 
-
-	
-?>
