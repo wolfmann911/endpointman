@@ -29,14 +29,14 @@ if((isset($_REQUEST['button_install'])) OR (isset($_REQUEST['button_update']))) 
 	} elseif(isset($_REQUEST['brand'])) {
 		$sql = "UPDATE endpointman_brand_list SET enabled = 0 WHERE id = '".$_REQUEST['model']."'";
 	}
-	$endpoint->db->query($sql);
+	$endpoint->eda->sql($sql);
 } elseif(isset($_REQUEST['button_enable'])) {
 	if(isset($_REQUEST['model'])) {
 		$sql = "UPDATE endpointman_model_list SET enabled = 1 WHERE id = '".$_REQUEST['model']."'";
 	} elseif(isset($_REQUEST['brand'])) {
 		$sql = "UPDATE endpointman_brand_list SET enabled = 1 WHERE id = '".$_REQUEST['model']."'";
 	}
-	$endpoint->db->query($sql);
+	$endpoint->eda->sql($sql);
 } elseif(isset($_REQUEST['button_uninstall'])) {
 	if(isset($_REQUEST['brand'])) {
 		$endpoint->remove_brand($_REQUEST['brand']);
@@ -52,7 +52,7 @@ if((isset($_REQUEST['button_install'])) OR (isset($_REQUEST['button_update']))) 
 }
 
 $sql="SELECT * from endpointman_brand_list WHERE id > 0 AND hidden = 0 ORDER BY id ASC ";
-$brand_list =& $endpoint->db->getAll($sql,array(),DB_FETCHMODE_ASSOC);
+$brand_list =& $endpoint->eda->sql($sql,'getAll',DB_FETCHMODE_ASSOC);
 $i = 0;
 $note = "";
 $row_out = array();
@@ -80,7 +80,7 @@ foreach($brand_list as $row) {
 	if($row['installed']){
 		$j = 0;
 		$sql = 'SELECT * FROM endpointman_product_list WHERE hidden = 0 AND brand = '.$row['id'].' ORDER BY long_name ASC';
-                $product_list =& $endpoint->db->getAll($sql,array(),DB_FETCHMODE_ASSOC);
+                $product_list =& $endpoint->eda->sql($sql,'getAll',DB_FETCHMODE_ASSOC);
                 foreach($product_list as $row2) {
 			$row_out[$i]['products'][$j] = $row2;
 			if($check_for_updates) {
@@ -98,7 +98,7 @@ foreach($brand_list as $row) {
 
 			if(1 == 1) {
 				$sql = "SELECT * FROM endpointman_model_list WHERE hidden = 0 AND product_id = '".$row2['id']."'";
-                                $model_list =& $endpoint->db->getAll($sql,array(),DB_FETCHMODE_ASSOC);
+                                $model_list =& $endpoint->eda->sql($sql,'getAll',DB_FETCHMODE_ASSOC);
 				$k = 0;
 				foreach($model_list as $row3) {
 					$row_out[$i]['products'][$j]['models'][$k] = $row3;

@@ -31,7 +31,9 @@ if(!file_exists(PHONE_MODULES_PATH."temp/")) {
 }
 
 if(!is_writeable(LOCAL_PATH)) {
-	chmod(LOCAL_PATH, 0764);
+	if(!chmod(LOCAL_PATH, 0764)) {
+            die('My own path is not writable ('.LOCAL_PATH.')');
+        }
 }
 
 if(!is_writeable(PHONE_MODULES_PATH)) {
