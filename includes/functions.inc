@@ -433,7 +433,7 @@ class endpointmanager {
     }
 
     function update_device($macid,$model,$template,$luid=NULL,$name=NULL,$line=NULL,$update_lines=TRUE) {
-        $sql = "UPDATE endpointman_mac_list SET model = ".$model.", template_id =  ".$temp." WHERE id = ".$macid;
+        $sql = "UPDATE endpointman_mac_list SET model = ".$model.", template_id =  ".$template." WHERE id = ".$macid;
         $this->eda->sql($sql);
 
         if($update_lines) {

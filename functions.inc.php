@@ -64,7 +64,7 @@ function endpointman_configpageinit($pagename) {
 
             if ($action == "del") {
                 $sql = "SELECT mac_id,luid FROM endpointman_line_list WHERE ext = ". $extdisplay;
-                $macid = $endpoint->db->getRow($sql,array(),DB_FETCHMODE_ASSOC);
+                $macid = $endpoint->eda->sql($sql,'getRow',DB_FETCHMODE_ASSOC);
                 if($macid) {
                     $endpoint->delete_line($macid['luid'], TRUE);
                 }
@@ -73,7 +73,7 @@ function endpointman_configpageinit($pagename) {
             if(($action == "edit") OR ($action == "add")) {
                 if(isset($delete)) {
                     $sql = "SELECT mac_id,luid FROM endpointman_line_list WHERE ext = ". $extdisplay;
-                    $macid = $endpoint->db->getRow($sql,array(),DB_FETCHMODE_ASSOC);
+                    $macid = $endpoint->eda->sql($sql,'getRow',DB_FETCHMODE_ASSOC);
                     if($macid) {
                         $endpoint->delete_line($macid['luid'], TRUE);
                     }
@@ -96,7 +96,7 @@ function endpointman_configpageinit($pagename) {
                         if($_REQUEST['devicetype'] == "fixed") {
                             //SQL to get the Description of the  extension from the extension table
                             $sql = "SELECT name FROM users WHERE extension = '".$_REQUEST['deviceuser']."'";
-                            $name = $db->getOne($sql);
+                            $name = $endpoint->eda->sql($sql,'getOne');
 
                         }
                     }
@@ -105,11 +105,13 @@ function endpointman_configpageinit($pagename) {
 
                     if($endpoint->mac_check_clean($mac)) {
                         $sql = "SELECT id FROM endpointman_mac_list WHERE mac = '".$endpoint->mac_check_clean($mac)."'";
-                        $macid = $endpoint->db->getOne($sql);
+                        $macid = $endpoint->eda->sql($sql,'getOne');
                         if($macid) {
                             //In Database already
+                            
                             $sql = 'SELECT * FROM endpointman_line_list WHERE ext = '.$extdisplay.' AND mac_id = '. $macid;
-                            $lines_list =& $endpoint->db->getRow($sql,array(),DB_FETCHMODE_ASSOC);
+                            $lines_list =& $endpoint->eda->sql($sql,'getRow',DB_FETCHMODE_ASSOC);
+                            
                             if(($lines_list) AND (isset($model)) AND (isset($line)) AND (!isset($delete)) AND (isset($temp))) {
                                 //Modifying line already in the database
                                 $endpoint->update_device($macid, $model, $temp, $lines_list['luid'],$name,$lines_list['line']);
@@ -151,7 +153,7 @@ function endpointman_configpageinit($pagename) {
                 } else {
                     //Mac not set so delete
                     $sql = "SELECT mac_id,luid FROM endpointman_line_list WHERE ext = ". $extdisplay;
-                    $macid = $endpoint->db->getRow($sql,array(),DB_FETCHMODE_ASSOC);
+                    $macid = $endpoint->eda->sql($sql,'getRow',DB_FETCHMODE_ASSOC);
                     if($macid) {
                         //$endpoint->delete_line($macid['luid'], TRUE);
                     }
@@ -207,7 +209,7 @@ function endpointman_configpageload() {
             $section = _('End Point Manager');
 
             $sql = "SELECT mac_id,luid,line FROM endpointman_line_list WHERE ext = '".$extdisplay."' ";
-            $line_info =& $db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
+            $line_info = $endpoint->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
             if($line_info) {
 
                 $js = "
