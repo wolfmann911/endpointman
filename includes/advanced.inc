@@ -6,6 +6,8 @@
  * @license MPL / GPLv2 / LGPL
  * @package Provisioner
  */
+$action = isset($_REQUEST['action']) ? $_REQUEST['action'] : '';
+
 echo $endpoint->tpl->draw( 'global_header' );
 if(!isset($_REQUEST['subpage'])) {
     $_REQUEST['subpage'] = "";
@@ -21,7 +23,7 @@ switch($_REQUEST['subpage']) {
     case "iedl":
         $endpoint->tpl->assign("exporter_address", "config.php?type=tool&amp;display=epm_config&amp;quietmode=1&amp;handler=file&amp;file=export.html.php&amp;module=endpointman&amp;rand=".rand());
         //Dave B's Q&D file upload security code (http://us2.php.net/manual/en/features.file-upload.php)
-        if((isset($_REQUEST['action'])) AND (isset($_REQUEST['button_import'])) AND ($_REQUEST['action'] == "import")) {
+        if((isset($_REQUEST['button_import'])) AND ($action == "import")) {
             $allowedExtensions = array("csv","txt");
             foreach ($_FILES as $file) {
                 if ($file['tmp_name'] > '') {
@@ -102,9 +104,6 @@ switch($_REQUEST['subpage']) {
         $endpoint->tpl->assign("provisioner_ver", $provisioner_ver);
         $endpoint->tpl->assign("brand_ava", $endpoint->brands_available());
 
-
-        //$provisioner_ver = filemtime(PHONE_MODULES_PATH."master.xml");
-        //$provisioner_ver = date("n-j-y",$provisioner_ver) . " at " . date("g:ia",$provisioner_ver);
         $provisioner_ver = "";
         $endpoint->tpl->assign("master_ver", $provisioner_ver);
         $uploads_dir = PHONE_MODULES_PATH."temp";
@@ -477,7 +476,7 @@ switch($_REQUEST['subpage']) {
             } else {
                 $_POST['allow_hdfiles'] = 0;
             }
-            
+                        
             $sql="UPDATE endpointman_global_vars SET value='" . $_POST['package_server'] . "' WHERE var_name='update_server'";
             $endpoint->eda->sql($sql);
             

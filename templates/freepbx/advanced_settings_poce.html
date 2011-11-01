@@ -64,3 +64,8 @@
   </tr>
 </table>
 </center>
+<script>
+    $(document).ready(function() {
+        var editor = CodeMirror.fromTextArea(document.getElementById("textarea"), {lineWrapping: true, lineNumbers: true, mode: {name: "xml", htmlMode: true}});
+    });
+</script>
