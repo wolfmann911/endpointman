@@ -89,6 +89,17 @@ if(is_link($dir)) {
     unlink($dir);
 }
 
+//javascripts
+$dir = $amp_conf['AMPWEBROOT'].'/admin/assets/endpointman/css';
+foreach (glob(LOCAL_PATH."assets/css/*.*") as $filename) {
+    if(file_exists($dir.'/'.basename($filename)) && (readlink($dir.'/'.basename($filename)) == $filename)) {
+        unlink($dir.'/'.basename($filename));
+    }
+}
+if(is_link($dir)) {
+    unlink($dir);
+}
+
 //theme
 $dir = $amp_conf['AMPWEBROOT'].'/admin/assets/endpointman/theme';
 foreach (glob(LOCAL_PATH."assets/theme/*.*") as $filename) {

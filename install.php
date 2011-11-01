@@ -1234,7 +1234,9 @@ $sql = "UPDATE endpointman_global_vars SET value = 'http://mirror.freepbx.org/pr
 $db->query($sql);
 
 $sql = 'SELECT value FROM `admin` WHERE `variable` LIKE CONVERT(_utf8 \'version\' USING latin1) COLLATE latin1_swedish_ci';
-$amp_version = $db->getOne($sql);
+preg_match('/^(\d*)\.(\d*)/', $db->getOne($sql), $versions);
+
+$amp_version['minor'] = $versions[2];
 
 if(file_exists($amp_conf['AMPWEBROOT']."/recordings/modules/phonesettings.module")) {
     unlink($amp_conf['AMPWEBROOT']."/recordings/modules/phonesettings.module");
@@ -1252,7 +1254,7 @@ if(file_exists($amp_conf['AMPWEBROOT']."/recordings/theme/coda-slider-2.0a.css")
     unlink($amp_conf['AMPWEBROOT']."/recordings/theme/coda-slider-2.0a.css");
 }
 
-if($amp_version < "2.9.0") {
+if($amp_version['minor'] < 9) {
     //Do symlinks ourself because retrieve_conf is OLD
 
     //images
