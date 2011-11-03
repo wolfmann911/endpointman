@@ -369,24 +369,48 @@
 </center>
 <table width='90%' align='center'>
     <tr>
-        <td width="26%" align='center'><form action='' name='globalmanaged' id='globalmanaged' method='POST'><input type='Submit' name='button_rebuild_configs_for_all_phones' onclick="submit_global('rebuild_configs_for_all_phones');" value='<?php echo _('Rebuild Configs for All Phones')?>'><br /><input type="checkbox" name="reboot">Reboot Phones</form></td>
-        <td width="32%" align='center'><form action='' name='globalmanaged2' id='globalmanaged2' method='POST'><select name="rb_brand">
-	{loop name="brand_ava"}
-                    <option value="{$value.value}">{$value.text}</option>
-	{/loop}
-                </select>
-                <input type='Submit' name='button_reboot_this_brand' onclick="submit_global2('reboot_brand');" value='<?php echo _('Reboot This Brand')?>'></form></td>
-        <td width="42%" align='center'><form action='' name='globalmanaged3' id='globalmanaged3' method='POST'><?php echo _('Reconfigure all')?> <select name="product_select" id="product_select">
-	{loop name="product_list"}
-                    <option value="{$value.value}">{$value.text}</option>
-	{/loop}
-                </select> <?php echo _('with')?>
-                <label>
-                    <select name="template_selector" id="template_selector">
-                        <option></option>
-                    </select>
-                    <input type="submit" name="button_rebuild_reboot" onclick="submit_global3('rebuild_reboot');" value="<?php echo _('Rebuild')?>"><br /><input type="checkbox" name="reboot">Reboot Phones
-                </label></td>
+        <td align='center'>
+            <form action='' name='globalmanaged' id='globalmanaged' method='POST'>
+                <input type='Submit' name='button_rebuild_configs_for_all_phones' onclick="submit_global('rebuild_configs_for_all_phones');" value='<?php echo _('Rebuild Configs for All Phones')?>'>
+                       <br />
+                <input type="checkbox" name="reboot">Reboot Phones
+            </form>
+        </td>
+        <td align='center'>
+                <form action='' name='globalmanaged2' id='globalmanaged2' method='POST'><select name="rb_brand">
+                {loop name="brand_ava"}
+                            <option value="{$value.value}">{$value.text}</option>
+                {/loop}
+                </select><br/>
+                <input type='Submit' name='button_reboot_this_brand' onclick="submit_global2('reboot_brand');" value='<?php echo _('Reboot This Brand')?>'></form>
+        </td>
+        <td align='center'>
+            <form action='' name='globalmanaged3' id='globalmanaged3' method='POST'><?php echo _('Reconfigure all')?> (products)<br/> <select name="product_select" id="product_select">
+            {loop name="product_list"}
+                        <option value="{$value.value}">{$value.text}</option>
+            {/loop}
+                    </select><br/> <?php echo _('with')?>
+                    <label>
+                        <select name="template_selector" id="template_selector">
+                            <option></option>
+                        </select>
+                        <input type="submit" name="button_rebuild_reboot" onclick="submit_global3('rebuild_reboot');" value="<?php echo _('Rebuild')?>"><br /><input type="checkbox" name="reboot">Reboot Phones
+                    </label>
+            </td>
+        <td align='center'>
+            <form action='' name='globalmanaged4' id='globalmanaged4' method='POST'><?php echo _('Reconfigure all')?> (models)<br/> <select name="model_select" id="model_select">
+            {loop name="model_list"}
+                        <option value="{$value.value}">{$value.text}</option>
+            {/loop}
+                    </select><br/> <?php echo _('with')?>
+                    <label>
+                        <select name="model_template_selector" id="model_template_selector">
+                            <option></option>
+                        </select>
+                        <input type="submit" name="button_rebuild_reboot" onclick="submit_global3('mrebuild_reboot');" value="<?php echo _('Rebuild')?>"><br /><input type="checkbox" name="reboot">Reboot Phones
+                    </label>
+            </td>
+            
     </tr>
 </table>
 </form>

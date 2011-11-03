@@ -80,6 +80,19 @@
                 })
             })
             $(function(){
+                $("select#model_select").change(function(){
+                    $.ajaxSetup({ cache: false });
+                    $.getJSON("config.php?type=tool&quietmode=1&handler=file&module=endpointman&file=ajax_select.html.php&atype=mtemplate",{id: $(this).val()}, function(j){
+                        var options = '';
+                        for (var i = 0; i < j.length; i++) {
+                            options += '<option value="' + j[i].optionValue + '">' + j[i].optionDisplay + '</option>';
+                        }
+                        $("#model_template_selector").html(options);
+                        $('#model_template_selector option:first').attr('selected', 'selected');
+                    })
+                })
+            })
+            $(function(){
                 $("select#model_new").change(function(){
                     $.ajaxSetup({ cache: false });
                     $.getJSON("config.php?type=tool&quietmode=1&handler=file&module=endpointman&file=ajax_select.html.php&atype=template2",{id: $(this).val()}, function(j){

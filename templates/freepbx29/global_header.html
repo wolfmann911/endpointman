@@ -2,16 +2,11 @@
     <head>
         <title>PBX Endpoint Configuration Manager</title>
         {if condition="isset($silent_mode)"}
-        <script type="text/javascript" src="common/libfreepbx.javascripts.js" language="javascript"></script>
+        <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js" language="javascript"></script>
         <script type="text/javascript" src="assets/endpointman/js/jquery.tools.min.js"></script>
         <script type="text/javascript" src="assets/endpointman/js/jquery.easing.1.3.js"></script>
         <script type="text/javascript" src="assets/endpointman/js/jquery.coda-slider-2.0.js"></script>
-        <link href="common/mainstyle.css" rel="stylesheet" type="text/css" />
-        {/if}
-        {if condition="$amp_ver < 29"}
-        <script type="text/javascript" src="assets/endpointman/js/jquery.tools.min.js"></script>
-        <script type="text/javascript" src="assets/endpointman/js/jquery.easing.1.3.js"></script>
-        <script type="text/javascript" src="assets/endpointman/js/jquery.coda-slider-2.0.js"></script>
+        <link href="assets/css/mainstyle.css" rel="stylesheet" type="text/css" />
         {/if}
         <style>
             .tooltip {
@@ -81,6 +76,19 @@
                         }
                         $("#template_selector").html(options);
                         $('#template_selector option:first').attr('selected', 'selected');
+                    })
+                })
+            })
+            $(function(){
+                $("select#model_select").change(function(){
+                    $.ajaxSetup({ cache: false });
+                    $.getJSON("config.php?type=tool&quietmode=1&handler=file&module=endpointman&file=ajax_select.html.php&atype=mtemplate",{id: $(this).val()}, function(j){
+                        var options = '';
+                        for (var i = 0; i < j.length; i++) {
+                            options += '<option value="' + j[i].optionValue + '">' + j[i].optionDisplay + '</option>';
+                        }
+                        $("#model_template_selector").html(options);
+                        $('#model_template_selector option:first').attr('selected', 'selected');
                     })
                 })
             })
