@@ -1318,7 +1318,12 @@ class endpointmanager {
 
                 //Timezone
                 require('timezone.php');
-                $provisioner_lib->DateTimeZone = new DateTimeZone($settings['tz']);
+                try {
+                    $provisioner_lib->DateTimeZone = new DateTimeZone($settings['tz']);
+                } catch(Exception $e) {
+                    $this->error['parse_configs'] = 'Caught exception: '. $e->getMessage();
+                    return(FALSE);
+                }
 
                 //Network Time Server
                 $provisioner_lib->ntp = $settings['ntp'];
