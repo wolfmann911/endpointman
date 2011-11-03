@@ -33,6 +33,8 @@ if($_REQUEST['atype'] == "model") {
 	$sql = "SELECT * FROM endpointman_model_list WHERE enabled = 1 AND brand =". $_GET['id'];
 } elseif ($_REQUEST['atype'] == "template") {
 	$sql = "SELECT id, name as model FROM  endpointman_template_list WHERE  product_id = '". $_GET['id']."'";
+} elseif ($_REQUEST['atype'] == "mtemplate") {
+	$sql = "SELECT id, name as model FROM  endpointman_template_list WHERE  model_id = '". $_GET['id']."'";
 } elseif ($_REQUEST['atype'] == "template2") {
 	$sql = "SELECT DISTINCT endpointman_template_list.id, endpointman_template_list.name as model FROM endpointman_template_list, endpointman_model_list, endpointman_product_list WHERE endpointman_template_list.product_id = endpointman_model_list.product_id AND endpointman_model_list.product_id = endpointman_product_list.id AND endpointman_model_list.id = '". $_GET['id']."'";
 } elseif ($_REQUEST['atype'] == "model_clone") {
@@ -55,7 +57,7 @@ if($_REQUEST['atype'] == "model") {
     }
 }
 
-if (($_REQUEST['atype'] == "template") OR ($_REQUEST['atype'] == "template2")) {
+if (($_REQUEST['atype'] == "template") OR ($_REQUEST['atype'] == "template2") OR ($_REQUEST['atype'] == "mtemplate")) {
 	$out[0]['optionValue'] = 0;
 	$out[0]['optionDisplay'] = "Custom...";
 	$i=1;
