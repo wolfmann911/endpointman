@@ -31,8 +31,6 @@ class endpointmanager {
 
         $this->global_cfg['disable_epm'] = FALSE;
 
-        //$this->db = $this->eda->db;
-
         $this->global_cfg['tz'] = !empty($this->global_cfg['tz']) ? $this->global_cfg['tz'] : 'America/Los_Angeles';
         date_default_timezone_set($this->global_cfg['tz']);
 
@@ -122,14 +120,12 @@ class endpointmanager {
         $this->global_cfg['amp_ver']['major'] = $versions[1];
         $this->global_cfg['amp_ver']['minor'] = $versions[2];
 
-        $suffix = $this->global_cfg['amp_ver']['minor'] < '10' ? '29' : '';
-        $this->tpl = new RainTPL( LOCAL_PATH.'templates/freepbx'.$suffix, LOCAL_PATH.'templates/freepbx/compiled', '/admin/modules/endpointman/templates/images' );
+        $this->tpl = new RainTPL( LOCAL_PATH.'templates/freepbx', LOCAL_PATH.'templates/freepbx/compiled', '/admin/assets/endpointman/images' );
 
 
         if($this->global_cfg['disable_help']) {
             $this->tpl->assign("disable_help", 1);
         }
-
 
         $this->tpl->assign("amp_ver", $this->global_cfg['amp_ver']['minor']);
 
