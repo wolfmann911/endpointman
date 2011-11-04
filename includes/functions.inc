@@ -361,10 +361,10 @@ class endpointmanager {
                     $lines_list = $this->eda->sql($sql,'getAll',DB_FETCHMODE_ASSOC);
 
                     foreach($lines_list as $row) {
-                        $sql = "SELECT description FROM devices WHERE id = ".$ext;
+                        $sql = "SELECT description FROM devices WHERE id = ".$row['ext'];
                         $name=$this->eda->sql($sql,'getOne');
 
-                        $sql = "UPDATE endpointman_line_list SET line = '".$line."', ext = ".$ext.", description = '".addslashes($name)."' WHERE luid =  ". $row['luid'];
+                        $sql = "UPDATE endpointman_line_list SET line = '".$row['line']."', ext = ".$row['ext'].", description = '".addslashes($name)."' WHERE luid =  ". $row['luid'];
                         $this->eda->sql($sql);
                     }
 
