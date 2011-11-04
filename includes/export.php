@@ -19,7 +19,7 @@ $outstream = fopen("php://output",'w');
 
 $sql = 'SELECT endpointman_mac_list.mac, endpointman_brand_list.name, endpointman_model_list.model, endpointman_line_list.ext,endpointman_line_list.line FROM endpointman_mac_list, endpointman_model_list, endpointman_brand_list, endpointman_line_list WHERE endpointman_line_list.mac_id = endpointman_mac_list.id AND endpointman_model_list.id = endpointman_mac_list.model AND endpointman_model_list.brand = endpointman_brand_list.id';
 
-$result = $endpoint->db->getAll($sql,array(),DB_FETCHMODE_ASSOC);
+$result = $endpoint->eda->sql($sql,'getAll',DB_FETCHMODE_ASSOC);
 
 foreach($result as $row) {
 	fputcsv($outstream, $row);    

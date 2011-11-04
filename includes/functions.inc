@@ -14,7 +14,7 @@ class endpointmanager {
     public $global_cfg; //global configuration options for Endpoint Manager
     public $error; //error construct
     public $message; //message construct
-    public $endpoint_data; //??
+    public $eda; //endpoint data abstraction layer
     public $tpl; //Template System Object (RAIN TPL)
 
     /**
@@ -25,18 +25,14 @@ class endpointmanager {
     function __construct() {
         global $amp_conf;
         require('abstraction/freepbx.inc');
-        $this->endpoint_data = new epm_data_abstraction();
+        $this->eda = new epm_data_abstraction();
 
-        $this->global_cfg = $this->endpoint_data->get_stored_globals();
-
-        $this->endpoint_data->global_cfg = $this->global_cfg;
+        $this->global_cfg = $this->eda->get_stored_globals();
 
         $this->global_cfg['disable_epm'] = FALSE;
 
-        $this->db = $this->endpoint_data->db;
-
-        //TODO: Need to have this change when the user changes timezones, for now we keep it set to my timezone
-        date_default_timezone_set('America/Los_Angeles');
+        $this->global_cfg['tz'] = !empty($this->global_cfg['tz']) ? $this->global_cfg['tz'] : 'America/Los_Angeles';
+        date_default_timezone_set($this->global_cfg['tz']);
 
         //Generate empty array
         $this->error = array();
@@ -116,18 +112,22 @@ class endpointmanager {
                 $this->global_cfg['diable_epm'] = TRUE;
             }
         }
+        
+        $sql = 'SELECT value FROM `admin` WHERE `variable` LIKE CONVERT(_utf8 \'version\' USING latin1) COLLATE latin1_swedish_ci';
+        
+        preg_match('/^(\d*)\.(\d*)/', $this->eda->sql($sql, 'getone'), $versions);
 
+        $this->global_cfg['amp_ver']['major'] = $versions[1];
+        $this->global_cfg['amp_ver']['minor'] = $versions[2];
 
-        $this->tpl = new RainTPL( LOCAL_PATH.'templates/freepbx', LOCAL_PATH.'templates/freepbx/compiled', '/admin/modules/endpointman/templates/images' );
+        $this->tpl = new RainTPL( LOCAL_PATH.'templates/freepbx', LOCAL_PATH.'templates/freepbx/compiled', '/admin/assets/endpointman/images' );
 
 
         if($this->global_cfg['disable_help']) {
             $this->tpl->assign("disable_help", 1);
         }
 
-        $sql = 'SELECT value FROM `admin` WHERE `variable` LIKE CONVERT(_utf8 \'version\' USING latin1) COLLATE latin1_swedish_ci';
-        $this->global_cfg['amp_ver'] = (int)substr(preg_replace('/[^0-9]*/i', '', $this->db->getOne($sql)),0,3);
-        $this->tpl->assign("amp_ver", $this->global_cfg['amp_ver']);
+        $this->tpl->assign("amp_ver", $this->global_cfg['amp_ver']['minor']);
 
     }
 
@@ -257,9 +257,9 @@ class endpointmanager {
         $oui = substr($this->mac_check_clean($mac),0,6);
         //Find the matching brand model to the oui
         $oui_sql = "SELECT endpointman_brand_list.name, endpointman_brand_list.id FROM endpointman_oui_list, endpointman_brand_list WHERE oui LIKE '%". $oui ."%' AND endpointman_brand_list.id = endpointman_oui_list.brand AND endpointman_brand_list.installed = 1 LIMIT 1";
-        $brand = $this->db->getRow($oui_sql, array(), DB_FETCHMODE_ASSOC);
+        $brand = $this->eda->sql($oui_sql, 'getRow', DB_FETCHMODE_ASSOC);
 
-        $res = $this->db->query($oui_sql);
+        $res = $this->eda->sql($oui_sql);
         $brand_count = $res->numRows();
 
         if (!$brand_count) {
@@ -287,7 +287,7 @@ class endpointmanager {
             } else {
                 if($this->sync_model($model)) {
                     $sql = "SELECT id,template_id FROM endpointman_mac_list WHERE mac = '".$mac."'";
-                    $dup = $this->db->getRow($sql,array(),DB_FETCHMODE_ASSOC);
+                    $dup = $this->eda->sql($sql,'getRow',DB_FETCHMODE_ASSOC);
 
                     if($dup) {
                         if(!isset($template)) {
@@ -295,7 +295,7 @@ class endpointmanager {
                         }
 
                         $sql = "UPDATE endpointman_mac_list SET model = ".$model.", template_id =  ".$template." WHERE id = ".$dup['id'];
-                        $this->db->query($sql);
+                        $this->eda->sql($sql);
                         $return = $this->add_line($dup['id'], $line, $ext);
                         if($return) {
                             return($return);
@@ -308,7 +308,7 @@ class endpointmanager {
                         }
 
                         $sql = "SELECT mac_id FROM endpointman_line_list WHERE ext = ".$ext;
-                        $used = $this->db->getOne($sql);
+                        $used = $this->eda->sql($sql,'getOne');
 
                         if(($used) AND (!$this->global_cfg['show_all_registrations'])) {
                             $this->error['add_device'] = "You can't assign the same user to multiple devices!";
@@ -317,27 +317,27 @@ class endpointmanager {
 
                         if(!isset($displayname)) {
                             $sql = 'SELECT description FROM devices WHERE id = '.$ext;
-                            $name =& $this->db->getOne($sql);
+                            $name =& $this->eda->sql($sql,'getOne');
                         } else {
                             $name = $displayname;
                         }
 
                         $sql = 'SELECT endpointman_product_list. * , endpointman_model_list.template_data, endpointman_brand_list.directory FROM endpointman_model_list, endpointman_brand_list, endpointman_product_list WHERE endpointman_model_list.id =  \''.$model.'\' AND endpointman_model_list.brand = endpointman_brand_list.id AND endpointman_model_list.product_id = endpointman_product_list.id';
 
-                        $row =& $this->db->getRow($sql,array(),DB_FETCHMODE_ASSOC);
+                        $row =& $this->eda->sql($sql,'getRow',DB_FETCHMODE_ASSOC);
 
                         $sql = "INSERT INTO `endpointman_mac_list` (`mac`, `model`, `template_id`) VALUES ('".$mac."', '".$model."', '".$template."')";
-                        $this->db->query($sql);
+                        $this->eda->sql($sql);
 
                         $sql = 'SELECT last_insert_id()';
-                        $ext_id =& $this->db->getOne($sql);
+                        $ext_id =& $this->eda->sql($sql,'getOne');
 
                         if(empty($line)) {
                             $line = 1;
                         }
 
                         $sql = "INSERT INTO `endpointman_line_list` (`mac_id`, `ext`, `line`, `description`) VALUES ('".$ext_id."', '".$ext."', '".$line."', '".addslashes($name)."')";
-                        $this->db->query($sql);
+                        $this->eda->sql($sql);
 
                         $this->message['add_device'] = "Added ".$name." to line ".$line;
                         return($ext_id);
@@ -356,26 +356,26 @@ class endpointmanager {
     function add_line($mac_id,$line=NULL,$ext=NULL,$displayname=NULL) {
         if((!isset($line)) AND (!isset($ext))) {
             if($this->linesAvailable(NULL,$mac_id)) {
-                if($this->endpoint_data->all_unused_registrations()) {
+                if($this->eda->all_unused_registrations()) {
                     $sql = 'SELECT * FROM endpointman_line_list WHERE mac_id = '. $mac_id;
-                    $lines_list = $this->db->getAll($sql,array(),DB_FETCHMODE_ASSOC);
+                    $lines_list = $this->eda->sql($sql,'getAll',DB_FETCHMODE_ASSOC);
 
                     foreach($lines_list as $row) {
                         $sql = "SELECT description FROM devices WHERE id = ".$ext;
-                        $name=$this->db->getOne($sql);
+                        $name=$this->eda->sql($sql,'getOne');
 
                         $sql = "UPDATE endpointman_line_list SET line = '".$line."', ext = ".$ext.", description = '".addslashes($name)."' WHERE luid =  ". $row['luid'];
-                        $this->db->query($sql);
+                        $this->eda->sql($sql);
                     }
 
                     $reg = array_values($this->display_registration_list());
                     $lines = array_values($this->linesAvailable(NULL,$mac_id));
 
                     $sql = "SELECT description FROM devices WHERE id = ".$reg[0]['value'];
-                    $name = $this->db->getOne($sql);
+                    $name = $this->eda->sql($sql,'getOne');
 
                     $sql = "INSERT INTO `endpointman_line_list` (`mac_id`, `ext`, `line`, `description`) VALUES ('".$mac_id."', '".$reg[0]['value']."', '".$lines[0]['value']."', '".addslashes($name)."')";
-                    $this->db->query($sql);
+                    $this->eda->sql($sql);
 
                     $this->message['add_line'] = "Added '<i>".$name."</i>' to line '<i>".$lines[0]['value']."</i>' on device '<i>".$reg[0]['value']."</i>' <br/> Configuration Files will not be Generated until you click Save!";
                     return($mac_id);
@@ -389,11 +389,11 @@ class endpointmanager {
             }
         } elseif((!isset($line)) AND (isset($ext))) {
             if($this->linesAvailable(NULL,$mac_id)) {
-                if($this->endpoint_data->all_unused_registrations()) {
+                if($this->eda->all_unused_registrations()) {
                     $lines = array_values($this->linesAvailable(NULL,$mac_id));
 
                     $sql = "INSERT INTO `endpointman_line_list` (`mac_id`, `ext`, `line`, `description`) VALUES ('".$mac_id."', '".$ext."', '".$lines[0]['value']."', '".addslashes($displayname)."')";
-                    $this->db->query($sql);
+                    $this->eda->sql($sql);
 
                     $this->message['add_line'] = "Added '<i>".$name."</i>' to line '<i>".$lines[0]['value']."</i>' on device '<i>".$reg[0]['value']."</i>' <br/> Configuration Files will not be Generated until you click Save!";
                     return($mac_id);
@@ -407,20 +407,20 @@ class endpointmanager {
             }
         } elseif((isset($line)) AND (isset($ext))) {
             $sql = "SELECT luid FROM endpointman_line_list WHERE line = '".$line."' AND mac_id = ".$mac_id;
-            $luid = $this->db->getOne($sql);
+            $luid = $this->eda->sql($sql,'getOne');
             if($luid) {
                 $this->error['add_line'] = "This line has already been assigned!";
                 return(FALSE);
             } else {
                 if(!isset($displayname)) {
                     $sql = 'SELECT description FROM devices WHERE id = '.$ext;
-                    $name =& $this->db->getOne($sql);
+                    $name =& $this->eda->sql($sql,'getOne');
                 } else {
                     $name = $displayname;
                 }
 
                 $sql = "INSERT INTO `endpointman_line_list` (`mac_id`, `ext`, `line`, `description`) VALUES ('".$mac_id."', '".$ext."', '".$line."', '".addslashes($name)."')";
-                $this->db->query($sql);
+                $this->eda->sql($sql);
                 $this->message['add_line'] .= "Added ".$name." to line ".$line . "<br/>";
                 return($mac_id);
             }
@@ -429,8 +429,8 @@ class endpointmanager {
     }
 
     function update_device($macid,$model,$template,$luid=NULL,$name=NULL,$line=NULL,$update_lines=TRUE) {
-        $sql = "UPDATE endpointman_mac_list SET model = ".$model.", template_id =  ".$temp." WHERE id = ".$macid;
-        $this->db->query($sql);
+        $sql = "UPDATE endpointman_mac_list SET model = ".$model.", template_id =  ".$template." WHERE id = ".$macid;
+        $this->eda->sql($sql);
 
         if($update_lines) {
             if(isset($luid)) {
@@ -446,28 +446,28 @@ class endpointmanager {
     function update_line($luid=NULL,$macid=NULL,$name=NULL,$line=NULL) {
         if(isset($luid)) {
             $sql = "SELECT * FROM endpointman_line_list WHERE luid = ".$luid;
-            $row = $this->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
+            $row = $this->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
 
             if(!isset($name)) {
                 $sql = "SELECT description FROM devices WHERE id = ".$row['ext'];
-                $name=$this->db->getOne($sql);
+                $name=$this->eda->sql($sql,'getOne');
             }
 
             if(!isset($line)) {
                 $line = $row['line'];
             }
             $sql = "UPDATE endpointman_line_list SET line = '".$line."', ext = '".$row['ext']."', description = '".$name."' WHERE luid =  ". $row['luid'];
-            $this->db->query($sql);
+            $this->eda->sql($sql);
             return(TRUE);
         } else {
             $sql = "SELECT * FROM endpointman_line_list WHERE mac_id = ".$macid;
-            $lines_info = $this->db->getAll($sql, array(), DB_FETCHMODE_ASSOC);
+            $lines_info = $this->eda->sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
             foreach($lines_info as $row) {
                 $sql = "SELECT description FROM devices WHERE id = ".$row['ext'];
-                $name=$this->db->getOne($sql);
+                $name=$this->eda->sql($sql,'getOne');
 
                 $sql = "UPDATE endpointman_line_list SET line = '".$row['line']."', ext = '".$row['ext']."', description = '".$name."' WHERE luid =  ". $row['luid'];
-                $this->db->query($sql);
+                $this->eda->sql($sql);
             }
             return(TRUE);
         }
@@ -480,23 +480,23 @@ class endpointmanager {
      */
     function delete_line($lineid,$allow_device_remove=FALSE) {
         $sql = 'SELECT mac_id FROM endpointman_line_list WHERE luid = '.$lineid ;
-        $mac_id = $this->db->getOne($sql,array(),DB_FETCHMODE_ASSOC);
+        $mac_id = $this->eda->sql($sql,'getOne',DB_FETCHMODE_ASSOC);
         $row = $this->get_phone_info($mac_id);
 
         $sql = 'SELECT COUNT(*) FROM endpointman_line_list WHERE mac_id = '.$mac_id;
-        $num_lines = $this->db->getOne($sql,array(),DB_FETCHMODE_ASSOC);
+        $num_lines = $this->eda->sql($sql,'getOne',DB_FETCHMODE_ASSOC);
         if($num_lines > 1) {
             $sql = "DELETE FROM endpointman_line_list WHERE luid=".$lineid;
-            $this->db->query($sql);
+            $this->eda->sql($sql);
             $this->message['delete_line'] = "Deleted!";
             return(TRUE);
         } else {
             if($allow_device_remove) {
                 $sql = "DELETE FROM endpointman_line_list WHERE luid=".$lineid;
-                $this->db->query($sql);
+                $this->eda->sql($sql);
 
                 $sql = "DELETE FROM endpointman_mac_list WHERE id=". $mac_id;
-                $this->db->query($sql);
+                $this->eda->sql($sql);
                 $this->message['delete_line'] = "Deleted!";
                 return(TRUE);
             } else {
@@ -508,10 +508,10 @@ class endpointmanager {
 
     function delete_device($mac_id) {
         $sql = "DELETE FROM endpointman_mac_list WHERE id=".$mac_id;
-        $this->db->query($sql);
+        $this->eda->sql($sql);
 
         $sql = "DELETE FROM endpointman_line_list WHERE mac_id=".$mac_id;
-        $this->db->query($sql);
+        $this->eda->sql($sql);
         $this->message['delete_device'] = "Deleted!";
         return(TRUE);
     }
@@ -577,12 +577,12 @@ class endpointmanager {
         }
         $sql = "SELECT id FROM endpointman_mac_list WHERE model > 0 AND id =".$mac_id;
 
-        $res = $this->db->query($sql);
+        $res = $this->eda->sql($sql);
         if($res->numRows()) {
             //Returns Brand Name, Brand Directory, Model Name, Mac Address, Extension (FreePBX), Custom Configuration Template, Custom Configuration Data, Product Name, Product ID, Product Configuration Directory, Product Configuration Version, Product XML name,
             $sql = "SELECT endpointman_mac_list.specific_settings, endpointman_mac_list.config_files_override, endpointman_mac_list.global_user_cfg_data, endpointman_model_list.id as model_id, endpointman_brand_list.id as brand_id, endpointman_brand_list.name, endpointman_brand_list.directory, endpointman_model_list.model, endpointman_mac_list.mac, endpointman_mac_list.template_id, endpointman_mac_list.global_custom_cfg_data, endpointman_product_list.long_name, endpointman_product_list.id as product_id, endpointman_product_list.cfg_dir, endpointman_product_list.cfg_ver, endpointman_model_list.template_data, endpointman_model_list.enabled, endpointman_mac_list.global_settings_override FROM endpointman_line_list, endpointman_mac_list, endpointman_model_list, endpointman_brand_list, endpointman_product_list WHERE endpointman_mac_list.model = endpointman_model_list.id AND endpointman_brand_list.id = endpointman_model_list.brand AND endpointman_product_list.id = endpointman_model_list.product_id AND endpointman_mac_list.id = endpointman_line_list.mac_id AND endpointman_mac_list.id = ". $mac_id;
 
-            $phone_info = $this->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
+            $phone_info = $this->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
 
             if(!$phone_info) {
                 $this->error['get_phone_info'] = "Error with SQL Statement";
@@ -592,12 +592,12 @@ class endpointmanager {
             if ($phone_info['template_id'] > 0) {
                 $sql = "SELECT name, global_custom_cfg_data, config_files_override, global_settings_override FROM endpointman_template_list WHERE id = ".$phone_info['template_id'];
 
-                $phone_info['template_data_info'] = $this->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
+                $phone_info['template_data_info'] = $this->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
 
             }
 
             $sql = "SELECT endpointman_line_list.*, sip.data as secret, devices.*, endpointman_line_list.description AS epm_description FROM endpointman_line_list, sip, devices WHERE endpointman_line_list.ext = devices.id AND endpointman_line_list.ext = sip.id AND sip.keyword = 'secret' AND mac_id = ".$mac_id." ORDER BY endpointman_line_list.line ASC";
-            $lines_info = $this->db->getAll($sql, array(), DB_FETCHMODE_ASSOC);
+            $lines_info = $this->eda->sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
             foreach($lines_info as $line) {
                 $phone_info['line'][$line['line']] = $line;
                 $phone_info['line'][$line['line']]['description'] = $line['epm_description'];
@@ -607,7 +607,7 @@ class endpointmanager {
         } else {
             $sql = "SELECT id, mac, ext FROM endpointman_mac_list WHERE id =".$mac_id;
             //Phone is unknown, we need to display this to the end user so that they can make corrections
-            $row = $this->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
+            $row = $this->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
 
             $brand = $this->get_brand_from_mac($row['mac']);
             if($brand) {
@@ -624,7 +624,7 @@ class endpointmanager {
             $phone_info['custom_cfg_template'] = 0;
             $phone_info['mac'] = $row['mac'];
             $sql = "SELECT endpointman_line_list.*, sip.data as secret, devices.* FROM endpointman_line_list, sip, devices WHERE endpointman_line_list.ext = devices.id AND endpointman_line_list.ext = sip.id AND sip.keyword = 'secret' AND mac_id = ".$mac_id;
-            $lines_info = $this->db->getAll($sql, array(), DB_FETCHMODE_ASSOC);
+            $lines_info = $this->eda->sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
             foreach($lines_info as $line) {
                 $phone_info['line'][$line['line']] = $line;
             }
@@ -650,7 +650,7 @@ class endpointmanager {
             $sql = "SELECT model FROM endpointman_mac_list WHERE id=".$id;
         }
 
-        $model_id = $this->db->getOne($sql);
+        $model_id = $this->eda->sql($sql,'getOne');
 
         //Make sure the model data from the local confg files are stored in the database and vice-versa. Serious errors will occur if the database is not in sync with the local file
         if(!$this->sync_model($model_id)) {
@@ -665,7 +665,7 @@ class endpointmanager {
             $sql = "SELECT endpointman_model_list.max_lines, endpointman_model_list.model as model_name, endpointman_mac_list.global_custom_cfg_data, endpointman_product_list.config_files, endpointman_mac_list.*, endpointman_line_list.*, endpointman_model_list.id as model_id, endpointman_model_list.template_data, endpointman_product_list.id as product_id, endpointman_product_list.short_name, endpointman_product_list.cfg_dir, endpointman_brand_list.directory FROM endpointman_brand_list, endpointman_mac_list, endpointman_model_list, endpointman_product_list, endpointman_line_list WHERE endpointman_mac_list.id=".$id." AND endpointman_mac_list.id = endpointman_line_list.mac_id AND endpointman_mac_list.model = endpointman_model_list.id AND endpointman_model_list.brand = endpointman_brand_list.id AND endpointman_model_list.product_id = endpointman_product_list.id";
         }
 
-        $row = $this->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
+        $row = $this->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
 
         $this->tpl->assign("template_editor_display", 1);
         echo $this->tpl->draw( 'global_header' );
@@ -705,9 +705,9 @@ class endpointmanager {
         $only_configs = array();
         foreach($config_files_list as $files) {
             $sql = "SELECT * FROM  endpointman_custom_configs WHERE product_id = '".$row['product_id']."' AND original_name = '".$files."'";
-            $alt_configs_list_count = $this->db->query($sql);
+            $alt_configs_list_count = $this->eda->sql($sql);
             if($alt_configs_list_count->numRows() > 0) {
-                $alt_configs_list = $this->db->getAll($sql, array(), DB_FETCHMODE_ASSOC);
+                $alt_configs_list = $this->eda->sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
                 $alt_configs[$i]['name'] = $files;
                 $files = str_replace(".","_",$files);
                 $h=0;
@@ -863,7 +863,7 @@ class endpointmanager {
                                 case "loop_line_options":
                                         //$a is the line number
                                         $sql = "SELECT line FROM endpointman_line_list WHERE  ext = ".$ext;
-                                        $a = $this->db->getOne($sql);
+                                        $a = $this->eda->sql($sql,'getOne');
                                         $template_variables_array[$group_count]['title'] = "Line Options for Line ".$a;
                                         foreach($config_options['data']['item'] as $items) {
                                             if(isset($items['description'])) {
@@ -1104,7 +1104,7 @@ class endpointmanager {
         }
 
         //Load template data
-        $row = $this->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
+        $row = $this->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
 
         $cfg_data = unserialize($row['template_data']);
         $count = count($cfg_data);
@@ -1206,7 +1206,7 @@ class endpointmanager {
             $location = "devices_manager";
         }
   
-        $this->db->query($sql);
+        $this->eda->sql($sql);
 
         $phone_info = array();
 
@@ -1219,7 +1219,7 @@ class endpointmanager {
             }
         } else {
             $sql = 'SELECT id FROM endpointman_mac_list WHERE template_id = '.$id;
-            $phones = $this->db->getAll($sql, array(), DB_FETCHMODE_ASSOC);
+            $phones = $this->eda->sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
             foreach($phones as $data) {
                 $phone_info = $this->get_phone_info($data['id']);
                 if(isset($_REQUEST['epm_reboot'])) {
@@ -1314,7 +1314,12 @@ class endpointmanager {
 
                 //Timezone
                 require('timezone.php');
-                $provisioner_lib->DateTimeZone = new DateTimeZone($settings['tz']);
+                try {
+                    $provisioner_lib->DateTimeZone = new DateTimeZone($settings['tz']);
+                } catch(Exception $e) {
+                    $this->error['parse_configs'] = 'Caught exception: '. $e->getMessage();
+                    return(FALSE);
+                }
 
                 //Network Time Server
                 $provisioner_lib->ntp = $settings['ntp'];
@@ -1333,9 +1338,9 @@ class endpointmanager {
                         $temp = unserialize($phone_info['template_data_info']['config_files_override']);
                         foreach($temp as $list) {
                             $sql = "SELECT original_name,data FROM endpointman_custom_configs WHERE id = ".$list;
-                            $res = $this->db->query($sql);
+                            $res = $this->eda->sql($sql);
                             if($res->numRows()) {
-                                $data = $this->db->getRow($sql, array(),DB_FETCHMODE_ASSOC);
+                                $data = $this->eda->sql($sql, 'getRow',DB_FETCHMODE_ASSOC);
                                 $provisioner_lib->config_files_override[$data['original_name']] = $data['data'];
                             }
                         }
@@ -1347,9 +1352,9 @@ class endpointmanager {
                         $temp = unserialize($phone_info['config_files_override']);
                         foreach($temp as $list) {
                             $sql = "SELECT original_name,data FROM endpointman_custom_configs WHERE id = ".$list;
-                            $res = $this->db->query($sql);
+                            $res = $this->eda->sql($sql);
                             if($res->numRows()) {
-                                $data = $this->db->getRow($sql, array(),DB_FETCHMODE_ASSOC);
+                                $data = $this->eda->sql($sql, 'getRow',DB_FETCHMODE_ASSOC);
                                 $provisioner_lib->config_files_override[$data['original_name']] = $data['data'];
                             }
                         }
@@ -1532,10 +1537,10 @@ class endpointmanager {
      */
     function firmware_update_check($id=NULL) {
         $sql = "SELECT * FROM  endpointman_product_list WHERE  id ='". $id."'";
-        $row = $this->db->getRow($sql,array(),DB_FETCHMODE_ASSOC);
+        $row = $this->eda->sql($sql,'getRow',DB_FETCHMODE_ASSOC);
 
         $sql = "SELECT directory FROM  endpointman_brand_list WHERE id =". $row['brand'];
-        $brand_directory = $this->db->getOne($sql);
+        $brand_directory = $this->eda->sql($sql,'getOne');
 
         //config drive unknown!
         if ($row['cfg_dir'] == "") {
@@ -1562,13 +1567,13 @@ class endpointmanager {
      */
     function firmware_local_check($id=NULL) {
         $sql = "SELECT * FROM  endpointman_product_list WHERE hidden = 0 AND id ='". $id ."'";
-        $res = $this->db->query($sql);
+        $res = $this->eda->sql($sql);
 
         if($res->numRows()) {
-            $row = $this->db->getRow($sql,array(),DB_FETCHMODE_ASSOC);
+            $row = $this->eda->sql($sql,'getRow',DB_FETCHMODE_ASSOC);
 
             $sql = "SELECT directory FROM  endpointman_brand_list WHERE hidden = 0 AND id =". $row['brand'];
-            $brand_directory = $this->db->getOne($sql);
+            $brand_directory = $this->eda->sql($sql,'getOne');
 
             //config drive unknown!
             if ($row['cfg_dir'] == "") {
@@ -1597,7 +1602,7 @@ class endpointmanager {
      */
     function remove_firmware($id) {
         $sql = "SELECT firmware_files FROM  endpointman_product_list WHERE  id =". $id;
-        $files = $this->db->getOne($sql);
+        $files = $this->eda->sql($sql,'getOne');
 
         $file_list = explode(",",$files);
         $i = 0;
@@ -1607,7 +1612,7 @@ class endpointmanager {
             }
         }
         $sql = 'UPDATE endpointman_product_list SET firmware_files = "", firmware_vers = "" WHERE id = '.$id;
-        $this->db->query($sql);
+        $this->eda->sql($sql);
     }
 
     /**
@@ -1616,7 +1621,7 @@ class endpointmanager {
      */
     function install_firmware($product_id) {
         $sql = 'SELECT endpointman_product_list.*, endpointman_brand_list.directory FROM endpointman_product_list, endpointman_brand_list WHERE endpointman_product_list.brand = endpointman_brand_list.id AND endpointman_product_list.id = '.$product_id;
-        $row = $this->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
+        $row = $this->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
         $temp = $this->xml2array(PHONE_MODULES_PATH."endpoint/".$row['directory']."/".$row['cfg_dir']."/family_data.xml");
         if($temp['data']['firmware_ver'] > $row['firmware_vers']) {
             echo "<div style='float: left'>Downloading firmware...</div><div style='float: left' id=\"DivExample\">.</div>";
@@ -1648,7 +1653,7 @@ class endpointmanager {
                 }
                 $list = implode(",", $list);
                 $sql = "UPDATE endpointman_product_list SET firmware_vers = '".$temp['data']['firmware_ver']."', firmware_files = '".$list."' WHERE id = ". $row['id'];
-                $this->db->query($sql);
+                $this->eda->sql($sql);
                 if(isset($copy_error)) {
                     echo "<BR />Copy Error Detected! Aborting Install!";
                     $this->remove_firmware($product_id);
@@ -1744,7 +1749,7 @@ class endpointmanager {
         $endpoint_last_mod = $temp['data']['last_modified'];
 
         $sql = "SELECT value FROM endpointman_global_vars WHERE var_name LIKE 'endpoint_vers'";
-        $data = $this->db->getOne($sql);
+        $data = $this->eda->sql($sql,'getOne');
         
         $contents = file_get_contents(UPDATE_PATH."/update_status");
 
@@ -1764,7 +1769,7 @@ class endpointmanager {
                     rename(PHONE_MODULES_PATH."temp/endpoint/base.php", PHONE_MODULES_PATH."endpoint/base.php");
 
                     $sql = "UPDATE endpointman_global_vars SET value = '".$endpoint_last_mod."' WHERE var_name = 'endpoint_vers'";
-                    $this->db->query($sql);
+                    $this->eda->sql($sql);
                 }
             }
 
@@ -1773,11 +1778,11 @@ class endpointmanager {
 
             //Assume that if we can't connect and find the master.xml file then why should we try to find every other file.
             if($master_result) {
-                $row = $this->db->getAll('SELECT * FROM  endpointman_brand_list WHERE id > 0', array(), DB_FETCHMODE_ASSOC);
+                $row = $this->eda->sql('SELECT * FROM  endpointman_brand_list WHERE id > 0', 'getAll', DB_FETCHMODE_ASSOC);
 
                 foreach($out as $data) {
 
-                    $local = $this->db->getOne("SELECT local FROM endpointman_brand_list WHERE  directory =  '".$data['directory']."'");
+                    $local = $this->eda->sql("SELECT local FROM endpointman_brand_list WHERE  directory =  '".$data['directory']."'",'getOne');
 
                     if(!$local) {
                         $result = $this->download_xml(UPDATE_PATH .$data['directory']."/".$data['directory'].".xml","endpoint/".$data['directory']);
@@ -1794,8 +1799,8 @@ class endpointmanager {
                         $temp['oui_list']['oui'] = $this->fix_single_array_keys($temp['oui_list']['oui']);
 
                         foreach($temp['oui_list']['oui'] as $oui) {
-                            $sql = "INSERT INTO endpointman_oui_list (`oui`, `brand`, `custom`) VALUES ('".$oui."', '".$temp['brand_id']."', '0')";
-                            $this->db->query($sql);
+                            $sql = "REPLACE INTO endpointman_oui_list (`oui`, `brand`, `custom`) VALUES ('".$oui."', '".$temp['brand_id']."', '0')";
+                            $this->eda->sql($sql);
 
                         }
 
@@ -1816,7 +1821,7 @@ class endpointmanager {
                         if(!($this->arraysearchrecursive($brand_name, $row, 'directory'))) {
                             //insert row
                             $sql = "INSERT INTO endpointman_brand_list (id, name, directory, cfg_ver) VALUES ('".$temp['brand_id']."', '".$temp['name']."', '".$temp['directory']."', '".$version[$brand_name]."')";
-                            $this->db->query($sql);
+                            $this->eda->sql($sql);
                         } else {
                             //in database already!
                         }
@@ -1857,7 +1862,7 @@ class endpointmanager {
      * @param integer $id Brand ID
      */
     function download_brand($id) {
-        $row = $this->db->getAll('SELECT * FROM  endpointman_brand_list WHERE id ='.$id, array(), DB_FETCHMODE_ASSOC);
+        $row = $this->eda->sql('SELECT * FROM  endpointman_brand_list WHERE id ='.$id, 'getAll', DB_FETCHMODE_ASSOC);
         echo "Downloading Brand XML.....";
         $result = $this->download_xml(UPDATE_PATH .$row[0]['directory']. "/".$row[0]['directory'].".xml","endpoint/".$row[0]['directory']);
 
@@ -1951,14 +1956,14 @@ class endpointmanager {
                 }
                 $brand_version = max($last_mod, $brand_last_mod);
 
-                $b_data = $this->db->getOne("SELECT id FROM endpointman_brand_list WHERE id='".$brand_id."'", array(), DB_FETCHMODE_ASSOC);
+                $b_data = $this->eda->sql("SELECT id FROM endpointman_brand_list WHERE id = '".$brand_id."'", 'getOne');
                 if($b_data) {
                     echo "Updating data..........";
                     $sql = "UPDATE endpointman_brand_list SET local = '".$local."', name = '".$brand_name."', cfg_ver = '".$brand_version."', installed = 1, hidden = 0 WHERE id = ".$brand_id;
-                    $this->db->query($sql);
+                    $this->eda->sql($sql);
                 } else {
                     $sql = "INSERT INTO endpointman_brand_list (id, name, directory, cfg_ver, local, installed) VALUES ('".$brand_id."', '".$brand_name."', '".$directory."', '".$brand_version."', '1', '1')";
-                    $this->db->query($sql);
+                    $this->eda->sql($sql);
                 }
 
                 $last_mod = "";
@@ -1970,14 +1975,14 @@ class endpointmanager {
                     $last_mod = max($last_mod, $family_list['last_modified']);
 
                     $family_line_xml = $this->xml2array(PHONE_MODULES_PATH.'/endpoint/'.$directory.'/'.$family_list['directory'].'/family_data.xml');
-                    
+                                        
                     $require_firmware = NULL;
                     if((key_exists('require_firmware', $family_line_xml['data'])) && ($remote) && ($family_line_xml['data']['require_firmware'] == "TRUE")) {
                         echo "Firmware Requirment Detected!..........<br/>";
                         $this->install_firmware($family_line_xml['data']['id']);
                     }
 
-                    $data = $this->db->getOne("SELECT id FROM endpointman_product_list WHERE id='".$brand_id.$family_line_xml['data']['id']."'", array(), DB_FETCHMODE_ASSOC);
+                    $data = $this->eda->sql("SELECT id FROM endpointman_product_list WHERE id='".$brand_id.$family_line_xml['data']['id']."'", 'getOne');
                     $short_name = preg_replace("/\[(.*?)\]/si", "", $family_line_xml['data']['name']);
                     if($data) {
                         $sql = "UPDATE endpointman_product_list SET short_name = '".$short_name."', long_name = '".$family_line_xml['data']['name']."', cfg_ver = '".$family_line_xml['data']['version']."', config_files='".$family_line_xml['data']['configuration_files']."' WHERE id = '".$brand_id.$family_line_xml['data']['id']."'";
@@ -1985,7 +1990,7 @@ class endpointmanager {
                         $sql = "INSERT INTO endpointman_product_list (`id`, `brand`, `short_name`, `long_name`, `cfg_dir`, `cfg_ver`, `config_files`, `hidden`) VALUES ('".$brand_id.$family_line_xml['data']['id']."', '".$brand_id."', '".$short_name."', '".$family_line_xml['data']['name']."', '".$family_line_xml['data']['directory']."', '".$family_line_xml['data']['version']."','".$family_line_xml['data']['configuration_files']."', '0')";
                     }
 
-                    $this->db->query($sql);
+                    $this->eda->sql($sql);
                     $family_line_xml['data']['model_list'] = $this->fix_single_array_keys($family_line_xml['data']['model_list']);
                     echo "--Updating Model Lines................<br/>";
                     foreach($family_line_xml['data']['model_list'] as $model_list) {
@@ -1998,7 +2003,7 @@ class endpointmanager {
                         $model_final_id = $brand_id.$family_line_xml['data']['id'].$model_list['id'];
                         $sql = 'SELECT id, global_custom_cfg_data, global_user_cfg_data FROM endpointman_mac_list WHERE model = '.$model_final_id;
                         $old_data = NULL;
-                        $old_data = $this->db->getAll($sql, array(), DB_FETCHMODE_ASSOC);
+                        $old_data = $this->eda->sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
                         foreach($old_data as $data) {
                             $global_custom_cfg_data = unserialize($data['global_custom_cfg_data']);
                             if((is_array($global_custom_cfg_data)) AND (!array_key_exists('data', $global_custom_cfg_data))) {
@@ -2021,7 +2026,7 @@ class endpointmanager {
                                 $final_data['ari'] = $new_ari;
                                 $final_data = serialize($final_data);
                                 $sql = "UPDATE endpointman_mac_list SET  global_custom_cfg_data =  '".$final_data."' WHERE  id =".$data['id'];
-                                $this->db->query($sql);
+                                $this->eda->sql($sql);
                                 echo "Done!<br/>";
                             }
 
@@ -2057,13 +2062,13 @@ class endpointmanager {
                                 }
                                 $final_data = serialize($new_data);
                                 $sql = "UPDATE endpointman_mac_list SET  global_user_cfg_data =  '".$final_data."' WHERE  id =".$data['id'];
-                                $this->db->query($sql);
+                                $this->eda->sql($sql);
                                 echo "Done!<br/>";
                             }
                         }
                         $old_data = NULL;
                         $sql = 'SELECT id, global_custom_cfg_data FROM endpointman_template_list WHERE model_id = '.$model_final_id;
-                        $old_data = $this->db->getAll($sql, array(), DB_FETCHMODE_ASSOC);
+                        $old_data = $this->eda->sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
                         foreach($old_data as $data) {
                             $global_custom_cfg_data = unserialize($data['global_custom_cfg_data']);
                             if((is_array($global_custom_cfg_data)) AND (!array_key_exists('data', $global_custom_cfg_data))) {
@@ -2091,14 +2096,15 @@ class endpointmanager {
                             }
                         }
 
-                        $m_data = $this->db->getOne("SELECT id FROM endpointman_model_list WHERE id='".$brand_id.$family_line_xml['data']['id'].$model_list['id']."'", array(), DB_FETCHMODE_ASSOC);
+                        $m_data = $this->eda->sql("SELECT id FROM endpointman_model_list WHERE id='".$brand_id.$family_line_xml['data']['id'].$model_list['id']."'", 'getone');
                         if($m_data) {
                             $sql = "UPDATE endpointman_model_list SET max_lines = '".$model_list['lines']."', model = '".$model_list['model']."', template_list = '".$template_list."' WHERE id = '".$brand_id.$family_line_xml['data']['id'].$model_list['id']."'";
                         } else {
                             $sql = "INSERT INTO endpointman_model_list (`id`, `brand`, `model`, `max_lines`, `product_id`, `template_list`, `enabled`, `hidden`) VALUES ('".$brand_id.$family_line_xml['data']['id'].$model_list['id']."', '".$brand_id."', '".$model_list['model']."', '".$model_list['lines']."', '".$brand_id.$family_line_xml['data']['id']."', '".$template_list."', '0', '0')";
                         }
-                        $this->db->query($sql);
+                        $this->eda->sql($sql);
 
+                        
                         if(!$this->sync_model($brand_id.$family_line_xml['data']['id'].$model_list['id'])) {
                             echo "System Error in Sync Model Function, Load Failure!<br />";
                         }
@@ -2107,8 +2113,8 @@ class endpointmanager {
                 }
 
                 foreach($temp['data']['brands']['oui_list']['oui'] as $oui) {
-                    $sql = "INSERT INTO endpointman_oui_list (`oui`, `brand`, `custom`) VALUES ('".$oui."', '".$brand_id."', '0')";
-                    $this->db->query($sql);
+                    $sql = "REPLACE INTO endpointman_oui_list (`oui`, `brand`, `custom`) VALUES ('".$oui."', '".$brand_id."', '0')";
+                    $this->eda->sql($sql);
                 }
 
                 echo "Done!<br/>";
@@ -2132,29 +2138,29 @@ class endpointmanager {
      */
     function remove_brand($id=NULL,$remove_configs=FALSE) {
         $sql = 'SELECT id, firmware_vers FROM endpointman_product_list WHERE brand = '.$id;
-        $products = $this->db->getAll($sql, array(), DB_FETCHMODE_ASSOC);
+        $products = $this->eda->sql($sql, 'getall', DB_FETCHMODE_ASSOC);
         foreach($products as $data) {
             if($data['firmware_vers'] != "") {
                 $this->remove_firmware($data['id']);
             }
         }
 
-        $brand_dir = $this->db->getOne("SELECT directory FROM endpointman_brand_list WHERE id=".$id);
+        $brand_dir = $this->eda->sql("SELECT directory FROM endpointman_brand_list WHERE id=".$id,'getone');
         $this->rmrf(PHONE_MODULES_PATH."endpoint/".$brand_dir);
 
         $sql = "DELETE FROM endpointman_model_list WHERE brand = '". $id."'";
-        $this->db->query($sql);
+        $this->eda->sql($sql);
 
         $sql = "DELETE FROM endpointman_product_list WHERE brand = '". $id . "'";
-        $this->db->query($sql);
+        $this->eda->sql($sql);
 
         $sql = "DELETE FROM endpointman_oui_list WHERE brand = '". $id . "'";
-        $this->db->query($sql);
+        $this->eda->sql($sql);
 
         $this->rmrf(PHONE_MODULES_PATH .$brand_dir);
         $sql = "DELETE FROM endpointman_brand_list WHERE id = ". $id;
 
-        $this->db->query($sql);
+        $this->eda->sql($sql);
     }
 
     /**
@@ -2163,38 +2169,38 @@ class endpointmanager {
      * @return boolean True on sync completed. False on sync failed
      */
     function sync_model($model) {
-        if((!empty($model)) OR ($model > 0)) {
-            $sql = "SELECT * FROM  endpointman_model_list WHERE id='".$model."'";
+        if ((!empty($model)) OR ($model > 0)) {
+            $sql = "SELECT * FROM  endpointman_model_list WHERE id='" . $model . "'";
 
-            $model_row = $this->db->getRow($sql, array(),DB_FETCHMODE_ASSOC);
+            $model_row = $this->eda->sql($sql, 'getrow', DB_FETCHMODE_ASSOC);
 
-            $sql = "SELECT * FROM  endpointman_product_list WHERE id='".$model_row['product_id']."'";
+            $sql = "SELECT * FROM  endpointman_product_list WHERE id='" . $model_row['product_id'] . "'";
 
-            $product_row = $this->db->getRow($sql, array(),DB_FETCHMODE_ASSOC);
+            $product_row = $this->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
 
-            $sql = "SELECT * FROM  endpointman_brand_list WHERE id=".$model_row['brand'];
+            $sql = "SELECT * FROM  endpointman_brand_list WHERE id=" . $model_row['brand'];
 
-            $brand_row = $this->db->getRow($sql, array(),DB_FETCHMODE_ASSOC);
+            $brand_row = $this->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
 
-			if(!file_exists(PHONE_MODULES_PATH.'/endpoint/'.$brand_row['directory'])) {
-				$this->error['sync_model'] = "Brand Directory '".$brand_row['directory']."' Doesn't Exist! (".PHONE_MODULES_PATH.'/endpoint/'.$brand_row['directory'].")";
+            if (!file_exists(PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'])) {
+                $this->error['sync_model'] = "Brand Directory '" . $brand_row['directory'] . "' Doesn't Exist! (" . PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . ")";
                 return(FALSE);
-			}
+            }
 
-			if(!file_exists(PHONE_MODULES_PATH.'/endpoint/'.$brand_row['directory'].'/'.$product_row['cfg_dir'])) {
-				$this->error['sync_model'] = "Product Directory '".$product_row['cfg_dir']."' Doesn't Exist! (".PHONE_MODULES_PATH.'/endpoint/'.$brand_row['directory'].'/'.$product_row['cfg_dir'].")";
+            if (!file_exists(PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'])) {
+                $this->error['sync_model'] = "Product Directory '" . $product_row['cfg_dir'] . "' Doesn't Exist! (" . PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'] . ")";
                 return(FALSE);
-			}
+            }
 
-			if(!file_exists(PHONE_MODULES_PATH.'/endpoint/'.$brand_row['directory'].'/'.$product_row['cfg_dir'].'/family_data.xml')) {
-				$this->error['sync_model'] = "File 'family_data.xml Doesn't exist in directory: ".PHONE_MODULES_PATH.'/endpoint/'.$brand_row['directory'].'/'.$product_row['cfg_dir'];
+            if (!file_exists(PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'] . '/family_data.xml')) {
+                $this->error['sync_model'] = "File 'family_data.xml Doesn't exist in directory: " . PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'];
                 return(FALSE);
-			}
-						
-            $family_line_xml = $this->xml2array(PHONE_MODULES_PATH.'/endpoint/'.$brand_row['directory'].'/'.$product_row['cfg_dir'].'/family_data.xml');
+            }
 
-            if($product_row['cfg_ver'] <= $family_line_xml['data']['version']) {
-                if(array_key_exists('template_data', $family_line_xml['data']['model_list'])) {
+            $family_line_xml = $this->xml2array(PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'] . '/family_data.xml');
+
+            if ($product_row['cfg_ver'] <= $family_line_xml['data']['version']) {
+                if (array_key_exists('template_data', $family_line_xml['data']['model_list'])) {
                     if (is_array($family_line_xml['data']['model_list']['template_data']['files'])) {
                         $template_list = implode(",", $family_line_xml['data']['model_list']['template_data']['files']);
                         $template_list_array = $family_line_xml['data']['model_list']['template_data']['files'];
@@ -2205,12 +2211,12 @@ class endpointmanager {
                     $maxlines = $family_line_xml['data']['model_list']['lines'];
                 } else {
                     $key = $this->arraysearchrecursive($model_row['model'], $family_line_xml['data']['model_list'], 'model');
-                    if($key === FALSE) {
+                    if ($key === FALSE) {
                         $this->error['sync_model'] = "Can't locate model in family XML file";
                         return(FALSE);
                     } else {
-                        if(is_array($family_line_xml['data']['model_list'][$key[0]]['template_data']['files'])) {
-                            $template_list = implode(",",$family_line_xml['data']['model_list'][$key[0]]['template_data']['files']);
+                        if (is_array($family_line_xml['data']['model_list'][$key[0]]['template_data']['files'])) {
+                            $template_list = implode(",", $family_line_xml['data']['model_list'][$key[0]]['template_data']['files']);
                             $template_list_array = $family_line_xml['data']['model_list'][$key[0]]['template_data']['files'];
                         } else {
                             $template_list = $family_line_xml['data']['model_list'][$key[0]]['template_data']['files'];
@@ -2220,49 +2226,49 @@ class endpointmanager {
                     $maxlines = $family_line_xml['data']['model_list'][$key[0]]['lines'];
                 }
 
-                $sql = "UPDATE endpointman_model_list SET max_lines = '".$maxlines."', template_list = '".$template_list."' WHERE id = '".$model."'";
-                $this->db->query($sql);
+                $sql = "UPDATE endpointman_model_list SET max_lines = '" . $maxlines . "', template_list = '" . $template_list . "' WHERE id = '" . $model . "'";
+                $this->eda->sql($sql);
 
                 $version = $family_line_xml['data']['version'];
                 $long_name = $family_line_xml['data']['name'];
                 $short_name = preg_replace("/\[(.*?)\]/si", "", $family_line_xml['data']['name']);
                 $configuration_files = $family_line_xml['data']['configuration_files'];
 
-                $sql = "UPDATE endpointman_product_list SET long_name = '".$template_list."', short_name = '".$short_name."' , cfg_ver = '".$version."', WHERE id = '".$product_row['id']."'";
-                $this->db->query($sql);
+                $sql = "UPDATE endpointman_product_list SET long_name = '" . $long_name . "', short_name = '" . $short_name . "' , cfg_ver = '" . $version . "' WHERE id = '" . $product_row['id'] . "'";
+                $this->eda->sql($sql);
 
                 $template_data_array = array();
-                foreach($template_list_array as $data) {
-                    if(file_exists(PHONE_MODULES_PATH.'/endpoint/'.$brand_row['directory'].'/'.$product_row['cfg_dir'].'/'.$data)) {
-                        $template_data_xml = $this->xml2array(PHONE_MODULES_PATH.'/endpoint/'.$brand_row['directory'].'/'.$product_row['cfg_dir'].'/'.$data);
+                foreach ($template_list_array as $data) {
+                    if (file_exists(PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'] . '/' . $data)) {
+                        $template_data_xml = $this->xml2array(PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'] . '/' . $data);
                         $template_data_xml = $this->fix_single_array_keys($template_data_xml['template_data']);
                         $template_data_array = array_merge($template_data_array, $template_data_xml);
                     }
                 }
 
-                if (file_exists(PHONE_MODULES_PATH.'/endpoint/'.$brand_row['directory'].'/'.$product_row['cfg_dir'].'/template_data_custom.xml')) {
-                    $template_data_multi = $this->xml2array(PHONE_MODULES_PATH.'/endpoint/'.$brand_row['directory'].'/'.$product_row['cfg_dir'].'/template_data_custom.xml');
-                    if($template_data_multi) {
+                if (file_exists(PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'] . '/template_data_custom.xml')) {
+                    $template_data_multi = $this->xml2array(PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'] . '/template_data_custom.xml');
+                    if ($template_data_multi) {
                         $template_data_multi = $this->fix_single_array_keys($template_data_multi['template_data']['item']);
                         $template_data_array = array_merge($template_data_array, $template_data_multi);
                     }
                 }
 
-                if (file_exists(PHONE_MODULES_PATH.'/endpoint/'.$brand_row['directory'].'/'.$product_row['cfg_dir'].'/template_data_' . $model_row['model'] . '_custom.xml')) {
+                if (file_exists(PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'] . '/template_data_' . $model_row['model'] . '_custom.xml')) {
                     $template_data_multi = $this->xml2array(self::$modules_path . $this->brand_name . "/" . $this->family_line . "/template_data_" . $this->model . "_custom.xml");
-                    if($template_data_multi) {
+                    if ($template_data_multi) {
                         $template_data_multi = $this->fix_single_array_keys($template_data_multi['template_data']['item']);
                         $template_data_array = array_merge($template_data_array, $template_data_multi);
                     }
                 }
 
-                if(empty($template_data_array)) {
+                if (empty($template_data_array)) {
                     $this->error['sync_model'] = "No Template Data Found";
                     return(FALSE);
                 }
 
-                $sql = "UPDATE endpointman_model_list SET template_data = '".serialize($template_data_array)."' WHERE id = '".$model."'";
-                $this->db->query($sql);
+                $sql = "UPDATE endpointman_model_list SET template_data = '" . serialize($template_data_array) . "' WHERE id = '" . $model . "'";
+                $this->eda->sql($sql);
             }
 
             return(TRUE);
@@ -2419,7 +2425,7 @@ class endpointmanager {
     function table_exists($table) {
 	global $amp_conf;
         $sql = "SHOW TABLES FROM ".$amp_conf['AMPDBNAME'];
-        $result = $this->db->getAll($sql);
+        $result = $this->eda->sql($sql,'getAll');
 
         foreach($result as $row) {
             if ($row[0] == $table) {
@@ -2671,9 +2677,9 @@ class endpointmanager {
                 //Find the matching brand model to the oui
                 $oui_sql = "SELECT endpointman_brand_list.name, endpointman_brand_list.id FROM endpointman_oui_list, endpointman_brand_list WHERE oui LIKE '%". $oui ."%' AND endpointman_brand_list.id = endpointman_oui_list.brand AND endpointman_brand_list.installed = 1 LIMIT 1";
 
-                $brand = $this->db->getRow($oui_sql, array(), DB_FETCHMODE_ASSOC);
+                $brand = $this->eda->sql($oui_sql, 'getRow', DB_FETCHMODE_ASSOC);
                 
-                $res = $this->db->query($oui_sql);
+                $res = $this->eda->sql($oui_sql);
                 $brand_count = $res->numRows();
                 
                 if (!$brand_count) {
@@ -2684,9 +2690,9 @@ class endpointmanager {
 
                 //Find out if endpoint has already been configured for this mac address
                 $epm_sql = "SELECT * FROM endpointman_mac_list WHERE mac LIKE  '%". $mac_strip ."%'";
-                $epm_row = $this->db->getRow($epm_sql, array(), DB_FETCHMODE_ASSOC);
+                $epm_row = $this->eda->sql($epm_sql, 'getRow', DB_FETCHMODE_ASSOC);
 
-                $res = $this->db->query($epm_sql);
+                $res = $this->eda->sql($epm_sql);
                 $epm_count = $res->numRows();
 
                 if ($epm_count) {
@@ -2712,7 +2718,7 @@ class endpointmanager {
 
     function areaAvailable($model,$area=NULL) {
         $sql = "SELECT max_lines FROM endpointman_model_list WHERE id = '". $model."'";
-        $count = $this->db->getOne($sql);
+        $count = $this->eda->sql($sql,'getOne');
 
         for($z=0;$z<$count;$z++) {
             $result[$z]['id'] = $z + 1;
@@ -2746,13 +2752,13 @@ class endpointmanager {
     function models_available($model=NULL, $brand=NULL, $product=NULL) {
         
         if ((!isset($oui)) && (!isset($brand)) && (!isset($model))) {
-            $result1 = $this->endpoint_data->all_models();
+            $result1 = $this->eda->all_models();
         }elseif((isset($brand)) && ($brand !=0)) {
-            $result1 = $this->endpoint_data->all_models_by_brand($brand);
+            $result1 = $this->eda->all_models_by_brand($brand);
         }elseif((isset($product)) && ($product !=0)) {
-            $result1 = $this->endpoint_data->all_models_by_product($product);
+            $result1 = $this->eda->all_models_by_product($product);
         } else {
-            $result1 = $this->endpoint_data->all_models();
+            $result1 = $this->eda->all_models();
         }
 
         $i = 1;
@@ -2796,7 +2802,7 @@ class endpointmanager {
             $sql="SELECT max_lines FROM endpointman_model_list WHERE id = (SELECT endpointman_mac_list.model FROM endpointman_mac_list, endpointman_line_list WHERE endpointman_line_list.luid = ".$lineid." AND endpointman_line_list.mac_id = endpointman_mac_list.id)";
 
             $sql_l = "SELECT line, mac_id FROM `endpointman_line_list` WHERE luid = ".$lineid;
-            $line = $this->db->getRow($sql_l, array(), DB_FETCHMODE_ASSOC);
+            $line = $this->eda->sql($sql_l, 'getRow', DB_FETCHMODE_ASSOC);
 
             $sql_lu = "SELECT line FROM endpointman_line_list WHERE mac_id = ".$line['mac_id'];
         } elseif(isset($macid)) {
@@ -2806,8 +2812,8 @@ class endpointmanager {
             $line['line'] = 0;
         }
 
-        $max_lines = $this->db->getOne($sql);
-        $lines_used = $this->db->getAll($sql_lu);
+        $max_lines = $this->eda->sql($sql,'getOne');
+        $lines_used = $this->eda->sql($sql_lu,'getAll');
 
         for($i = 1; $i <= $max_lines; $i++) {    
             if($i == $line['line']) {
@@ -2835,10 +2841,10 @@ class endpointmanager {
     function display_registration_list($line_id=NULL) {
 
         if(isset($line_id)) {
-            $result = $this->endpoint_data->all_unused_registrations();
-            $line_data = $this->endpoint_data->get_line_information($line_id);
+            $result = $this->eda->all_unused_registrations();
+            $line_data = $this->eda->get_line_information($line_id);
         } else {
-            $result = $this->endpoint_data->all_unused_registrations();
+            $result = $this->eda->all_unused_registrations();
             $line_data = NULL;
         }
 
@@ -2865,7 +2871,7 @@ class endpointmanager {
      * @return array Number array used to generate a select box
      */
     function brands_available ($selected = NULL,$show_blank=TRUE) {
-        $data = $this->endpoint_data->all_active_brands();
+        $data = $this->eda->all_active_brands();
         if($show_blank) {
             $temp[0]['value'] = "";
             $temp[0]['text'] = "";
@@ -2890,11 +2896,11 @@ class endpointmanager {
         $i = 0;
         $sql="SELECT id FROM  endpointman_product_list WHERE endpointman_product_list.id ='".$product_id."'";
 
-        $id = $this->db->getOne($sql);
+        $id = $this->eda->sql($sql,'getOne');
 
         $sql="SELECT * FROM  endpointman_template_list WHERE  product_id = '".$id."'";
 
-        $data = $this->db->getAll($sql,array(), DB_FETCHMODE_ASSOC);
+        $data = $this->eda->sql($sql,'getAll', DB_FETCHMODE_ASSOC);
         foreach($data as $row) {
             $temp[$i]['value'] = $row['id'];
             $temp[$i]['text'] = $row['name'];
@@ -2914,14 +2920,7 @@ class endpointmanager {
         return($temp);
     }
 
-    function listTZ($selected) {
-        /**
-        $sql="SELECT tz FROM endpointman_time_zones";
-        $data = $this->db->getAll($sql,array(), DB_FETCHMODE_ASSOC);
-         *
-         *
-         */
-        
+    function listTZ($selected) {        
         require('timezone.php');        
         $data = DateTimeZone::listIdentifiers();
         $i = 0;
@@ -2945,4 +2944,40 @@ function endpointman_flush_buffers(){
     //ob_flush();
     flush();
     ob_start();
+}
+
+function endpointman_update_progress_bar($out) {
+    echo '<script type="text/javascript">document.getElementById(\'DivExample\').innerHTML="%'.$out.'";</script>';
+}
+
+function endpointmanager_read_header($ch, $string) {
+    global $file_size, $fout;
+    $length = strlen($string);
+    $regs = "";
+    preg_match("/(Content-Length:) (.*)/i", $string, $regs);
+    if((isset($regs[2])) AND ($regs[2] <> "")) {
+        $file_size = intval($regs[2]);
+    }
+    //ob_flush();
+    endpointman_flush_buffers();
+    return $length;
+}
+
+function endpointmanager_read_body($ch, $string) {
+    global $fout, $file_size, $downloaded, $lastseen, $progress_bar;
+    $length = strlen($string);
+    $downloaded += intval($length);
+    $downloadProgress = round(100 * (1 - $downloaded / $file_size), 0);
+    $downloadProgress = 100 - $downloadProgress;
+    if($lastseen <> $downloadProgress and $downloadProgress < 101) {
+        if($progress_bar) {
+            endpointman_update_progress_bar($downloadProgress);
+        }
+        $lastseen = $downloadProgress;
+    }
+    if($fout)
+        fwrite($fout, $string);
+    //ob_flush();
+    endpointman_flush_buffers();
+    return $length;
 }

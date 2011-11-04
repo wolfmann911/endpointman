@@ -93,36 +93,55 @@ function ep_table_exists ($table) {
 
 $epm_module_xml = epm_install_xml2array(LOCAL_PATH."module.xml");
 
-$version = $epm_module_xml['module']['version'];
+preg_match('/^(\d*)\.(\d*)/', $epm_module_xml['module']['version'], $versions);
+
+$xml_full_version = $epm_module_xml['module']['version'];
+
+$version['major'] = $versions[1];
+$version['minor'] = $versions[2];
+
+$sql = 'SELECT value FROM `admin` WHERE `variable` LIKE CONVERT(_utf8 \'version\' USING latin1) COLLATE latin1_swedish_ci';
+preg_match('/^(\d*)\.(\d*)/', $db->getOne($sql), $versions);
+
+$amp_version['minor'] = $versions[2];
+
+if($amp_version['minor'] < 9) {
+    out("<strong>Warning: Endpoint Manager is unsupported on FreePBX 2.".$amp_version['minor'].". We do check it on occasion but it is not a supported platform</strong>");
+}
+
 
 $sql = 'SELECT `version` FROM `modules` WHERE `modulename` = CONVERT(_utf8 \'endpointman\' USING latin1) COLLATE latin1_swedish_ci';
-
 $full_vers = $db->getOne($sql);
 
-$db_version = (float)preg_replace('/[^0-9]*/i', '', $full_vers);
 
 if($db->getOne($sql)) {
+    $new_install = FALSE;
     $global_cfg =& $db->getAssoc("SELECT var_name, value FROM endpointman_global_vars");
-    $global_cfg['version'] = $db_version;
+    
+    if(preg_match('/^(\d*)\.(\d*)\.(\d*)$/', $full_vers, $versions)) {
+	
+    }elseif(preg_match('/^(\d*)\.(\d*)\.(\d*)\.(\d*)$/', $full_vers, $versions)){
+
+    }elseif(preg_match('/^(\d*)\.(\d*)\.(\d*)\.(\d*)\.(\d*)$/', $full_vers, $versions)){
+
+    }
+
+    $very['major'] = $versions[1];
+    $very['minor'] = isset($versions[2]) ? $versions[2] : '0';
+    $very['subminor'] = isset($versions[3]) ? $versions[3] : '0';
+    $very['subsubminor'] = isset($versions[4]) ? $versions[4] : '0';
+
+    $ver = $very['major'] . $very['minor'] . $very['subminor'] . $very['subsubminor'];
+    
+    out('Version Identified as '. $full_vers);
 } else {
-    $global_cfg['version'] = '?';
-}
-$new_install = FALSE;
-if($global_cfg['version'] != "?") {
-    $ver = $global_cfg['version'];
-} else {
-    $ver = "1000";
     $new_install = TRUE;
+    out('New Installation Detected!');
 }
 
-if($new_install) {
-    out('New Installation Detected!');
-} else {
-    out('Version Identified as '. $full_vers);
-}
 if(!$new_install) {
 
-    if(($ver < "190") AND ($ver > 0)) {
+    if(($ver < "1900") AND ($ver > 0)) {
         out("Please Wait While we upgrade your old setup");
         //Expand the value option
         $sql = 'ALTER TABLE `endpointman_global_vars` CHANGE `value` `value` VARCHAR(100) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT \'Data\'';
@@ -297,7 +316,7 @@ if(!$new_install) {
         out("DONE! You can now use endpoint manager!");
     }
 
-    if ($ver <= "190") {
+    if ($ver <= "1900") {
         out("Locating NMAP + ARP + ASTERISK Executables");
 
         $nmap = find_exec("nmap");
@@ -367,7 +386,7 @@ if(!$new_install) {
         $sql = "ALTER TABLE endpointman_mac_list CHANGE custom_cfg_data custom_cfg_data TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL";
         $db->query($sql);
     }
-    if ($ver <= "191") {
+    if ($ver <= "1910") {
         out("Create Custom Configs Table");
         $sql = "CREATE TABLE IF NOT EXISTS `endpointman_custom_configs` (
 	  `id` int(11) NOT NULL auto_increment,
@@ -422,11 +441,11 @@ if(!$new_install) {
         $sql = "ALTER TABLE endpointman_mac_list CHANGE custom_cfg_data custom_cfg_data TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL";
         $db->query($sql);
     }
-    if ($ver <= "192") {
+    if ($ver <= "1920") {
         out('Updating Global Variables');
     }
 
-    if ($ver <= "199") {
+    if ($ver <= "1990") {
         out("Adding Custom Field to OUI List");
         $sql = 'ALTER TABLE `endpointman_oui_list` ADD `custom` INT(1) NOT NULL DEFAULT \'0\'';
         $db->query($sql);
@@ -470,7 +489,7 @@ if(!$new_install) {
         $sql = "INSERT INTO cronmanager (module, id, time, freq, lasttime, command) VALUES ('endpointman', 'UPDATES', '23', '24', '0', 'php ".LOCAL_PATH. "includes/update_check.php')";
         $db->query($sql);
     }
-    if($ver <= "200") {
+    if($ver <= "2000") {
         out("Locating NMAP + ARP + ASTERISK Executables");
         $nmap = find_exec("nmap");
         $arp = find_exec("arp");
@@ -660,10 +679,8 @@ if(!$new_install) {
             out("Creating temp folder");
         }
     }
-    if ($ver <= "221") {
-    }
 
-    if ($ver <= "222") {
+    if ($ver <= "2220") {
 
         out("Remove all Dashes in IDs");
         $data = array();
@@ -707,16 +724,16 @@ if(!$new_install) {
             $db->query($sql);
         }
     }
-    if ($ver <= "223") {
+    if ($ver <= "2230") {
         $sql = "UPDATE endpointman_global_vars SET value = 'http://www.provisioner.net/release/' WHERE var_name = 'update_server'";
         $db->query($sql);
     }
 
-    if ($ver <= "224") {
+    if ($ver <= "2240") {
 
     }
 
-    if ($ver <= "225") {
+    if ($ver <= "2250") {
         out("Fixing Permissions of Phone Modules Directory");
         $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(PHONE_MODULES_PATH), RecursiveIteratorIterator::SELF_FIRST);
         foreach($iterator as $item) {
@@ -728,7 +745,7 @@ if(!$new_install) {
         $db->query($sql);
     }
 
-    if ($ver <= "226") {
+    if ($ver <= "2260") {
         $sql = "CREATE TABLE IF NOT EXISTS `endpointman_line_list` (
               `luid` int(11) NOT NULL AUTO_INCREMENT,
               `mac_id` int(11) NOT NULL,
@@ -780,11 +797,7 @@ if(!$new_install) {
 
     }
 
-    if ($ver <= "227") {
-
-    }
-
-    if ($ver <= "228") {
+    if ($ver <= "2280") {
         out("Fix Debug Left on Error, this turns off debug.");
         $sql = "UPDATE endpointman_global_vars SET value = '0' WHERE var_name = 'debug'";
         $db->query($sql);
@@ -793,12 +806,9 @@ if(!$new_install) {
         $db->query($sql);
     }
 
-    if ($ver <= "240") {
+    if ($ver <= "2400") {
         out("Uninstalling All Installed Brands (You'll just simply have to update again, no loss of data)");
         $db->query("UPDATE endpointman_brand_list SET  installed =  '0'");
-        out("Changing update server");
-        $sql = "UPDATE endpointman_global_vars SET value = 'http://mirror.freepbx.org/provisioner/' WHERE var_name ='update_server'";
-        $db->query($sql);
         $sql = "UPDATE  endpointman_model_list SET  enabled =  '0', template_data = '".serialize(array())."'";
         $db->query($sql);
 
@@ -844,13 +854,6 @@ if(!$new_install) {
         out("Adding show_all_registrations to global_vars table");
         $sql = 'INSERT INTO endpointman_global_vars (idnum, var_name, value) VALUES (NULL, "show_all_registrations", "0")';
         $db->query($sql);
-    }
-
-    if($ver <= "2909") {
-        out("Successfully  Migrated to the new Installer!");
-        $sql = "UPDATE endpointman_global_vars SET value = 'http://mirror.freepbx.org/provisioner/' WHERE var_name ='update_server'";
-        $db->query($sql);
-        out("Mirgrated to FreePBX Mirror");
     }
 
     if($ver <= "2910") {
@@ -985,7 +988,6 @@ if(!$new_install) {
 
 }
 
-
 if ($new_install) {
 
     out("Creating Brand List Table");
@@ -1038,7 +1040,7 @@ if ($new_install) {
             (4, 'gmthr', ''),
             (5, 'config_location', '/tftpboot/'),
             (6, 'update_server', 'http://mirror.freepbx.org/provisioner/v2.5/'),
-            (7, 'version', '".$version."'),
+            (7, 'version', '".$xml_full_version."'),
             (8, 'enable_ari', '0'),
             (9, 'debug', '0'),
             (10, 'arp_location', '".$arp."'),
@@ -1051,7 +1053,8 @@ if ($new_install) {
             (17, 'disable_help', '0'),
             (18, 'show_all_registrations', '0'),
             (19, 'ntp', ''),
-            (20, 'server_type', 'file')";
+            (20, 'server_type', 'file'),
+            (21, 'allow_hdfiles', '0')";
     $db->query($sql);
 
     out("Creating mac list Table");
@@ -1126,88 +1129,6 @@ if ($new_install) {
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1";
     $db->query($sql);
 
-    out("Creating Time Zone List Tables");
-        $sql = "CREATE TABLE IF NOT EXISTS `endpointman_time_zones_desc` (
-  `id` int(11) NOT NULL auto_increment,
-  `tid` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `description` varchar(255) NOT NULL,
-  PRIMARY KEY  (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=32";
-        $db->query($sql);
-
-        $sql = "INSERT INTO `endpointman_time_zones_desc` (`id`, `tid`, `name`, `description`) VALUES
-(1, 1, 'UTC', 'Universal Coordinated Time (and Greenwich Mean Time)'),
-(2, 2, 'ECT', 'European Central Time'),
-(3, 3, 'EET', 'Eastern European Time'),
-(4, 3, 'ART', '(Arabic) Egypt Standard Time'),
-(5, 4, 'EAT', 'Eastern African Time'),
-(6, 5, 'MET', 'Middle East Time'),
-(7, 6, 'NET', 'Near East Time'),
-(8, 7, 'PLT', 'Pakistan Lahore Time'),
-(9, 8, 'IST', 'India Standard Time'),
-(10, 9, 'BST', 'Bangladesh Standard Time'),
-(11, 10, 'VST', 'Vietnam Standard Time'),
-(12, 11, 'CTT', 'China Taiwan Time'),
-(13, 12, 'JST', 'Japan Standard Time'),
-(14, 13, 'ACT', 'Australia Central Time'),
-(15, 14, 'AET', 'Australia Eastern Time'),
-(16, 15, 'SST', 'Solomon Standard Time'),
-(17, 16, 'NST', 'New Zealand Standard Time'),
-(18, 17, 'MIT', 'Midway Islands Time'),
-(19, 18, 'HST', 'Hawaii Standard Time'),
-(20, 19, 'AST', 'Alaska Standard Time'),
-(21, 20, 'PST', 'Pacific Standard Time'),
-(22, 21, 'PNT', 'Phoenix Standard Time'),
-(23, 21, 'MST', 'Mountain Standard Time'),
-(24, 22, 'CST', 'Central Standard Time'),
-(25, 23, 'EST', 'Eastern Standard Time'),
-(26, 23, 'IET', 'Indiana Eastern Standard Time'),
-(27, 24, 'PRT', 'Puerto Rico and US Virgin Islands Time'),
-(28, 25, 'CNT', 'Canada Newfoundland Time'),
-(29, 26, 'AGT', 'Argentina Standard Time'),
-(30, 26, 'BET', 'Brazil Eastern Time'),
-(31, 27, 'CAT', 'Central African Time')";
-        $db->query($sql);
-
-        $sql = "CREATE TABLE IF NOT EXISTS `endpointman_time_zones_new` (
-  `id` int(11) NOT NULL auto_increment,
-  `gmt` varchar(255) NOT NULL,
-  `offset` int(11) NOT NULL,
-  PRIMARY KEY  (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=28";
-        $db->query($sql);
-
-        $sql = "INSERT INTO `endpointman_time_zones_new` (`id`, `gmt`, `offset`) VALUES
-(1, 'GMT', 0),
-(2, 'GMT+1:00', 3600),
-(3, 'GMT+2:00', 7200),
-(4, 'GMT+3:00', 10800),
-(5, 'GMT+3:30', 12600),
-(6, 'GMT+4:00', 14400),
-(7, 'GMT+5:00', 18000),
-(8, 'GMT+5:30', 19800),
-(9, 'GMT+6:00', 21600),
-(10, 'GMT+7:00', 25200),
-(11, 'GMT+8:00', 28800),
-(12, 'GMT+9:00', 32400),
-(13, 'GMT+9:30', 34200),
-(14, 'GMT+10:00', 36000),
-(15, 'GMT+11:00', 39600),
-(16, 'GMT+12:00', 43200),
-(17, 'GMT-11:00', -39600),
-(18, 'GMT-10:00', -36000),
-(19, 'GMT-9:00', -32400),
-(20, 'GMT-8:00', -28800),
-(21, 'GMT-7:00', -25200),
-(22, 'GMT-6:00', -21600),
-(23, 'GMT-5:00', -18000),
-(24, 'GMT-4:00', -14400),
-(25, 'GMT-3:30', -12600),
-(26, 'GMT-3:00', -10800),
-(27, 'GMT-1:00', -3600)";
-        $db->query($sql);
-
     out("Create Custom Configs Table");
     $sql = "CREATE TABLE IF NOT EXISTS `endpointman_custom_configs` (
           `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -1221,19 +1142,16 @@ if ($new_install) {
 
     out('Creating symlink to web provisioner');
     if(!symlink(LOCAL_PATH."provisioning",$amp_conf['AMPWEBROOT']."/provisioning")) {
-        out("<strong>Your permissions are wrong on ".$amp_conf['AMPWEBROOT'].", web provisioning link not created!</strong>");
+        //out("<strong>Your permissions are wrong on ".$amp_conf['AMPWEBROOT'].", web provisioning link not created!</strong>");
     }
 }
 
-out("Update Version Number to ".$version);
-$sql = "UPDATE endpointman_global_vars SET value = '".$version."' WHERE var_name = 'version'";
+out("Update Version Number to ".$xml_full_version);
+$sql = "UPDATE endpointman_global_vars SET value = '".$xml_full_version."' WHERE var_name = 'version'";
 $db->query($sql);
 
 $sql = "UPDATE endpointman_global_vars SET value = 'http://mirror.freepbx.org/provisioner/v2.5/' WHERE var_name = 'update_server'";
 $db->query($sql);
-
-$sql = 'SELECT value FROM `admin` WHERE `variable` LIKE CONVERT(_utf8 \'version\' USING latin1) COLLATE latin1_swedish_ci';
-$amp_version = $db->getOne($sql);
 
 if(file_exists($amp_conf['AMPWEBROOT']."/recordings/modules/phonesettings.module")) {
     unlink($amp_conf['AMPWEBROOT']."/recordings/modules/phonesettings.module");
@@ -1251,7 +1169,7 @@ if(file_exists($amp_conf['AMPWEBROOT']."/recordings/theme/coda-slider-2.0a.css")
     unlink($amp_conf['AMPWEBROOT']."/recordings/theme/coda-slider-2.0a.css");
 }
 
-if($amp_version < "2.9.0") {
+if($amp_version['minor'] < 9) {
     //Do symlinks ourself because retrieve_conf is OLD
 
     //images
