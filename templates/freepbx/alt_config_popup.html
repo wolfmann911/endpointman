@@ -6,7 +6,11 @@
         <script type="text/javascript" src="assets/endpointman/js/codemirror.js"></script>
         <script type="text/javascript" src="assets/endpointman/js/xml.js"></script>
         <link href="assets/endpointman/theme/default.css" rel="stylesheet" type="text/css" />
+        {if condition="$amp_ver < 10"}
         <link href="assets/css/mainstyle.css" rel="stylesheet" type="text/css" />
+        {else}
+        <link href="common/mainstyle.css" rel="stylesheet" type="text/css" />
+        {/if}
         <script language="javascript">
             function Close() {
                 self.close();
