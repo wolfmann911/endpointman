@@ -105,6 +105,10 @@ preg_match('/^(\d*)\.(\d*)/', $db->getOne($sql), $versions);
 
 $amp_version['minor'] = $versions[2];
 
+if($amp_version['minor'] < 9) {
+    out("<strong>Warning: Endpoint Manager is unsupported on FreePBX 2.".$amp_version['minor'].". We do check it on occasion but it is not a supported platform</strong>");
+}
+
 
 $sql = 'SELECT `version` FROM `modules` WHERE `modulename` = CONVERT(_utf8 \'endpointman\' USING latin1) COLLATE latin1_swedish_ci';
 $full_vers = $db->getOne($sql);
