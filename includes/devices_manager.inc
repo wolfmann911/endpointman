@@ -95,7 +95,7 @@ switch ($sub_type) {
                 break;
             case "delete":
                 $sql = 'SELECT mac_id FROM endpointman_line_list WHERE luid = '.$_REQUEST['edit_id'] ;
-                $mac_id = $endpoint->eda->sql($sql,'getOne',DB_FETCHMODE_ASSOC);
+                $mac_id = $endpoint->eda->sql($sql,'getOne');
                 $row = $endpoint->get_phone_info($mac_id);
 
                 $endpoint->delete_line($_REQUEST['edit_id'],FALSE);
@@ -473,6 +473,9 @@ if (isset($template_editor)) {
     $endpoint->tpl->assign("amp_conf_serial", base64_encode(serialize($amp_send)));
     $endpoint->tpl->assign("no_add", $no_add);
     $endpoint->tpl->assign("mode", $mode);
+    
+    $edit_row['id'] = isset($edit_row['id']) ? $edit_row['id'] : '0';
+    $endpoint->tpl->assign("edit_id", $edit_row['id']);
 
     if(isset($final)) {
         $_SESSION['dev_cache'] = base64_encode(serialize($final));
@@ -498,7 +501,7 @@ if (isset($template_editor)) {
             $endpoint->tpl->assign("models_ava", $ma);
 
             $endpoint->tpl->assign("display_templates", $endpoint->display_templates($edit_row['product_id'],$edit_row['template_id']));
-            $endpoint->tpl->assign("edit_id", $edit_row['id']);
+            
         } else {
             $message = _("You have disabled/removed all models that correspond to this brand. Please enable them in 'Brand Configurations/Setup' before trying to edit this phone");
             $endpoint->tpl->assign("mode", NULL);
