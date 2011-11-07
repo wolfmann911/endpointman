@@ -1,4 +1,5 @@
 <?PHP
+
 /**
  * Endpoint Manager Master Page File
  *
@@ -6,29 +7,29 @@
  * @license MPL / GPLv2 / LGPL
  * @package Endpoint Manager
  */
-require_once $amp_conf['AMPWEBROOT'].'/admin/modules/endpointman/config.php';
+require_once $amp_conf['AMPWEBROOT'] . '/admin/modules/endpointman/config.php';
 
 switch ($page) {
-	case 'advanced':
-		include LOCAL_PATH.'includes/advanced.inc';	
-		break;
-	
-	case 'template_manager':
-		include LOCAL_PATH.'includes/template_manager.inc';	
-		break;
+    case 'advanced':
+        include LOCAL_PATH . 'includes/advanced.inc';
+        break;
 
-	case 'devices_manager';
-		include LOCAL_PATH.'includes/devices_manager.inc';
-		break;
+    case 'template_manager':
+        include LOCAL_PATH . 'includes/template_manager.inc';
+        break;
 
-	case 'brand_model_manager':
-		include LOCAL_PATH.'includes/brand_model_manager.inc';
-		break;
-		
-	case 'installer':
-	  include LOCAL_PATH.'install.php';
-	  break;
+    case 'devices_manager';
+        include LOCAL_PATH . 'includes/devices_manager.inc';
+        break;
 
-	default:
-		include LOCAL_PATH.'includes/devices_manager.inc';
+    case 'brand_model_manager':
+        include LOCAL_PATH . 'includes/brand_model_manager.inc';
+        break;
+
+    case 'installer':
+        include LOCAL_PATH . 'install.inc';
+        break;
+
+    default:
+        include LOCAL_PATH . 'includes/devices_manager.inc';
 }

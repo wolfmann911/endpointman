@@ -82,8 +82,8 @@ class endpointmanager {
         }
 
         //include the local template class
-        if(file_exists(LOCAL_PATH."includes/rain.tpl.class.php")) {
-            require(LOCAL_PATH."includes/rain.tpl.class.php");
+        if(file_exists(LOCAL_PATH."includes/rain.tpl.class.inc")) {
+            require(LOCAL_PATH."includes/rain.tpl.class.inc");
         } else {
             die("Can't Load the Template Class");
         }
@@ -480,11 +480,11 @@ class endpointmanager {
      */
     function delete_line($lineid,$allow_device_remove=FALSE) {
         $sql = 'SELECT mac_id FROM endpointman_line_list WHERE luid = '.$lineid ;
-        $mac_id = $this->eda->sql($sql,'getOne',DB_FETCHMODE_ASSOC);
+        $mac_id = $this->eda->sql($sql,'getOne');
         $row = $this->get_phone_info($mac_id);
 
         $sql = 'SELECT COUNT(*) FROM endpointman_line_list WHERE mac_id = '.$mac_id;
-        $num_lines = $this->eda->sql($sql,'getOne',DB_FETCHMODE_ASSOC);
+        $num_lines = $this->eda->sql($sql,'getOne');
         if($num_lines > 1) {
             $sql = "DELETE FROM endpointman_line_list WHERE luid=".$lineid;
             $this->eda->sql($sql);
@@ -1313,7 +1313,7 @@ class endpointmanager {
                 $provisioner_lib->model = $phone_info['model'];
 
                 //Timezone
-                require('timezone.php');
+                require('timezone.inc');
                 try {
                     $provisioner_lib->DateTimeZone = new DateTimeZone($settings['tz']);
                 } catch(Exception $e) {
@@ -2921,7 +2921,7 @@ class endpointmanager {
     }
 
     function listTZ($selected) {        
-        require('timezone.php');        
+        require('timezone.inc');        
         $data = DateTimeZone::listIdentifiers();
         $i = 0;
         foreach($data as $key => $row) {
