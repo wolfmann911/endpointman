@@ -128,14 +128,16 @@
     }
     function add_device() {
         $('#adding').append('<input type="hidden" name="sub_type" value="add"/>');
+        /*
         $('#adding').ajaxSubmit(function(responseText, statusText, xhr, $form) { 
             //ffalert('status: ' + statusText + '\n\nresponseText: \n' + responseText + '\n\nThe output div should have already been updated with the responseText.'); 
             $(this).resetForm();
             $('#devList tr:last').after('<tr><td>stuff</td></tr>');
             return false;
         });
+        */
         //return false //to prevent normal browser submit and page navigation 
-        //document.adding.submit();
+        document.adding.submit();
     }
     function find_devices() {
         $('#spinner').toggle();
