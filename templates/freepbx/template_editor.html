@@ -14,7 +14,14 @@
     </head>
     <body>
 {else}
+        <link href="assets/endpointman/theme/coda-slider-2.0a.css" media="screen, projection" rel="stylesheet" type="text/css" />
+
 <script language="javascript" type="text/javascript">
+    $().ready(function() {
+        $('#coda-slider-9').codaSlider({
+            dynamicArrows: false
+        });
+    });
     function Reload() {
         window.location.reload();
     }

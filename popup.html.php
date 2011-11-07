@@ -6,4 +6,4 @@
  * @license MPL / GPLv2 / LGPL
  * @package Endpoint Manager
  */
-include('includes/popup.php');
+include('includes/popup.inc');
