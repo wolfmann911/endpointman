@@ -187,11 +187,21 @@ class endpointmanager {
         }
         $message = NULL;
         foreach($this->message as $key => $error) {
-            $message .= $error;
-            if($this->global_cfg['debug']) {
-                $message .= " Function: [".$key."]";
+            if(is_array($error)) {
+                foreach($error as $sub_error) {
+                    $message .= $sub_error;
+                    if ($this->global_cfg['debug']) {
+                        $message .= " Function: [" . $key . "]";
+                    }
+                    $message .= "<br />";
+                }
+            } else {
+                $message .= $error;
+                if ($this->global_cfg['debug']) {
+                        $message .= " Function: [" . $key . "]";
+                }
+                $message .= "<br />";
             }
-            $message .= "<br />";
         }
 
         if(isset($message)) {
@@ -339,7 +349,7 @@ class endpointmanager {
                         $sql = "INSERT INTO `endpointman_line_list` (`mac_id`, `ext`, `line`, `description`) VALUES ('".$ext_id."', '".$ext."', '".$line."', '".addslashes($name)."')";
                         $this->eda->sql($sql);
 
-                        $this->message['add_device'] = "Added ".$name." to line ".$line;
+                        $this->message['add_device'][] = "Added ".$name." to line ".$line;
                         return($ext_id);
                     }
                 } else {
