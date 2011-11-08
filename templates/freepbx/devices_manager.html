@@ -150,6 +150,7 @@
     }
     function add_searched_devices() {
         $('#unmanaged').append('<input type="hidden" name="sub_type" value="add_selected_phones"/>');
+        //$('#devList tr:last').after('<tr><td>stuff</td></tr>');
         document.unmanaged.submit();
     }
     function submit_global(type) {
@@ -372,7 +373,7 @@
 		{loop name="unmanaged"}
         <input name="mac_{$value.id}" type="hidden" value="{$value.mac_strip}">
         <input name="brand_{$value.id}" type="hidden" value="{$value.brand_id}">
-        <tr>
+        <tr id="{$value.mac_strip}">
             <td align='center' width='20'><input type="checkbox" name="add[]" value="{$value.id}"></td>
             <td align='center' width='148'>{$value.mac_strip}<br />({$value.ip})</td>
             <td width="188" align='center'>{$value.brand}</td>
