@@ -47,21 +47,17 @@ switch($_REQUEST['subpage']) {
 
                                             $sql_model = "SELECT id FROM endpointman_model_list WHERE brand = ".$brand_id." AND model LIKE '%".$device[2]."%' LIMIT 1";
                                             $sql_ext = "SELECT extension, name FROM users WHERE extension LIKE '%".$device[3]."%' LIMIT 1";
+                                            
+                                            $line_id = isset($device[4]) ? $device[4] : 1;
 
-                                            if(isset($device[4])) {
-                                                $line_id = $device[4];
-                                            } else {
-                                                $line_id = 1;
-                                            }
-
-                                            $res_model =& $endpoint->eda->sql($sql_model);
+                                            $res_model = $endpoint->eda->sql($sql_model);
                                             if($res_model->numRows()) {
-                                                $model_id =& $endpoint->eda->sql($sql_model,'getRow', DB_FETCHMODE_ASSOC);
+                                                $model_id = $endpoint->eda->sql($sql_model,'getRow', DB_FETCHMODE_ASSOC);
                                                 $model_id = $model_id['id'];
 
-                                                $res_ext =& $endpoint->eda->sql($sql_ext);
+                                                $res_ext = $endpoint->eda->sql($sql_ext);
                                                 if($res_ext->numRows()) {
-                                                    $ext =& $endpoint->eda->sql($sql_ext,'getRow', DB_FETCHMODE_ASSOC);
+                                                    $ext = $endpoint->eda->sql($sql_ext,'getRow', DB_FETCHMODE_ASSOC);
                                                     $description = $ext['name'];
                                                     $ext = $ext['extension'];
 
@@ -428,9 +424,25 @@ switch($_REQUEST['subpage']) {
             $sql="UPDATE endpointman_global_vars SET value='" . $_POST['tz'] . "' WHERE var_name='tz'";
             $endpoint->eda->sql($sql);
 
-            $sql="UPDATE endpointman_global_vars SET value='" . $_POST['cfg_type'] . "' WHERE var_name='server_type'";
+            if($_POST['cfg_type'] == 'http') {
+                $symlink = $amp_conf['AMPWEBROOT']."/provisioning";
+                $reallink = LOCAL_PATH."provisioning";
+                if((!is_link($symlink)) OR (!readlink($symlink) == $reallink)) {
+                    if(!symlink($reallink,$symlink)) {
+                        $endpoint->error['config_dir'] = "Your permissions are wrong on ".$amp_conf['AMPWEBROOT'].", web provisioning link not created!";
+                        $_POST['cfg_type'] = 'file';
+                    } else {
+                        $_POST['cfg_type'] = 'http';
+                    }
+                } else {
+                    $_POST['cfg_type'] = 'http';
+                }
+            } else {
+                $_POST['cfg_type'] = 'file';
+            }
+            $sql = "UPDATE endpointman_global_vars SET value='" . $_POST['cfg_type'] . "' WHERE var_name='server_type'";
             $endpoint->eda->sql($sql);
-
+            
             //No trailing slash. Help the user out and add one :-)
             if($_POST['config_loc'][strlen($_POST['config_loc'])-1] != "/") {
                 $_POST['config_loc'] = $_POST['config_loc'] ."/";
@@ -508,7 +520,7 @@ switch($_REQUEST['subpage']) {
             $endpoint->eda->sql($sql);
 
             if($_POST['cfg_type'] == 'http') {
-                $endpoint->message['advanced_settings'] = "Updated! - Point your phones to: http://".$_SERVER['SERVER_ADDR']."/provisioning/index.php/";
+                $endpoint->message['advanced_settings'] = "Updated! - Point your phones to: http://".$_SERVER['SERVER_ADDR']."/provisioning/p.php/";
             } else {
                 $endpoint->message['advanced_settings'] = "Updated!";
             }

@@ -6,4 +6,4 @@
  * @license MPL / GPLv2 / LGPL
  * @package Endpoint Manager
  */
-include('includes/export.php');
+include('includes/export.inc');
