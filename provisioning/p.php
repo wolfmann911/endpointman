@@ -6,7 +6,7 @@ if (!@include_once(getenv('FREEPBX_CONF') ? getenv('FREEPBX_CONF') : '/etc/freep
 
 define('PROVISIONER_BASE', $amp_conf['AMPWEBROOT'].'/admin/modules/_ep_phone_modules/');
 require($amp_conf['AMPWEBROOT'].'/admin/modules/endpointman/includes/functions.inc');
-require($amp_conf['AMPWEBROOT'].'/admin/modules/endpointman/includes/timezone.php');
+require($amp_conf['AMPWEBROOT'].'/admin/modules/endpointman/includes/timezone.inc');
 
 $endpoint = new endpointmanager();
 
@@ -29,11 +29,14 @@ if(getMethod() == "GET") {
     # Assume they're 504G's. Faulty in firmware 7.4.3a
     $filename = basename($_SERVER["REQUEST_URI"]);
     $web_path = 'http://'.$_SERVER["SERVER_NAME"].dirname($_SERVER["PHP_SELF"]).'/';
+    /*
     if ($filename == "p.php") { 
             $filename = "spa502G.cfg";
             $_SERVER['REQUEST_URI']=$_SERVER['REQUEST_URI']."/spa502G.cfg";
             $web_path = $web_path."p.php/";
     }
+     * 
+     */
 
     # Firmware Linksys/SPA504G-7.4.3a is broken and MUST be upgraded.
     if (preg_match('/7.4.3a/', $_SERVER['HTTP_USER_AGENT'])) {
@@ -45,7 +48,7 @@ if(getMethod() == "GET") {
 
     $filename = str_replace('p.php/','', $filename);
     $strip = str_replace('spa', '', $filename);
-
+    
     if(preg_match('/[0-9A-Fa-f]{12}/i', $strip, $matches) && !(preg_match('/[0]{10}[0-9]{2}/i',$strip))) {
         $mac_address = $matches[0];
 
