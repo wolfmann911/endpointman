@@ -18,7 +18,7 @@
             https://github.com/tm1000/freepbx-endpointmanager/commits/master
         </changelog>
 	<info>https://github.com/tm1000/freepbx-endpointmanager</info>
-	<location>2.10/endpointman-2.10.0.3.tgz</location>
+	<location>release/2.10/endpointman-2.10.1.3.tgz</location>
 	<depends>
 		<version>2.6</version>
 	</depends>
@@ -26,5 +26,5 @@
 		<module>core</module>
 		<module>fw_ari</module>
 	</requirements>
-<md5sum>856903a3ead940bb07b38cb2dc70c8ed</md5sum>
+<md5sum>9a17b7a7d604254149fcfb4d38a68a2b</md5sum>
 </module>
