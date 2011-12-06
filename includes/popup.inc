@@ -8,6 +8,16 @@ require 'functions.inc';
 $endpoint = new endpointmanager();
 
 if($_REQUEST['pop_type'] == 'edit_specifics') {
+    
+    if(file_exists(PHONE_MODULES_PATH . 'endpoint/global_template_data.json')) {
+        $template_list[0] = 'global_template_data.json';
+        $merged = $endpoint->merge_data(PHONE_MODULES_PATH . 'endpoint/', $template_list);
+        
+        $html_array = $endpoint->generate_gui_html(serialize($merged), NULL, TRUE, NULL, 3);
+        
+    }
+    
+    /*
     $info = $endpoint->get_phone_info($_REQUEST['edit_id']);
     if(isset($_REQUEST['button_save'])) {
 	$endpoint->message['advanced_settings'] = "Updated!";
@@ -29,9 +39,11 @@ if($_REQUEST['pop_type'] == 'edit_specifics') {
 	$displayname[$z]['line'] = $line;
 	$z++;
     }
+     * 
+     */
 
     $endpoint->prepare_message_box();
-    $endpoint->tpl->assign("display_name", $displayname);
+    $endpoint->tpl->assign("html_array", $html_array);
     echo $endpoint->tpl->draw( 'specifics_pop' );
 }
 

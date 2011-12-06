@@ -447,12 +447,14 @@ switch($_REQUEST['subpage']) {
             if($_POST['config_loc'][strlen($_POST['config_loc'])-1] != "/") {
                 $_POST['config_loc'] = $_POST['config_loc'] ."/";
             }
-
+            
+            $tftp_writable = FALSE;
             if((isset($_POST['config_loc'])) AND ($_POST['config_loc'] != "")) {
                 if((file_exists($_POST['config_loc'])) AND (is_dir($_POST['config_loc']))) {
                     if(is_writable($_POST['config_loc'])) {
                         $sql="UPDATE endpointman_global_vars SET value='" . $_POST['config_loc'] . "' WHERE var_name='config_location'";
                         $endpoint->eda->sql($sql);
+                        $tftp_writable = TRUE;
                     } else {
                         $endpoint->error['config_dir'] = "Directory Not Writable!";
                     }
@@ -463,6 +465,18 @@ switch($_REQUEST['subpage']) {
                 $endpoint->error['config_dir'] = "No Configuration Location Defined!";
             }
 
+            //Check tftp server to make sure it's functioning if we are using it
+            if(($_POST['cfg_type'] == 'file') AND ($tftp_writable)) {
+                $time = time();
+                $tftp_data = md5($time);
+                file_put_contents($_POST['config_loc']."/test-".$time, $tftp_data);
+                $tftp_get = $endpoint->tftp_fetch($_POST['srvip'],"test-".$time);
+                unlink($_POST['config_loc']."/test-".$time);
+                if($tftp_get != $tftp_data) {
+                    $endpoint->error['config_dir'] = "Your TFTP server is not properly configured";
+                }
+            }
+            
             if((isset($_POST['enable_ari'])) AND ($_POST['enable_ari'] == "on")) {
                 $_POST['enable_ari'] = 1;
             } else {
