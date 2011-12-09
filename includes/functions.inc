@@ -1254,6 +1254,84 @@ class endpointmanager {
         }
 
     }
+    
+    function write_configs($provisioner_lib,$reboot,$write_path,$phone_info,$returned_data) {
+        //Create Directory Structure (If needed)
+        if (isset($provisioner_lib->directory_structure)) {
+            foreach ($provisioner_lib->directory_structure as $data) {
+                $dir = $write_path . $data;
+                if (!file_exists($dir)) {
+                    if(!@mkdir($dir, 0755)) {
+                        $this->error['parse_configs'] = "Could Not Create Directory: " . $data;
+                        return(FALSE);
+                    }
+                }
+            }
+        }
+
+        //Copy Files/Directories (If needed)
+        if (isset($provisioner_lib->copy_files)) {
+            foreach ($provisioner_lib->copy_files as $data) {
+                if (((file_exists($write_path . $data)) AND (!in_array($data, $provisioner_lib->protected_files))) OR (!file_exists($write_path . $data))) {
+                    if (is_dir(PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data)) {
+                        if (!file_exists($write_path . $data)) {
+                            if (!@mkdir($write_path . $data, 0666)) {
+                                $this->error['parse_configs'] = "Could Not Create Directory: " . $data;
+                                return(FALSE);
+                            }
+                        }
+                        $dir_iterator = new RecursiveDirectoryIterator(PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data . "/");
+                        $iterator = new RecursiveIteratorIterator($dir_iterator, RecursiveIteratorIterator::SELF_FIRST);
+                        // could use CHILD_FIRST if you so wish
+                        foreach ($iterator as $file) {
+                            if (is_dir($file)) {
+                                $dir = str_replace(PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data . "/", "", $file);
+                                if (!file_exists($write_path . $data . "/" . $dir)) {
+                                    if (!@mkdir($write_path . $data . "/" . $dir, 0666)) {
+                                        $this->error['parse_configs'] = "Could Not Create Directory: " . $data . "/" . $dir;
+                                        return(FALSE);
+                                    }
+                                }
+                            } else {
+                                $dir = str_replace(PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data . "/", "", $file);
+                                if (!@copy($file, $write_path . $data . "/" . $dir)) {
+                                    $this->error['parse_configs'] = "Could Not Copy File: " . $data . "/" . $dir;
+                                    return(FALSE);
+                                } else {
+                                    chmod($write_path . $data . "/" . $dir, 0666);
+                                }
+                            }
+                        }
+                    } else {
+                        copy(PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data, $write_path . $data);
+                        chmod($write_path . $data, 0666);
+                    }
+                }
+            }
+        }
+
+        foreach ($returned_data as $file => $data) {
+            if (((file_exists($write_path . $file)) AND (is_writable($write_path . $file)) AND (!in_array($file, $provisioner_lib->protected_files))) OR (!file_exists($write_path . $file))) {                
+                file_put_contents($write_path . $file,$data);
+                chmod($write_path . $file, 0666);
+                if (!file_exists($write_path . $file)) {
+                    $this->error['parse_configs'] = "File not written to hard drive!";
+                    return(FALSE);
+                }
+            } elseif (!in_array($file, $provisioner_lib->protected_files)) {
+                $this->error['parse_configs'] = "File not written to hard drive!";
+                return(FALSE);
+            }
+        }
+
+        if($reboot) {
+            $provisioner_lib->reboot();
+        }
+    }
+    
+    function display_configs() {
+        
+    }
 
     /**
      * Prepare and then send the data that Provisioner expects, then take what provisioner gives us and do what it says
@@ -1272,9 +1350,6 @@ class endpointmanager {
             $class = "endpoint_" . $phone_info['directory'] . "_" . $phone_info['cfg_dir'] . '_phone';
             $base_class = "endpoint_" . $phone_info['directory']. '_base';
             $master_class = "endpoint_base";
-            /**Quick Fix for FreePBX Distro
-			* I seriously want to figure out why ONLY the FreePBX Distro can't do autoloads.
-			**/
             if(!class_exists($master_class)) {
                 ProvisionerConfig::endpointsAutoload($master_class);
             }
@@ -1284,7 +1359,6 @@ class endpointmanager {
             if(!class_exists($class)) {
                 ProvisionerConfig::endpointsAutoload($class);
             }
-            //end quick fix
             
             if(class_exists($class)) {
                 $provisioner_lib = new $class();
@@ -1415,10 +1489,25 @@ class endpointmanager {
                 }
                 
                 if (!$write) {
-                    $provisioner_lib->server_type = 'dynamic';
-                    $provisioner_lib->provisioning_type = 'http';
-                    $new_template_data['provisioning_path'] = $_SERVER["SERVER_ADDR"]."/provisioning/";
+                    $new_template_data['provision']['type'] = 'dynamic';
+                    $new_template_data['provision']['protocol'] = 'http';
+                    $new_template_data['provision']['path'] = 'http://'.$_SERVER["SERVER_ADDR"] . dirname($_SERVER['REQUEST_URI']).'/';
+                    $new_template_data['provision']['encryption'] = FALSE;
+                } else {
+                    $new_template_data['provision']['type'] = 'file';
+                    $new_template_data['provision']['protocol'] = 'tftp';
+                    $new_template_data['provision']['path'] = '';
+                    $new_template_data['provision']['encryption'] = FALSE;
                 }
+                
+                
+                $new_template_data['network']['dhcp'] = TRUE;
+                $new_template_data['network']['ipv4'] = '';
+                $new_template_data['network']['ipv6'] = '';
+                $new_template_data['network']['subnet'] = '255.255.255.0';
+                $new_template_data['network']['gateway'] = '';
+                $new_template_data['network']['vlan']['id'] = '';
+                $new_template_data['network']['vlan']['qos'] = '';
 
                 //Set Variables according to the template_data files included. We can include different template.xml files within family_data.xml also one can create
                 //template_data_custom.xml which will get included or template_data_<model_name>_custom.xml which will also get included
@@ -1447,10 +1536,9 @@ class endpointmanager {
                 $time_start = microtime(true);
                 
                 $provisioner_lib->debug = TRUE;
-                
+                                
                 $returned_data = $provisioner_lib->generate_config();
                 
-                //print_r($provisioner_lib->debug_return);
                 //End timer
                 $time_end = microtime(true);
                 $time = $time_end - $time_start;
@@ -1458,81 +1546,9 @@ class endpointmanager {
                     $this->error['generate_time'] = "It took an awfully long time to generate configs...(".round($time,2)." seconds)";
                 }
                 if($write) {
-                    //Create Directory Structure (If needed)
-                    if(isset($provisioner_lib->directory_structure)) {
-                        foreach($provisioner_lib->directory_structure as $data) {
-                            $dir = $settings['config_location'] . $data;
-                            if(!file_exists($dir)) {
-                                mkdir($dir, 0755);
-                            }
-                        }
-                    }
-
-                    //Copy Files/Directories (If needed)
-                    if(isset($provisioner_lib->copy_files)) {
-                        foreach($provisioner_lib->copy_files as $data) {
-                            if(((file_exists($settings['config_location'].$data)) AND (!in_array($data,$provisioner_lib->protected_files))) OR (!file_exists($settings['config_location'].$data))) {
-                                if(is_dir(PHONE_MODULES_PATH."endpoint/".$phone_info['directory']."/".$phone_info['cfg_dir']."/".$data)) {
-                                    if(!file_exists($settings['config_location'].$data)) {
-                                        if (!@mkdir($settings['config_location'].$data, 0666)) {
-                                            $this->error['parse_configs'] = "Could Not Create Directory: ".$data;
-                                            return(FALSE);
-                                        }
-                                    }
-                                    $dir_iterator = new RecursiveDirectoryIterator(PHONE_MODULES_PATH."endpoint/".$phone_info['directory']."/".$phone_info['cfg_dir']."/".$data."/");
-                                    $iterator = new RecursiveIteratorIterator($dir_iterator, RecursiveIteratorIterator::SELF_FIRST);
-                                    // could use CHILD_FIRST if you so wish
-                                    foreach ($iterator as $file) {
-                                        if(is_dir($file)) {
-                                            $dir = str_replace(PHONE_MODULES_PATH."endpoint/".$phone_info['directory']."/".$phone_info['cfg_dir']."/".$data."/", "", $file);
-                                            if(!file_exists($settings['config_location'].$data."/".$dir)) {
-                                                if (!@mkdir($settings['config_location'].$data."/".$dir, 0666)) {
-                                                    $this->error['parse_configs'] = "Could Not Create Directory: ".$data."/".$dir;
-                                                    return(FALSE);
-                                                }
-                                            }
-                                        } else {
-                                            $dir = str_replace(PHONE_MODULES_PATH."endpoint/".$phone_info['directory']."/".$phone_info['cfg_dir']."/".$data."/", "", $file);
-                                            if(!@copy($file, $settings['config_location'].$data."/".$dir)) {
-                                                $this->error['parse_configs'] = "Could Not Copy File: ".$data."/".$dir;
-                                                return(FALSE);
-                                            } else {
-                                                chmod($settings['config_location'].$data."/".$dir, 0666);
-                                            }
-                                        }
-                                    }
-                                } else {
-                                    copy(PHONE_MODULES_PATH."endpoint/".$phone_info['directory']."/".$phone_info['cfg_dir']."/".$data,$settings['config_location'].$data);
-                                    chmod($settings['config_location'].$data, 0666);
-                                }
-                            }
-                        }
-                    }
-
-                    //Generate Files
-                    foreach($returned_data as $key => $data) {
-                        if(((file_exists($settings['config_location'].$key)) AND (is_writable($settings['config_location'].$key)) AND (!in_array($key,$provisioner_lib->protected_files))) OR (!file_exists($settings['config_location'].$key))) {
-                            $fp = fopen($settings['config_location'].$key, 'w');
-                            fwrite($fp, $data);
-                            fclose($fp);
-                            chmod($settings['config_location'].$key, 0666);
-                            if(!file_exists($settings['config_location'].$key)) {
-                                $this->error['parse_configs'] = "File not written to hard drive!";
-                                return(FALSE);
-                            }
-                        } elseif(!in_array($key,$provisioner_lib->protected_files)) {
-                            $this->error['parse_configs'] = "File not written to hard drive!";
-                            return(FALSE);
-                        }
-                    }
-                    if($reboot) {
-                        $provisioner_lib->reboot();
-                    }
+                    $this->write_configs($provisioner_lib,$reboot,$settings['config_location'],$phone_info,$returned_data);
                 } else {
-                    if($reboot) {
-                        $provisioner_lib->reboot();
-                    }
-                    return($returned_data);
+                    return ($returned_data);
                 }
                 return(TRUE);
             } else {
