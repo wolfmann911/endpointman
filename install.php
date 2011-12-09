@@ -982,7 +982,7 @@ if(!$new_install) {
     
     if ($ver <= "21002") {
         out('Updating Mirror Location...again');
-        $sql = "UPDATE endpointman_global_vars SET value = 'http://mirror.freepbx.org/provisioner/v2.5/' WHERE var_name ='update_server'";
+        $sql = "UPDATE endpointman_global_vars SET value = 'http://www.provisioner.net/release/v3/' WHERE var_name ='update_server'";
         $db->query($sql);
     }
 
@@ -1039,7 +1039,7 @@ if ($new_install) {
             (3, 'gmtoff', ''),
             (4, 'gmthr', ''),
             (5, 'config_location', '/tftpboot/'),
-            (6, 'update_server', 'http://mirror.freepbx.org/provisioner/v2.5/'),
+            (6, 'update_server', 'http://www.provisioner.net/release/v3/'),
             (7, 'version', '".$xml_full_version."'),
             (8, 'enable_ari', '0'),
             (9, 'debug', '0'),
@@ -1150,7 +1150,7 @@ out("Update Version Number to ".$xml_full_version);
 $sql = "UPDATE endpointman_global_vars SET value = '".$xml_full_version."' WHERE var_name = 'version'";
 $db->query($sql);
 
-$sql = "UPDATE endpointman_global_vars SET value = 'http://mirror.freepbx.org/provisioner/v2.5/' WHERE var_name = 'update_server'";
+$sql = "UPDATE endpointman_global_vars SET value = 'http://www.provisioner.net/release/v3/' WHERE var_name = 'update_server'";
 $db->query($sql);
 
 if(file_exists($amp_conf['AMPWEBROOT']."/recordings/modules/phonesettings.module")) {

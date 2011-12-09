@@ -11,9 +11,30 @@ if($_REQUEST['pop_type'] == 'edit_specifics') {
     
     if(file_exists(PHONE_MODULES_PATH . 'endpoint/global_template_data.json')) {
         $template_list[0] = 'global_template_data.json';
-        $merged = $endpoint->merge_data(PHONE_MODULES_PATH . 'endpoint/', $template_list);
+                
+        $phone_info = $endpoint->get_phone_info($_REQUEST['edit_id']);
         
-        $html_array = $endpoint->generate_gui_html(serialize($merged), NULL, TRUE, NULL, 3);
+        $sql = 'SELECT max_lines FROM endpointman_model_list WHERE id = '. $phone_info['model_id'];
+        
+        $lines = $endpoint->eda->sql($sql, 'getOne');
+        $merged = $endpoint->merge_data(PHONE_MODULES_PATH . 'endpoint/', $template_list,$lines);
+
+        //remove stuff that is meaningless in this context
+        unset($merged['data']['globals']['globals']['option|mac']);
+        unset($merged['data']['globals']['globals']['break|0']);
+        unset($merged['data']['globals']['globals']['option|provision_protocol']);
+        
+        foreach($phone_info['line'] as $data) {
+                $lid = $data['line'];
+                $new_values['line|'.$lid.'|display_name'] = $data['description'];
+                $new_values['line|'.$lid.'|username'] = $data['ext'];
+                $new_values['line|'.$lid.'|authname'] = $data['ext'];
+                $new_values['line|'.$lid.'|secret'] = $data['secret'];
+                $new_values['line|'.$lid.'|server_host'] = '1';
+                $new_values['line|'.$lid.'|server_port'] = 5060;
+        }
+        
+        $html_array = $endpoint->generate_gui_html(serialize($merged), serialize($new_values), TRUE, NULL, $lines);
         
     }
     
