@@ -878,87 +878,6 @@ if(!$new_install) {
         $sql = 'INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (NULL, \'server_type\', \'file\');';
         $db->query($sql);
 
-        $sql = "CREATE TABLE IF NOT EXISTS `endpointman_time_zones_desc` (
-  `id` int(11) NOT NULL auto_increment,
-  `tid` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `description` varchar(255) NOT NULL,
-  PRIMARY KEY  (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=32";
-        $db->query($sql);
-
-        $sql = "INSERT INTO `endpointman_time_zones_desc` (`id`, `tid`, `name`, `description`) VALUES
-(1, 1, 'UTC', 'Universal Coordinated Time (and Greenwich Mean Time)'),
-(2, 2, 'ECT', 'European Central Time'),
-(3, 3, 'EET', 'Eastern European Time'),
-(4, 3, 'ART', '(Arabic) Egypt Standard Time'),
-(5, 4, 'EAT', 'Eastern African Time'),
-(6, 5, 'MET', 'Middle East Time'),
-(7, 6, 'NET', 'Near East Time'),
-(8, 7, 'PLT', 'Pakistan Lahore Time'),
-(9, 8, 'IST', 'India Standard Time'),
-(10, 9, 'BST', 'Bangladesh Standard Time'),
-(11, 10, 'VST', 'Vietnam Standard Time'),
-(12, 11, 'CTT', 'China Taiwan Time'),
-(13, 12, 'JST', 'Japan Standard Time'),
-(14, 13, 'ACT', 'Australia Central Time'),
-(15, 14, 'AET', 'Australia Eastern Time'),
-(16, 15, 'SST', 'Solomon Standard Time'),
-(17, 16, 'NST', 'New Zealand Standard Time'),
-(18, 17, 'MIT', 'Midway Islands Time'),
-(19, 18, 'HST', 'Hawaii Standard Time'),
-(20, 19, 'AST', 'Alaska Standard Time'),
-(21, 20, 'PST', 'Pacific Standard Time'),
-(22, 21, 'PNT', 'Phoenix Standard Time'),
-(23, 21, 'MST', 'Mountain Standard Time'),
-(24, 22, 'CST', 'Central Standard Time'),
-(25, 23, 'EST', 'Eastern Standard Time'),
-(26, 23, 'IET', 'Indiana Eastern Standard Time'),
-(27, 24, 'PRT', 'Puerto Rico and US Virgin Islands Time'),
-(28, 25, 'CNT', 'Canada Newfoundland Time'),
-(29, 26, 'AGT', 'Argentina Standard Time'),
-(30, 26, 'BET', 'Brazil Eastern Time'),
-(31, 27, 'CAT', 'Central African Time')";
-        $db->query($sql);
-
-        $sql = "CREATE TABLE IF NOT EXISTS `endpointman_time_zones_new` (
-  `id` int(11) NOT NULL auto_increment,
-  `gmt` varchar(255) NOT NULL,
-  `offset` int(11) NOT NULL,
-  PRIMARY KEY  (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=28";
-        $db->query($sql);
-
-        $sql = "INSERT INTO `endpointman_time_zones_new` (`id`, `gmt`, `offset`) VALUES
-(1, 'GMT', 0),
-(2, 'GMT+1:00', 3600),
-(3, 'GMT+2:00', 7200),
-(4, 'GMT+3:00', 10800),
-(5, 'GMT+3:30', 12600),
-(6, 'GMT+4:00', 14400),
-(7, 'GMT+5:00', 18000),
-(8, 'GMT+5:30', 19800),
-(9, 'GMT+6:00', 21600),
-(10, 'GMT+7:00', 25200),
-(11, 'GMT+8:00', 28800),
-(12, 'GMT+9:00', 32400),
-(13, 'GMT+9:30', 34200),
-(14, 'GMT+10:00', 36000),
-(15, 'GMT+11:00', 39600),
-(16, 'GMT+12:00', 43200),
-(17, 'GMT-11:00', -39600),
-(18, 'GMT-10:00', -36000),
-(19, 'GMT-9:00', -32400),
-(20, 'GMT-8:00', -28800),
-(21, 'GMT-7:00', -25200),
-(22, 'GMT-6:00', -21600),
-(23, 'GMT-5:00', -18000),
-(24, 'GMT-4:00', -14400),
-(25, 'GMT-3:30', -12600),
-(26, 'GMT-3:00', -10800),
-(27, 'GMT-1:00', -3600)";
-        $db->query($sql);
-
         out('Creating symlink to web provisioner');
         if (!symlink(LOCAL_PATH . "provisioning", $amp_conf['AMPWEBROOT'] . "/provisioning")) {
             out("<strong>Your permissions are wrong on " . $amp_conf['AMPWEBROOT'] . ", web provisioning link not created!</strong>");
@@ -984,6 +903,36 @@ if(!$new_install) {
         out('Updating Mirror Location...again');
         $sql = "UPDATE endpointman_global_vars SET value = 'http://www.provisioner.net/release/v3/' WHERE var_name ='update_server'";
         $db->query($sql);
+    }
+    
+    if($ver <= "21021") {
+        out('Updating Mirror Location...again');
+        $sql = "UPDATE endpointman_global_vars SET value = 'http://www.provisioner.net/release/v3/' WHERE var_name ='update_server'";
+        $db->query($sql);
+                
+        out("Uninstalling All Installed Brands (You'll just simply have to update again, no loss of data)");
+        $db->query("UPDATE endpointman_brand_list SET  installed =  '0'");
+        
+        $sql = "UPDATE  endpointman_model_list SET  enabled =  '0', template_data = '".serialize(array())."'";
+        $db->query($sql);
+
+        out("Moving old brand data for backups, its now in ". $amp_conf['AMPWEBROOT']."/admin/modules/_ep_phone_modules_old");
+        exec("mv ". $amp_conf['AMPWEBROOT']."/admin/modules/_ep_phone_modules" . " ". $amp_conf['AMPWEBROOT']."/admin/modules/_ep_phone_modules_old");
+
+        if(!file_exists(PHONE_MODULES_PATH)) {
+            mkdir(PHONE_MODULES_PATH, 0764);
+            out("Creating Phone Modules Directory");
+        }
+
+        if(!file_exists(PHONE_MODULES_PATH."setup.php")) {
+            copy(LOCAL_PATH."install/setup.php",PHONE_MODULES_PATH."setup.php");
+            out("Moving Auto Provisioner Class");
+        }
+
+        if(!file_exists(PHONE_MODULES_PATH."temp/")) {
+            mkdir(PHONE_MODULES_PATH."temp/", 0764);
+            out("Creating temp folder");
+        }
     }
 
 }
