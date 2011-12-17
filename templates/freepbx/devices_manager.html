@@ -180,7 +180,7 @@
     }
     function popitup(url, name, id) {
         if(id != '0') {
-            newwindow=window.open(url + '&model_list=' + document.getElementById('model_new').value + '&template_list=' + document.getElementById('template_list').value + '&rand=' + new Date().getTime(),'name2','height=1000,width=950');
+            newwindow=window.open(url + '&model_list=' + document.getElementById('model_new').value + '&template_list=' + document.getElementById('template_list').value + '&rand=' + new Date().getTime(),'name2','height=1000,width=950,scrollbars=yes,location=no');
             if (window.focus) {newwindow.focus()}
             return false;
         }
