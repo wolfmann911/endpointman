@@ -10,26 +10,26 @@
             function submitform() {
                 $('#myform').append('<input type="hidden" name="button_save" value="Save"/>');
                 document.myform.submit();
-                setTimeout("opener.Reload()",100);
             }
         </script>
     </head>
     <body face="Arial">
-        <div id="spinner">
-        </div>
         <br>
         <h1><face="Arial"><center><?php echo _('End Point Configuration Manager')?></center></h1>
         <hr>
 	{if condition="isset($show_error_box)"}
 	{include="message_box"}
 	{/if}
+        {include="variables"}
 	    <form name="myform" id="myform" method="post" action=""><input type="hidden" id="value" name="value" value="{$value}" />
 		<table width="90%" border="0" cellspacing="0" cellpadding="0">
-		    <tr><td colspan="2"><u>General Settings</u></td></tr>
 {loop name="html_array"}
+<tr><td colspan="2">&nbsp;</td></tr>
+<tr><td colspan="2"><u><strong>{$value.title}</strong></u></td></tr>
 {loop name="value.data"}
+{if condition="$value.type != 'break'"}
                                 <tr>
-                                    <td nowrap>
+                                    <td width="50%" nowrap>
 					{if condition="$value.type == 'input'"}        
 					    <label>{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}: <input type='text' name='{$value.key}' id='{$value.key}' value='{$value.value}' size="{if condition="isset($value.max_chars)"}{$value.max_chars}{else}40{/if}"></label>
 					{elseif condition="$value.type == 'textarea'"}
@@ -48,10 +48,12 @@
 							{/loop}
                                         </select>
                                         {elseif condition="$value.type == 'checkbox'"}
-                                            <label>{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}: <input type='checkbox' name='{$value.key}' id='{$value.key}' value='{$value.value}' {if condition="$value.key === TRUE"}checked{/if}></label>
+                                            <label>{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}: <input type='checkbox' name='{$value.key}' id='{$value.key}' value='{$value.value}' {if condition="$value.checked === TRUE"}checked{/if}></label>
 					{/if}
                                     </td>
+                                    <td><label><input type='checkbox' name='freepbx_{$value.key}' id='freepbx_{$value.key}' value='freepbx_{$value.value}' {if condition="$value.freepbx.checked === TRUE"}checked{/if}> FreePBX Controlled</label></td>
                                 </tr>
+                                {/if}
 						{if condition="$value.type == 'break'"}
                                 <tr>
                                     <td>&nbsp;</td>
@@ -61,6 +63,7 @@
 					{/loop}
                                         {/loop}
 		</table>
-	    </form>
+	    <input type="submit" value="Submit" onClick="javascript:submitform();" /><input type=button value="Close Window" onClick="javascript:Close();">
+      </form>
   </body>
 </html>

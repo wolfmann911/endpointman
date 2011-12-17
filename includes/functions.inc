@@ -48,7 +48,8 @@ class endpointmanager {
             $this->error['amp_conf'] = 'The Global Variable $amp_conf is empty or not set! Can\'t connect to the database.';
             $this->global_cfg['disable_epm'] = TRUE;
         }
-
+        
+        define("UPDATE_PATH", $this->global_cfg['update_server']);
         define("MODULES_PATH", $amp_conf['AMPWEBROOT'] . '/admin/modules/');
 
         //Determine if local path is correct!
@@ -656,7 +657,7 @@ class endpointmanager {
             foreach ($lines_info as $line) {
                 $phone_info['line'][$line['line']] = $line;
                 $phone_info['line'][$line['line']]['description'] = $line['epm_description'];
-            }
+            }            
         } else {
             $sql = "SELECT id, mac, ext FROM endpointman_mac_list WHERE id =" . $mac_id;
             //Phone is unknown, we need to display this to the end user so that they can make corrections
@@ -814,19 +815,24 @@ class endpointmanager {
     function generate_gui_html($cfg_data, $custom_cfg_data=NULL, $admin=FALSE, $user_cfg_data=NULL, $max_lines=3, $ext=NULL) {
         //take the data out of the database and turn it back into an array for use
         $cfg_data = unserialize($cfg_data);
-
+        $template_type = 'GENERAL';
         //Check to see if there is a custom template for this phone already listed in the endpointman_mac_list database
         if (!empty($custom_cfg_data)) {
             $custom_cfg_data = unserialize($custom_cfg_data);
             if (array_key_exists('data', $custom_cfg_data)) {
-                $custom_cfg_data_ari = $custom_cfg_data['ari'];
+                if(array_key_exists('ari', $custom_cfg_data)) {
+                    $extra_data = $custom_cfg_data['ari'];
+                } else {
+                    $template_type = 'GLOBAL';
+                    $extra_data = $custom_cfg_data['freepbx'];
+                }
                 $custom_cfg_data = $custom_cfg_data['data'];
             } else {
-                $custom_cfg_data_ari = array();
+                $extra_data = array();
             }
         } else {
             $custom_cfg_data = array();
-            $custom_cfg_data_ari = array();
+            $extra_data = array();
         }
         if (isset($user_cfg_data)) {
             $user_cfg_data = unserialize($user_cfg_data);
@@ -861,7 +867,7 @@ class endpointmanager {
                                     $lcount = isset($var_items['line_count']) ? $var_items['line_count'] : $lcount;
                                     $key = "line|" . $lcount . "|" . $var_name;
                                     $items[$variables_count] = $items;
-                                    $template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($variables_count, $var_items, $key, $custom_cfg_data, $admin, $user_cfg_data, $custom_cfg_data_ari);
+                                    $template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($variables_count, $var_items, $key, $custom_cfg_data, $admin, $user_cfg_data, $extra_data,$template_type);
                                     $template_variables_array[$group_count]['data'][$variables_count]['looping'] = TRUE;
                                     $variables_count++;
                                 }
@@ -880,7 +886,7 @@ class endpointmanager {
                                     $tv = explode('_', $variable);
                                     $key = "loop|" . $tv[0] . "_" . $var_name . "_" . $var_items['loop_count'];
                                     $items[$variables_count] = $var_items;
-                                    $template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($variables_count, $var_items, $key, $custom_cfg_data, $admin, $user_cfg_data, $custom_cfg_data_ari);
+                                    $template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($variables_count, $var_items, $key, $custom_cfg_data, $admin, $user_cfg_data, $extra_data,$template_type);
                                     $template_variables_array[$group_count]['data'][$variables_count]['looping'] = TRUE;
                                     $variables_count++;
                                 }
@@ -901,9 +907,9 @@ class endpointmanager {
                                 foreach ($config_options as $var_name => $var_items) {
                                     $tv = explode('_', $variable);
                                     $key = "loop|" . $tv[0] . "_" . $var_name . "_" . $var_items['loop_count'];
-                                    if (isset($custom_cfg_data_ari[$key])) {
+                                    if (isset($extra_data[$key])) {
                                         $items[$variables_count] = $var_items;
-                                        $template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($variables_count, $var_items, $key, $custom_cfg_data, $admin, $user_cfg_data, $custom_cfg_data_ari);
+                                        $template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($variables_count, $var_items, $key, $custom_cfg_data, $admin, $user_cfg_data, $extra_data,$template_type);
                                         $template_variables_array[$group_count]['data'][$variables_count]['looping'] = TRUE;
                                         $variables_count++;
                                     }
@@ -914,28 +920,28 @@ class endpointmanager {
                     //Both Views
                     switch ($config_options['type']) {
                         case "break":
-                            $template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($variables_count, $config_options, $key, $custom_cfg_data, $admin, $user_cfg_data, $custom_cfg_data_ari);
+                            $template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($variables_count, $config_options, $key, $custom_cfg_data, $admin, $user_cfg_data, $extra_data,$template_type);
                             $variables_count++;
                             break;
                         default:
                             if (array_key_exists('variable', $config_options)) {
                                 $key = str_replace('$', '', $config_options['variable']);
                                 //TODO: Move this into the sync function
-//Checks to see if values are defined in the database, if not then we assume this is a new option and we need a default value here!
+                                //Checks to see if values are defined in the database, if not then we assume this is a new option and we need a default value here!
                                 if (!isset($custom_cfg_data[$key])) {
-//xml2array will take values that have no data and turn them into arrays, we want to avoid the word 'array' as a default value, so we blank it out here if we are an array
+                                    //xml2array will take values that have no data and turn them into arrays, we want to avoid the word 'array' as a default value, so we blank it out here if we are an array
                                     if ((array_key_exists('default_value', $config_options)) AND (is_array($config_options['default_value']))) {
                                         $custom_cfg_data[$key] = "";
                                     } elseif ((array_key_exists('default_value', $config_options)) AND (!is_array($config_options['default_value']))) {
                                         $custom_cfg_data[$key] = $config_options['default_value'];
                                     }
                                 }
-                                if ((!$admin) AND (isset($custom_cfg_data_ari[$key]))) {
+                                if ((!$admin) AND (isset($extra_data[$key]))) {
                                     $custom_cfg_data[$key] = $user_cfg_data[$key];
-                                    $template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($variables_count, $config_options, $key, $custom_cfg_data, $admin, $user_cfg_data, $custom_cfg_data_ari);
+                                    $template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($variables_count, $config_options, $key, $custom_cfg_data, $admin, $user_cfg_data, $extra_data,$template_type);
                                     $variables_count++;
                                 } elseif ($admin) {
-                                    $template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($variables_count, $config_options, $key, $custom_cfg_data, $admin, $user_cfg_data, $custom_cfg_data_ari);
+                                    $template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($variables_count, $config_options, $key, $custom_cfg_data, $admin, $user_cfg_data, $extra_data,$template_type);
                                     $variables_count++;
                                 }
                             }
@@ -957,7 +963,7 @@ class endpointmanager {
      * @param array $custom_cfg_data
      * @return array
      */
-    function generate_form_data($i, $cfg_data, $key=NULL, $custom_cfg_data=NULL, $admin=FALSE, $user_cfg_data=NULL, $custom_cfg_data_ari=NULL) {
+    function generate_form_data($i, $cfg_data, $key=NULL, $custom_cfg_data=NULL, $admin=FALSE, $user_cfg_data=NULL, $extra_data=NULL,$template_type='GENERAL') {
         switch ($cfg_data['type']) {
             case "input":
                 if ((!$admin) && (isset($user_cfg_data[$key]))) {
@@ -1024,7 +1030,8 @@ class endpointmanager {
                 $template_variables_array['type'] = "checkbox";
                 $template_variables_array['key'] = $key;
                 $template_variables_array['description'] = $cfg_data['description'];
-                $template_variables_array['checked'] = $custom_cfg_data[$key];
+                $template_variables_array['checked'] = $custom_cfg_data[$key] ? TRUE : NULL;
+                $template_variables_array['value'] = $key;
                 break;
             case "file";
                 if ((!$admin) && (isset($user_cfg_data[$key]))) {
@@ -1066,13 +1073,23 @@ class endpointmanager {
             $template_variables_array['tooltip'] = $cfg_data['description_attr']['tooltip'];
         }
 
-        if (($this->global_cfg['enable_ari']) AND ($admin) AND ($cfg_data['type'] != "break") AND ($cfg_data['type'] != "group")) {
+        if (($this->global_cfg['enable_ari']) AND ($admin) AND ($cfg_data['type'] != "break") AND ($cfg_data['type'] != "group") AND ($template_type == 'GENERAL')) {
 
             $template_variables_array['aried'] = 1;
             $template_variables_array['ari']['key'] = $key;
 
-            if (isset($custom_cfg_data_ari[$key])) {
+            if (isset($extra_data[$key])) {
                 $template_variables_array['ari']['checked'] = "checked";
+            }
+        }
+        
+        if($template_type == 'GLOBAL') {
+            $template_variables_array['freepbxed'] = 1;
+            $template_variables_array['freepbx']['key'] = $key;
+            if(empty($extra_data)) {
+                $template_variables_array['freepbx']['checked'] = TRUE;
+            } elseif (isset($extra_data[$key])) {
+                $template_variables_array['freepbx']['checked'] = TRUE;
             }
         }
         return($template_variables_array);
@@ -1378,7 +1395,7 @@ class endpointmanager {
                 try {
                     $provisioner_lib->DateTimeZone = new DateTimeZone($settings['tz']);
                 } catch (Exception $e) {
-                    $this->error['parse_configs'] = 'Caught exception: ' . $e->getMessage();
+                    $this->error['parse_configs'] = 'Error Returned From Timezone Library: ' . $e->getMessage();
                     return(FALSE);
                 }
 
@@ -1429,6 +1446,7 @@ class endpointmanager {
                 $line_ops = array();
                 if (is_array($global_custom_cfg_data)) {
                     foreach ($global_custom_cfg_data as $key => $data) {
+                        //TODO: clean up with reg-exp
                         $full_key = $key;
                         $key = explode('|', $key);
                         $count = count($key);
@@ -1443,9 +1461,9 @@ class endpointmanager {
                             case 2:
                                 $breaks = explode('_', $key[1]);
                                 if (($this->global_cfg['enable_ari'] == 1) AND (isset($global_custom_cfg_ari[$full_key])) AND (isset($global_user_cfg_data[$full_key]))) {
-                                    $new_template_data[$breaks[0]][$breaks[2]][$breaks[1]] = $global_user_cfg_data[$full_key];
+                                    $new_template_data['loops'][$breaks[0]][$breaks[2]][$breaks[1]] = $global_user_cfg_data[$full_key];
                                 } else {
-                                    $new_template_data[$breaks[0]][$breaks[2]][$breaks[1]] = $global_custom_cfg_data[$full_key];
+                                    $new_template_data['loops'][$breaks[0]][$breaks[2]][$breaks[1]] = $global_custom_cfg_data[$full_key];
                                 }
                                 break;
                             case 3:
@@ -1462,7 +1480,7 @@ class endpointmanager {
                 if (!$write) {
                     $new_template_data['provision']['type'] = 'dynamic';
                     $new_template_data['provision']['protocol'] = 'http';
-                    $new_template_data['provision']['path'] = 'http://' . $_SERVER["SERVER_ADDR"] . dirname($_SERVER['REQUEST_URI']) . '/';
+                    $new_template_data['provision']['path'] = $_SERVER["SERVER_ADDR"] . dirname($_SERVER['REQUEST_URI']) . '/';
                     $new_template_data['provision']['encryption'] = FALSE;
                 } else {
                     $new_template_data['provision']['type'] = 'file';
@@ -1471,6 +1489,7 @@ class endpointmanager {
                     $new_template_data['provision']['encryption'] = FALSE;
                 }
 
+                $new_template_data['ntp'] = $settings['ntp'];
 
                 $new_template_data['network']['dhcp'] = TRUE;
                 $new_template_data['network']['ipv4'] = '';
@@ -1479,22 +1498,56 @@ class endpointmanager {
                 $new_template_data['network']['gateway'] = '';
                 $new_template_data['network']['vlan']['id'] = '';
                 $new_template_data['network']['vlan']['qos'] = '';
+                
+                //Overwrite all specific settings variables now
+                if (!empty($phone_info['specific_settings'])) {
+                    $specific_settings = unserialize($phone_info['specific_settings']);
+                    $specific_settings = is_array($specific_settings) ? $specific_settings : array();
+                } else {
+                    $specific_settings = array();
+                }
+                
 
                 //Set Variables according to the template_data files included. We can include different template.xml files within family_data.xml also one can create
                 //template_data_custom.xml which will get included or template_data_<model_name>_custom.xml which will also get included
-                //line 'global' will set variables that aren't line dependant                
+                //line 'global' will set variables that aren't line dependant
+                
                 $provisioner_lib->settings = $new_template_data;
 
                 //Loop through Lines!
                 $li = 0;
                 foreach ($phone_info['line'] as $line) {
                     $line_options = is_array($line_ops[$line['line']]) ? $line_ops[$line['line']] : array();
-                    $line_statics = array('line' => $line['line'], 'username' => $line['ext'], 'secret' => $line['secret'], 'displayname' => $line['description'], 'server_host' => $this->global_cfg['srvip'], 'server_port' => '5060');
+                    $line_statics = array('line' => $line['line'], 'username' => $line['ext'], 'authname' => $line['ext'], 'secret' => $line['secret'], 'displayname' => $line['description'], 'server_host' => $this->global_cfg['srvip'], 'server_port' => '5060');
+                    
                     $provisioner_lib->settings['line'][$li] = array_merge($line_options, $line_statics);
                     $li++;
                 }
+                
+                foreach($specific_settings['data'] as $key => $data) {
+                    $default_exp = preg_split("/\|/i", $key);
+                    if(isset($default_exp[2])) {
+                        //lineloop
+                        $var = $default_exp[2];
+                        $line = $default_exp[1];
+                        $loc = $this->arraysearchrecursive($line, $provisioner_lib->settings['line'], 'line');
+                        if($loc !== FALSE) {
+                            $k = $loc[0];
+                            $provisioner_lib->settings['line'][$k][$var] = $data;
+                        } else {
+                            //Adding a new line-ish type options
+                            if(isset($specific_settings['data']['line|'.$line.'|line_enabled'])) {
+                                $lastkey = array_pop(array_keys($provisioner_lib->settings['line']));
+                                $lastkey++;
+                                $provisioner_lib->settings['line'][$lastkey]['line'] = $line;
+                                $provisioner_lib->settings['line'][$lastkey][$var] = $data;
+                            }
+                        }
+                    } else {
+                        $provisioner_lib->settings[$var] = $data;
+                    }
+                }
 
-                $provisioner_lib->settings['ntp'] = $settings['ntp'];
                 $provisioner_lib->settings['mac'] = $phone_info['mac'];
                 $provisioner_lib->mac = $phone_info['mac'];
 
@@ -1508,8 +1561,15 @@ class endpointmanager {
 
                 $provisioner_lib->debug = TRUE;
 
-                $returned_data = $provisioner_lib->generate_config();
+                try {
+                    $returned_data = $provisioner_lib->generate_all_files();
+                } catch (Exception $e) {
+                    $this->error['prepare_configs'] = 'Error Returned From Provisioner Library: '.  $e->getMessage();
+                    return(FALSE);
+                }
+                
 
+                //print_r($provisioner_lib->debug_return);
                 //End timer
                 $time_end = microtime(true);
                 $time = $time_end - $time_start;
@@ -1711,6 +1771,8 @@ class endpointmanager {
     function update_check() {
         $master_result = $this->download_file(UPDATE_PATH . "master.json", PHONE_MODULES_PATH . "master.json");
 
+        
+        
         if (!$master_result) {
             $this->error['brand_update_check_master'] = "Not able to connect to repository. Using local master file instead.";
         }
@@ -2358,6 +2420,7 @@ class endpointmanager {
 
     function download_file($url_file, $destination_file) {
         $contents = file_get_contents($url_file);
+        
         if (preg_match('/200/', $http_response_header[0])) {
             $dirname = dirname($destination_file);
             if (!file_exists($dirname)) {
@@ -2443,129 +2506,6 @@ class endpointmanager {
         } else {
             return(array());
         }
-    }
-
-    /**
-     * xml2array() will convert the given XML text to an array in the XML structure.
-     * @author http://www.bin-co.com/php/scripts/xml2array/
-     * @param <type> $url The XML file
-     * @param <type> $get_attributes 1 or 0. If this is 1 the function will get the attributes as well as the tag values - this results in a different array structure in the return value.
-     * @param <type> $priority Can be 'tag' or 'attribute'. This will change the way the resulting array structure. For 'tag', the tags are given more importance.
-     * @param <type> $array_tags - any tag names listed here will allways be returned as an array, even if there is only one of them.
-     * @return <type> The parsed XML in an array form. Use print_r() to see the resulting array structure.
-     */
-    function xml2array_remove($url, $get_attributes = 1, $priority = 'tag', $array_tags=array()) {
-        $contents = "";
-        if (!function_exists('xml_parser_create')) {
-            return array();
-        }
-        $parser = xml_parser_create('');
-        if (!($fp = @ fopen($url, 'rb'))) {
-            return array();
-        }
-        while (!feof($fp)) {
-            $contents .= fread($fp, 8192);
-        }
-        fclose($fp);
-        xml_parser_set_option($parser, XML_OPTION_TARGET_ENCODING, "UTF-8");
-        xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, 0);
-        xml_parser_set_option($parser, XML_OPTION_SKIP_WHITE, 1);
-        xml_parse_into_struct($parser, trim($contents), $xml_values);
-        xml_parser_free($parser);
-        if (!$xml_values) {
-            return; //Hmm...
-        }
-        $xml_array = array();
-        $parents = array();
-        $opened_tags = array();
-        $arr = array();
-        $current = & $xml_array;
-        $repeated_tag_index = array();
-        foreach ($xml_values as $data) {
-            unset($attributes, $value);
-            extract($data);
-            $result = array();
-            $attributes_data = array();
-            if (isset($value)) {
-                if ($priority == 'tag') {
-                    $result = $value;
-                } else {
-                    $result['value'] = $value;
-                }
-            }
-            if (isset($attributes) and $get_attributes) {
-                foreach ($attributes as $attr => $val) {
-                    if ($priority == 'tag') {
-                        $attributes_data[$attr] = $val;
-                    } else {
-                        $result['attr'][$attr] = $val; //Set all the attributes in a array called 'attr'
-                    }
-                }
-            }
-            if ($type == "open") {
-                $parent[$level - 1] = & $current;
-                if (!is_array($current) or (!in_array($tag, array_keys($current)))) {
-                    if (in_array($tag, $array_tags)) {
-                        $current[$tag][0] = $result;
-                        $repeated_tag_index[$tag . '_' . $level] = 1;
-                        $current = & $current[$tag][0];
-                    } else {
-                        $current[$tag] = $result;
-                        if ($attributes_data) {
-                            $current[$tag . '_attr'] = $attributes_data;
-                        }
-                        $repeated_tag_index[$tag . '_' . $level] = 1;
-                        $current = & $current[$tag];
-                    }
-                } else {
-                    if (isset($current[$tag][0])) {
-                        $current[$tag][$repeated_tag_index[$tag . '_' . $level]] = $result;
-                        $repeated_tag_index[$tag . '_' . $level]++;
-                    } else {
-                        $current[$tag] = array($current[$tag], $result);
-                        $repeated_tag_index[$tag . '_' . $level] = 2;
-                        if (isset($current[$tag . '_attr'])) {
-                            $current[$tag]['0_attr'] = $current[$tag . '_attr'];
-                            unset($current[$tag . '_attr']);
-                        }
-                    }
-                    $last_item_index = $repeated_tag_index[$tag . '_' . $level] - 1;
-                    $current = & $current[$tag][$last_item_index];
-                }
-            } else if ($type == "complete") {
-                if (!isset($current[$tag])) {
-                    $current[$tag] = $result;
-                    $repeated_tag_index[$tag . '_' . $level] = 1;
-                    if ($priority == 'tag' and $attributes_data) {
-                        $current[$tag . '_attr'] = $attributes_data;
-                    }
-                } else {
-                    if (isset($current[$tag][0]) and is_array($current[$tag])) {
-                        $current[$tag][$repeated_tag_index[$tag . '_' . $level]] = $result;
-                        if ($priority == 'tag' and $get_attributes and $attributes_data) {
-                            $current[$tag][$repeated_tag_index[$tag . '_' . $level] . '_attr'] = $attributes_data;
-                        }
-                        $repeated_tag_index[$tag . '_' . $level]++;
-                    } else {
-                        $current[$tag] = array($current[$tag], $result);
-                        $repeated_tag_index[$tag . '_' . $level] = 1;
-                        if ($priority == 'tag' and $get_attributes) {
-                            if (isset($current[$tag . '_attr'])) {
-                                $current[$tag]['0_attr'] = $current[$tag . '_attr'];
-                                unset($current[$tag . '_attr']);
-                            }
-                            if ($attributes_data) {
-                                $current[$tag][$repeated_tag_index[$tag . '_' . $level] . '_attr'] = $attributes_data;
-                            }
-                        }
-                        $repeated_tag_index[$tag . '_' . $level]++; //0 and 1 index is already taken
-                    }
-                }
-            } else if ($type == 'close') {
-                $current = & $parent[$level - 1];
-            }
-        }
-        return ($xml_array);
     }
 
     /**
