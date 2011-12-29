@@ -134,6 +134,7 @@ if($db->getOne($sql)) {
     $ver = $very['major'] . $very['minor'] . $very['subminor'] . $very['subsubminor'];
     
     out('Version Identified as '. $full_vers);
+    out('Internal Reference Number: '.$ver);
 } else {
     $new_install = TRUE;
     out('New Installation Detected!');
@@ -899,19 +900,14 @@ if(!$new_install) {
         $db->query($sql);
     }
     
-    if ($ver <= "21002") {
-        out('Updating Mirror Location...again');
-        $sql = "UPDATE endpointman_global_vars SET value = 'http://www.provisioner.net/release/v3/' WHERE var_name ='update_server'";
-        $db->query($sql);
-    }
-    
     if($ver <= "21021") {
         out('Updating Mirror Location...again');
         $sql = "UPDATE endpointman_global_vars SET value = 'http://www.provisioner.net/release/v3/' WHERE var_name ='update_server'";
         $db->query($sql);
                 
         out("Uninstalling All Installed Brands (You'll just simply have to update again, no loss of data)");
-        $db->query("UPDATE endpointman_brand_list SET  installed =  '0'");
+        $db->query("UPDATE endpointman_brand_list SET installed =  '0'");
+        $db->query("TRUNCATE TABLE endpointman_brand_list");
         
         $sql = "UPDATE  endpointman_model_list SET  enabled =  '0', template_data = '".serialize(array())."'";
         $db->query($sql);

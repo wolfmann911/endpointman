@@ -429,7 +429,6 @@ switch($_REQUEST['subpage']) {
                 }
             } else {
                 $_POST['cfg_type'] = 'file';
-                $endpoint->tftp_check();
             }
             $sql = "UPDATE endpointman_global_vars SET value='" . $_POST['cfg_type'] . "' WHERE var_name='server_type'";
             $endpoint->eda->sql($sql);
@@ -450,7 +449,7 @@ switch($_REQUEST['subpage']) {
                         $endpoint->error['config_dir'] = "Directory Not Writable!";
                     }
                 } else {
-                    $endpoint->error['config_dir'] = "Not a Vaild Directory";
+                    $endpoint->error['config_dir'] = "Not a Vaild Directory <br /> Try to run 'mkdir ".$_POST['config_loc']."' as root";
                 }
             } else {
                 $endpoint->error['config_dir'] = "No Configuration Location Defined!";
@@ -458,14 +457,7 @@ switch($_REQUEST['subpage']) {
 
             //Check tftp server to make sure it's functioning if we are using it
             if(($_POST['cfg_type'] == 'file') AND ($tftp_writable)) {
-                $time = time();
-                $tftp_data = md5($time);
-                file_put_contents($_POST['config_loc']."/test-".$time, $tftp_data);
-                $tftp_get = $endpoint->tftp_fetch($_POST['srvip'],"test-".$time);
-                unlink($_POST['config_loc']."/test-".$time);
-                if($tftp_get != $tftp_data) {
-                    $endpoint->error['config_dir'] = "Your TFTP server is not properly configured";
-                }
+                $endpoint->tftp_check();
             }
             
             if((isset($_POST['enable_ari'])) AND ($_POST['enable_ari'] == "on")) {

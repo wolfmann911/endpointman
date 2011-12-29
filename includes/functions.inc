@@ -106,7 +106,7 @@ class endpointmanager {
                     $group = exec("groups");
                     $this->error['config_location'] = "Configuration Directory is not writable!" .
                             "<br />Please change the location: <a href='config.php?type=tool&display=epm_advanced'>Here</a>" .
-                            "<br />Or run this command on SSH: 'chown -R " . $user . ":" . $group . " " . $this->global_cfg['config_location'] . "' then 'chmod -R 777 " . $this->global_cfg['config_location'] . "'";
+                            "<br />Or run this command on SSH: 'chown -hR root:" . $group . " " . $this->global_cfg['config_location'] . "' then 'chmod g+w " . $this->global_cfg['config_location'] . "'";
                     $this->global_cfg['diable_epm'] = TRUE;
                 }
             } else {
@@ -137,7 +137,7 @@ class endpointmanager {
      * @param type $filename
      * @return type 
      */
-    function tftp_fetch($host, $filename) {
+    function tftp_fetch($host, $filename) { 
         //first off let's check if this is installed or disabled
         $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
 
@@ -168,7 +168,7 @@ class endpointmanager {
             // for large files this function should take a file handle as an arg
             $ret .= substr($buffer, 4);
         } while (strlen($buffer) == 516);  // the first non-full packet is the last.
-        return $ret;
+        return $ret; 
     }
     
     function tftp_check() {
@@ -184,13 +184,19 @@ class endpointmanager {
                 $this->error['tftp_check'] = 'Unable to write to '.$this->global_cfg['config_location'];
             }
         } else {
+            $dis = FALSE;
             if (file_exists('/etc/xinetd.d/tftp')) {
                 $contents = file_get_contents('/etc/xinetd.d/tftp');
                 if (preg_match('/disable.*=.*yes/i', $contents)) {
-                    $this->error['tftp_check'] = 'Disabled is set to "yes" in /etc/xinetd.d/tftp. Please fix';
+                    $this->error['tftp_check'] = 'Disabled is set to "yes" in /etc/xinetd.d/tftp. Please fix <br />Then restart your TFTP service';
+                    $dis = TRUE;
                 }
             }
-            $this->error['tftp_check'] = 'TFTP Server is not running';
+            if(!$dis) {
+                $this->error['tftp_check'] = 'TFTP Server is not running. <br />'.
+                'See here for instructions on how to install one: <a href="http://wiki.provisioner.net/index.php/Tftp" target="_blank">http://wiki.provisioner.net/index.php/Tftp</a>';
+        
+            }
         }
        
     }
@@ -1874,7 +1880,7 @@ class endpointmanager {
                             //in database already!
                         }
                     } else {
-                        $this->error['brand_update_check_local_file'] = "<br/>Error: No Local File for " . $data['name'] . "!<br /><br />Learn how to manually upload packages here (it's easy!): <a href='http://projects.colsolgrp.net/documents/28' target='_blank'>Click Here!</a>";
+                        $this->error['brand_update_check_local_file'] = "<br/>Error: No Local File for " . $data['name'] . "!<br /><br />Learn how to manually upload packages here (it's easy!): <a href='http://wiki.provisioner.net/index.php/Endpoint_manager_manual_upload' target='_blank'>Click Here!</a>";
                     }
                 }
 
@@ -1897,7 +1903,7 @@ class endpointmanager {
                     }
                 }
             } else {
-                $this->error['brand_update_check_master_file'] = "<br/>Aborting Brand Downloads. Can't Get Master File, Assuming Timeout Issues!<br /><br />Learn how to manually upload packages here (it's easy!): <a href='http://projects.colsolgrp.net/documents/28' target='_blank'>Click Here!</a>";
+                $this->error['brand_update_check_master_file'] = "<br/>Aborting Brand Downloads. Can't Get Master File, Assuming Timeout Issues!<br /><br />Learn how to manually upload packages here (it's easy!): <a href='http://wiki.provisioner.net/index.php/Endpoint_manager_manual_upload' target='_blank'>Click Here!</a>";
             }
 
             return $out;
