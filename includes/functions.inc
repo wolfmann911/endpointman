@@ -27,7 +27,8 @@ class endpointmanager {
 
     function __construct() {
         global $amp_conf;
-        require('abstraction/freepbx.inc');
+        require_once('abstraction/freepbx.inc');
+        require_once('json.inc');
         $this->eda = new epm_data_abstraction();
 
         $this->global_cfg = $this->eda->get_stored_globals();
@@ -138,14 +139,6 @@ class endpointmanager {
      */
     function tftp_fetch($host, $filename) {
         //first off let's check if this is installed or disabled
-        if (file_exists('/etc/xinetd.d/tftp')) {
-            $contents = file_get_contents('/etc/xinetd.d/tftp');
-            if (preg_match('/disable.*=.*yes/i', $contents)) {
-                return '';
-            }
-        } else {
-            return '';
-        }
         $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
 
         // create the request packet
@@ -176,6 +169,30 @@ class endpointmanager {
             $ret .= substr($buffer, 4);
         } while (strlen($buffer) == 516);  // the first non-full packet is the last.
         return $ret;
+    }
+    
+    function tftp_check() {
+        $subject = shell_exec("netstat -luan --numeric-ports");
+        if(preg_match('/:69\s/i', $subject)) {
+            $rand = md5(rand(10,2000));
+            if(file_put_contents($this->global_cfg['config_location'].'TEST', $rand)) {
+                if($this->tftp_fetch('127.0.0.1','TEST') != $rand) {
+                    $this->error['tftp_check'] = 'Local TFTP Server is not correctly configured';
+                }
+                unlink($this->global_cfg['config_location'].'TEST');
+            } else {
+                $this->error['tftp_check'] = 'Unable to write to '.$this->global_cfg['config_location'];
+            }
+        } else {
+            if (file_exists('/etc/xinetd.d/tftp')) {
+                $contents = file_get_contents('/etc/xinetd.d/tftp');
+                if (preg_match('/disable.*=.*yes/i', $contents)) {
+                    $this->error['tftp_check'] = 'Disabled is set to "yes" in /etc/xinetd.d/tftp. Please fix';
+                }
+            }
+            $this->error['tftp_check'] = 'TFTP Server is not running';
+        }
+       
     }
 
     function display_htmlspecialchars($contents) {
@@ -1485,7 +1502,7 @@ class endpointmanager {
                 } else {
                     $new_template_data['provision']['type'] = 'file';
                     $new_template_data['provision']['protocol'] = 'tftp';
-                    $new_template_data['provision']['path'] = '';
+                    $new_template_data['provision']['path'] = $_SERVER["SERVER_ADDR"];
                     $new_template_data['provision']['encryption'] = FALSE;
                 }
 
@@ -1511,6 +1528,7 @@ class endpointmanager {
                 //Set Variables according to the template_data files included. We can include different template.xml files within family_data.xml also one can create
                 //template_data_custom.xml which will get included or template_data_<model_name>_custom.xml which will also get included
                 //line 'global' will set variables that aren't line dependant
+               
                 
                 $provisioner_lib->settings = $new_template_data;
 

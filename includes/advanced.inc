@@ -375,17 +375,7 @@ switch($_REQUEST['subpage']) {
 
             $phone_config = new $class();
 
-
-            if((method_exists($phone_config,'display_options')) AND (method_exists($phone_config,'process_options'))) {
-                if(isset($_REQUEST['phone_options'])) {
-                    $endpoint->tpl->assign("options", $phone_config->process_options());
-                } else {
-                    $endpoint->tpl->assign("options", $phone_config->display_options());
-                }
-            }
-
-
-
+            //TODO: remove
             $template_file_list[0]['value'] = "template_data_custom.xml";
             $template_file_list[0]['text'] = "template_data_custom.xml";
 
@@ -439,6 +429,7 @@ switch($_REQUEST['subpage']) {
                 }
             } else {
                 $_POST['cfg_type'] = 'file';
+                $endpoint->tftp_check();
             }
             $sql = "UPDATE endpointman_global_vars SET value='" . $_POST['cfg_type'] . "' WHERE var_name='server_type'";
             $endpoint->eda->sql($sql);
