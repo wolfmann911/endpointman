@@ -106,13 +106,7 @@
             <br/>
         {/loop}
             <br />
-            <?php echo _('You can also use certain variables in your configs')?>:<br />{noparse}
-	-"{$server.ip.1}" = <?php echo _('Server 1 IP')?><br />
-        -"{$server.port.1}" = <?php echo _('Server 1 Port')?><br />
-	-"{$mac}" = <?php echo _('Device\'s Mac Address')?><br />
-        -"{$model}" = <?php echo _('Device\'s Model')?><br />
-	-"{$ext.line.1}" = <?php echo _('Device\'s Default Extension (Line 1 or Master)')?><br />
-	-"{$displayname.line.1}" = <?php echo _('Device\'s Description in FreePBX (Usually the Full Name)')?><br />{/noparse}
+            {include="variables"}
             <br />
             {/if}
 
@@ -143,6 +137,8 @@
 							    <option value='{$value.value}' {if condition="array_key_exists('selected',$value)"}{$value.selected}{/if}>{$value.description}</option>
 							{/loop}
                                         </select>
+                                        {elseif condition="$value.type == 'checkbox'"}
+                                            <label>{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}: <input type='checkbox' name='{$value.key}' id='{$value.key}' value='{$value.value}'></label>
 					{/if}
                                     </td><td width="90%">
 						{if condition="isset($value.aried)"}
