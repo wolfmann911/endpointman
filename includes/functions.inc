@@ -2447,16 +2447,22 @@ class endpointmanager {
         
         if (preg_match('/200/', $http_response_header[0])) {
             $dirname = dirname($destination_file);
+            if (!is_writable($dirname)) {
+                $this->error['download_file'] = "Directory '".$dirname."' is not writable! Unable to download files";
+                return false;
+            }
             if (!file_exists($dirname)) {
                 mkdir($dirname);
             }
             file_put_contents($destination_file, $contents);
             //check file placement
             if (!file_exists($destination_file)) {
+                $this->error['download_file'] = "File Doesn't Exist in '".$dirname."'. Unable to download files";
                 return false;
             }
             return true;
         } else {
+            $this->error['download_file'] = "Server Replied with error '".$http_response_header[0]."'. Unable to download files";
             return false;
         }
     }
