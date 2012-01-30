@@ -8,30 +8,65 @@ require 'functions.inc';
 $endpoint = new endpointmanager();
 
 if($_REQUEST['pop_type'] == 'edit_specifics') {
-    $info = $endpoint->get_phone_info($_REQUEST['edit_id']);
-    if(isset($_REQUEST['button_save'])) {
-	$endpoint->message['advanced_settings'] = "Updated!";
-	foreach($info['line'] as $data) {
-	    $line = $data['line'];
-	    $final['displayname_'.$line] = $_REQUEST['displayname_'.$line];
-	}
-	$sql = "UPDATE endpointman_mac_list SET specific_settings = '".serialize($final)."' WHERE id =". $_REQUEST['edit_id'];
-	$endpoint->eda->sql($sql);
-    }
+    
+    if(file_exists(PHONE_MODULES_PATH . 'endpoint/global_template_data.json')) {
+        $template_list[0] = 'global_template_data.json';
+                
+        $phone_info = $endpoint->get_phone_info($_REQUEST['edit_id']);
+        
+        $sql = 'SELECT max_lines FROM endpointman_model_list WHERE id = '. $phone_info['model_id'];
+        
+        $lines = $endpoint->eda->sql($sql, 'getOne');
+        $merged = $endpoint->merge_data(PHONE_MODULES_PATH . 'endpoint/', $template_list,$lines);
 
-    $info = $endpoint->get_phone_info($_REQUEST['edit_id']);
-    $specific_settings = !empty($info['specific_settings']) ? unserialize($info['specific_settings']) : array();
+        //remove stuff that is meaningless in this context
+        unset($merged['data']['globals']['globals']['option|mac']);
+        unset($merged['data']['globals']['globals']['break|0']);
+        unset($merged['data']['globals']['globals']['option|provision_protocol']);
+        
+        $html_array = $endpoint->generate_gui_html(serialize($merged), NULL, TRUE, NULL, $lines);
+        
+        $specific_data = array();
+        if (isset($_REQUEST['button_save'])) {
+            foreach ($_REQUEST as $key => $data) {
+                $key = str_replace('freepbx_', '', $key);
+                if (isset($_REQUEST['freepbx_' . $key])) {
+                    $specific_data['freepbx'][$key] = TRUE;
+                }
+                if ($endpoint->arraysearchrecursive($key, $html_array, 'key')) {
+                    if(!isset($specific_data['freepbx'][$key])) {
+                        $specific_data['data'][$key] = $data;
+                    }
+                }
+            }
+            $specific_data['data']['use_dhcp'] = isset($specific_data['data']['use_dhcp']) ? TRUE : FALSE;
 
-    $z = 0;
-    foreach($info['line'] as $data) {
-	$line = $data['line'];
-	$displayname[$z]['displayname'] = isset($specific_settings['displayname_'.$line]) ? $specific_settings['displayname_'.$line] : '{$displayname.line.'.$line.'}';
-	$displayname[$z]['line'] = $line;
-	$z++;
+            $sql = "UPDATE endpointman_mac_list SET specific_settings = '" . serialize($specific_data) . "' WHERE id =" . $_REQUEST['edit_id'];
+            $endpoint->eda->sql($sql);
+        } else {
+            $sql = 'SELECT specific_settings FROM endpointman_mac_list WHERE id ='. $_REQUEST['edit_id'];
+            $specific_data = unserialize($endpoint->eda->sql($sql, 'getOne'));
+        }
+        
+        foreach($phone_info['line'] as $data) {
+                $lid = $data['line'];
+                $specific_data['data']['line|'.$lid.'|displayname'] = !isset($specific_data['data']['line|'.$lid.'|displayname']) ? $data['description'] : $specific_data['data']['line|'.$lid.'|displayname'];
+                $specific_data['data']['line|'.$lid.'|username'] = !isset($specific_data['data']['line|'.$lid.'|username']) ? $data['ext'] : $specific_data['data']['line|'.$lid.'|username'];
+                $specific_data['data']['line|'.$lid.'|authname'] = !isset($specific_data['data']['line|'.$lid.'|authname']) ? $data['ext'] : $specific_data['data']['line|'.$lid.'|authname'];
+                $specific_data['data']['line|'.$lid.'|secret'] = !isset($specific_data['data']['line|'.$lid.'|secret']) ? $data['secret'] : $specific_data['data']['line|'.$lid.'|secret'];
+                $specific_data['data']['line|'.$lid.'|server_host'] = !isset($specific_data['data']['line|'.$lid.'|server_host']) ? $endpoint->global_cfg['srvip'] : $specific_data['data']['line|'.$lid.'|server_host'];
+                $specific_data['data']['line|'.$lid.'|server_port'] = !isset($specific_data['data']['line|'.$lid.'|server_port']) ? 5060 : $specific_data['data']['line|'.$lid.'|server_port'];
+                $specific_data['data']['line|'.$lid.'|line_enabled'] = !isset($specific_data['data']['line|'.$lid.'|line_enabled']) ? TRUE : $specific_data['data']['line|'.$lid.'|line_enabled'];
+        }
+
+        $specific_data['data']['ntp'] = isset($specific_data['data']['ntp']) ? $specific_data['data']['ntp'] : $endpoint->global_cfg['ntp'];
+        $specific_data['data']['use_dhcp'] = isset($specific_data['data']['use_dhcp']) ? TRUE : FALSE;  
+        
+        $html_array = $endpoint->generate_gui_html(serialize($merged), serialize($specific_data), TRUE, NULL, $lines);
     }
 
     $endpoint->prepare_message_box();
-    $endpoint->tpl->assign("display_name", $displayname);
+    $endpoint->tpl->assign("html_array", $html_array);
     echo $endpoint->tpl->draw( 'specifics_pop' );
 }
 
