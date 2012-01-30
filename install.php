@@ -937,6 +937,8 @@ if(!$new_install) {
         $db->query($sql);
         
         //$sql = 'INSERT INTO `asterisk`.`endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (NULL, \'tftp_check\', \'0\');';
+        //$sql = 'INSERT INTO `asterisk`.`endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (NULL, \'nmap_search\', \'\');';
+
     }
 
 }
@@ -1008,7 +1010,8 @@ if ($new_install) {
             (19, 'ntp', ''),
             (20, 'server_type', 'file'),
             (21, 'allow_hdfiles', '0'),
-            (22, 'tftp_check', '0')";
+            (22, 'tftp_check', '0'),
+            (23, 'nmap_search', '')";
     $db->query($sql);
 
     out("Creating mac list Table");

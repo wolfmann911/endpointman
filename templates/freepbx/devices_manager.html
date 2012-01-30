@@ -197,7 +197,7 @@
     {if condition="$no_add == FALSE"}
     <form id='go' action='config.php?type=tool&amp;display=epm_devices' method='POST'>
         <label><?php echo _('Search for new devices in netmask')?>
-            <input name="netmask" type="text" value="{$srvip}/24">
+            <input name="netmask" type="text" value="{$netmask}">
             <input type="Submit" name="button_go" id="button_go" onclick="find_devices();" value="<?php echo _('Go')?>">
         </label>
         <label>

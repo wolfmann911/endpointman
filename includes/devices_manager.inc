@@ -230,6 +230,9 @@ switch ($sub_type) {
         }
         break;
     case "go" :
+        $sql = "UPDATE endpointman_global_vars SET value = '".$_REQUEST['netmask']."' WHERE var_name = 'nmap_search'";
+        $endpoint->eda->sql($sql);
+        $endpoint->global_cfg['nmap_search'] = $_REQUEST['netmask'];
         if ((isset($_REQUEST['nmap'])) AND ($_REQUEST['nmap'] == 1)) {
             $temp = $endpoint->discover_new($_REQUEST['netmask']);
         } else {
@@ -453,10 +456,11 @@ foreach($template_list as $row) {
 //initialize a Rain TPL object
 if (isset($template_editor)) {
 
-} else {
+} else {    
     $endpoint->tpl->assign("list", $list);
     $endpoint->tpl->assign("error", "");
-    $endpoint->tpl->assign("srvip", $_SERVER["SERVER_ADDR"]);
+    $serv_address = !empty($endpoint->global_cfg['nmap_search']) ? $endpoint->global_cfg['nmap_search'] : $_SERVER["SERVER_ADDR"].'/24';
+    $endpoint->tpl->assign("netmask", $serv_address);
     $endpoint->tpl->assign("web_var", "?type=$type");
     $ma = $endpoint->models_available();
     if($ma != FALSE) {
