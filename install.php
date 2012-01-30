@@ -935,6 +935,8 @@ if(!$new_install) {
         out('Updating Mirror Location...again');
         $sql = "UPDATE endpointman_global_vars SET value = 'http://mirror.freepbx.org/provisioner/v3/' WHERE var_name ='update_server'";
         $db->query($sql);
+        
+        //$sql = 'INSERT INTO `asterisk`.`endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (NULL, \'tftp_check\', \'0\');';
     }
 
 }
@@ -1005,7 +1007,8 @@ if ($new_install) {
             (18, 'show_all_registrations', '0'),
             (19, 'ntp', ''),
             (20, 'server_type', 'file'),
-            (21, 'allow_hdfiles', '0')";
+            (21, 'allow_hdfiles', '0'),
+            (22, 'tftp_check', '0')";
     $db->query($sql);
 
     out("Creating mac list Table");

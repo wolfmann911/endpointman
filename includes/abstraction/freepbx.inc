@@ -34,9 +34,12 @@ class epm_data_abstraction {
     }
     
     function sql_error($results) {
+        echo "<h1>FATAL SQL ERROR! ::::: ";
+        echo $results->getDebugInfo() . "SQL - <br /> $sql";
+        echo "</h1>";
         echo "<pre>";
         var_dump(debug_backtrace());
-        die($results->getDebugInfo() . "SQL - <br /> $sql");
+        die();
     }
     
     function get_stored_globals() {

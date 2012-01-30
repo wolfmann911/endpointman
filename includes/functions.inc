@@ -172,31 +172,42 @@ class endpointmanager {
     }
     
     function tftp_check() {
-        $subject = shell_exec("netstat -luan --numeric-ports");
-        if(preg_match('/:69\s/i', $subject)) {
-            $rand = md5(rand(10,2000));
-            if(file_put_contents($this->global_cfg['config_location'].'TEST', $rand)) {
-                if($this->tftp_fetch('127.0.0.1','TEST') != $rand) {
-                    $this->error['tftp_check'] = 'Local TFTP Server is not correctly configured';
+        //create a simple block here incase people have strange issues going on as we will kill http
+        //by running this if the server isn't really running!
+        $sql = 'SELECT value FROM endpointman_global_vars WHERE var_name = \'tftp_check\'';
+        if($this->eda->sql($sql, 'getOne') != 1){
+            $sql = 'UPDATE endpointman_global_vars SET value = \'1\' WHERE var_name = \'tftp_check\'';
+            $this->eda->sql($sql);
+            $subject = shell_exec("netstat -luan --numeric-ports");
+            if(preg_match('/:69\s/i', $subject)) {
+                $rand = md5(rand(10,2000));
+                if(file_put_contents($this->global_cfg['config_location'].'TEST', $rand)) {
+                    if($this->tftp_fetch('127.0.0.1','TEST') != $rand) {
+                        $this->error['tftp_check'] = 'Local TFTP Server is not correctly configured';
+                    }
+                    unlink($this->global_cfg['config_location'].'TEST');
+                } else {
+                    $this->error['tftp_check'] = 'Unable to write to '.$this->global_cfg['config_location'];
                 }
-                unlink($this->global_cfg['config_location'].'TEST');
             } else {
-                $this->error['tftp_check'] = 'Unable to write to '.$this->global_cfg['config_location'];
-            }
-        } else {
-            $dis = FALSE;
-            if (file_exists('/etc/xinetd.d/tftp')) {
-                $contents = file_get_contents('/etc/xinetd.d/tftp');
-                if (preg_match('/disable.*=.*yes/i', $contents)) {
-                    $this->error['tftp_check'] = 'Disabled is set to "yes" in /etc/xinetd.d/tftp. Please fix <br />Then restart your TFTP service';
-                    $dis = TRUE;
+                $dis = FALSE;
+                if (file_exists('/etc/xinetd.d/tftp')) {
+                    $contents = file_get_contents('/etc/xinetd.d/tftp');
+                    if (preg_match('/disable.*=.*yes/i', $contents)) {
+                        $this->error['tftp_check'] = 'Disabled is set to "yes" in /etc/xinetd.d/tftp. Please fix <br />Then restart your TFTP service';
+                        $dis = TRUE;
+                    }
+                }
+                if(!$dis) {
+                    $this->error['tftp_check'] = 'TFTP Server is not running. <br />'.
+                    'See here for instructions on how to install one: <a href="http://wiki.provisioner.net/index.php/Tftp" target="_blank">http://wiki.provisioner.net/index.php/Tftp</a>';
+
                 }
             }
-            if(!$dis) {
-                $this->error['tftp_check'] = 'TFTP Server is not running. <br />'.
-                'See here for instructions on how to install one: <a href="http://wiki.provisioner.net/index.php/Tftp" target="_blank">http://wiki.provisioner.net/index.php/Tftp</a>';
-        
-            }
+            $sql = 'UPDATE endpointman_global_vars SET value = \'0\' WHERE var_name = \'tftp_check\'';
+            $this->eda->sql($sql);
+        } else {
+            $this->error['tftp_check'] = 'TFTP Server check failed on last past. Skipping';
         }
        
     }
