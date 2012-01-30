@@ -902,7 +902,7 @@ if(!$new_install) {
     
     if($ver <= "21021") {
         out('Updating Mirror Location...again');
-        $sql = "UPDATE endpointman_global_vars SET value = 'http://www.provisioner.net/release/v3/' WHERE var_name ='update_server'";
+        $sql = "UPDATE endpointman_global_vars SET value = 'http://mirror.freepbx.org/provisioner/v3/' WHERE var_name ='update_server'";
         $db->query($sql);
                 
         out("Uninstalling All Installed Brands (You'll just simply have to update again, no loss of data)");
@@ -929,6 +929,12 @@ if(!$new_install) {
             mkdir(PHONE_MODULES_PATH."temp/", 0764);
             out("Creating temp folder");
         }
+    }
+    
+    if($ver <= "21024") {
+        out('Updating Mirror Location...again');
+        $sql = "UPDATE endpointman_global_vars SET value = 'http://mirror.freepbx.org/provisioner/v3/' WHERE var_name ='update_server'";
+        $db->query($sql);
     }
 
 }
@@ -984,7 +990,7 @@ if ($new_install) {
             (3, 'gmtoff', ''),
             (4, 'gmthr', ''),
             (5, 'config_location', '/tftpboot/'),
-            (6, 'update_server', 'http://www.provisioner.net/release/v3/'),
+            (6, 'update_server', 'http://mirror.freepbx.org/provisioner/v3/'),
             (7, 'version', '".$xml_full_version."'),
             (8, 'enable_ari', '0'),
             (9, 'debug', '0'),

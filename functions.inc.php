@@ -149,13 +149,6 @@ function endpointman_configpageinit($pagename) {
                             }
                         }
                     }
-                } else {
-                    //Mac not set so delete
-                    $sql = "SELECT mac_id,luid FROM endpointman_line_list WHERE ext = ". $extdisplay;
-                    $macid = $endpoint->eda->sql($sql,'getRow',DB_FETCHMODE_ASSOC);
-                    if($macid) {
-                        //$endpoint->delete_line($macid['luid'], TRUE);
-                    }
                 }
             }
             endpointman_applyhooks();

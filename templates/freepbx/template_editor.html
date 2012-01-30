@@ -137,6 +137,8 @@
 							    <option value='{$value.value}' {if condition="array_key_exists('selected',$value)"}{$value.selected}{/if}>{$value.description}</option>
 							{/loop}
                                         </select>
+                                        {elseif condition="$value.type == 'checkbox'"}
+                                            <label>{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}: <input type='checkbox' name='{$value.key}' id='{$value.key}' value='{$value.value}'></label>
 					{/if}
                                     </td><td width="90%">
 						{if condition="isset($value.aried)"}
