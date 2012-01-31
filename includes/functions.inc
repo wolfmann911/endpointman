@@ -2458,12 +2458,12 @@ class endpointmanager {
         
         if (preg_match('/200/', $http_response_header[0])) {
             $dirname = dirname($destination_file);
-            if (!is_writable($dirname)) {
-                $this->error['download_file'] = "Directory '".$dirname."' is not writable! Unable to download files";
-                return false;
-            }
             if (!file_exists($dirname)) {
                 mkdir($dirname);
+            }
+            if (!is_writable($dirname)) {
+                    $this->error['download_file'] = "Directory '".$dirname."' is not writable! Unable to download files";
+                    return false;
             }
             file_put_contents($destination_file, $contents);
             //check file placement
