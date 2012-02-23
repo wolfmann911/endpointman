@@ -1,8 +1,10 @@
 RewriteEngine on
-RewriteRule ([^/]+\.cfg) p.php?request=$1 [L]
-RewriteRule ([^/]+\.tuz) p.php?request=$1 [L]
-RewriteRule ([^/]+\.xml) p.php?request=$1 [L]
-RewriteRule ([0-9a-f]{12}.*) p.php?request=$1 [L]
+#RewriteRule ([^/]+\.cfg) p.php?request=$1 [L]
+#RewriteRule ([^/]+\.tuz) p.php?request=$1 [L]
+#RewriteRule ([^/]+\.xml) p.php?request=$1 [L]
+#RewriteRule ([0-9a-f]{12}.*) p.php?request=$1 [L]
+
+RewriteRule ^.*$ p.php [QSA,L]
 
 RewriteCond %{THE_REQUEST} ^PUT*
 RewriteRule /prov/[^/]+/([^/]+)\.log p.php?putfile=$1

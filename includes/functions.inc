@@ -1602,8 +1602,6 @@ class endpointmanager {
                     $this->error['prepare_configs'] = 'Error Returned From Provisioner Library: '.  $e->getMessage();
                     return(FALSE);
                 }
-                
-
                 //print_r($provisioner_lib->debug_return);
                 //End timer
                 $time_end = microtime(true);
