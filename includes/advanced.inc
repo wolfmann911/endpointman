@@ -454,11 +454,6 @@ switch($_REQUEST['subpage']) {
             } else {
                 $endpoint->error['config_dir'] = "No Configuration Location Defined!";
             }
-
-            //Check tftp server to make sure it's functioning if we are using it
-            if(($_POST['cfg_type'] == 'file') AND ($tftp_writable)) {
-                $endpoint->tftp_check();
-            }
             
             if((isset($_POST['enable_ari'])) AND ($_POST['enable_ari'] == "on")) {
                 $_POST['enable_ari'] = 1;
@@ -484,6 +479,19 @@ switch($_REQUEST['subpage']) {
                 $_POST['allow_hdfiles'] = 1;
             } else {
                 $_POST['allow_hdfiles'] = 0;
+            }
+            if((isset($_POST['tftp_check'])) AND ($_POST['tftp_check'] == "on")) {
+                $_POST['tftp_check'] = 1;
+            } else {
+                $_POST['tftp_check'] = 0;
+            }
+            
+            $sql="UPDATE endpointman_global_vars SET value='" . $_POST['tftp_check'] . "' WHERE var_name='tftp_check'";
+            $endpoint->eda->sql($sql);
+            
+            //Check tftp server to make sure it's functioning if we are using it
+            if(($_POST['cfg_type'] == 'file') AND ($tftp_writable)) {
+                $endpoint->tftp_check();
             }
                         
             $sql="UPDATE endpointman_global_vars SET value='" . $_POST['package_server'] . "' WHERE var_name='update_server'";
@@ -554,6 +562,12 @@ switch($_REQUEST['subpage']) {
         } else {
             $allow_hdfiles = "";
         }
+        
+        if($endpoint->global_cfg['tftp_check']) {
+            $tftp_checked = "checked";
+        } else {
+            $tftp_checked = "";
+        }
 
         if($endpoint->global_cfg['debug']) {
             $debug_selected = "checked";
@@ -574,6 +588,8 @@ switch($_REQUEST['subpage']) {
         $endpoint->tpl->assign("debug_selected", $debug_selected);
 
         $endpoint->tpl->assign("hdfiles_selected", $allow_hdfiles);
+        
+        $endpoint->tpl->assign("tftp_selected", $tftp_checked);
 
         $endpoint->tpl->assign("ip", $_SERVER["SERVER_ADDR"]);
         $endpoint->tpl->assign("srvip", $endpoint->global_cfg['srvip']);
