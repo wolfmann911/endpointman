@@ -931,12 +931,6 @@ if(!$new_install) {
         }
     }
     
-    if($ver <= "21024") {
-        out('Updating Mirror Location...again');
-        $sql = "UPDATE endpointman_global_vars SET value = 'http://mirror.freepbx.org/provisioner/v3/' WHERE var_name ='update_server'";
-        $db->query($sql);
-    }
-    
     if($ver <= "21031") {
         out("Adding tftp server check and nmap search save values");
         $sql = 'INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (NULL, \'tftp_check\', \'0\');';
@@ -1111,7 +1105,7 @@ out("Update Version Number to ".$xml_full_version);
 $sql = "UPDATE endpointman_global_vars SET value = '".$xml_full_version."' WHERE var_name = 'version'";
 $db->query($sql);
 
-$sql = "UPDATE endpointman_global_vars SET value = 'http://www.provisioner.net/release/v3/' WHERE var_name = 'update_server'";
+$sql = "UPDATE endpointman_global_vars SET value = 'http://mirror.freepbx.org/provisioner/v3/' WHERE var_name = 'update_server'";
 $db->query($sql);
 
 if(file_exists($amp_conf['AMPWEBROOT']."/recordings/modules/phonesettings.module")) {
