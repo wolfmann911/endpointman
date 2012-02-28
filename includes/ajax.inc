@@ -10,7 +10,7 @@
 require 'functions.inc';
 $endpoint = new endpointmanager();
 
-include 'jsonwrapper.php';
+include 'json.inc';
 
 function in_array_recursive($needle, $haystack) {
     $it = new RecursiveIteratorIterator(new RecursiveArrayIterator($haystack));
