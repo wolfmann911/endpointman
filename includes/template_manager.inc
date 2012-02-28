@@ -39,7 +39,7 @@ if(isset($_REQUEST['edit_template'])) {
 } elseif(isset($_REQUEST['delete_template'])) {
     $sql = "DELETE FROM endpointman_template_list WHERE id = ". $_REQUEST['id'];
     $endpoint->eda->sql($sql);
-    $sql = "UPDATE endpointman_mac_list SET custom_cfg_template = 0 WHERE custom_cfg_template = ".$_REQUEST['id'];
+    $sql = "UPDATE endpointman_mac_list SET template_id = 0 WHERE template_id = ".$_REQUEST['id'];
     $endpoint->eda->sql($sql);
     $default_display = TRUE;
     $endpoint->message['general'] = _('Deleted');

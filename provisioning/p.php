@@ -28,6 +28,7 @@ if(getMethod() == "GET") {
     # Workaround for SPAs that don't actually request their type of device
     # Assume they're 504G's. Faulty in firmware 7.4.3a
     $filename = basename($_SERVER["REQUEST_URI"]);
+
     $web_path = 'http://'.$_SERVER["SERVER_NAME"].dirname($_SERVER["PHP_SELF"]).'/';
     /*
     if ($filename == "p.php") { 
@@ -59,7 +60,7 @@ if(getMethod() == "GET") {
 
         $files = $endpoint->prepare_configs($phone_info,FALSE,FALSE);
         
-        if(!files) {
+        if(!$files) {
             header("HTTP/1.0 500 Internal Server Error");
             die();
         }

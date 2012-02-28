@@ -1,4 +1,5 @@
 <?PHP
+
 /**
  * Endpoint Manager FreePBX Hooks File
  *
@@ -6,7 +7,6 @@
  * @license MPL / GPLv2 / LGPL
  * @package Endpoint Manager
  */
-
 function endpointman_get_config($engine) {
     global $db;
     global $ext;
@@ -15,135 +15,165 @@ function endpointman_get_config($engine) {
     $sql = 'SELECT value FROM `admin` WHERE `variable` LIKE CONVERT(_utf8 \'version\' USING latin1) COLLATE latin1_swedish_ci';
     $amp_version = $db->getOne($sql);
 
-    switch($engine) {
+    switch ($engine) {
         case "asterisk":
             if (isset($core_conf) && is_a($core_conf, "core_conf") && ($amp_version >= "2.8.0")) {
-                $core_conf->addSipNotify('polycom-check-cfg',array('Event' => 'check-sync','Content-Length' => '0'));
-                $core_conf->addSipNotify('polycom-reboot',array('Event' => 'check-sync','Content-Length' => '0'));
-                $core_conf->addSipNotify('sipura-check-cfg',array('Event' => 'resync','Content-Length' => '0'));
-                $core_conf->addSipNotify('grandstream-check-cfg',array('Event' => 'sys-control'));
-                $core_conf->addSipNotify('cisco-check-cfg',array('Event' => 'check-sync','Content-Length' => '0'));
-                $core_conf->addSipNotify('reboot-snom',array('Event' => 'reboot','Content-Length' => '0'));
-                $core_conf->addSipNotify('aastra-check-cfg',array('Event' => 'check-sync','Content-Length' => '0'));
-                $core_conf->addSipNotify('linksys-cold-restart',array('Event' => 'reboot_now','Content-Length' => '0'));
-                $core_conf->addSipNotify('linksys-warm-restart',array('Event' => 'restart_now','Content-Length' => '0'));
-                $core_conf->addSipNotify('spa-reboot',array('Event' => 'reboot','Content-Length' => '0'));
+                $core_conf->addSipNotify('polycom-check-cfg', array('Event' => 'check-sync', 'Content-Length' => '0'));
+                $core_conf->addSipNotify('polycom-reboot', array('Event' => 'check-sync', 'Content-Length' => '0'));
+                $core_conf->addSipNotify('sipura-check-cfg', array('Event' => 'resync', 'Content-Length' => '0'));
+                $core_conf->addSipNotify('grandstream-check-cfg', array('Event' => 'sys-control'));
+                $core_conf->addSipNotify('cisco-check-cfg', array('Event' => 'check-sync', 'Content-Length' => '0'));
+                $core_conf->addSipNotify('reboot-snom', array('Event' => 'reboot', 'Content-Length' => '0'));
+                $core_conf->addSipNotify('aastra-check-cfg', array('Event' => 'check-sync', 'Content-Length' => '0'));
+                $core_conf->addSipNotify('linksys-cold-restart', array('Event' => 'reboot_now', 'Content-Length' => '0'));
+                $core_conf->addSipNotify('linksys-warm-restart', array('Event' => 'restart_now', 'Content-Length' => '0'));
+                $core_conf->addSipNotify('spa-reboot', array('Event' => 'reboot', 'Content-Length' => '0'));
             }
             break;
     }
 }
+
 function endpointman_configpageinit($pagename) {
     global $currentcomponent, $amp_conf, $db;
-
-    $display = isset($_REQUEST['display'])?$_REQUEST['display']:null;
-
-    if($display == "extensions") {
-        if(isset($_REQUEST['extension'])) {
-            $extdisplay = isset($_REQUEST['extension'])?$_REQUEST['extension']:null;
+	
+    $display = isset($_REQUEST['display']) ? $_REQUEST['display'] : null;
+	$type = '';
+	$tech = '';
+	$extdisplay = '';
+	
+    if ($display == "extensions") {
+        if (isset($_REQUEST['extension'])) {
+            $extdisplay = isset($_REQUEST['extension']) ? $_REQUEST['extension'] : null;
         } else {
-            $extdisplay = isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:null;
+            $extdisplay = isset($_REQUEST['extdisplay']) ? $_REQUEST['extdisplay'] : null;
         }
-    } elseif($display == "devices") {
-        $extdisplay = isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:null;
+    } elseif ($display == "devices") {
+		if (isset($_REQUEST['deviceid'])) {
+			$extdisplay = isset($_REQUEST['deviceid']) ? $_REQUEST['deviceid'] : null;
+		} else {
+			$extdisplay = isset($_REQUEST['extdisplay']) ? $_REQUEST['extdisplay'] : null;
+		}
+    }
+	
+    if (isset($extdisplay) && !empty($extdisplay)) {
+        $sql = "SELECT tech FROM devices WHERE id = " . $extdisplay;
+        $tech = $db->getOne($sql);
+		if(!$tech) {
+			$tech = "sip";
+			$type = 'new';
+		} elseif($tech == 'sip') {
+			$type = 'edit';
+			$tech = 'sip';
+		}
+    } elseif(isset($_REQUEST['tech_hardware']) OR isset($_REQUEST['tech'])) {
+		$tech = isset($_REQUEST['tech_hardware']) ? $_REQUEST['tech_hardware'] : $_REQUEST['tech'];
+		if(($tech == 'sip_generic') OR ($tech == 'sip')) { 
+        	$tech = "sip";
+			$type = 'new';
+		}
     }
 
-    $action = isset($_REQUEST['action'])?$_REQUEST['action']:null;
-    $delete = isset($_REQUEST['epm_delete'])?$_REQUEST['epm_delete']:null;
-    $tech = isset($_REQUEST['tech_hardware'])?$_REQUEST['tech_hardware']:null;
-
-    if((($display == "extensions") OR ($display == "devices")) && (isset($extdisplay) OR ($tech == "sip_generic"))) {    
+    if (($tech == 'sip') AND (!empty($type))) {
         global $endpoint;
 
-        $doc_root =	$amp_conf['AMPWEBROOT'] ."/admin/modules/endpointman/";
-        if(file_exists($doc_root . "includes/functions.inc")) {
+	    $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : null;
+	    $delete = isset($_REQUEST['epm_delete']) ? $_REQUEST['epm_delete'] : null;
+
+        $doc_root = $amp_conf['AMPWEBROOT'] . "/admin/modules/endpointman/";
+        if (file_exists($doc_root . "includes/functions.inc")) {
             require($doc_root . "includes/functions.inc");
 
             $endpoint = new endpointmanager();
             ini_set('display_errors', 0);
 
             if ($action == "del") {
-                $sql = "SELECT mac_id,luid FROM endpointman_line_list WHERE ext = ". $extdisplay;
-                $macid = $endpoint->eda->sql($sql,'getRow',DB_FETCHMODE_ASSOC);
-                if($macid) {
+                $sql = "SELECT mac_id,luid FROM endpointman_line_list WHERE ext = " . $extdisplay;
+                $macid = $endpoint->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
+                if ($macid) {
                     $endpoint->delete_line($macid['luid'], TRUE);
                 }
             }
 
-            if(($action == "edit") OR ($action == "add")) {
-                if(isset($delete)) {
-                    $sql = "SELECT mac_id,luid FROM endpointman_line_list WHERE ext = ". $extdisplay;
-                    $macid = $endpoint->eda->sql($sql,'getRow',DB_FETCHMODE_ASSOC);
-                    if($macid) {
+            if (($action == "edit") OR ($action == "add")) {
+                if (isset($delete)) {
+                    $sql = "SELECT mac_id,luid FROM endpointman_line_list WHERE ext = " . $extdisplay;
+                    $macid = $endpoint->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
+                    if ($macid) {
                         $endpoint->delete_line($macid['luid'], TRUE);
                     }
                 }
 
-                $mac = isset($_REQUEST['epm_mac'])?$_REQUEST['epm_mac']:null;
+                $mac = isset($_REQUEST['epm_mac']) ? $_REQUEST['epm_mac'] : null;
 
-                if(!empty($mac)) {
+                if (!empty($mac)) {
                     //Mac is set
-                    $brand = isset($_REQUEST['epm_brand'])?$_REQUEST['epm_brand']:null;
-                    $model = isset($_REQUEST['epm_model'])?$_REQUEST['epm_model']:null;
-                    $line = isset($_REQUEST['epm_line'])?$_REQUEST['epm_line']:null;
-                    $temp = isset($_REQUEST['epm_temps'])?$_REQUEST['epm_temps']:null;
-                    if(isset($_REQUEST['name'])) {
-                        $name = isset($_REQUEST['name'])?$_REQUEST['name']:null;
+                    $brand = isset($_REQUEST['epm_brand']) ? $_REQUEST['epm_brand'] : null;
+                    $model = isset($_REQUEST['epm_model']) ? $_REQUEST['epm_model'] : null;
+                    $line = isset($_REQUEST['epm_line']) ? $_REQUEST['epm_line'] : null;
+                    $temp = isset($_REQUEST['epm_temps']) ? $_REQUEST['epm_temps'] : null;
+                    if (isset($_REQUEST['name'])) {
+                        $name = isset($_REQUEST['name']) ? $_REQUEST['name'] : null;
+						echo "hi";
                     } else {
-                        $name = isset($_REQUEST['description'])?$_REQUEST['description']:null;
+						echo "hi";
+                        $name = isset($_REQUEST['description']) ? $_REQUEST['description'] : null;
+						echo $name;
                     }
-                    if(isset($_REQUEST['deviceid'])) {
-                        if($_REQUEST['devicetype'] == "fixed") {
+                    if (isset($_REQUEST['deviceid'])) {
+                        if ($_REQUEST['devicetype'] == "fixed") {
                             //SQL to get the Description of the  extension from the extension table
-                            $sql = "SELECT name FROM users WHERE extension = '".$_REQUEST['deviceuser']."'";
-                            $name = $endpoint->eda->sql($sql,'getOne');
-
+                            $sql = "SELECT name FROM users WHERE extension = '" . $_REQUEST['deviceuser'] . "'";
+                            $name_o = $endpoint->eda->sql($sql, 'getOne');
+							if($name_o) {
+								$name = $name_o;
+							}
                         }
                     }
 
-                    $reboot = isset($_REQUEST['epm_reboot'])?$_REQUEST['epm_reboot']:null;
+                    $reboot = isset($_REQUEST['epm_reboot']) ? $_REQUEST['epm_reboot'] : null;
 
-                    if($endpoint->mac_check_clean($mac)) {
-                        $sql = "SELECT id FROM endpointman_mac_list WHERE mac = '".$endpoint->mac_check_clean($mac)."'";
-                        $macid = $endpoint->eda->sql($sql,'getOne');
-                        if($macid) {
+                    if ($endpoint->mac_check_clean($mac)) {
+                        $sql = "SELECT id FROM endpointman_mac_list WHERE mac = '" . $endpoint->mac_check_clean($mac) . "'";
+                        $macid = $endpoint->eda->sql($sql, 'getOne');
+                        if ($macid) {
                             //In Database already
-                            
-                            $sql = 'SELECT * FROM endpointman_line_list WHERE ext = '.$extdisplay.' AND mac_id = '. $macid;
-                            $lines_list =& $endpoint->eda->sql($sql,'getRow',DB_FETCHMODE_ASSOC);
-                            
-                            if(($lines_list) AND (isset($model)) AND (isset($line)) AND (!isset($delete)) AND (isset($temp))) {
+
+                            $sql = 'SELECT * FROM endpointman_line_list WHERE ext = ' . $extdisplay . ' AND mac_id = ' . $macid;
+                            $lines_list = & $endpoint->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
+
+                            if (($lines_list) AND (isset($model)) AND (isset($line)) AND (!isset($delete)) AND (isset($temp))) {
                                 //Modifying line already in the database
-                                $endpoint->update_device($macid, $model, $temp, $lines_list['luid'],$name,$lines_list['line']);
+                                $endpoint->update_device($macid, $model, $temp, $lines_list['luid'], $name, $lines_list['line']);
 
                                 $row = $endpoint->get_phone_info($macid);
-                                if(isset($reboot)) {
+                                if (isset($reboot)) {
                                     $endpoint->prepare_configs($row);
                                 } else {
-                                    $endpoint->prepare_configs($row,FALSE);
+                                    $endpoint->prepare_configs($row, FALSE);
                                 }
-                            } elseif((isset($model)) AND (!isset($delete)) AND (isset($line)) AND (isset($temp))) {
+                            } elseif ((isset($model)) AND (!isset($delete)) AND (isset($line)) AND (isset($temp))) {
                                 //Add line to the database
 
-                                if(empty($line)) {
+                                if (empty($line)) {
                                     $endpoint->add_line($macid, NULL, $extdisplay, $name);
                                 } else {
-                                   $endpoint->add_line($macid, $line, $extdisplay, $name);
+                                    $endpoint->add_line($macid, $line, $extdisplay, $name);
                                 }
-                                
+
                                 $endpoint->update_device($macid, $model, $temp, NULL, NULL, NULL, FALSE);
 
                                 $row = $endpoint->get_phone_info($macid);
-                                if(isset($reboot)) {
+                                if (isset($reboot)) {
                                     $endpoint->prepare_configs($row);
                                 } else {
-                                    $endpoint->prepare_configs($row,FALSE);
+                                    $endpoint->prepare_configs($row, FALSE);
                                 }
                             }
-                        } elseif(!isset($delete)) {
+                        } elseif (!isset($delete)) {
                             //Add Extension/Phone to database
                             $mac_id = $endpoint->add_device($mac, $model, $extdisplay, $temp, NULL, $name);
 
-                            if($mac_id) {
+                            if ($mac_id) {
                                 $row = $endpoint->get_phone_info($mac_id);
                                 $endpoint->prepare_configs($row);
                             }
@@ -157,6 +187,7 @@ function endpointman_configpageinit($pagename) {
         }
     }
 }
+
 function endpointman_applyhooks() {
     global $currentcomponent;
 
@@ -164,19 +195,23 @@ function endpointman_applyhooks() {
     // displaying stuff on the page.
     $currentcomponent->addguifunc('endpointman_configpageload');
 }
+
 // This is called before the page is actually displayed, so we can use addguielem().
 function endpointman_configpageload() {
     global $currentcomponent, $endpoint, $db;
 
-    $display = isset($_REQUEST['display'])?$_REQUEST['display']:null;
+    $display = isset($_REQUEST['display']) ? $_REQUEST['display'] : null;
+    $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : null;
+    $extdisplay = isset($_REQUEST['extdisplay']) ? $_REQUEST['extdisplay'] : null;
+    if (isset($extdisplay) && !empty($extdisplay)) {
+        $sql = "SELECT tech FROM devices WHERE id = " . $extdisplay;
+        $tech = $endpoint->eda->sql($sql, 'getOne');
+    } else {
+        $tech = isset($_REQUEST['tech_hardware']) ? $_REQUEST['tech_hardware'] : null;
+    }
 
-    // Init vars from $_REQUEST[]
-    $action = isset($_REQUEST['action'])?$_REQUEST['action']:null;
-    $extdisplay = isset($_REQUEST['extdisplay'])?$_REQUEST['extdisplay']:null;
-    $tech = isset($_REQUEST['tech_hardware']) ? $_REQUEST['tech_hardware'] : null;
-    $tech = isset($tech) ? $tech : $_REQUEST['tech'];
-    if((isset($tech)) && (($tech == 'sip_generic') OR ($tech == 'sip'))) {
-    // Don't display this stuff it it's on a 'This xtn has been deleted' page.
+    if (isset($tech) && (($tech == 'sip') OR ($tech == 'sip_generic'))) {
+        // Don't display this stuff it it's on a 'This xtn has been deleted' page.
         if ($action != 'del') {
 
             $js = "
@@ -199,9 +234,9 @@ function endpointman_configpageload() {
 
             $section = _('End Point Manager');
 
-            $sql = "SELECT mac_id,luid,line FROM endpointman_line_list WHERE ext = '".$extdisplay."' ";
+            $sql = "SELECT mac_id,luid,line FROM endpointman_line_list WHERE ext = '" . $extdisplay . "' ";
             $line_info = $endpoint->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
-            if($line_info) {
+            if ($line_info) {
 
                 $js = "
                         $.ajaxSetup({ cache: false });
@@ -228,8 +263,8 @@ function endpointman_configpageload() {
                 $info = $endpoint->get_phone_info($line_info['mac_id']);
 
                 $brand_list = $endpoint->brands_available($info['brand_id'], true);
-                if(!empty($info['brand_id'])) {
-                    $model_list = $endpoint->models_available(NULL,$info['brand_id']);
+                if (!empty($info['brand_id'])) {
+                    $model_list = $endpoint->models_available(NULL, $info['brand_id']);
                     $line_list = $endpoint->linesAvailable($line_info['luid']);
                     $template_list = $endpoint->display_templates($info['product_id']);
                 } else {
@@ -240,14 +275,13 @@ function endpointman_configpageload() {
 
                 $checked = false;
 
-                $currentcomponent->addguielem($section, new gui_checkbox('epm_delete', $checked, 'Delete','Delete this Extension from Endpoint Manager'),9);
-                $currentcomponent->addguielem($section, new gui_textbox('epm_mac', $info['mac'], 'MAC Address', 'The MAC Address of the Phone Assigned to this Extension/Device. <br />(Leave Blank to Remove from Endpoint Manager)', '', 'Please enter a valid MAC Address', true, 17, false),9);
-                $currentcomponent->addguielem($section, new gui_selectbox('epm_brand', $brand_list, $info['brand_id'], 'Brand', 'The Brand of this Phone.', false, 'frm_'.$display.'_brand_change(this.options[this.selectedIndex].value)', false),9);
-                $currentcomponent->addguielem($section, new gui_selectbox('epm_model', $model_list, $info['model_id'], 'Model', 'The Model of this Phone.', false, 'frm_'.$display.'_model_change(this.options[this.selectedIndex].value,\''.$line_info['luid'].'\')', false),9);
-                $currentcomponent->addguielem($section, new gui_selectbox('epm_line', $line_list, $line_info['line'], 'Line', 'The Line of this Extension/Device.', false, '', false),9);
-                $currentcomponent->addguielem($section, new gui_selectbox('epm_temps', $template_list, $info['template_id'], 'Template', 'The Template of this Phone.', false, '', false),9);
-                $currentcomponent->addguielem($section, new gui_checkbox('epm_reboot', $checked, 'Reboot','Reboot this Phone on Submit'),9);
-
+                $currentcomponent->addguielem($section, new gui_checkbox('epm_delete', $checked, 'Delete', 'Delete this Extension from Endpoint Manager'), 9);
+                $currentcomponent->addguielem($section, new gui_textbox('epm_mac', $info['mac'], 'MAC Address', 'The MAC Address of the Phone Assigned to this Extension/Device. <br />(Leave Blank to Remove from Endpoint Manager)', '', 'Please enter a valid MAC Address', true, 17, false), 9);
+                $currentcomponent->addguielem($section, new gui_selectbox('epm_brand', $brand_list, $info['brand_id'], 'Brand', 'The Brand of this Phone.', false, 'frm_' . $display . '_brand_change(this.options[this.selectedIndex].value)', false), 9);
+                $currentcomponent->addguielem($section, new gui_selectbox('epm_model', $model_list, $info['model_id'], 'Model', 'The Model of this Phone.', false, 'frm_' . $display . '_model_change(this.options[this.selectedIndex].value,\'' . $line_info['luid'] . '\')', false), 9);
+                $currentcomponent->addguielem($section, new gui_selectbox('epm_line', $line_list, $line_info['line'], 'Line', 'The Line of this Extension/Device.', false, '', false), 9);
+                $currentcomponent->addguielem($section, new gui_selectbox('epm_temps', $template_list, $info['template_id'], 'Template', 'The Template of this Phone.', false, '', false), 9);
+                $currentcomponent->addguielem($section, new gui_checkbox('epm_reboot', $checked, 'Reboot', 'Reboot this Phone on Submit'), 9);
             } else {
 
                 $js = "
@@ -277,17 +311,17 @@ function endpointman_configpageload() {
                 $line_list = array();
                 $template_list = array();
 
-                $currentcomponent->addguielem($section, new gui_textbox('epm_mac', $info['mac'], 'MAC Address', 'The MAC Address of the Phone Assigned to this Extension/Device. <br />(Leave Blank to Remove from Endpoint Manager)', '', 'Please enter a valid MAC Address', true, 17, false),9);
-                $currentcomponent->addguielem($section, new gui_selectbox('epm_brand', $brand_list, $info['brand_id'], 'Brand', 'The Brand of this Phone.', false, 'frm_'.$display.'_brand_change(this.options[this.selectedIndex].value)', false),9);
-                $currentcomponent->addguielem($section, new gui_selectbox('epm_model', $model_list, $info['model_id'], 'Model', 'The Model of this Phone.', false, 'frm_'.$display.'_model_change(this.options[this.selectedIndex].value,document.getElementById(\'epm_mac\').value)', false),9);
-                $currentcomponent->addguielem($section, new gui_selectbox('epm_line', $line_list, $line_info['line'], 'Line', 'The Line of this Extension/Device.', false, '', false),9);
-                $currentcomponent->addguielem($section, new gui_selectbox('epm_temps', $template_list, $info['template_id'], 'Template', 'The Template of this Phone.', false, '', false),9);
-                $currentcomponent->addguielem($section, new guitext('epm_note','Note: This might reboot the phone if it\'s already registered to Asterisk'));
-
+                $currentcomponent->addguielem($section, new gui_textbox('epm_mac', $info['mac'], 'MAC Address', 'The MAC Address of the Phone Assigned to this Extension/Device. <br />(Leave Blank to Remove from Endpoint Manager)', '', 'Please enter a valid MAC Address', true, 17, false), 9);
+                $currentcomponent->addguielem($section, new gui_selectbox('epm_brand', $brand_list, $info['brand_id'], 'Brand', 'The Brand of this Phone.', false, 'frm_' . $display . '_brand_change(this.options[this.selectedIndex].value)', false), 9);
+                $currentcomponent->addguielem($section, new gui_selectbox('epm_model', $model_list, $info['model_id'], 'Model', 'The Model of this Phone.', false, 'frm_' . $display . '_model_change(this.options[this.selectedIndex].value,document.getElementById(\'epm_mac\').value)', false), 9);
+                $currentcomponent->addguielem($section, new gui_selectbox('epm_line', $line_list, $line_info['line'], 'Line', 'The Line of this Extension/Device.', false, '', false), 9);
+                $currentcomponent->addguielem($section, new gui_selectbox('epm_temps', $template_list, $info['template_id'], 'Template', 'The Template of this Phone.', false, '', false), 9);
+                $currentcomponent->addguielem($section, new guitext('epm_note', 'Note: This might reboot the phone if it\'s already registered to Asterisk'));
             }
         }
     }
 }
 
 function endpointman_hookProcess_core($viewing_itemid, $request) {
+    
 }

@@ -3,6 +3,38 @@
 {/if}
 {if condition="isset($show_installer)"}
 <script>
+{if condition="$amp_ver >= 10"}
+var box;
+function process_module_actions(actions) {
+    $(document).ready(function() {
+	urlStr = "config.php?display=epm_config&amp;quietmode=1&amp;handler=file&amp;file=installer.html.php&amp;module=endpointman&amp;type=manual_install&amp;package={$package}&amp;xml={$xml}&amp;install_type={$type}";
+	urlStr += "&amp;rand="+Math.random ( );
+        for (var i in actions) {
+            urlStr += "&amp;moduleaction["+i+"]="+actions[i];
+        }
+        box = $('<div></div>')
+        .html('<iframe height="100%" frameBorder="0" src="'+urlStr+'"></iframe>')
+        .dialog({
+            title: 'Status - Please Wait',
+            resizable: false,
+            modal: true,
+            position: ['center', 50],
+            width: '400px',
+            height: 230,
+            close: function (e) {
+                close_module_actions(true);
+                $(e.target).dialog("destroy").remove();
+            }
+        });
+    });
+}
+function close_module_actions(goback) {
+        box.dialog("destroy").remove();
+        if (goback) {
+            location.href = 'config.php?type=tool&display=epm_advanced&subpage=manual_upload';
+        }
+}
+{else}
 function process_module_actions(actions) {
 	freepbx_modal_show('moduleBox');
 	urlStr = "config.php?type=tool&amp;display=epm_config&amp;quietmode=1&amp;handler=file&amp;file=installer.html.php&amp;module=endpointman&amp;type=manual_install&amp;package={$package}&amp;xml={$xml}&amp;install_type={$type}";
@@ -19,6 +51,7 @@ function close_module_actions(goback) {
   		location.href = 'config.php?type=tool&display=epm_advanced&subpage=manual_upload';
 	}
 }
+{/if}
 process_module_actions();
 </script>
 

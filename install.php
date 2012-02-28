@@ -936,6 +936,14 @@ if(!$new_install) {
         $sql = "UPDATE endpointman_global_vars SET value = 'http://mirror.freepbx.org/provisioner/v3/' WHERE var_name ='update_server'";
         $db->query($sql);
     }
+    
+    if($ver <= "21031") {
+        out("Adding tftp server check and nmap search save values");
+        $sql = 'INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (NULL, \'tftp_check\', \'0\');';
+        $db->query($sql);
+        $sql = 'INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (NULL, \'nmap_search\', \'\');';
+        $db->query($sql);
+    }
 
 }
 
@@ -1005,7 +1013,9 @@ if ($new_install) {
             (18, 'show_all_registrations', '0'),
             (19, 'ntp', ''),
             (20, 'server_type', 'file'),
-            (21, 'allow_hdfiles', '0')";
+            (21, 'allow_hdfiles', '0'),
+            (22, 'tftp_check', '0'),
+            (23, 'nmap_search', '')";
     $db->query($sql);
 
     out("Creating mac list Table");
