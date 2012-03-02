@@ -51,7 +51,10 @@ function endpointman_configpageinit($pagename) {
 		} else {
 			$extdisplay = isset($_REQUEST['extdisplay']) ? $_REQUEST['extdisplay'] : null;
 		}
-    }
+		} else {
+			// we only care about extensions or devices, otherwise return
+			return true;
+		}
 	
     if (isset($extdisplay) && !empty($extdisplay)) {
         $sql = "SELECT tech FROM devices WHERE id = " . $extdisplay;
