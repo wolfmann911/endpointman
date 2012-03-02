@@ -12,12 +12,9 @@ function endpointman_get_config($engine) {
     global $ext;
     global $core_conf;
 
-    $sql = 'SELECT value FROM `admin` WHERE `variable` LIKE CONVERT(_utf8 \'version\' USING latin1) COLLATE latin1_swedish_ci';
-    $amp_version = $db->getOne($sql);
-
     switch ($engine) {
         case "asterisk":
-            if (isset($core_conf) && is_a($core_conf, "core_conf") && ($amp_version >= "2.8.0")) {
+            if (isset($core_conf) && is_a($core_conf, "core_conf") && (method_exists($core_conf, 'addSipNotify'))) {
                 $core_conf->addSipNotify('polycom-check-cfg', array('Event' => 'check-sync', 'Content-Length' => '0'));
                 $core_conf->addSipNotify('polycom-reboot', array('Event' => 'check-sync', 'Content-Length' => '0'));
                 $core_conf->addSipNotify('sipura-check-cfg', array('Event' => 'resync', 'Content-Length' => '0'));
@@ -28,6 +25,7 @@ function endpointman_get_config($engine) {
                 $core_conf->addSipNotify('linksys-cold-restart', array('Event' => 'reboot_now', 'Content-Length' => '0'));
                 $core_conf->addSipNotify('linksys-warm-restart', array('Event' => 'restart_now', 'Content-Length' => '0'));
                 $core_conf->addSipNotify('spa-reboot', array('Event' => 'reboot', 'Content-Length' => '0'));
+                $core_conf->addSipNotify('reboot-yealink', array('Event' => 'check-sync\;reboot=true', 'Content-Length' => '0'));
             }
             break;
     }
@@ -53,7 +51,10 @@ function endpointman_configpageinit($pagename) {
 		} else {
 			$extdisplay = isset($_REQUEST['extdisplay']) ? $_REQUEST['extdisplay'] : null;
 		}
-    }
+		} else {
+			// we only care about extensions or devices, otherwise return
+			return true;
+		}
 	
     if (isset($extdisplay) && !empty($extdisplay)) {
         $sql = "SELECT tech FROM devices WHERE id = " . $extdisplay;

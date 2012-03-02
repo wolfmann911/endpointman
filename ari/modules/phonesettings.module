@@ -38,7 +38,6 @@ class phonesettings {
    *   Common arguments
     */
     function navMenu($args) {
-				global $amp_conf;
 
         $ret = "";
         $exten = $_SESSION['ari_user']['extension'];
@@ -47,7 +46,7 @@ class phonesettings {
         $results = $_SESSION['dbh_asterisk']->getAll($sql, DB_FETCHMODE_ASSOC);
 
         // and we are not logged in as admin
-        if (($exten!=$amp_conf['ARI_ADMIN_USERNAME']) AND ($results[0]['value'])) {
+        if (($exten!=$ARI_ADMIN_USERNAME) AND ($results[0]['value'])) {
             $ret .= "<p><small><small><a href='" . $_SESSION['ARI_ROOT'] . "?m=phonesettings&f=display'>" . _("Phone Settings") . "</a></small></small></p><br>";
         }
 
