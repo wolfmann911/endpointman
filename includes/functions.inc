@@ -1734,7 +1734,7 @@ class endpointmanager {
                 mkdir(PHONE_MODULES_PATH . "endpoint/" . $row['directory'] . "/" . $row['cfg_dir'] . "/firmware");
                 exec("tar -xvf " . PHONE_MODULES_PATH . 'temp/' . $temp['data']['firmware_pkg'] . " -C " . PHONE_MODULES_PATH . "endpoint/" . $row['directory'] . "/" . $row['cfg_dir']);
                 $i = 0;
-                foreach (glob(PHONE_MODULES_PATH . "endpoint/" . $row['directory'] . "/" . $row['cfg_dir'] . "/firmware/*.*") as $filename) {
+                foreach (glob(PHONE_MODULES_PATH . "endpoint/" . $row['directory'] . "/" . $row['cfg_dir'] . "/firmware/*") as $filename) {
                     $file = basename($filename);
                     $list[$i] = $file;
                     if (!@copy($filename, $this->global_cfg['config_location'] . $file)) {
