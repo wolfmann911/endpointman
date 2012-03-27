@@ -102,7 +102,7 @@
   </label></td>
 </tr>
 <tr>
-  <td align='right'><?php echo _("Allow Saving to Hard-Drive Configuration Files")?></td>
+  <td align='right'><?php echo _("Allow Saving Over Default Configuration Files")?></td>
   <td align='left'><label>
     <input type=checkbox name="allow_hdfiles" {$hdfiles_selected}>
   </label></td>
@@ -111,6 +111,12 @@
   <td align='right'><?php echo _("Disable TFTP Server Check")?></td>
   <td align='left'><label>
     <input type=checkbox name="tftp_check" {$tftp_selected}>
+  </label></td>
+</tr>
+<tr>
+  <td align='right'><?php echo _("Disable Configuration File Backups")?></td>
+  <td align='left'><label>
+    <input type=checkbox name="backup_check" {$backup_selected}>
   </label></td>
 </tr>
 <tr>

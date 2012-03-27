@@ -938,6 +938,12 @@ if(!$new_install) {
         $sql = 'INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (NULL, \'nmap_search\', \'\');';
         $db->query($sql);
     }
+    
+    if($ver <= "21037") {
+        out("Adding Config File Backups");
+        $sql = 'INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (NULL, \'backup_check\', \'1\');';
+        $db->query($sql);
+    }
 
 }
 
@@ -1009,7 +1015,8 @@ if ($new_install) {
             (20, 'server_type', 'file'),
             (21, 'allow_hdfiles', '0'),
             (22, 'tftp_check', '0'),
-            (23, 'nmap_search', '')";
+            (23, 'nmap_search', ''),
+            (24, 'backup_check', '0')";
     $db->query($sql);
 
     out("Creating mac list Table");

@@ -1327,6 +1327,18 @@ class endpointmanager {
 
         foreach ($returned_data as $file => $data) {
             if (((file_exists($write_path . $file)) AND (is_writable($write_path . $file)) AND (!in_array($file, $provisioner_lib->protected_files))) OR (!file_exists($write_path . $file))) {
+                //Move old file to backup
+                if(!$this->global_cfg['backup_check']) {
+                    if(!file_exists($write_path.'config_bkup')) {
+                        if (!@mkdir($write_path.'config_bkup', 0755)) {
+                            $this->error['parse_configs'] = "Could Not Create Backup Directory";
+                            return(FALSE);
+                        }
+                    }
+                    if (file_exists($write_path . $file)) {
+                        copy($write_path . $file, $write_path . 'config_bkup/' . $file . '.'.time());
+                    }
+                }
                 file_put_contents($write_path . $file, $data);
                 chmod($write_path . $file, 0666);
                 if (!file_exists($write_path . $file)) {

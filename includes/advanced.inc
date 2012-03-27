@@ -485,6 +485,11 @@ switch($_REQUEST['subpage']) {
             } else {
                 $_POST['tftp_check'] = 0;
             }
+            if((isset($_POST['backup_check'])) AND ($_POST['backup_check'] == "on")) {
+                $_POST['backup_check'] = 1;
+            } else {
+                $_POST['backup_check'] = 0;
+            }
             
             $sql="UPDATE endpointman_global_vars SET value='" . $_POST['tftp_check'] . "' WHERE var_name='tftp_check'";
             $endpoint->eda->sql($sql);
@@ -522,6 +527,9 @@ switch($_REQUEST['subpage']) {
             $endpoint->eda->sql($sql);
 
             $sql="UPDATE endpointman_global_vars SET value='" . $_POST['disable_help'] . "' WHERE var_name='disable_help'";
+            $endpoint->eda->sql($sql);
+            
+            $sql="UPDATE endpointman_global_vars SET value='" . $_POST['backup_check'] . "' WHERE var_name='backup_check'";
             $endpoint->eda->sql($sql);
 
             if($_POST['cfg_type'] == 'http') {
@@ -568,6 +576,12 @@ switch($_REQUEST['subpage']) {
         } else {
             $tftp_checked = "";
         }
+        
+        if($endpoint->global_cfg['backup_check']) {
+            $backup_checked = "checked";
+        } else {
+            $backup_checked = "";
+        }
 
         if($endpoint->global_cfg['debug']) {
             $debug_selected = "checked";
@@ -590,6 +604,8 @@ switch($_REQUEST['subpage']) {
         $endpoint->tpl->assign("hdfiles_selected", $allow_hdfiles);
         
         $endpoint->tpl->assign("tftp_selected", $tftp_checked);
+        
+        $endpoint->tpl->assign("backup_selected", $backup_checked);
 
         $endpoint->tpl->assign("ip", $_SERVER["SERVER_ADDR"]);
         $endpoint->tpl->assign("srvip", $endpoint->global_cfg['srvip']);
