@@ -1281,52 +1281,45 @@ class endpointmanager {
         //Create Directory Structure (If needed)
         if (isset($provisioner_lib->directory_structure)) {
             foreach ($provisioner_lib->directory_structure as $data) {
-                $dir = $write_path . $data;
-                if (!file_exists($dir)) {
-                    if (!@mkdir($dir, 0755)) {
-                        $this->error['parse_configs'] = "Could Not Create Directory: " . $data;
-                        return(FALSE);
+                if(file_exists(PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data)) {
+                    $dir_iterator = new RecursiveDirectoryIterator(PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data . "/");
+                    $iterator = new RecursiveIteratorIterator($dir_iterator, RecursiveIteratorIterator::SELF_FIRST);
+                    // could use CHILD_FIRST if you so wish
+                    foreach ($iterator as $file) {
+                        if ($file->isDir() && !preg_match('/\/(\.\.)$/i',$file)) {
+                            $file = preg_replace('/\/(\.)$/i', '', $file);
+                            $dir = $write_path . str_replace(PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/", "", $file);
+                            if (!file_exists($dir)) {
+                                if (!@mkdir($dir, 0755,TRUE)) {
+                                    $this->error['parse_configs'] = "Could Not Create Directory: " . $data;
+                                    return(FALSE);
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    $dir = $write_path . $data;
+                    if (!file_exists($dir)) {
+                        if (!@mkdir($dir, 0755)) {
+                            $this->error['parse_configs'] = "Could Not Create Directory: " . $data;
+                            return(FALSE);
+                        }
                     }
                 }
             }
         }
 
-        //Copy Files/Directories (If needed)
+        //Copy Files (If needed)
         if (isset($provisioner_lib->copy_files)) {
             foreach ($provisioner_lib->copy_files as $data) {
-                if (((file_exists($write_path . $data)) AND (!in_array($data, $provisioner_lib->protected_files))) OR (!file_exists($write_path . $data))) {
-                    if (is_dir(PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data)) {
-                        if (!file_exists($write_path . $data)) {
-                            if (!@mkdir($write_path . $data, 0666)) {
-                                $this->error['parse_configs'] = "Could Not Create Directory: " . $data;
-                                return(FALSE);
-                            }
+                if (file_exists(PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data)) {
+                    $file = $write_path . $data;
+                    $orig = PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data;
+                    if(!file_exists($file)) {
+                        if (!@copy($orig, $file)) {
+                            $this->error['parse_configs'] = "Could Not Create File: " . $data;
+                            return(FALSE);
                         }
-                        $dir_iterator = new RecursiveDirectoryIterator(PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data . "/");
-                        $iterator = new RecursiveIteratorIterator($dir_iterator, RecursiveIteratorIterator::SELF_FIRST);
-                        // could use CHILD_FIRST if you so wish
-                        foreach ($iterator as $file) {
-                            if (is_dir($file)) {
-                                $dir = str_replace(PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data . "/", "", $file);
-                                if (!file_exists($write_path . $data . "/" . $dir)) {
-                                    if (!@mkdir($write_path . $data . "/" . $dir, 0666)) {
-                                        $this->error['parse_configs'] = "Could Not Create Directory: " . $data . "/" . $dir;
-                                        return(FALSE);
-                                    }
-                                }
-                            } else {
-                                $dir = str_replace(PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data . "/", "", $file);
-                                if (!@copy($file, $write_path . $data . "/" . $dir)) {
-                                    $this->error['parse_configs'] = "Could Not Copy File: " . $data . "/" . $dir;
-                                    return(FALSE);
-                                } else {
-                                    chmod($write_path . $data . "/" . $dir, 0666);
-                                }
-                            }
-                        }
-                    } else {
-                        copy(PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data, $write_path . $data);
-                        chmod($write_path . $data, 0666);
                     }
                 }
             }
