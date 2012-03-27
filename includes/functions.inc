@@ -1103,8 +1103,8 @@ class endpointmanager {
                 break;
         }
 
-        if (isset($cfg_data['description_attr']['tooltip'])) {
-            $template_variables_array['tooltip'] = $cfg_data['description_attr']['tooltip'];
+        if (isset($cfg_data['tooltip'])) {
+            $template_variables_array['tooltip'] = htmlentities($cfg_data['tooltip']);
         }
 
         if (($this->global_cfg['enable_ari']) AND ($admin) AND ($cfg_data['type'] != "break") AND ($cfg_data['type'] != "group") AND ($template_type == 'GENERAL')) {
