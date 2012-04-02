@@ -2172,7 +2172,26 @@ class endpointmanager {
                             echo "System Error in Sync Model Function, Load Failure!<br />";
                         }
                     }
-                    //TODO: Phone Models Move Here
+                    //Phone Models Move Here
+                    $family_id = $brand_id . $family_line_xml['data']['id'];
+                    $sql = "SELECT * FROM endpointman_model_list WHERE product_id = ".$family_id;
+                    $products = $this->eda->sql($sql, 'getall', DB_FETCHMODE_ASSOC);
+                    foreach($products as $data) {  
+                        if(!$this->arraysearchrecursive($data['model'], $family_line_xml['data']['model_list'], 'model')) {
+                            echo "Moving/Removing Model '".$data['model']."' not present in JSON file......<br />";
+                            $model_name = $data['model'];
+                            $sql = 'DELETE FROM endpointman_model_list WHERE id = '.$data['id'];
+                            $this->eda->sql($sql);
+                            $sql = "SELECT id FROM endpointman_model_list WHERE model LIKE '".$model_name."'";
+                            $new_model_id = $this->eda->sql($sql,'getOne');
+                            if($new_model_id) {
+                                $sql = "UPDATE  endpointman_mac_list SET  model =  '".$new_model_id."' WHERE  model = '".$data['id']."'";
+                            } else {
+                                $sql = "UPDATE  endpointman_mac_list SET  model =  '0' WHERE  model = '".$data['id']."'";
+                            }
+                            $this->eda->sql($sql);
+                        }
+                    }
                 }
 
                 foreach ($temp['data']['brands']['oui_list'] as $oui) {
