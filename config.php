@@ -22,8 +22,8 @@ $debug = NULL;
 
 $endpoint = new endpointmanager();
 
-if(!file_exists($amp_conf['AMPWEBROOT'].'/admin/assets/endpointman/images/add.png')) {
-    echo "WARNING: Assets Missing! ^^Please click the Orange \"Apply Configuration Changes\" Bar";
+if(!file_exists(dirname(dirname(dirname(__FILE__))).'/assets/endpointman/images/add.png')) {
+    echo "WARNING: Assets Missing! ^^Please click the \"Apply Configuration Changes\" Button";
 }
 
 if(!file_exists(PHONE_MODULES_PATH."temp/")) {

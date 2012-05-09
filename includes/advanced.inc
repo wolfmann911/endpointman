@@ -490,6 +490,26 @@ switch($_REQUEST['subpage']) {
             } else {
                 $_POST['backup_check'] = 0;
             }
+            if((isset($_POST['use_repo'])) AND ($_POST['use_repo'] == "on")) {
+                if($endpoint->has_git()) {
+                    $_POST['use_repo'] = 1;
+                    if(!file_exists(PHONE_MODULES_PATH.'/.git')) {
+                        $o = getcwd();
+                        chdir(dirname(PHONE_MODULES_PATH));
+                        $endpoint->rmrf(PHONE_MODULES_PATH);
+                        $path = $endpoint->has_git();
+                        exec($path.' clone https://github.com/provisioner/Provisioner.git _ep_phone_modules',$output);
+                        chdir($o);
+                    }
+                } else {
+                    $endpoint->error['use_repo'] = 'Git not installed!';
+                }
+            } else {
+                $_POST['use_repo'] = 0;
+                if(file_exists(PHONE_MODULES_PATH.'/.git')) {
+                    $endpoint->rmrf(PHONE_MODULES_PATH);
+                }
+            }
             
             $sql="UPDATE endpointman_global_vars SET value='" . $_POST['tftp_check'] . "' WHERE var_name='tftp_check'";
             $endpoint->eda->sql($sql);
@@ -530,6 +550,9 @@ switch($_REQUEST['subpage']) {
             $endpoint->eda->sql($sql);
             
             $sql="UPDATE endpointman_global_vars SET value='" . $_POST['backup_check'] . "' WHERE var_name='backup_check'";
+            $endpoint->eda->sql($sql);
+            
+            $sql="UPDATE endpointman_global_vars SET value='" . $_POST['use_repo'] . "' WHERE var_name='use_repo'";
             $endpoint->eda->sql($sql);
 
             if($_POST['cfg_type'] == 'http') {
@@ -582,6 +605,12 @@ switch($_REQUEST['subpage']) {
         } else {
             $backup_checked = "";
         }
+        
+        if($endpoint->global_cfg['use_repo']) {
+            $use_repo = "checked";
+        } else {
+            $use_repo = "";
+        }
 
         if($endpoint->global_cfg['debug']) {
             $debug_selected = "checked";
@@ -606,6 +635,8 @@ switch($_REQUEST['subpage']) {
         $endpoint->tpl->assign("tftp_selected", $tftp_checked);
         
         $endpoint->tpl->assign("backup_selected", $backup_checked);
+        
+        $endpoint->tpl->assign("use_repo", $use_repo);
 
         $endpoint->tpl->assign("ip", $_SERVER["SERVER_ADDR"]);
         $endpoint->tpl->assign("srvip", $endpoint->global_cfg['srvip']);

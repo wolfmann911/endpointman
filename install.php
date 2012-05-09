@@ -944,7 +944,12 @@ if(!$new_install) {
         $sql = 'INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (NULL, \'backup_check\', \'1\');';
         $db->query($sql);
     }
-
+    
+    if($ver <= "21038") {
+        out("Adding Use Repo Option");
+        $sql = 'INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (NULL, \'use_repo\', \'0\');';
+        $db->query($sql);
+    }
 }
 
 if ($new_install) {
@@ -1016,7 +1021,8 @@ if ($new_install) {
             (21, 'allow_hdfiles', '0'),
             (22, 'tftp_check', '0'),
             (23, 'nmap_search', ''),
-            (24, 'backup_check', '0')";
+            (24, 'backup_check', '0'),
+            (25, 'use_repo', '0')";
     $db->query($sql);
 
     out("Creating mac list Table");
