@@ -1926,6 +1926,11 @@ class endpointmanager {
                 $this->error['remote_server'] = "The Remote Server Is Currently Syncing With the Master Server, Please try again later";
             }
         } else {
+			$o = getcwd();
+            chdir(dirname(PHONE_MODULES_PATH));
+            $path = $this->has_git();
+            exec($path.' git pull',$output);
+            chdir($o);
             $temp = $this->file2json(PHONE_MODULES_PATH . 'endpoint/master.json');
             $endpoint_package = $temp['data']['package'];
             $endpoint_last_mod = $temp['data']['last_modified'];
@@ -2322,30 +2327,34 @@ class endpointmanager {
      * @param int $id Brand ID
      */
     function remove_brand($id=NULL, $remove_configs=FALSE) {
-        $sql = 'SELECT id, firmware_vers FROM endpointman_product_list WHERE brand = ' . $id;
-        $products = $this->eda->sql($sql, 'getall', DB_FETCHMODE_ASSOC);
-        foreach ($products as $data) {
-            if ($data['firmware_vers'] != "") {
-                $this->remove_firmware($data['id']);
-            }
-        }
+		if(!$this->global_cfg['use_repo']) {
+	        $sql = 'SELECT id, firmware_vers FROM endpointman_product_list WHERE brand = ' . $id;
+	        $products = $this->eda->sql($sql, 'getall', DB_FETCHMODE_ASSOC);
+	        foreach ($products as $data) {
+	            if ($data['firmware_vers'] != "") {
+	                $this->remove_firmware($data['id']);
+	            }
+	        }
 
-        $brand_dir = $this->eda->sql("SELECT directory FROM endpointman_brand_list WHERE id=" . $id, 'getone');
-        $this->rmrf(PHONE_MODULES_PATH . "endpoint/" . $brand_dir);
+	        $brand_dir = $this->eda->sql("SELECT directory FROM endpointman_brand_list WHERE id=" . $id, 'getone');
+	        $this->rmrf(PHONE_MODULES_PATH . "endpoint/" . $brand_dir);
 
-        $sql = "DELETE FROM endpointman_model_list WHERE brand = '" . $id . "'";
-        $this->eda->sql($sql);
+	        $sql = "DELETE FROM endpointman_model_list WHERE brand = '" . $id . "'";
+	        $this->eda->sql($sql);
 
-        $sql = "DELETE FROM endpointman_product_list WHERE brand = '" . $id . "'";
-        $this->eda->sql($sql);
+	        $sql = "DELETE FROM endpointman_product_list WHERE brand = '" . $id . "'";
+	        $this->eda->sql($sql);
 
-        $sql = "DELETE FROM endpointman_oui_list WHERE brand = '" . $id . "'";
-        $this->eda->sql($sql);
+	        $sql = "DELETE FROM endpointman_oui_list WHERE brand = '" . $id . "'";
+	        $this->eda->sql($sql);
 
-        $this->rmrf(PHONE_MODULES_PATH . $brand_dir);
-        $sql = "DELETE FROM endpointman_brand_list WHERE id = " . $id;
+	        $this->rmrf(PHONE_MODULES_PATH . $brand_dir);
+	        $sql = "DELETE FROM endpointman_brand_list WHERE id = " . $id;
 
-        $this->eda->sql($sql);
+	        $this->eda->sql($sql);
+		} else {
+			$this->error['remove_brand'] = "Not allowed in repo mode";
+		}
     }
 
     function merge_data($path, $template_list, $maxlines = 3) {
