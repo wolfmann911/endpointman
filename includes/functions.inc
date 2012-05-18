@@ -1711,62 +1711,94 @@ class endpointmanager {
         $sql = 'UPDATE endpointman_product_list SET firmware_files = "", firmware_vers = "" WHERE id = ' . $id;
         $this->eda->sql($sql);
     }
+    
+    function sys_get_temp_dir() {
+        if (!empty($_ENV['TMP'])) {
+            return realpath($_ENV['TMP']);
+        }
+        if (!empty($_ENV['TMPDIR'])) {
+            return realpath($_ENV['TMPDIR']);
+        }
+        if (!empty($_ENV['TEMP'])) {
+            return realpath($_ENV['TEMP']);
+        }
+        $tempfile = tempnam(uniqid(rand(), TRUE), '');
+        if (file_exists($tempfile)) {
+            unlink($tempfile);
+            return realpath(dirname($tempfile));
+        }
+    }
 
     /**
      * Install Firmware for the specified Product Line
      * @param <type> $product_id Product ID
      */
     function install_firmware($product_id) {
-        if(!$this->global_cfg['use_repo']) {
-            $sql = 'SELECT endpointman_product_list.*, endpointman_brand_list.directory FROM endpointman_product_list, endpointman_brand_list WHERE endpointman_product_list.brand = endpointman_brand_list.id AND endpointman_product_list.id = ' . $product_id;
-            $row = $this->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
-            $temp = $this->file2json(PHONE_MODULES_PATH . "endpoint/" . $row['directory'] . "/" . $row['cfg_dir'] . "/family_data.json");
-            if ($temp['data']['firmware_ver'] > $row['firmware_vers']) {
-                echo "<div style='float: left'>Downloading firmware...</div><div style='float: left' id=\"DivExample\">.</div>";
-                $this->download_file_with_progress_bar(UPDATE_PATH . $row['directory'] . "/" . $temp['data']['firmware_pkg'], PHONE_MODULES_PATH . "temp/" . $temp['data']['firmware_pkg']);
-                echo "<script type='text/javascript'>document.getElementById('DivExample').innerHTML='Done!';</script><br />";
-                $md5_xml = $temp['data']['firmware_md5sum'];
-                $md5_pkg = md5_file(PHONE_MODULES_PATH . 'temp/' . $temp['data']['firmware_pkg']);
-                echo "Checking MD5sum of Package...";
-                if ($md5_xml == $md5_pkg) {
-                    echo "Matches!<br />";
-                    if (!file_exists(PHONE_MODULES_PATH . "endpoint/" . $row['directory'] . "/" . $row['cfg_dir'] . "/firmware")) {
-                        mkdir(PHONE_MODULES_PATH . "endpoint/" . $row['directory'] . "/" . $row['cfg_dir'] . "/firmware");
-                    }
-                    echo "Installing Firmware...";
-                    exec("rm -Rf " . PHONE_MODULES_PATH . "endpoint/" . $row['directory'] . "/" . $row['cfg_dir'] . "/firmware");
-                    mkdir(PHONE_MODULES_PATH . "endpoint/" . $row['directory'] . "/" . $row['cfg_dir'] . "/firmware");
-                    exec("tar -xvf " . PHONE_MODULES_PATH . 'temp/' . $temp['data']['firmware_pkg'] . " -C " . PHONE_MODULES_PATH . "endpoint/" . $row['directory'] . "/" . $row['cfg_dir']);
-                    $i = 0;
-                    foreach (glob(PHONE_MODULES_PATH . "endpoint/" . $row['directory'] . "/" . $row['cfg_dir'] . "/firmware/*") as $filename) {
-                        $file = basename($filename);
-                        $list[$i] = $file;
-                        if (!@copy($filename, $this->global_cfg['config_location'] . $file)) {
-                            echo "<br />--Failed To Copy $file...";
-                            $copy_error = TRUE;
-                        } elseif ($this->global_cfg['debug']) {
-                            echo"<br />--Copied " . $file . " to " . $this->global_cfg['config_location'];
-                        }
-                        $i++;
-                    }
-                    $list = implode(",", $list);
-                    $sql = "UPDATE endpointman_product_list SET firmware_vers = '" . $temp['data']['firmware_ver'] . "', firmware_files = '" . $list . "' WHERE id = " . $row['id'];
-                    $this->eda->sql($sql);
-                    if (isset($copy_error)) {
-                        echo "<BR />Copy Error Detected! Aborting Install!";
-                        $this->remove_firmware($product_id);
-                        echo "<BR />Please Check Directory/Permissions";
-                    } else {
-                        echo "<BR />Done!";
-                    }
+        $temp_directory = $this->sys_get_temp_dir() . "/epm_temp/";
+        $sql = 'SELECT endpointman_product_list.*, endpointman_brand_list.directory FROM endpointman_product_list, endpointman_brand_list WHERE endpointman_product_list.brand = endpointman_brand_list.id AND endpointman_product_list.id = ' . $product_id;
+        $row = $this->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
+        $json_data = $this->file2json(PHONE_MODULES_PATH . "endpoint/" . $row['directory'] . "/" . $row['cfg_dir'] . "/family_data.json");
+        if ($json_data['data']['firmware_ver'] > $row['firmware_vers']) {
+            if (!file_exists($temp_directory)) {
+                mkdir($temp_directory);
+            }
+            $md5_xml = $json_data['data']['firmware_md5sum'];
+            $firmware_pkg = $json_data['data']['firmware_pkg'];
+            if (file_exists($temp_directory . $firmware_pkg)) {
+                $md5_pkg = md5_file($temp_directory . $firmware_pkg);
+                if ($md5_xml = $md5_pkg) {
+                    echo "Skipping download....<br />";
                 } else {
-                    echo "<BR />Firmware MD5 didn't match<br />";
+                    echo "<div style='float: left'>Downloading firmware...</div><div style='float: left' id=\"DivExample\">.</div>";
+                    $this->download_file_with_progress_bar(UPDATE_PATH . $row['directory'] . "/" . $firmware_pkg, $temp_directory . $firmware_pkg);
+                    echo "<script type='text/javascript'>document.getElementById('DivExample').innerHTML='Done!';</script><br />";
+                    $md5_pkg = md5_file($temp_directory . $firmware_pkg);
                 }
             } else {
-                echo "<BR />Your Firmware is already up to date";
+                echo "<div style='float: left'>Downloading firmware...</div><div style='float: left' id=\"DivExample\">.</div>";
+                $this->download_file_with_progress_bar(UPDATE_PATH . $row['directory'] . "/" . $firmware_pkg, $temp_directory . $firmware_pkg);
+                echo "<script type='text/javascript'>document.getElementById('DivExample').innerHTML='Done!';</script><br />";
+                $md5_pkg = md5_file($temp_directory . $firmware_pkg);
+            }
+
+            echo "Checking MD5sum of Package...";
+            if ($md5_xml == $md5_pkg) {
+                echo "Matches!<br />";
+                if (file_exists($temp_directory . $row['directory'] . "/" . $row['cfg_dir'] . "/firmware")) {
+                    $this->rmrf($temp_directory . $row['directory'] . "/" . $row['cfg_dir'] . "/firmware");
+                }
+                mkdir($temp_directory . $row['directory'] . "/" . $row['cfg_dir'] . "/firmware", 0777, TRUE);
+                echo "Installing Firmware...";
+                exec("tar -xvf " . $temp_directory . $firmware_pkg . " -C " . $temp_directory . $row['directory'] . "/" . $row['cfg_dir']);
+                $i = 0;
+                foreach (glob($temp_directory . $row['directory'] . "/" . $row['cfg_dir'] . "/firmware/*") as $filename) {
+                    $file = basename($filename);
+                    $list[$i] = $file;
+                    if (!@copy($filename, $this->global_cfg['config_location'] . $file)) {
+                        echo "<br />--Failed To Copy $file...";
+                        $copy_error = TRUE;
+                    } elseif ($this->global_cfg['debug']) {
+                        echo"<br />--Copied " . $file . " to " . $this->global_cfg['config_location'];
+                    }
+                    $i++;
+                }
+
+                $this->rmrf($temp_directory . $row['directory']);
+                $list = implode(",", $list);
+                $sql = "UPDATE endpointman_product_list SET firmware_vers = '" . $json_data['data']['firmware_ver'] . "', firmware_files = '" . $list . "' WHERE id = " . $row['id'];
+                $this->eda->sql($sql);
+                if (isset($copy_error)) {
+                    echo "<BR />Copy Error Detected! Aborting Install!";
+                    $this->remove_firmware($product_id);
+                    echo "<BR />Please Check Directory/Permissions";
+                } else {
+                    echo "<BR />Done!";
+                }
+            } else {
+                echo "<BR />Firmware MD5 didn't match<br />";
             }
         } else {
-            echo 'This function is disabled when set to repo mode';
+            echo "<BR />Your Firmware is already up to date";
         }
     }
 
