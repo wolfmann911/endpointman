@@ -49,10 +49,10 @@ class endpointmanager {
             $this->error['amp_conf'] = 'The Global Variable $amp_conf is empty or not set! Can\'t connect to the database.';
             $this->global_cfg['disable_epm'] = TRUE;
         }
-        
+
         define("UPDATE_PATH", $this->global_cfg['update_server']);
-        define("MODULES_PATH", dirname(dirname(dirname(__FILE__))).'/');
-        
+        define("MODULES_PATH", dirname(dirname(dirname(__FILE__))) . '/');
+
         //Determine if local path is correct!
         if (file_exists(MODULES_PATH . "endpointman/")) {
             define("LOCAL_PATH", MODULES_PATH . "endpointman/");
@@ -69,13 +69,10 @@ class endpointmanager {
                 mkdir(PHONE_MODULES_PATH, 0764);
             }
 
-            if (!file_exists(PHONE_MODULES_PATH . "setup.php")) {
-                copy(LOCAL_PATH . "install/setup.php", PHONE_MODULES_PATH . "setup.php");
+            if (file_exists(PHONE_MODULES_PATH . "setup.php")) {
+                unlink(PHONE_MODULES_PATH . "setup.php");
             }
 
-            if (!file_exists(PHONE_MODULES_PATH . "temp/")) {
-                mkdir(PHONE_MODULES_PATH . "temp/", 0764);
-            }
             if (!file_exists(MODULES_PATH . "_ep_phone_modules/")) {
                 die('Endpoint Manager can not create the modules folder!');
             }
@@ -137,7 +134,7 @@ class endpointmanager {
      * @param type $filename
      * @return type 
      */
-    function tftp_fetch($host, $filename) { 
+    function tftp_fetch($host, $filename) {
         //first off let's check if this is installed or disabled
         $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
 
@@ -168,26 +165,26 @@ class endpointmanager {
             // for large files this function should take a file handle as an arg
             $ret .= substr($buffer, 4);
         } while (strlen($buffer) == 516);  // the first non-full packet is the last.
-        return $ret; 
+        return $ret;
     }
-    
+
     function tftp_check() {
         //create a simple block here incase people have strange issues going on as we will kill http
         //by running this if the server isn't really running!
         $sql = 'SELECT value FROM endpointman_global_vars WHERE var_name = \'tftp_check\'';
-        if($this->eda->sql($sql, 'getOne') != 1){
+        if ($this->eda->sql($sql, 'getOne') != 1) {
             $sql = 'UPDATE endpointman_global_vars SET value = \'1\' WHERE var_name = \'tftp_check\'';
             $this->eda->sql($sql);
             $subject = shell_exec("netstat -luan --numeric-ports");
-            if(preg_match('/:69\s/i', $subject)) {
-                $rand = md5(rand(10,2000));
-                if(file_put_contents($this->global_cfg['config_location'].'TEST', $rand)) {
-                    if($this->tftp_fetch('127.0.0.1','TEST') != $rand) {
+            if (preg_match('/:69\s/i', $subject)) {
+                $rand = md5(rand(10, 2000));
+                if (file_put_contents($this->global_cfg['config_location'] . 'TEST', $rand)) {
+                    if ($this->tftp_fetch('127.0.0.1', 'TEST') != $rand) {
                         $this->error['tftp_check'] = 'Local TFTP Server is not correctly configured';
                     }
-                    unlink($this->global_cfg['config_location'].'TEST');
+                    unlink($this->global_cfg['config_location'] . 'TEST');
                 } else {
-                    $this->error['tftp_check'] = 'Unable to write to '.$this->global_cfg['config_location'];
+                    $this->error['tftp_check'] = 'Unable to write to ' . $this->global_cfg['config_location'];
                 }
             } else {
                 $dis = FALSE;
@@ -198,10 +195,9 @@ class endpointmanager {
                         $dis = TRUE;
                     }
                 }
-                if(!$dis) {
-                    $this->error['tftp_check'] = 'TFTP Server is not running. <br />'.
-                    'See here for instructions on how to install one: <a href="http://wiki.provisioner.net/index.php/Tftp" target="_blank">http://wiki.provisioner.net/index.php/Tftp</a>';
-
+                if (!$dis) {
+                    $this->error['tftp_check'] = 'TFTP Server is not running. <br />' .
+                            'See here for instructions on how to install one: <a href="http://wiki.provisioner.net/index.php/Tftp" target="_blank">http://wiki.provisioner.net/index.php/Tftp</a>';
                 }
             }
             $sql = 'UPDATE endpointman_global_vars SET value = \'0\' WHERE var_name = \'tftp_check\'';
@@ -209,7 +205,6 @@ class endpointmanager {
         } else {
             $this->error['tftp_check'] = 'TFTP Server check failed on last past. Skipping';
         }
-       
     }
 
     function display_htmlspecialchars($contents) {
@@ -691,7 +686,7 @@ class endpointmanager {
             foreach ($lines_info as $line) {
                 $phone_info['line'][$line['line']] = $line;
                 $phone_info['line'][$line['line']]['description'] = $line['epm_description'];
-            }            
+            }
         } else {
             $sql = "SELECT id, mac, ext FROM endpointman_mac_list WHERE id =" . $mac_id;
             //Phone is unknown, we need to display this to the end user so that they can make corrections
@@ -854,7 +849,7 @@ class endpointmanager {
         if (!empty($custom_cfg_data)) {
             $custom_cfg_data = unserialize($custom_cfg_data);
             if (array_key_exists('data', $custom_cfg_data)) {
-                if(array_key_exists('ari', $custom_cfg_data)) {
+                if (array_key_exists('ari', $custom_cfg_data)) {
                     $extra_data = $custom_cfg_data['ari'];
                 } else {
                     $template_type = 'GLOBAL';
@@ -901,7 +896,7 @@ class endpointmanager {
                                     $lcount = isset($var_items['line_count']) ? $var_items['line_count'] : $lcount;
                                     $key = "line|" . $lcount . "|" . $var_name;
                                     $items[$variables_count] = $items;
-                                    $template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($variables_count, $var_items, $key, $custom_cfg_data, $admin, $user_cfg_data, $extra_data,$template_type);
+                                    $template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($variables_count, $var_items, $key, $custom_cfg_data, $admin, $user_cfg_data, $extra_data, $template_type);
                                     $template_variables_array[$group_count]['data'][$variables_count]['looping'] = TRUE;
                                     $variables_count++;
                                 }
@@ -920,7 +915,7 @@ class endpointmanager {
                                     $tv = explode('_', $variable);
                                     $key = "loop|" . $tv[0] . "_" . $var_name . "_" . $var_items['loop_count'];
                                     $items[$variables_count] = $var_items;
-                                    $template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($variables_count, $var_items, $key, $custom_cfg_data, $admin, $user_cfg_data, $extra_data,$template_type);
+                                    $template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($variables_count, $var_items, $key, $custom_cfg_data, $admin, $user_cfg_data, $extra_data, $template_type);
                                     $template_variables_array[$group_count]['data'][$variables_count]['looping'] = TRUE;
                                     $variables_count++;
                                 }
@@ -943,7 +938,7 @@ class endpointmanager {
                                     $key = "loop|" . $tv[0] . "_" . $var_name . "_" . $var_items['loop_count'];
                                     if (isset($extra_data[$key])) {
                                         $items[$variables_count] = $var_items;
-                                        $template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($variables_count, $var_items, $key, $custom_cfg_data, $admin, $user_cfg_data, $extra_data,$template_type);
+                                        $template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($variables_count, $var_items, $key, $custom_cfg_data, $admin, $user_cfg_data, $extra_data, $template_type);
                                         $template_variables_array[$group_count]['data'][$variables_count]['looping'] = TRUE;
                                         $variables_count++;
                                     }
@@ -954,7 +949,7 @@ class endpointmanager {
                     //Both Views
                     switch ($config_options['type']) {
                         case "break":
-                            $template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($variables_count, $config_options, $key, $custom_cfg_data, $admin, $user_cfg_data, $extra_data,$template_type);
+                            $template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($variables_count, $config_options, $key, $custom_cfg_data, $admin, $user_cfg_data, $extra_data, $template_type);
                             $variables_count++;
                             break;
                         default:
@@ -972,10 +967,10 @@ class endpointmanager {
                                 }
                                 if ((!$admin) AND (isset($extra_data[$key]))) {
                                     $custom_cfg_data[$key] = $user_cfg_data[$key];
-                                    $template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($variables_count, $config_options, $key, $custom_cfg_data, $admin, $user_cfg_data, $extra_data,$template_type);
+                                    $template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($variables_count, $config_options, $key, $custom_cfg_data, $admin, $user_cfg_data, $extra_data, $template_type);
                                     $variables_count++;
                                 } elseif ($admin) {
-                                    $template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($variables_count, $config_options, $key, $custom_cfg_data, $admin, $user_cfg_data, $extra_data,$template_type);
+                                    $template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($variables_count, $config_options, $key, $custom_cfg_data, $admin, $user_cfg_data, $extra_data, $template_type);
                                     $variables_count++;
                                 }
                             }
@@ -997,7 +992,7 @@ class endpointmanager {
      * @param array $custom_cfg_data
      * @return array
      */
-    function generate_form_data($i, $cfg_data, $key=NULL, $custom_cfg_data=NULL, $admin=FALSE, $user_cfg_data=NULL, $extra_data=NULL,$template_type='GENERAL') {
+    function generate_form_data($i, $cfg_data, $key=NULL, $custom_cfg_data=NULL, $admin=FALSE, $user_cfg_data=NULL, $extra_data=NULL, $template_type='GENERAL') {
         switch ($cfg_data['type']) {
             case "input":
                 if ((!$admin) && (isset($user_cfg_data[$key]))) {
@@ -1116,11 +1111,11 @@ class endpointmanager {
                 $template_variables_array['ari']['checked'] = "checked";
             }
         }
-        
-        if($template_type == 'GLOBAL') {
+
+        if ($template_type == 'GLOBAL') {
             $template_variables_array['freepbxed'] = 1;
             $template_variables_array['freepbx']['key'] = $key;
-            if(empty($extra_data)) {
+            if (empty($extra_data)) {
                 $template_variables_array['freepbx']['checked'] = TRUE;
             } elseif (isset($extra_data[$key])) {
                 $template_variables_array['freepbx']['checked'] = TRUE;
@@ -1281,11 +1276,11 @@ class endpointmanager {
         //Create Directory Structure (If needed)
         if (isset($provisioner_lib->directory_structure)) {
             foreach ($provisioner_lib->directory_structure as $data) {
-                if(file_exists(PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data)) {
+                if (file_exists(PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data)) {
                     $dir_iterator = new RecursiveDirectoryIterator(PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data . "/");
                     $iterator = new RecursiveIteratorIterator($dir_iterator, RecursiveIteratorIterator::SELF_FIRST);
                     // could use CHILD_FIRST if you so wish
-                    foreach ($iterator as $file) {                        
+                    foreach ($iterator as $file) {
                         $dir = $write_path . str_replace(PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/", "", dirname($file));
                         if (!file_exists($dir)) {
                             if (!@mkdir($dir, 0755, TRUE)) {
@@ -1312,7 +1307,7 @@ class endpointmanager {
                 if (file_exists(PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data)) {
                     $file = $write_path . $data;
                     $orig = PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data;
-                    if(!file_exists($file)) {
+                    if (!file_exists($file)) {
                         if (!@copy($orig, $file)) {
                             $this->error['parse_configs'] = "Could Not Create File: " . $data;
                             return(FALSE);
@@ -1325,21 +1320,21 @@ class endpointmanager {
         foreach ($returned_data as $file => $data) {
             if (((file_exists($write_path . $file)) AND (is_writable($write_path . $file)) AND (!in_array($file, $provisioner_lib->protected_files))) OR (!file_exists($write_path . $file))) {
                 //Move old file to backup
-                if(!$this->global_cfg['backup_check']) {
-                    if(!file_exists($write_path.'config_bkup')) {
-                        if (!@mkdir($write_path.'config_bkup', 0755)) {
+                if (!$this->global_cfg['backup_check']) {
+                    if (!file_exists($write_path . 'config_bkup')) {
+                        if (!@mkdir($write_path . 'config_bkup', 0755)) {
                             $this->error['parse_configs'] = "Could Not Create Backup Directory";
                             return(FALSE);
                         }
                     }
                     if (file_exists($write_path . $file)) {
-                        copy($write_path . $file, $write_path . 'config_bkup/' . $file . '.'.time());
+                        copy($write_path . $file, $write_path . 'config_bkup/' . $file . '.' . time());
                     }
                 }
                 file_put_contents($write_path . $file, $data);
                 chmod($write_path . $file, 0666);
                 if (!file_exists($write_path . $file)) {
-                    $this->error['parse_configs'] = "File (".$file.") not written to hard drive!";
+                    $this->error['parse_configs'] = "File (" . $file . ") not written to hard drive!";
                     return(FALSE);
                 }
             } elseif (!in_array($file, $provisioner_lib->protected_files)) {
@@ -1535,7 +1530,7 @@ class endpointmanager {
                 $new_template_data['network']['gateway'] = '';
                 $new_template_data['network']['vlan']['id'] = '';
                 $new_template_data['network']['vlan']['qos'] = '';
-                
+
                 //Overwrite all specific settings variables now
                 if (!empty($phone_info['specific_settings'])) {
                     $specific_settings = unserialize($phone_info['specific_settings']);
@@ -1543,13 +1538,13 @@ class endpointmanager {
                 } else {
                     $specific_settings = array();
                 }
-                
+
 
                 //Set Variables according to the template_data files included. We can include different template.xml files within family_data.xml also one can create
                 //template_data_custom.xml which will get included or template_data_<model_name>_custom.xml which will also get included
                 //line 'global' will set variables that aren't line dependant
-               
-                
+
+
                 $provisioner_lib->settings = $new_template_data;
 
                 //Loop through Lines!
@@ -1557,24 +1552,24 @@ class endpointmanager {
                 foreach ($phone_info['line'] as $line) {
                     $line_options = is_array($line_ops[$line['line']]) ? $line_ops[$line['line']] : array();
                     $line_statics = array('line' => $line['line'], 'username' => $line['ext'], 'authname' => $line['ext'], 'secret' => $line['secret'], 'displayname' => $line['description'], 'server_host' => $this->global_cfg['srvip'], 'server_port' => '5060');
-                    
+
                     $provisioner_lib->settings['line'][$li] = array_merge($line_options, $line_statics);
                     $li++;
                 }
-                
-                foreach($specific_settings['data'] as $key => $data) {
+
+                foreach ($specific_settings['data'] as $key => $data) {
                     $default_exp = preg_split("/\|/i", $key);
-                    if(isset($default_exp[2])) {
+                    if (isset($default_exp[2])) {
                         //lineloop
                         $var = $default_exp[2];
                         $line = $default_exp[1];
                         $loc = $this->arraysearchrecursive($line, $provisioner_lib->settings['line'], 'line');
-                        if($loc !== FALSE) {
+                        if ($loc !== FALSE) {
                             $k = $loc[0];
                             $provisioner_lib->settings['line'][$k][$var] = $data;
                         } else {
                             //Adding a new line-ish type options
-                            if(isset($specific_settings['data']['line|'.$line.'|line_enabled'])) {
+                            if (isset($specific_settings['data']['line|' . $line . '|line_enabled'])) {
                                 $lastkey = array_pop(array_keys($provisioner_lib->settings['line']));
                                 $lastkey++;
                                 $provisioner_lib->settings['line'][$lastkey]['line'] = $line;
@@ -1602,7 +1597,7 @@ class endpointmanager {
                 try {
                     $returned_data = $provisioner_lib->generate_all_files();
                 } catch (Exception $e) {
-                    $this->error['prepare_configs'] = 'Error Returned From Provisioner Library: '.  $e->getMessage();
+                    $this->error['prepare_configs'] = 'Error Returned From Provisioner Library: ' . $e->getMessage();
                     return(FALSE);
                 }
                 //print_r($provisioner_lib->debug_return);
@@ -1711,7 +1706,7 @@ class endpointmanager {
         $sql = 'UPDATE endpointman_product_list SET firmware_files = "", firmware_vers = "" WHERE id = ' . $id;
         $this->eda->sql($sql);
     }
-    
+
     function sys_get_temp_dir() {
         if (!empty($_ENV['TMP'])) {
             return realpath($_ENV['TMP']);
@@ -1803,6 +1798,7 @@ class endpointmanager {
     }
 
     function download_json($location, $directory=NULL) {
+        $temp_directory = $this->sys_get_temp_dir() . "/epm_temp/";
         if (!isset($directory)) {
             $destination_file = PHONE_MODULES_PATH . 'endpoint/master.json';
             $directory = "master";
@@ -1812,7 +1808,7 @@ class endpointmanager {
             }
             $destination_file = PHONE_MODULES_PATH . '/' . $directory . '/brand_data.json';
         }
-        $temp_file = PHONE_MODULES_PATH . 'temp/' . $directory . '.json';
+        $temp_file = $temp_directory . $directory . '.json';
         file_exists(dirname($temp_file)) ? '' : mkdir(dirname($temp_file));
 
         if ($this->download_file($location, $temp_file)) {
@@ -1841,7 +1837,8 @@ class endpointmanager {
      * @return array An array of all the brands/products/models and information about what's  enabled, installed or otherwise
      */
     function update_check() {
-        if(!$this->global_cfg['use_repo']) {
+        $temp_location = $this->sys_get_temp_dir() . "/epm_temp/";
+        if (!$this->global_cfg['use_repo']) {
             $master_result = $this->download_file(UPDATE_PATH . "master.json", PHONE_MODULES_PATH . "endpoint/master.json");
 
             if (!$master_result) {
@@ -1860,19 +1857,20 @@ class endpointmanager {
 
             if ($contents != '1') {
                 if (($data == "") OR ($data <= $endpoint_last_mod)) {
-                    if ((!$master_result) OR (!$this->download_file(UPDATE_PATH . '/' . $endpoint_package, PHONE_MODULES_PATH . "temp/" . $endpoint_package))) {
+                    if ((!$master_result) OR (!$this->download_file(UPDATE_PATH . '/' . $endpoint_package, $temp_location . $endpoint_package))) {
                         $this->error['brand_update_check_json'] = "<br/>Not able to connect to repository. Using local Provisioner.net Package";
                     } else {
-                        exec("tar -xvf " . PHONE_MODULES_PATH . 'temp/' . $endpoint_package . " -C " . PHONE_MODULES_PATH . "temp/");
+                        exec("tar -xvf " . $temp_location . $endpoint_package . " -C " . $temp_location);
 
                         if (!file_exists(PHONE_MODULES_PATH . "endpoint")) {
                             mkdir(PHONE_MODULES_PATH . "endpoint");
                         }
 
                         //TODO: Automate this somehow...
-                        unlink(PHONE_MODULES_PATH . "temp/setup.php");
-                        rename(PHONE_MODULES_PATH . "temp/endpoint/base.php", PHONE_MODULES_PATH . "endpoint/base.php");
-                        rename(PHONE_MODULES_PATH . "temp/endpoint/global_template_data.json", PHONE_MODULES_PATH . "endpoint/global_template_data.json");
+
+                        rename($temp_location . "setup.php", PHONE_MODULES_PATH . "autoload.php");
+                        rename($temp_location . "endpoint/base.php", PHONE_MODULES_PATH . "endpoint/base.php");
+                        rename($temp_location . "endpoint/global_template_data.json", PHONE_MODULES_PATH . "endpoint/global_template_data.json");
 
                         $sql = "UPDATE endpointman_global_vars SET value = '" . $endpoint_last_mod . "' WHERE var_name = 'endpoint_vers'";
                         $this->eda->sql($sql);
@@ -1958,32 +1956,32 @@ class endpointmanager {
                 $this->error['remote_server'] = "The Remote Server Is Currently Syncing With the Master Server, Please try again later";
             }
         } else {
-			$o = getcwd();
+            $o = getcwd();
             chdir(dirname(PHONE_MODULES_PATH));
             $path = $this->has_git();
-            exec($path.' git pull',$output);
+            exec($path . ' git pull', $output);
             chdir($o);
             $temp = $this->file2json(PHONE_MODULES_PATH . 'endpoint/master.json');
             $endpoint_package = $temp['data']['package'];
             $endpoint_last_mod = $temp['data']['last_modified'];
-            
+
             $sql = "UPDATE endpointman_global_vars SET value = '" . $endpoint_last_mod . "' WHERE var_name = 'endpoint_vers'";
             $this->eda->sql($sql);
-            
+
             $out = $temp['data']['brands'];
-            
+
             $row = $this->eda->sql('SELECT * FROM  endpointman_brand_list WHERE id > 0', 'getAll', DB_FETCHMODE_ASSOC);
 
             foreach ($out as $data) {
                 $temp = $this->file2json(PHONE_MODULES_PATH . 'endpoint/' . $data['directory'] . '/brand_data.json');
                 if (key_exists('directory', $temp['data']['brands'])) {
-                    
+
                     //Pull in all variables
                     $directory = $temp['data']['brands']['directory'];
                     $brand_name = $temp['data']['brands']['name'];
                     $brand_id = $temp['data']['brands']['brand_id'];
                     $brand_version = $temp['data']['brands']['last_modified'];
-                    
+
                     $b_data = $this->eda->sql("SELECT id FROM endpointman_brand_list WHERE id = '" . $brand_id . "'", 'getOne');
                     if ($b_data) {
                         $sql = "UPDATE endpointman_brand_list SET local = '1', name = '" . $brand_name . "', cfg_ver = '" . $brand_version . "', installed = 1, hidden = 0 WHERE id = " . $brand_id;
@@ -1992,7 +1990,7 @@ class endpointmanager {
                         $sql = "INSERT INTO endpointman_brand_list (id, name, directory, cfg_ver, local, installed) VALUES ('" . $brand_id . "', '" . $brand_name . "', '" . $directory . "', '" . $brand_version . "', '1', '1')";
                         $this->eda->sql($sql);
                     }
-                    
+
                     $last_mod = "";
                     foreach ($temp['data']['brands']['family_list'] as $family_list) {
                         $last_mod = max($last_mod, $family_list['last_modified']);
@@ -2000,13 +1998,13 @@ class endpointmanager {
                         $family_line_xml = $this->file2json(PHONE_MODULES_PATH . '/endpoint/' . $directory . '/' . $family_list['directory'] . '/family_data.json');
 
                         $family_line_xml['data']['last_modified'] = isset($family_line_xml['data']['last_modified']) ? $family_line_xml['data']['last_modified'] : '';
-                        
+
                         /* DONT DO THIS YET
-                        $require_firmware = NULL;
-                        if ((key_exists('require_firmware', $family_line_xml['data'])) && ($remote) && ($family_line_xml['data']['require_firmware'] == "TRUE")) {
-                            echo "Firmware Requirment Detected!..........<br/>";
-                            $this->install_firmware($family_line_xml['data']['id']);
-                        }
+                          $require_firmware = NULL;
+                          if ((key_exists('require_firmware', $family_line_xml['data'])) && ($remote) && ($family_line_xml['data']['require_firmware'] == "TRUE")) {
+                          echo "Firmware Requirment Detected!..........<br/>";
+                          $this->install_firmware($family_line_xml['data']['id']);
+                          }
                          * 
                          */
 
@@ -2018,10 +2016,10 @@ class endpointmanager {
                             $sql = "INSERT INTO endpointman_product_list (`id`, `brand`, `short_name`, `long_name`, `cfg_dir`, `cfg_ver`, `config_files`, `hidden`) VALUES ('" . $brand_id . $family_line_xml['data']['id'] . "', '" . $brand_id . "', '" . $short_name . "', '" . $family_line_xml['data']['name'] . "', '" . $family_line_xml['data']['directory'] . "', '" . $family_line_xml['data']['last_modified'] . "','" . $family_line_xml['data']['configuration_files'] . "', '0')";
                         }
                         $this->eda->sql($sql);
-                        
+
                         foreach ($family_line_xml['data']['model_list'] as $model_list) {
                             $template_list = implode(",", $model_list['template_data']);
-                            
+
                             $m_data = $this->eda->sql("SELECT id FROM endpointman_model_list WHERE id='" . $brand_id . $family_line_xml['data']['id'] . $model_list['id'] . "'", 'getone');
                             if ($m_data) {
                                 $sql = "UPDATE endpointman_model_list SET max_lines = '" . $model_list['lines'] . "', model = '" . $model_list['model'] . "', template_list = '" . $template_list . "' WHERE id = '" . $brand_id . $family_line_xml['data']['id'] . $model_list['id'] . "'";
@@ -2031,7 +2029,7 @@ class endpointmanager {
                             $this->eda->sql($sql);
 
                             if (!$this->sync_model($brand_id . $family_line_xml['data']['id'] . $model_list['id'])) {
-                                echo "System Error in Sync Model Function, Load Failure!".$model_list['model'];
+                                echo "System Error in Sync Model Function, Load Failure!" . $model_list['model'];
                             }
                         }
                         //Phone Models Move Here
@@ -2053,7 +2051,7 @@ class endpointmanager {
                                 }
                                 $this->eda->sql($sql);
                             }
-                        }  
+                        }
                     }
                     foreach ($temp['data']['brands']['oui_list'] as $oui) {
                         $sql = "REPLACE INTO endpointman_oui_list (`oui`, `brand`, `custom`) VALUES ('" . $oui . "', '" . $brand_id . "', '0')";
@@ -2069,7 +2067,8 @@ class endpointmanager {
      * @param integer $id Brand ID
      */
     function download_brand($id) {
-        if(!$this->global_cfg['use_repo']) {
+        if (!$this->global_cfg['use_repo']) {
+            $temp_directory = $this->sys_get_temp_dir() . "/epm_temp/";
             $row = $this->eda->sql('SELECT * FROM  endpointman_brand_list WHERE id =' . $id, 'getAll', DB_FETCHMODE_ASSOC);
             echo "Downloading Brand JSON.....";
             $result = $this->download_file(UPDATE_PATH . $row[0]['directory'] . "/" . $row[0]['directory'] . ".json", PHONE_MODULES_PATH . "endpoint/" . $row[0]['directory'] . "/brand_data.json");
@@ -2081,29 +2080,29 @@ class endpointmanager {
                 $package = $temp['data']['brands']['package'];
 
                 echo "<div style='float: left'>Downloading Brand Package...</div><div style='float: left' id=\"DivExample\">.</div>";
-                $this->download_file_with_progress_bar(UPDATE_PATH . $row[0]['directory'] . '/' . $package, PHONE_MODULES_PATH . "temp/" . $package);
+                $this->download_file_with_progress_bar(UPDATE_PATH . $row[0]['directory'] . '/' . $package, $temp_directory . $package);
                 echo "<script type='text/javascript'>document.getElementById('DivExample').innerHTML='Done!';</script><br />";
 
-                if (file_exists(PHONE_MODULES_PATH . 'temp/' . $package)) {
+                if (file_exists($temp_directory . $package)) {
                     $md5_xml = $temp['data']['brands']['md5sum'];
-                    $md5_pkg = md5_file(PHONE_MODULES_PATH . 'temp/' . $package);
+                    $md5_pkg = md5_file($temp_directory . $package);
 
                     echo "Checking MD5sum of Package....";
                     if ($md5_xml == $md5_pkg) {
                         echo "Done!<br/>";
                         echo "Extracting Tarball........";
-                        exec("tar -xvf " . PHONE_MODULES_PATH . 'temp/' . $package . " -C " . PHONE_MODULES_PATH . "temp/");
+                        exec("tar -xvf " . $temp_directory . $package . " -C " . $temp_directory);
                         echo "Done!<br />";
 
                         //Update File in the temp directory
-                        copy(PHONE_MODULES_PATH . 'endpoint/' . $row[0]['directory'] . '/brand_data.json', PHONE_MODULES_PATH . 'temp/' . $row[0]['directory'] . '/brand_data.json');
+                        copy(PHONE_MODULES_PATH . 'endpoint/' . $row[0]['directory'] . '/brand_data.json', $temp_directory . $row[0]['directory'] . '/brand_data.json');
 
                         $this->update_brand($row[0]['directory'], TRUE);
                     } else {
                         echo "MD5 Did not match!";
                     }
                 } else {
-                    $this->error['uploader'] = "Can't Find Downloaded File!";
+                    echo "Can't Find Downloaded File!";
                 }
             } else {
                 echo "<br/>Error Connecting to the Package Repository. Module not installed. Please Try again later.<br/>You Can Also Manually Update The Repository By Downloading Files here: <a href='http://www.provisioner.net/releases3' target='_blank'>Release Repo</a><br />Then Use Manual Upload in Advanced Settings";
@@ -2118,8 +2117,9 @@ class endpointmanager {
      * Still needs way to determine when models move...perhaps another function?
      */
     function update_brand($package, $remote=TRUE) {
-        if (file_exists(PHONE_MODULES_PATH . 'temp/' . $package . '/brand_data.json')) {
-            $temp = $this->file2json(PHONE_MODULES_PATH . 'temp/' . $package . '/brand_data.json');
+        $temp_directory = $this->sys_get_temp_dir() . "/epm_temp/";
+        if (file_exists($temp_directory . $package . '/brand_data.json')) {
+            $temp = $this->file2json($temp_directory . $package . '/brand_data.json');
             if (key_exists('directory', $temp['data']['brands'])) {
                 echo "Appears to be a valid Provisioner.net JSON file.....Continuing<br />";
 
@@ -2136,18 +2136,18 @@ class endpointmanager {
                     mkdir(PHONE_MODULES_PATH . "endpoint/" . $directory);
                 }
 
-                $dir_iterator = new RecursiveDirectoryIterator(PHONE_MODULES_PATH . "temp/" . $directory . "/");
+                $dir_iterator = new RecursiveDirectoryIterator($temp_directory . $directory . "/");
                 $iterator = new RecursiveIteratorIterator($dir_iterator, RecursiveIteratorIterator::SELF_FIRST);
                 foreach ($iterator as $file) {
                     if (is_dir($file)) {
-                        $dir = str_replace(PHONE_MODULES_PATH . "temp/" . $directory . "/", "", $file);
+                        $dir = str_replace($temp_directory . $directory . "/", "", $file);
                         if (!file_exists(PHONE_MODULES_PATH . "endpoint/" . $directory . "/" . $dir)) {
                             mkdir(PHONE_MODULES_PATH . "endpoint/" . $directory . "/" . $dir, 0764, TRUE);
                             echo ".";
                         }
                     } else {
                         if ((basename($file) != "brand_data.json") OR (!$remote)) {
-                            $dir = str_replace(PHONE_MODULES_PATH . "temp/" . $directory . "/", "", $file);
+                            $dir = str_replace($temp_directory . $directory . "/", "", $file);
                             $stats = rename($file, PHONE_MODULES_PATH . "endpoint/" . $directory . "/" . $dir);
                             if ($stats === FALSE) {
                                 echo "Error Moving " . basename($file);
@@ -2316,20 +2316,20 @@ class endpointmanager {
                     }
                     //Phone Models Move Here
                     $family_id = $brand_id . $family_line_xml['data']['id'];
-                    $sql = "SELECT * FROM endpointman_model_list WHERE product_id = ".$family_id;
+                    $sql = "SELECT * FROM endpointman_model_list WHERE product_id = " . $family_id;
                     $products = $this->eda->sql($sql, 'getall', DB_FETCHMODE_ASSOC);
-                    foreach($products as $data) {  
-                        if(!$this->arraysearchrecursive($data['model'], $family_line_xml['data']['model_list'], 'model')) {
-                            echo "Moving/Removing Model '".$data['model']."' not present in JSON file......<br />";
+                    foreach ($products as $data) {
+                        if (!$this->arraysearchrecursive($data['model'], $family_line_xml['data']['model_list'], 'model')) {
+                            echo "Moving/Removing Model '" . $data['model'] . "' not present in JSON file......<br />";
                             $model_name = $data['model'];
-                            $sql = 'DELETE FROM endpointman_model_list WHERE id = '.$data['id'];
+                            $sql = 'DELETE FROM endpointman_model_list WHERE id = ' . $data['id'];
                             $this->eda->sql($sql);
-                            $sql = "SELECT id FROM endpointman_model_list WHERE model LIKE '".$model_name."'";
-                            $new_model_id = $this->eda->sql($sql,'getOne');
-                            if($new_model_id) {
-                                $sql = "UPDATE  endpointman_mac_list SET  model =  '".$new_model_id."' WHERE  model = '".$data['id']."'";
+                            $sql = "SELECT id FROM endpointman_model_list WHERE model LIKE '" . $model_name . "'";
+                            $new_model_id = $this->eda->sql($sql, 'getOne');
+                            if ($new_model_id) {
+                                $sql = "UPDATE  endpointman_mac_list SET  model =  '" . $new_model_id . "' WHERE  model = '" . $data['id'] . "'";
                             } else {
-                                $sql = "UPDATE  endpointman_mac_list SET  model =  '0' WHERE  model = '".$data['id']."'";
+                                $sql = "UPDATE  endpointman_mac_list SET  model =  '0' WHERE  model = '" . $data['id'] . "'";
                             }
                             $this->eda->sql($sql);
                         }
@@ -2350,7 +2350,7 @@ class endpointmanager {
         }
 
         echo "Removing Temporary Files..............";
-        $this->rmrf(PHONE_MODULES_PATH . "temp/" . $package);
+        $this->rmrf($temp_directory . $package);
         echo "Done!<br />";
     }
 
@@ -2358,35 +2358,50 @@ class endpointmanager {
      * Remove the brand
      * @param int $id Brand ID
      */
-    function remove_brand($id=NULL, $remove_configs=FALSE) {
-		if(!$this->global_cfg['use_repo']) {
-	        $sql = 'SELECT id, firmware_vers FROM endpointman_product_list WHERE brand = ' . $id;
-	        $products = $this->eda->sql($sql, 'getall', DB_FETCHMODE_ASSOC);
-	        foreach ($products as $data) {
-	            if ($data['firmware_vers'] != "") {
-	                $this->remove_firmware($data['id']);
-	            }
-	        }
+    function remove_brand($id=NULL, $remove_configs=FALSE, $force=FALSE) {
+        if (!$this->global_cfg['use_repo']) {
+            $sql = 'SELECT id, firmware_vers FROM endpointman_product_list WHERE brand = ' . $id;
+            $products = $this->eda->sql($sql, 'getall', DB_FETCHMODE_ASSOC);
+            foreach ($products as $data) {
+                if ($data['firmware_vers'] != "") {
+                    $this->remove_firmware($data['id']);
+                }
+            }
 
-	        $brand_dir = $this->eda->sql("SELECT directory FROM endpointman_brand_list WHERE id=" . $id, 'getone');
-	        $this->rmrf(PHONE_MODULES_PATH . "endpoint/" . $brand_dir);
+            $brand_dir = $this->eda->sql("SELECT directory FROM endpointman_brand_list WHERE id=" . $id, 'getone');
+            $this->rmrf(PHONE_MODULES_PATH . "endpoint/" . $brand_dir);
 
-	        $sql = "DELETE FROM endpointman_model_list WHERE brand = '" . $id . "'";
-	        $this->eda->sql($sql);
+            $sql = "DELETE FROM endpointman_model_list WHERE brand = '" . $id . "'";
+            $this->eda->sql($sql);
 
-	        $sql = "DELETE FROM endpointman_product_list WHERE brand = '" . $id . "'";
-	        $this->eda->sql($sql);
+            $sql = "DELETE FROM endpointman_product_list WHERE brand = '" . $id . "'";
+            $this->eda->sql($sql);
 
-	        $sql = "DELETE FROM endpointman_oui_list WHERE brand = '" . $id . "'";
-	        $this->eda->sql($sql);
+            $sql = "DELETE FROM endpointman_oui_list WHERE brand = '" . $id . "'";
+            $this->eda->sql($sql);
 
-	        $this->rmrf(PHONE_MODULES_PATH . $brand_dir);
-	        $sql = "DELETE FROM endpointman_brand_list WHERE id = " . $id;
+            $this->rmrf(PHONE_MODULES_PATH . $brand_dir);
+            $sql = "DELETE FROM endpointman_brand_list WHERE id = " . $id;
 
-	        $this->eda->sql($sql);
-		} else {
-			$this->error['remove_brand'] = "Not allowed in repo mode";
-		}
+            $this->eda->sql($sql);
+        } elseif ($force) {
+            $brand_dir = $this->eda->sql("SELECT directory FROM endpointman_brand_list WHERE id=" . $id, 'getone');
+
+            $sql = "DELETE FROM endpointman_model_list WHERE brand = '" . $id . "'";
+            $this->eda->sql($sql);
+
+            $sql = "DELETE FROM endpointman_product_list WHERE brand = '" . $id . "'";
+            $this->eda->sql($sql);
+
+            $sql = "DELETE FROM endpointman_oui_list WHERE brand = '" . $id . "'";
+            $this->eda->sql($sql);
+
+            $sql = "DELETE FROM endpointman_brand_list WHERE id = " . $id;
+
+            $this->eda->sql($sql);
+        } else {
+            $this->error['remove_brand'] = "Not allowed in repo mode";
+        }
     }
 
     function merge_data($path, $template_list, $maxlines = 3) {
@@ -2539,7 +2554,7 @@ class endpointmanager {
             $template_data_array = array();
 
             $template_data_array = $this->merge_data(PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'] . '/', $template_list_array);
-            
+
             $sql = "UPDATE endpointman_model_list SET template_data = '" . serialize($template_data_array) . "' WHERE id = '" . $model . "'";
             $this->eda->sql($sql);
             return(TRUE);
@@ -2618,25 +2633,25 @@ class endpointmanager {
 
     function download_file($url_file, $destination_file) {
         $contents = file_get_contents($url_file);
-        
+
         if (preg_match('/200/', $http_response_header[0])) {
             $dirname = dirname($destination_file);
             if (!file_exists($dirname)) {
                 mkdir($dirname);
             }
             if (!is_writable($dirname)) {
-                    $this->error['download_file'] = "Directory '".$dirname."' is not writable! Unable to download files";
-                    return false;
+                $this->error['download_file'] = "Directory '" . $dirname . "' is not writable! Unable to download files";
+                return false;
             }
             file_put_contents($destination_file, $contents);
             //check file placement
             if (!file_exists($destination_file)) {
-                $this->error['download_file'] = "File Doesn't Exist in '".$dirname."'. Unable to download files";
+                $this->error['download_file'] = "File Doesn't Exist in '" . $dirname . "'. Unable to download files";
                 return false;
             }
             return true;
         } else {
-            $this->error['download_file'] = "Server Replied with error '".$http_response_header[0]."'. Unable to download files";
+            $this->error['download_file'] = "Server Replied with error '" . $http_response_header[0] . "'. Unable to download files";
             return false;
         }
     }
@@ -3094,7 +3109,7 @@ class endpointmanager {
     function validate_json($json) {
         return(TRUE);
     }
-    
+
     function has_git() {
         exec('which git', $output);
 
