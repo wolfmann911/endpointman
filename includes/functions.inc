@@ -450,7 +450,7 @@ class endpointmanager {
                         $sql = "SELECT description FROM devices WHERE id = " . $row['ext'];
                         $name = $this->eda->sql($sql, 'getOne');
 
-                        $sql = "UPDATE endpointman_line_list SET line = '" . $row['line'] . "', ext = " . $row['ext'] . ", description = '" . addslashes($name) . "' WHERE luid =  " . $row['luid'];
+                        $sql = "UPDATE endpointman_line_list SET line = '" . $row['line'] . "', ext = '" . $row['ext'] . "', description = '" . addslashes($name) . "' WHERE luid =  " . $row['luid'];
                         $this->eda->sql($sql);
                     }
 
@@ -1523,14 +1523,6 @@ class endpointmanager {
 
                 $new_template_data['ntp'] = $settings['ntp'];
 
-                $new_template_data['network']['dhcp'] = TRUE;
-                $new_template_data['network']['ipv4'] = '';
-                $new_template_data['network']['ipv6'] = '';
-                $new_template_data['network']['subnet'] = '255.255.255.0';
-                $new_template_data['network']['gateway'] = '';
-                $new_template_data['network']['vlan']['id'] = '';
-                $new_template_data['network']['vlan']['qos'] = '';
-
                 //Overwrite all specific settings variables now
                 if (!empty($phone_info['specific_settings'])) {
                     $specific_settings = unserialize($phone_info['specific_settings']);
@@ -1538,7 +1530,6 @@ class endpointmanager {
                 } else {
                     $specific_settings = array();
                 }
-
 
                 //Set Variables according to the template_data files included. We can include different template.xml files within family_data.xml also one can create
                 //template_data_custom.xml which will get included or template_data_<model_name>_custom.xml which will also get included
@@ -1577,10 +1568,32 @@ class endpointmanager {
                             }
                         }
                     } else {
-                        $provisioner_lib->settings[$var] = $data;
+                        switch ($key) {
+                            case "connection_type":
+                                $provisioner_lib->settings['network'][$key] = $data;
+                                break;
+                            case "ip4_address":
+                                $provisioner_lib->settings['network']['ipv4'] = $data;
+                                break;
+                            case "ip6_address":
+                                $provisioner_lib->settings['network']['ipv6'] = $data;
+                                break;
+                            case "subnet_mask":
+                                $provisioner_lib->settings['network']['subnet'] = $data;
+                                break;
+                            case "gateway_address":
+                                $provisioner_lib->settings['network']['gateway'] = $data;
+                                break;
+                            case "primary_dns":
+                                $provisioner_lib->settings['network'][$key] = $data;
+                                break;
+                            default:
+                                $provisioner_lib->settings[$key] = $data;
+                                break;
+                        }
                     }
                 }
-
+                
                 $provisioner_lib->settings['mac'] = $phone_info['mac'];
                 $provisioner_lib->mac = $phone_info['mac'];
 
