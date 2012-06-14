@@ -212,13 +212,14 @@ switch ($sub_type) {
                     $provisioner_lib->root_dir = PHONE_MODULES_PATH;
 
                     $provisioner_lib->engine = 'asterisk';
+                    $provisioner_lib->engine_location = !empty($endpoint->global_cfg['asterisk_location']) ? $endpoint->global_cfg['asterisk_location'] : 'asterisk';
                     $provisioner_lib->system = 'unix';
 
                     //have to because of versions less than php5.3
                     $provisioner_lib->brand_name = $phone_info['directory'];
                     $provisioner_lib->family_line = $phone_info['cfg_dir'];
-
-                    $provisioner_lib->lines[1] = array('ext' => $phone_info['line'][1]['ext']);
+                    
+                    $provisioner_lib->settings['line'][0] = array('username' => $phone_info['line'][1]['ext'], 'authname' => $phone_info['line'][1]['ext']);
                     $provisioner_lib->reboot();
                     unset($provisioner_lib);
                 }

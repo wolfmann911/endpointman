@@ -450,7 +450,7 @@ class endpointmanager {
                         $sql = "SELECT description FROM devices WHERE id = " . $row['ext'];
                         $name = $this->eda->sql($sql, 'getOne');
 
-                        $sql = "UPDATE endpointman_line_list SET line = '" . $row['line'] . "', ext = '" . $row['ext'] . "', description = '" . addslashes($name) . "' WHERE luid =  " . $row['luid'];
+                        $sql = "UPDATE endpointman_line_list SET line = '" . $row['line'] . "', ext = '" . $row['ext'] . "', description = '" . mysql_real_escape_string($name) . "' WHERE luid =  " . $row['luid'];
                         $this->eda->sql($sql);
                     }
 
@@ -541,7 +541,7 @@ class endpointmanager {
             if (!isset($line)) {
                 $line = $row['line'];
             }
-            $sql = "UPDATE endpointman_line_list SET line = '" . $line . "', ext = '" . $row['ext'] . "', description = '" . $name . "' WHERE luid =  " . $row['luid'];
+            $sql = "UPDATE endpointman_line_list SET line = '" . $line . "', ext = '" . $row['ext'] . "', description = '" . mysql_real_escape_string($name) . "' WHERE luid =  " . $row['luid'];
             $this->eda->sql($sql);
             return(TRUE);
         } else {
@@ -551,7 +551,7 @@ class endpointmanager {
                 $sql = "SELECT description FROM devices WHERE id = " . $row['ext'];
                 $name = $this->eda->sql($sql, 'getOne');
 
-                $sql = "UPDATE endpointman_line_list SET line = '" . $row['line'] . "', ext = '" . $row['ext'] . "', description = '" . $name . "' WHERE luid =  " . $row['luid'];
+                $sql = "UPDATE endpointman_line_list SET line = '" . $row['line'] . "', ext = '" . $row['ext'] . "', description = '" . mysql_real_escape_string($name) . "' WHERE luid =  " . $row['luid'];
                 $this->eda->sql($sql);
             }
             return(TRUE);
@@ -1410,7 +1410,7 @@ class endpointmanager {
                 //Tell the system who we are and were to find the data.
                 $provisioner_lib->root_dir = PHONE_MODULES_PATH;
                 $provisioner_lib->engine = 'asterisk';
-                $provisioner_lib->engine_location = $this->global_cfg['asterisk_location'];
+                $provisioner_lib->engine_location = !empty($this->global_cfg['asterisk_location']) ? $this->global_cfg['asterisk_location'] : 'asterisk';
                 $provisioner_lib->system = 'unix';
 
                 //have to because of versions less than php5.3
