@@ -7,7 +7,8 @@
  * @license MPL / GPLv2 / LGPL
  * @package Endpoint Manager
  */
-require_once $amp_conf['AMPWEBROOT'] . '/admin/modules/endpointman/config.php';
+
+require_once dirname(__FILE__).'/config.php';
 
 switch ($page) {
     case 'advanced':

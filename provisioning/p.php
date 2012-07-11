@@ -18,8 +18,23 @@ if ((!isset($endpoint->global_cfg['server_type'])) OR ($endpoint->global_cfg['se
 
 $provis_ip = $endpoint->global_cfg['srvip'];
 
-if((isset($_REQUEST['putfile'])) && ((getMethod() == 'PUT') OR (getMethod() == 'POST'))) {
+if(((getMethod() == 'PUT') OR (getMethod() == 'POST'))) {
     //write log files or other files to drive. not sussed out yet completely.
+
+    /* PUT data comes in on the stdin stream */
+    //$putdata = fopen("php://input", "r");
+
+    /* Open a file for writing */
+    //$fp = fopen($endpoint->global_cfg['config_location'] . $_SERVER['REDIRECT_URL'], "a");
+
+    /* Read the data 1 KB at a time
+        and write to the file */
+    //while ($data = fread($putdata, 1024))
+    //    fwrite($fp, $data);
+
+    /* Close the streams */
+    //fclose($fp);
+    //fclose($putdata);
     header('HTTP/1.1 200 OK');
     die();
 }
