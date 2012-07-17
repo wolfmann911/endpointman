@@ -1325,8 +1325,13 @@ class endpointmanager {
                             }
                         }
                     } else {
-                        copy(PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data, $write_path . $data);
-                        chmod($write_path . $data, 0666);
+                        if(file_exists(PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data)) {
+						    if(!file_exists(dirname($write_path . $data))) {
+							    !@mkdir(dirname($write_path . $data));
+						    }                        
+                            copy(PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data, $write_path . $data);
+                            chmod($write_path . $data, 0666);
+                        }
                     }
                 }
             }
