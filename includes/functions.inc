@@ -1313,6 +1313,14 @@ class endpointmanager {
                             $this->error['parse_configs'] = "Could Not Create File: " . $data;
                             return(FALSE);
                         }
+                    } else {
+                        if(file_exists(PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data)) {
+						    if(!file_exists(dirname($write_path . $data))) {
+							    !@mkdir(dirname($write_path . $data));
+						    }                        
+                            copy(PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data, $write_path . $data);
+                            chmod($write_path . $data, 0666);
+                        }
                     }
                 }
             }
