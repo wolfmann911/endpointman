@@ -1,4 +1,5 @@
 <?PHP
+
 /**
  * Endpoint Manager Installer
  *
@@ -6,20 +7,24 @@
  * @license MPL / GPLv2 / LGPL
  * @package Endpoint Manager
  */
-if (! function_exists("out")) {
+if (!function_exists("out")) {
+
     function out($text) {
-        echo $text."<br />";
+        echo $text . "<br />";
     }
+
 }
 
-if (! function_exists("outn")) {
+if (!function_exists("outn")) {
+
     function outn($text) {
         echo $text;
     }
+
 }
 
 function epm_rmrf($dir) {
-    if(file_exists($dir)) {
+    if (file_exists($dir)) {
         $iterator = new RecursiveDirectoryIterator($dir);
         foreach (new RecursiveIteratorIterator($iterator, RecursiveIteratorIterator::CHILD_FIRST) as $file) {
             if ($file->isDir()) {
@@ -34,21 +39,21 @@ function epm_rmrf($dir) {
 }
 
 function find_exec($exec) {
-    $usr_bin = glob("/usr/bin/".$exec);
-    $usr_sbin = glob("/usr/sbin/".$exec);
-    $sbin = glob("/sbin/".$exec);
-    $bin = glob("/bin/".$exec);
-    $etc = glob("/etc/".$exec);
-    if(isset($usr_bin[0])) {
-        return("/usr/bin/".$exec);
-    } elseif(isset($usr_sbin[0])) {
-        return("/usr/sbin/".$exec);
-    } elseif(isset($sbin[0])) {
-        return("/sbin/".$exec);
-    } elseif(isset($bin[0])) {
-        return("/bin/".$exec);
-    } elseif(isset($etc[0])) {
-        return("/etc/".$exec);
+    $usr_bin = glob("/usr/bin/" . $exec);
+    $usr_sbin = glob("/usr/sbin/" . $exec);
+    $sbin = glob("/sbin/" . $exec);
+    $bin = glob("/bin/" . $exec);
+    $etc = glob("/etc/" . $exec);
+    if (isset($usr_bin[0])) {
+        return("/usr/bin/" . $exec);
+    } elseif (isset($usr_sbin[0])) {
+        return("/usr/sbin/" . $exec);
+    } elseif (isset($sbin[0])) {
+        return("/sbin/" . $exec);
+    } elseif (isset($bin[0])) {
+        return("/bin/" . $exec);
+    } elseif (isset($etc[0])) {
+        return("/etc/" . $exec);
     } else {
         return($exec);
     }
@@ -58,32 +63,33 @@ global $db;
 
 out("Endpoint Manager Installer");
 
-define("PHONE_MODULES_PATH", $amp_conf['AMPWEBROOT'].'/admin/modules/_ep_phone_modules/');
-define("LOCAL_PATH", $amp_conf['AMPWEBROOT'].'/admin/modules/endpointman/');
+define("PHONE_MODULES_PATH", $amp_conf['AMPWEBROOT'] . '/admin/modules/_ep_phone_modules/');
+define("LOCAL_PATH", $amp_conf['AMPWEBROOT'] . '/admin/modules/endpointman/');
 
 
-if(!file_exists(PHONE_MODULES_PATH)) {
+if (!file_exists(PHONE_MODULES_PATH)) {
     mkdir(PHONE_MODULES_PATH, 0764);
     out("Creating Phone Modules Directory");
 }
 
-if(!file_exists(PHONE_MODULES_PATH."setup.php")) {
-    copy(LOCAL_PATH."install/setup.php",PHONE_MODULES_PATH."setup.php");
+if (!file_exists(PHONE_MODULES_PATH . "setup.php")) {
+    copy(LOCAL_PATH . "install/setup.php", PHONE_MODULES_PATH . "setup.php");
     out("Moving Auto Provisioner Class");
 }
 
-if(!file_exists(PHONE_MODULES_PATH."temp/")) {
-    mkdir(PHONE_MODULES_PATH."temp/", 0764);
+if (!file_exists(PHONE_MODULES_PATH . "temp/")) {
+    mkdir(PHONE_MODULES_PATH . "temp/", 0764);
     out("Creating temp folder");
 }
+
 //Detect Version
 
-function ep_table_exists ($table) {
-    global $amp_conf,$db;
-    $sql = "SHOW TABLES FROM ".$amp_conf['AMPDBNAME'];
+function ep_table_exists($table) {
+    global $amp_conf, $db;
+    $sql = "SHOW TABLES FROM " . $amp_conf['AMPDBNAME'];
     $result = $db->getAll($sql);
 
-    foreach($result as $row) {
+    foreach ($result as $row) {
         if ($row[0] == $table) {
             return TRUE;
         }
@@ -91,7 +97,7 @@ function ep_table_exists ($table) {
     return FALSE;
 }
 
-$epm_module_xml = epm_install_xml2array(LOCAL_PATH."module.xml");
+$epm_module_xml = epm_install_xml2array(LOCAL_PATH . "module.xml");
 
 preg_match('/^(\d*)\.(\d*)/', $epm_module_xml['module']['version'], $versions);
 
@@ -105,8 +111,8 @@ preg_match('/^(\d*)\.(\d*)/', $db->getOne($sql), $versions);
 
 $amp_version['minor'] = $versions[2];
 
-if($amp_version['minor'] < 9) {
-    out("<strong>Warning: Endpoint Manager is unsupported on FreePBX 2.".$amp_version['minor'].". We do check it on occasion but it is not a supported platform</strong>");
+if ($amp_version['minor'] < 9) {
+    out("<strong>Warning: Endpoint Manager is unsupported on FreePBX 2." . $amp_version['minor'] . ". We do check it on occasion but it is not a supported platform</strong>");
 }
 
 
@@ -114,16 +120,16 @@ $sql = 'SELECT `version` FROM `modules` WHERE `modulename` = CONVERT(_utf8 \'end
 $full_vers = $db->getOne($sql);
 
 
-if($db->getOne($sql)) {
+if ($db->getOne($sql)) {
     $new_install = FALSE;
-    $global_cfg =& $db->getAssoc("SELECT var_name, value FROM endpointman_global_vars");
-    
-    if(preg_match('/^(\d*)\.(\d*)\.(\d*)$/', $full_vers, $versions)) {
-	
-    }elseif(preg_match('/^(\d*)\.(\d*)\.(\d*)\.(\d*)$/', $full_vers, $versions)){
+    $global_cfg = & $db->getAssoc("SELECT var_name, value FROM endpointman_global_vars");
 
-    }elseif(preg_match('/^(\d*)\.(\d*)\.(\d*)\.(\d*)\.(\d*)$/', $full_vers, $versions)){
-
+    if (preg_match('/^(\d*)\.(\d*)\.(\d*)$/', $full_vers, $versions)) {
+        
+    } elseif (preg_match('/^(\d*)\.(\d*)\.(\d*)\.(\d*)$/', $full_vers, $versions)) {
+        
+    } elseif (preg_match('/^(\d*)\.(\d*)\.(\d*)\.(\d*)\.(\d*)$/', $full_vers, $versions)) {
+        
     }
 
     $very['major'] = $versions[1];
@@ -132,17 +138,17 @@ if($db->getOne($sql)) {
     $very['subsubminor'] = isset($versions[4]) ? $versions[4] : '0';
 
     $ver = $very['major'] . $very['minor'] . $very['subminor'] . $very['subsubminor'];
-    
-    out('Version Identified as '. $full_vers);
-    out('Internal Reference Number: '.$ver);
+
+    out('Version Identified as ' . $full_vers);
+    out('Internal Reference Number: ' . $ver);
 } else {
     $new_install = TRUE;
     out('New Installation Detected!');
 }
 
-if(!$new_install) {
+if (!$new_install) {
 
-    if(($ver < "1900") AND ($ver > 0)) {
+    if (($ver < "1900") AND ($ver > 0)) {
         out("Please Wait While we upgrade your old setup");
         //Expand the value option
         $sql = 'ALTER TABLE `endpointman_global_vars` CHANGE `value` `value` VARCHAR(100) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT \'Data\'';
@@ -162,9 +168,9 @@ if(!$new_install) {
 		(7, 'version', '2.0.0'),
 		(8, 'enable_ari', '0'),
 		(9, 'debug', '0'),
-		(10, 'arp_location', '".$arp."'),
-		(11, 'nmap_location', '".$nmap."'),
-		(12, 'asterisk_location', '".$asterisk."'),
+		(10, 'arp_location', '" . $arp . "'),
+		(11, 'nmap_location', '" . $nmap . "'),
+		(12, 'asterisk_location', '" . $asterisk . "'),
                 (13, 'language', ''),
                 (14, 'check_updates', '1'),
                 (15, 'disable_htaccess', ''),
@@ -279,31 +285,31 @@ if(!$new_install) {
         $db->query($sql);
 
         $old_models = array(
-                "57iCT" => array("brand" => 1, "model" => 2, "product" => 7),
-                "57i" => array("brand" => 1, "model" => 3, "product" => 7),
-                "330" => array("brand" => 4, "model" => 6, "product" => 4),
-                "560" => array("brand" => 4, "model" => 7, "product" => 4),
-                "300" => array("brand" => 6, "model" => 8, "product" => 8),
-                "320" => array("brand" => 6, "model" => 9, "product" => 8),
-                "360" => array("brand" => 6, "model" => 10, "product" => 8),
-                "370" => array("brand" => 6, "model" => 11, "product" => 8),
-                "820" => array("brand" => 6, "model" => 12, "product" => 8),
-                "M3" => array("brand" => 6, "model" => 13, "product" => 8),
-                "GXP-2000" => array("brand" => 2, "model" => 15, "product" => 1),
-                "BT200_201" => array("brand" => 2, "model" => 27, "product" => 2),
-                "spa941" => array("brand" => 0, "model" => 0, "product" => 0),
-                "spa942" => array("brand" => 0, "model" => 0, "product" => 0),
-                "spa962" => array("brand" => 0, "model" => 0, "product" => 0),
-                "55i" => array("brand" => 1, "model" => 4, "product" => 7)
+            "57iCT" => array("brand" => 1, "model" => 2, "product" => 7),
+            "57i" => array("brand" => 1, "model" => 3, "product" => 7),
+            "330" => array("brand" => 4, "model" => 6, "product" => 4),
+            "560" => array("brand" => 4, "model" => 7, "product" => 4),
+            "300" => array("brand" => 6, "model" => 8, "product" => 8),
+            "320" => array("brand" => 6, "model" => 9, "product" => 8),
+            "360" => array("brand" => 6, "model" => 10, "product" => 8),
+            "370" => array("brand" => 6, "model" => 11, "product" => 8),
+            "820" => array("brand" => 6, "model" => 12, "product" => 8),
+            "M3" => array("brand" => 6, "model" => 13, "product" => 8),
+            "GXP-2000" => array("brand" => 2, "model" => 15, "product" => 1),
+            "BT200_201" => array("brand" => 2, "model" => 27, "product" => 2),
+            "spa941" => array("brand" => 0, "model" => 0, "product" => 0),
+            "spa942" => array("brand" => 0, "model" => 0, "product" => 0),
+            "spa962" => array("brand" => 0, "model" => 0, "product" => 0),
+            "55i" => array("brand" => 1, "model" => 4, "product" => 7)
         );
 
         out("Migrating Old Devices");
         $sql = "SELECT * FROM endpointman_mac_list";
         $result = $db->query($sql);
-        while($row =& $result->fetchRow(DB_FETCHMODE_ASSOC)) {
+        while ($row = & $result->fetchRow(DB_FETCHMODE_ASSOC)) {
             $id = $row['model'];
             $new_model = $old_models[$id]['model'];
-            $sql = "UPDATE endpointman_mac_list SET model = ".$new_model." WHERE id =" . $row['id'];
+            $sql = "UPDATE endpointman_mac_list SET model = " . $new_model . " WHERE id =" . $row['id'];
             $db->query($sql);
         }
         out("Old Devices Migrated, You must install the phone modules from within endpointmanager to see your old devices!");
@@ -333,13 +339,13 @@ if(!$new_install) {
         $sql_update_vars = "INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (9, 'debug', '0')";
         $db->query($sql_update_vars);
 
-        $sql_update_vars = "INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (10, 'arp_location', '".$arp."')";
+        $sql_update_vars = "INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (10, 'arp_location', '" . $arp . "')";
         $db->query($sql_update_vars);
 
-        $sql_update_vars = "INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (11, 'nmap_location', '".$nmap."')";
+        $sql_update_vars = "INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (11, 'nmap_location', '" . $nmap . "')";
         $db->query($sql_update_vars);
 
-        $sql_update_vars = "INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (12, 'asterisk_location', '".$asterisk."')";
+        $sql_update_vars = "INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (12, 'asterisk_location', '" . $asterisk . "')";
         $db->query($sql_update_vars);
 
         out("Updating Mac List Table");
@@ -413,13 +419,13 @@ if(!$new_install) {
         $sql_update_vars = "INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (9, 'debug', '0')";
         $db->query($sql_update_vars);
 
-        $sql_update_vars = "INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (10, 'arp_location', '".$arp."')";
+        $sql_update_vars = "INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (10, 'arp_location', '" . $arp . "')";
         $db->query($sql_update_vars);
 
-        $sql_update_vars = "INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (11, 'nmap_location', '".$nmap."')";
+        $sql_update_vars = "INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (11, 'nmap_location', '" . $nmap . "')";
         $db->query($sql_update_vars);
 
-        $sql_update_vars = "INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (12, 'asterisk_location', '".$asterisk."')";
+        $sql_update_vars = "INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (12, 'asterisk_location', '" . $asterisk . "')";
         $db->query($sql_update_vars);
 
         out("Update Mac List Table");
@@ -487,22 +493,22 @@ if(!$new_install) {
         $db->query($sql);
 
         out("Add Automatic Update Check [Can be Disabled]");
-        $sql = "INSERT INTO cronmanager (module, id, time, freq, lasttime, command) VALUES ('endpointman', 'UPDATES', '23', '24', '0', 'php ".LOCAL_PATH. "includes/update_check.php')";
+        $sql = "INSERT INTO cronmanager (module, id, time, freq, lasttime, command) VALUES ('endpointman', 'UPDATES', '23', '24', '0', 'php " . LOCAL_PATH . "includes/update_check.php')";
         $db->query($sql);
     }
-    if($ver <= "2000") {
+    if ($ver <= "2000") {
         out("Locating NMAP + ARP + ASTERISK Executables");
         $nmap = find_exec("nmap");
         $arp = find_exec("arp");
         $asterisk = find_exec("asterisk");
 
-        $sql_update_vars = "INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (11, 'nmap_location', '".$asterisk."')";
+        $sql_update_vars = "INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (11, 'nmap_location', '" . $asterisk . "')";
         $db->query($sql_update_vars);
 
-        $sql_update_vars = "INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (11, 'nmap_location', '".$nmap."')";
+        $sql_update_vars = "INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (11, 'nmap_location', '" . $nmap . "')";
         $db->query($sql_update_vars);
 
-        $sql_update_vars = "INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (12, 'asterisk_location', '".$asterisk."')";
+        $sql_update_vars = "INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (12, 'asterisk_location', '" . $asterisk . "')";
         $db->query($sql_update_vars);
 
         out("Add Unique to Global Variables Table");
@@ -557,105 +563,105 @@ if(!$new_install) {
         $sql = "TRUNCATE TABLE `endpointman_model_list`";
         $db->query($sql);
 
-        $data =& $db->getAll("SELECT * FROM `endpointman_mac_list",array(), DB_FETCHMODE_ASSOC);
+        $data = & $db->getAll("SELECT * FROM `endpointman_mac_list", array(), DB_FETCHMODE_ASSOC);
 
         $new_model_list = array(
-                "2" => "1-2-11",
-                "3" => "1-2-10",
-                "4" => "1-2-9",
-                "6" => "4-2-3",
-                "7" => "4-3-7",
-                "8" => "6-1-1",
-                "9" => "6-1-2",
-                "10" => "6-1-3",
-                "11" => "6-1-4",
-                "12"  => "6-1-5",
-                "13"  => "6-1-6",
-                "15" => "2-1-3",
-                "22"  => "4-2-4",
-                "23" => "2-1-2",
-                "24" => "2-1-1",
-                "25" => "2-1-4",
-                "26" => "2-1-5",
-                "27" => "2-2-1",
-                "28" => "2-2-2",
-                "29" => "4-2-1",
-                "30" => "4-2-5",
-                "31" => "4-2-6",
-                "32" => "4-2-7",
-                "33" => "4-2-2",
-                "34" => "4-3-1",
-                "35" => "4-3-2",
-                "36" => "4-3-3",
-                "37" => "4-3-4",
-                "38" => "4-3-5",
-                "39" => "4-3-6",
-                "40" => "4-3-8",
-                "41" => "4-3-9",
-                "42" => "4-3-10",
-                "43" => "4-3-11",
-                "44" => "4-3-12",
-                "45" => "4-1-1",
-                "46" => "4-1-2",
-                "47" => "1-2-1",
-                "48" => "1-2-2",
-                "49" => "1-1-1",
-                "50" => "1-1-2",
-                "51" => "1-2-3",
-                "52" => "1-2-4",
-                "53" => "1-2-5",
-                "54" => "1-2-6",
-                "55" => "1-2-7",
-                "56" => "1-2-8",
-                "57" => "",
-                "58" => "",
-                "59" => "",
-                "60" => "7-1-1",
-                "61" => "7-1-2",
-                "62" => "8-1-1",
-                "63" => "8-1-2",
-                "64" => "8-1-3",
-                "65" => "8-1-4",
-                "67" => "7-2-1",
-                "68" => "7-2-2",
-                "69" => "7-2-3",
-                "70" => "7-2-4",
-                "71" => "7-2-5",
-                "72" => "7-2-6"
+            "2" => "1-2-11",
+            "3" => "1-2-10",
+            "4" => "1-2-9",
+            "6" => "4-2-3",
+            "7" => "4-3-7",
+            "8" => "6-1-1",
+            "9" => "6-1-2",
+            "10" => "6-1-3",
+            "11" => "6-1-4",
+            "12" => "6-1-5",
+            "13" => "6-1-6",
+            "15" => "2-1-3",
+            "22" => "4-2-4",
+            "23" => "2-1-2",
+            "24" => "2-1-1",
+            "25" => "2-1-4",
+            "26" => "2-1-5",
+            "27" => "2-2-1",
+            "28" => "2-2-2",
+            "29" => "4-2-1",
+            "30" => "4-2-5",
+            "31" => "4-2-6",
+            "32" => "4-2-7",
+            "33" => "4-2-2",
+            "34" => "4-3-1",
+            "35" => "4-3-2",
+            "36" => "4-3-3",
+            "37" => "4-3-4",
+            "38" => "4-3-5",
+            "39" => "4-3-6",
+            "40" => "4-3-8",
+            "41" => "4-3-9",
+            "42" => "4-3-10",
+            "43" => "4-3-11",
+            "44" => "4-3-12",
+            "45" => "4-1-1",
+            "46" => "4-1-2",
+            "47" => "1-2-1",
+            "48" => "1-2-2",
+            "49" => "1-1-1",
+            "50" => "1-1-2",
+            "51" => "1-2-3",
+            "52" => "1-2-4",
+            "53" => "1-2-5",
+            "54" => "1-2-6",
+            "55" => "1-2-7",
+            "56" => "1-2-8",
+            "57" => "",
+            "58" => "",
+            "59" => "",
+            "60" => "7-1-1",
+            "61" => "7-1-2",
+            "62" => "8-1-1",
+            "63" => "8-1-2",
+            "64" => "8-1-3",
+            "65" => "8-1-4",
+            "67" => "7-2-1",
+            "68" => "7-2-2",
+            "69" => "7-2-3",
+            "70" => "7-2-4",
+            "71" => "7-2-5",
+            "72" => "7-2-6"
         );
 
-        foreach($data as $list) {
-            $sql = "UPDATE endpointman_mac_list SET model = '".$new_model_list[$list['model']]."' WHERE id = ". $list['id'];
+        foreach ($data as $list) {
+            $sql = "UPDATE endpointman_mac_list SET model = '" . $new_model_list[$list['model']] . "' WHERE id = " . $list['id'];
             $db->query($sql);
         }
 
 
 
         $new_product_list = array(
-                "6" => array("product_id" => "1-1", "model_id" => "1-1-1"),
-                "7" => array("product_id" => "1-2", "model_id" => "1-2-1"),
-                "1" => array("product_id" => "2-1", "model_id" => "2-1-1"),
-                "2" => array("product_id" => "2-2", "model_id" => "2-2-1"),
-                "3" => array("product_id" => "4-2", "model_id" => "4-2-1"),
-                "5" => array("product_id" => "4-1", "model_id" => "4-1-1"),
-                "4" => array("product_id" => "4-3", "model_id" => "4-3-1"),
-                "8" => array("product_id" => "6-1", "model_id" => "6-1-1"),
-                "9" => array("product_id" => "7-1", "model_id" => "7-1-1"),
-                "11" => array("product_id" => "7-2", "model_id" => "7-2-1"),
-                "10" => array("product_id" => "8-1", "model_id" => "8-1-1")
+            "6" => array("product_id" => "1-1", "model_id" => "1-1-1"),
+            "7" => array("product_id" => "1-2", "model_id" => "1-2-1"),
+            "1" => array("product_id" => "2-1", "model_id" => "2-1-1"),
+            "2" => array("product_id" => "2-2", "model_id" => "2-2-1"),
+            "3" => array("product_id" => "4-2", "model_id" => "4-2-1"),
+            "5" => array("product_id" => "4-1", "model_id" => "4-1-1"),
+            "4" => array("product_id" => "4-3", "model_id" => "4-3-1"),
+            "8" => array("product_id" => "6-1", "model_id" => "6-1-1"),
+            "9" => array("product_id" => "7-1", "model_id" => "7-1-1"),
+            "11" => array("product_id" => "7-2", "model_id" => "7-2-1"),
+            "10" => array("product_id" => "8-1", "model_id" => "8-1-1")
         );
 
         $data = array();
-        $data =& $db->getAll("SELECT * FROM endpointman_custom_configs",array(), DB_FETCHMODE_ASSOC);
-        foreach($data as $list) {
-            $sql = "UPDATE endpointman_custom_configs SET product_id = '".$new_product_list[$list['product_id']]['product_id']."' WHERE id = ". $list['id'];
+        $data = & $db->getAll("SELECT * FROM endpointman_custom_configs", array(), DB_FETCHMODE_ASSOC);
+        foreach ($data as $list) {
+            $sql = "UPDATE endpointman_custom_configs SET product_id = '" . $new_product_list[$list['product_id']]['product_id'] . "' WHERE id = " . $list['id'];
             $db->query($sql);
         }
 
         $data = array();
-        $data =& $db->getAll("SELECT * FROM endpointman_template_list",array(), DB_FETCHMODE_ASSOC);
-        foreach($data as $list) {
-            $sql = "UPDATE endpointman_template_list SET model_id = '".$new_product_list[$list['product_id']]['model_id']."', product_id = '".$new_product_list[$list['product_id']]['product_id']."' WHERE id = ". $list['id'];
+        $data = & $db->getAll("SELECT * FROM endpointman_template_list", array(), DB_FETCHMODE_ASSOC);
+        foreach ($data as $list) {
+            $sql = "UPDATE endpointman_template_list SET model_id = '" . $new_product_list[$list['product_id']]['model_id'] . "', product_id = '" . $new_product_list[$list['product_id']]['product_id'] . "' WHERE id = " . $list['id'];
             $db->query($sql);
         }
 
@@ -663,20 +669,20 @@ if(!$new_install) {
         $db->query('TRUNCATE TABLE `endpointman_custom_configs`');
 
 
-        exec("rm -Rf ".PHONE_MODULES_PATH);
+        exec("rm -Rf " . PHONE_MODULES_PATH);
 
-        if(!file_exists(PHONE_MODULES_PATH)) {
+        if (!file_exists(PHONE_MODULES_PATH)) {
             mkdir(PHONE_MODULES_PATH, 0764);
             out("Creating Phone Modules Directory");
         }
 
-        if(!file_exists(PHONE_MODULES_PATH."setup.php")) {
-            copy(LOCAL_PATH."install/setup.php",PHONE_MODULES_PATH."setup.php");
+        if (!file_exists(PHONE_MODULES_PATH . "setup.php")) {
+            copy(LOCAL_PATH . "install/setup.php", PHONE_MODULES_PATH . "setup.php");
             out("Moving Auto Provisioner Class");
         }
 
-        if(!file_exists(PHONE_MODULES_PATH."temp/")) {
-            mkdir(PHONE_MODULES_PATH."temp/", 0764);
+        if (!file_exists(PHONE_MODULES_PATH . "temp/")) {
+            mkdir(PHONE_MODULES_PATH . "temp/", 0764);
             out("Creating temp folder");
         }
     }
@@ -685,43 +691,43 @@ if(!$new_install) {
 
         out("Remove all Dashes in IDs");
         $data = array();
-        $data =& $db->getAll("SELECT * FROM `endpointman_model_list",array(), DB_FETCHMODE_ASSOC);
-        foreach($data as $list) {
+        $data = & $db->getAll("SELECT * FROM `endpointman_model_list", array(), DB_FETCHMODE_ASSOC);
+        foreach ($data as $list) {
             $new_model_id = str_replace("-", "", $list['id']);
-            $sql = "UPDATE endpointman_model_list SET id = '".$new_model_id."' WHERE id = ". $list['id'];
+            $sql = "UPDATE endpointman_model_list SET id = '" . $new_model_id . "' WHERE id = " . $list['id'];
             $db->query($sql);
         }
 
         $data = array();
-        $data =& $db->getAll("SELECT * FROM `endpointman_product_list",array(), DB_FETCHMODE_ASSOC);
-        foreach($data as $list) {
+        $data = & $db->getAll("SELECT * FROM `endpointman_product_list", array(), DB_FETCHMODE_ASSOC);
+        foreach ($data as $list) {
             $new_product_id = str_replace("-", "", $list['id']);
-            $sql = "UPDATE endpointman_product_list SET id = '".$new_product_id."' WHERE id = ". $list['id'];
+            $sql = "UPDATE endpointman_product_list SET id = '" . $new_product_id . "' WHERE id = " . $list['id'];
             $db->query($sql);
         }
 
         $data = array();
-        $data =& $db->getAll("SELECT * FROM `endpointman_mac_list",array(), DB_FETCHMODE_ASSOC);
-        foreach($data as $list) {
+        $data = & $db->getAll("SELECT * FROM `endpointman_mac_list", array(), DB_FETCHMODE_ASSOC);
+        foreach ($data as $list) {
             $new_model_id = str_replace("-", "", $list['model']);
-            $sql = "UPDATE endpointman_mac_list SET model = '".$new_model_id."' WHERE id = ". $list['id'];
+            $sql = "UPDATE endpointman_mac_list SET model = '" . $new_model_id . "' WHERE id = " . $list['id'];
             $db->query($sql);
         }
 
         $data = array();
-        $data =& $db->getAll("SELECT * FROM endpointman_template_list",array(), DB_FETCHMODE_ASSOC);
-        foreach($data as $list) {
+        $data = & $db->getAll("SELECT * FROM endpointman_template_list", array(), DB_FETCHMODE_ASSOC);
+        foreach ($data as $list) {
             $new_model_id = str_replace("-", "", $list['model_id']);
             $new_product_id = str_replace("-", "", $list['product_id']);
-            $sql = "UPDATE endpointman_template_list SET model_id = '".$new_model_id."', product_id = '".$new_product_id."' WHERE id = ". $list['id'];
+            $sql = "UPDATE endpointman_template_list SET model_id = '" . $new_model_id . "', product_id = '" . $new_product_id . "' WHERE id = " . $list['id'];
             $db->query($sql);
         }
 
         $data = array();
-        $data =& $db->getAll("SELECT * FROM endpointman_custom_configs",array(), DB_FETCHMODE_ASSOC);
-        foreach($data as $list) {
+        $data = & $db->getAll("SELECT * FROM endpointman_custom_configs", array(), DB_FETCHMODE_ASSOC);
+        foreach ($data as $list) {
             $new_product_id = str_replace("-", "", $list['product_id']);
-            $sql = "UPDATE endpointman_custom_configs SET product_id = '".$new_product_id."' WHERE id = ". $list['id'];
+            $sql = "UPDATE endpointman_custom_configs SET product_id = '" . $new_product_id . "' WHERE id = " . $list['id'];
             $db->query($sql);
         }
     }
@@ -731,13 +737,13 @@ if(!$new_install) {
     }
 
     if ($ver <= "2240") {
-
+        
     }
 
     if ($ver <= "2250") {
         out("Fixing Permissions of Phone Modules Directory");
         $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(PHONE_MODULES_PATH), RecursiveIteratorIterator::SELF_FIRST);
-        foreach($iterator as $item) {
+        foreach ($iterator as $item) {
             chmod($item, 0764);
         }
 
@@ -760,9 +766,9 @@ if(!$new_install) {
         $db->query($sql);
 
         $data = array();
-        $data =& $db->getAll("SELECT * FROM endpointman_mac_list",array(), DB_FETCHMODE_ASSOC);
-        foreach($data as $list) {
-            $sql = "INSERT INTO endpointman_line_list (mac_id, line, ext, description) VALUES ('".$list['id']."', '1', '".$list['ext']."', '".$list['description']."')";
+        $data = & $db->getAll("SELECT * FROM endpointman_mac_list", array(), DB_FETCHMODE_ASSOC);
+        foreach ($data as $list) {
+            $sql = "INSERT INTO endpointman_line_list (mac_id, line, ext, description) VALUES ('" . $list['id'] . "', '1', '" . $list['ext'] . "', '" . $list['description'] . "')";
             $db->query($sql);
         }
 
@@ -795,7 +801,6 @@ if(!$new_install) {
 
         $sql = 'ALTER TABLE `endpointman_mac_list` CHANGE `custom_cfg_data` `global_custom_cfg_data` LONGBLOB NOT NULL';
         $db->query($sql);
-
     }
 
     if ($ver <= "2280") {
@@ -810,23 +815,23 @@ if(!$new_install) {
     if ($ver <= "2400") {
         out("Uninstalling All Installed Brands (You'll just simply have to update again, no loss of data)");
         $db->query("UPDATE endpointman_brand_list SET  installed =  '0'");
-        $sql = "UPDATE  endpointman_model_list SET  enabled =  '0', template_data = '".serialize(array())."'";
+        $sql = "UPDATE  endpointman_model_list SET  enabled =  '0', template_data = '" . serialize(array()) . "'";
         $db->query($sql);
 
-        exec("rm -Rf ".PHONE_MODULES_PATH);
+        exec("rm -Rf " . PHONE_MODULES_PATH);
 
-        if(!file_exists(PHONE_MODULES_PATH)) {
+        if (!file_exists(PHONE_MODULES_PATH)) {
             mkdir(PHONE_MODULES_PATH, 0764);
             out("Creating Phone Modules Directory");
         }
 
-        if(!file_exists(PHONE_MODULES_PATH."setup.php")) {
-            copy(LOCAL_PATH."install/setup.php",PHONE_MODULES_PATH."setup.php");
+        if (!file_exists(PHONE_MODULES_PATH . "setup.php")) {
+            copy(LOCAL_PATH . "install/setup.php", PHONE_MODULES_PATH . "setup.php");
             out("Moving Auto Provisioner Class");
         }
 
-        if(!file_exists(PHONE_MODULES_PATH."temp/")) {
-            mkdir(PHONE_MODULES_PATH."temp/", 0764);
+        if (!file_exists(PHONE_MODULES_PATH . "temp/")) {
+            mkdir(PHONE_MODULES_PATH . "temp/", 0764);
             out("Creating temp folder");
         }
     }
@@ -836,18 +841,18 @@ if(!$new_install) {
         $db->query($sql);
     }
 
-    if($ver <= "2903") {
+    if ($ver <= "2903") {
         $sql = 'ALTER TABLE  `endpointman_custom_configs` CHANGE  `data`  `data` LONGBLOB NOT NULL';
         $db->query($sql);
     }
 
-    if($ver <= "2904") {
+    if ($ver <= "2904") {
         out("Adding 'local' column to brand_list");
         $sql = 'ALTER TABLE  `endpointman_brand_list` ADD  `local` INT( 1 ) NOT NULL DEFAULT  \'0\' AFTER  `cfg_ver`';
         $db->query($sql);
     }
 
-    if($ver <= "2907") {
+    if ($ver <= "2907") {
         out("Adding UNIQUE key to table global_vars for var_name");
         $sql = "ALTER TABLE `endpointman_global_vars` ADD UNIQUE `unique` (`var_name`)";
         $db->query($sql);
@@ -857,7 +862,7 @@ if(!$new_install) {
         $db->query($sql);
     }
 
-    if($ver <= "2910") {
+    if ($ver <= "2910") {
         out("Fix again to the 'Allow Duplicate Extensions' Error");
         $sql = 'ALTER TABLE `endpointman_global_vars` ADD UNIQUE `var_name` (`var_name`)';
         $db->query($sql);
@@ -899,39 +904,39 @@ if(!$new_install) {
         $sql = 'ALTER TABLE `endpointman_mac_list` ADD `specific_settings` LONGBLOB NULL;';
         $db->query($sql);
     }
-    
-    if($ver <= "21021") {
+
+    if ($ver <= "21021") {
         out('Updating Mirror Location...again');
         $sql = "UPDATE endpointman_global_vars SET value = 'http://mirror.freepbx.org/provisioner/v3/' WHERE var_name ='update_server'";
         $db->query($sql);
-                
+
         out("Uninstalling All Installed Brands (You'll just simply have to update again, no loss of data)");
         $db->query("UPDATE endpointman_brand_list SET installed =  '0'");
         $db->query("TRUNCATE TABLE endpointman_brand_list");
-        
-        $sql = "UPDATE  endpointman_model_list SET  enabled =  '0', template_data = '".serialize(array())."'";
+
+        $sql = "UPDATE  endpointman_model_list SET  enabled =  '0', template_data = '" . serialize(array()) . "'";
         $db->query($sql);
 
-        out("Moving old brand data for backups, its now in ". $amp_conf['AMPWEBROOT']."/admin/modules/_ep_phone_modules_old");
-        exec("mv ". $amp_conf['AMPWEBROOT']."/admin/modules/_ep_phone_modules" . " ". $amp_conf['AMPWEBROOT']."/admin/modules/_ep_phone_modules_old");
+        out("Moving old brand data for backups, its now in " . $amp_conf['AMPWEBROOT'] . "/admin/modules/_ep_phone_modules_old");
+        exec("mv " . $amp_conf['AMPWEBROOT'] . "/admin/modules/_ep_phone_modules" . " " . $amp_conf['AMPWEBROOT'] . "/admin/modules/_ep_phone_modules_old");
 
-        if(!file_exists(PHONE_MODULES_PATH)) {
+        if (!file_exists(PHONE_MODULES_PATH)) {
             mkdir(PHONE_MODULES_PATH, 0764);
             out("Creating Phone Modules Directory");
         }
 
-        if(!file_exists(PHONE_MODULES_PATH."setup.php")) {
-            copy(LOCAL_PATH."install/setup.php",PHONE_MODULES_PATH."setup.php");
+        if (!file_exists(PHONE_MODULES_PATH . "setup.php")) {
+            copy(LOCAL_PATH . "install/setup.php", PHONE_MODULES_PATH . "setup.php");
             out("Moving Auto Provisioner Class");
         }
 
-        if(!file_exists(PHONE_MODULES_PATH."temp/")) {
-            mkdir(PHONE_MODULES_PATH."temp/", 0764);
+        if (!file_exists(PHONE_MODULES_PATH . "temp/")) {
+            mkdir(PHONE_MODULES_PATH . "temp/", 0764);
             out("Creating temp folder");
         }
     }
-    
-    if($ver <= "21031") {
+
+    if ($ver <= "21031") {
         out("Adding tftp server check and nmap search save values");
         $sql = 'INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (NULL, \'tftp_check\', \'0\');';
         $db->query($sql);
@@ -939,6 +944,17 @@ if(!$new_install) {
         $db->query($sql);
     }
 
+    if ($ver <= "21037") {
+        out("Adding Config File Backups");
+        $sql = 'INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (NULL, \'backup_check\', \'1\');';
+        $db->query($sql);
+    }
+
+    if ($ver <= "21038") {
+        out("Adding Use Repo Option");
+        $sql = 'INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (NULL, \'use_repo\', \'0\');';
+        $db->query($sql);
+    }
 }
 
 if ($new_install) {
@@ -953,7 +969,7 @@ if ($new_install) {
                     `local` int(1) NOT NULL DEFAULT '0',
                   `hidden` int(1) NOT NULL DEFAULT '0',
                   PRIMARY KEY (`id`)
-                ) ENGINE=MyISAM DEFAULT CHARSET=latin1";
+                ) ENGINE=MyISAM";
     $db->query($sql);
 
     out("Creating Line List Table");
@@ -967,7 +983,7 @@ if ($new_install) {
   `custom_cfg_data` longblob NOT NULL,
   `user_cfg_data` longblob NOT NULL,
   PRIMARY KEY (`luid`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;";
+) ENGINE=MyISAM";
     $db->query($sql);
 
     out("Creating Global Variables Table");
@@ -977,7 +993,7 @@ if ($new_install) {
                   `value` text NOT NULL COMMENT 'Data',
                   PRIMARY KEY (`idnum`),
                   UNIQUE KEY `var_name` (`var_name`)
-                ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=17";
+                ) ENGINE=MyISAM";
     $db->query($sql);
 
     out("Locating NMAP + ARP + ASTERISK Executables");
@@ -993,12 +1009,12 @@ if ($new_install) {
             (4, 'gmthr', ''),
             (5, 'config_location', '/tftpboot/'),
             (6, 'update_server', 'http://mirror.freepbx.org/provisioner/v3/'),
-            (7, 'version', '".$xml_full_version."'),
+            (7, 'version', '" . $xml_full_version . "'),
             (8, 'enable_ari', '0'),
             (9, 'debug', '0'),
-            (10, 'arp_location', '".$arp."'),
-            (11, 'nmap_location', '".$nmap."'),
-            (12, 'asterisk_location', '".$asterisk."'),
+            (10, 'arp_location', '" . $arp . "'),
+            (11, 'nmap_location', '" . $nmap . "'),
+            (12, 'asterisk_location', '" . $asterisk . "'),
             (13, 'language', ''),
             (14, 'check_updates', '0'),
             (15, 'disable_htaccess', ''),
@@ -1009,7 +1025,9 @@ if ($new_install) {
             (20, 'server_type', 'file'),
             (21, 'allow_hdfiles', '0'),
             (22, 'tftp_check', '0'),
-            (23, 'nmap_search', '')";
+            (23, 'nmap_search', ''),
+            (24, 'backup_check', '0'),
+            (25, 'use_repo', '0')";
     $db->query($sql);
 
     out("Creating mac list Table");
@@ -1025,7 +1043,7 @@ if ($new_install) {
     `specific_settings` longblob,
   PRIMARY KEY (`id`),
   UNIQUE KEY `mac` (`mac`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1";
+) ENGINE=MyISAM";
     $db->query($sql);
 
     out("Creating model List Table");
@@ -1040,7 +1058,7 @@ if ($new_install) {
   `enabled` int(1) NOT NULL DEFAULT '0',
   `hidden` int(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1";
+) ENGINE=MyISAM";
     $db->query($sql);
 
     out("Creating oui List Table");
@@ -1051,7 +1069,7 @@ if ($new_install) {
           `custom` int(1) NOT NULL DEFAULT '0',
           PRIMARY KEY (`id`),
           UNIQUE KEY `oui` (`oui`)
-        ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1";
+        ) ENGINE=MyISAM";
     $db->query($sql);
 
     out("Creating product List Table");
@@ -1068,7 +1086,7 @@ if ($new_install) {
   `config_files` text,
   `special_cfgs` blob NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1";
+) ENGINE=MyISAM";
     $db->query($sql);
 
     out("Creating Template List Table");
@@ -1081,7 +1099,7 @@ if ($new_install) {
   `config_files_override` text,
   `global_settings_override` longblob,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1";
+) ENGINE=MyISAM";
     $db->query($sql);
 
     out("Create Custom Configs Table");
@@ -1092,136 +1110,135 @@ if ($new_install) {
           `product_id` varchar(11) NOT NULL,
           `data` longblob NOT NULL,
           PRIMARY KEY (`id`)
-        ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1";
+        ) ENGINE=MyISAM";
     $db->query($sql);
 
     out('Creating symlink to web provisioner');
-    if(!symlink(LOCAL_PATH."provisioning",$amp_conf['AMPWEBROOT']."/provisioning")) {
+    if (!symlink(LOCAL_PATH . "provisioning", $amp_conf['AMPWEBROOT'] . "/provisioning")) {
         //out("<strong>Your permissions are wrong on ".$amp_conf['AMPWEBROOT'].", web provisioning link not created!</strong>");
     }
 }
 
-out("Update Version Number to ".$xml_full_version);
-$sql = "UPDATE endpointman_global_vars SET value = '".$xml_full_version."' WHERE var_name = 'version'";
+out("Update Version Number to " . $xml_full_version);
+$sql = "UPDATE endpointman_global_vars SET value = '" . $xml_full_version . "' WHERE var_name = 'version'";
 $db->query($sql);
 
 $sql = "UPDATE endpointman_global_vars SET value = 'http://mirror.freepbx.org/provisioner/v3/' WHERE var_name = 'update_server'";
 $db->query($sql);
 
-if(file_exists($amp_conf['AMPWEBROOT']."/recordings/modules/phonesettings.module")) {
-    unlink($amp_conf['AMPWEBROOT']."/recordings/modules/phonesettings.module");
+if (file_exists($amp_conf['AMPWEBROOT'] . "/recordings/modules/phonesettings.module")) {
+    unlink($amp_conf['AMPWEBROOT'] . "/recordings/modules/phonesettings.module");
 }
 
-if(file_exists($amp_conf['AMPWEBROOT']."/recordings/theme/js/jquery.coda-slider-2.0.js")) {
-    unlink($amp_conf['AMPWEBROOT']."/recordings/theme/js/jquery.coda-slider-2.0.js");
+if (file_exists($amp_conf['AMPWEBROOT'] . "/recordings/theme/js/jquery.coda-slider-2.0.js")) {
+    unlink($amp_conf['AMPWEBROOT'] . "/recordings/theme/js/jquery.coda-slider-2.0.js");
 }
 
-if(file_exists($amp_conf['AMPWEBROOT']."/recordings/theme/js/jquery.easing.1.3.js")) {
-    unlink($amp_conf['AMPWEBROOT']."/recordings/theme/js/jquery.easing.1.3.js");
+if (file_exists($amp_conf['AMPWEBROOT'] . "/recordings/theme/js/jquery.easing.1.3.js")) {
+    unlink($amp_conf['AMPWEBROOT'] . "/recordings/theme/js/jquery.easing.1.3.js");
 }
 
-if(file_exists($amp_conf['AMPWEBROOT']."/recordings/theme/coda-slider-2.0a.css")) {
-    unlink($amp_conf['AMPWEBROOT']."/recordings/theme/coda-slider-2.0a.css");
+if (file_exists($amp_conf['AMPWEBROOT'] . "/recordings/theme/coda-slider-2.0a.css")) {
+    unlink($amp_conf['AMPWEBROOT'] . "/recordings/theme/coda-slider-2.0a.css");
 }
 
-if($amp_version['minor'] < 9) {
+if ($amp_version['minor'] < 9) {
     //Do symlinks ourself because retrieve_conf is OLD
-
     //images
-    $dir = $amp_conf['AMPWEBROOT'].'/admin/assets/endpointman/images';
-    if(!file_exists($dir)) {
+    $dir = $amp_conf['AMPWEBROOT'] . '/admin/assets/endpointman/images';
+    if (!file_exists($dir)) {
         mkdir($dir, 0777, TRUE);
     }
-    foreach (glob(LOCAL_PATH."assets/images/*.*") as $filename) {
-        if(file_exists($dir.'/'.basename($filename))) {
-            unlink($dir.'/'.basename($filename));
-            symlink($filename, $dir.'/'.basename($filename));
+    foreach (glob(LOCAL_PATH . "assets/images/*.*") as $filename) {
+        if (file_exists($dir . '/' . basename($filename))) {
+            unlink($dir . '/' . basename($filename));
+            symlink($filename, $dir . '/' . basename($filename));
         } else {
-            symlink($filename, $dir.'/'.basename($filename));
+            symlink($filename, $dir . '/' . basename($filename));
         }
     }
 
     //javascripts
-    $dir = $amp_conf['AMPWEBROOT'].'/admin/assets/endpointman/js';
-    if(!file_exists($dir)) {
+    $dir = $amp_conf['AMPWEBROOT'] . '/admin/assets/endpointman/js';
+    if (!file_exists($dir)) {
         mkdir($dir, 0777, TRUE);
     }
-    foreach (glob(LOCAL_PATH."assets/js/*.*") as $filename) {
-        if(file_exists($dir.'/'.basename($filename))) {
-            unlink($dir.'/'.basename($filename));
-            symlink($filename, $dir.'/'.basename($filename));
+    foreach (glob(LOCAL_PATH . "assets/js/*.*") as $filename) {
+        if (file_exists($dir . '/' . basename($filename))) {
+            unlink($dir . '/' . basename($filename));
+            symlink($filename, $dir . '/' . basename($filename));
         } else {
-            symlink($filename, $dir.'/'.basename($filename));
+            symlink($filename, $dir . '/' . basename($filename));
         }
     }
 
     //theme (css/stylesheets)
-    $dir = $amp_conf['AMPWEBROOT'].'/admin/assets/endpointman/theme';
-    if(!file_exists($dir)) {
+    $dir = $amp_conf['AMPWEBROOT'] . '/admin/assets/endpointman/theme';
+    if (!file_exists($dir)) {
         mkdir($dir, 0777, TRUE);
     }
-    foreach (glob(LOCAL_PATH."assets/theme/*.*") as $filename) {
-        if(file_exists($dir.'/'.basename($filename))) {
-            unlink($dir.'/'.basename($filename));
-            symlink($filename, $dir.'/'.basename($filename));
+    foreach (glob(LOCAL_PATH . "assets/theme/*.*") as $filename) {
+        if (file_exists($dir . '/' . basename($filename))) {
+            unlink($dir . '/' . basename($filename));
+            symlink($filename, $dir . '/' . basename($filename));
         } else {
-            symlink($filename, $dir.'/'.basename($filename));
+            symlink($filename, $dir . '/' . basename($filename));
         }
     }
 
     //ari-theme (css/stylesheets)
-    $dir = $amp_conf['AMPWEBROOT'].'/recordings/theme';
-    if(!file_exists($dir)) {
+    $dir = $amp_conf['AMPWEBROOT'] . '/recordings/theme';
+    if (!file_exists($dir)) {
         mkdir($dir, 0777, TRUE);
     }
-    foreach (glob(LOCAL_PATH."ari/theme/*.*") as $filename) {
-        if(file_exists($dir.'/'.basename($filename))) {
-            unlink($dir.'/'.basename($filename));
-            symlink($filename, $dir.'/'.basename($filename));
+    foreach (glob(LOCAL_PATH . "ari/theme/*.*") as $filename) {
+        if (file_exists($dir . '/' . basename($filename))) {
+            unlink($dir . '/' . basename($filename));
+            symlink($filename, $dir . '/' . basename($filename));
         } else {
-            symlink($filename, $dir.'/'.basename($filename));
+            symlink($filename, $dir . '/' . basename($filename));
         }
     }
 
     //ari-images
-    $dir = $amp_conf['AMPWEBROOT'].'/recordings/theme/images';
-    if(!file_exists($dir)) {
+    $dir = $amp_conf['AMPWEBROOT'] . '/recordings/theme/images';
+    if (!file_exists($dir)) {
         mkdir($dir, 0777, TRUE);
     }
-    foreach (glob(LOCAL_PATH."ari/images/*.*") as $filename) {
-        if(file_exists($dir.'/'.basename($filename))) {
-            unlink($dir.'/'.basename($filename));
-            symlink($filename, $dir.'/'.basename($filename));
+    foreach (glob(LOCAL_PATH . "ari/images/*.*") as $filename) {
+        if (file_exists($dir . '/' . basename($filename))) {
+            unlink($dir . '/' . basename($filename));
+            symlink($filename, $dir . '/' . basename($filename));
         } else {
-            symlink($filename, $dir.'/'.basename($filename));
+            symlink($filename, $dir . '/' . basename($filename));
         }
     }
 
     //ari-js
-    $dir = $amp_conf['AMPWEBROOT'].'/recordings/theme/js';
-    if(!file_exists($dir)) {
+    $dir = $amp_conf['AMPWEBROOT'] . '/recordings/theme/js';
+    if (!file_exists($dir)) {
         mkdir($dir, 0777, TRUE);
     }
-    foreach (glob(LOCAL_PATH."ari/js/*.*") as $filename) {
-        if(file_exists($dir.'/'.basename($filename))) {
-            unlink($dir.'/'.basename($filename));
-            symlink($filename, $dir.'/'.basename($filename));
+    foreach (glob(LOCAL_PATH . "ari/js/*.*") as $filename) {
+        if (file_exists($dir . '/' . basename($filename))) {
+            unlink($dir . '/' . basename($filename));
+            symlink($filename, $dir . '/' . basename($filename));
         } else {
-            symlink($filename, $dir.'/'.basename($filename));
+            symlink($filename, $dir . '/' . basename($filename));
         }
     }
 
     //ari-modules
-    $dir = $amp_conf['AMPWEBROOT'].'/recordings/modules';
-    if(!file_exists($dir)) {
+    $dir = $amp_conf['AMPWEBROOT'] . '/recordings/modules';
+    if (!file_exists($dir)) {
         mkdir($dir, 0777, TRUE);
     }
-    foreach (glob(LOCAL_PATH."ari/modules/*.*") as $filename) {
-        if(file_exists($dir.'/'.basename($filename))) {
-            unlink($dir.'/'.basename($filename));
-            symlink($filename, $dir.'/'.basename($filename));
+    foreach (glob(LOCAL_PATH . "ari/modules/*.*") as $filename) {
+        if (file_exists($dir . '/' . basename($filename))) {
+            unlink($dir . '/' . basename($filename));
+            symlink($filename, $dir . '/' . basename($filename));
         } else {
-            symlink($filename, $dir.'/'.basename($filename));
+            symlink($filename, $dir . '/' . basename($filename));
         }
     }
 }
@@ -1229,13 +1246,13 @@ if($amp_version['minor'] < 9) {
 function epm_install_xml2array($url, $get_attributes = 1, $priority = 'tag') {
     $contents = "";
     if (!function_exists('xml_parser_create')) {
-        return array ();
+        return array();
     }
     $parser = xml_parser_create('');
-    if(!($fp = @ fopen($url, 'rb'))) {
-        return array ();
+    if (!($fp = @ fopen($url, 'rb'))) {
+        return array();
     }
-    while(!feof($fp)) {
+    while (!feof($fp)) {
         $contents .= fread($fp, 8192);
     }
     fclose($fp);
@@ -1244,88 +1261,81 @@ function epm_install_xml2array($url, $get_attributes = 1, $priority = 'tag') {
     xml_parser_set_option($parser, XML_OPTION_SKIP_WHITE, 1);
     xml_parse_into_struct($parser, trim($contents), $xml_values);
     xml_parser_free($parser);
-    if(!$xml_values) {
+    if (!$xml_values) {
         return; //Hmm...
     }
-    $xml_array = array ();
-    $parents = array ();
-    $opened_tags = array ();
-    $arr = array ();
+    $xml_array = array();
+    $parents = array();
+    $opened_tags = array();
+    $arr = array();
     $current = & $xml_array;
-    $repeated_tag_index = array ();
+    $repeated_tag_index = array();
     foreach ($xml_values as $data) {
-        unset ($attributes, $value);
+        unset($attributes, $value);
         extract($data);
-        $result = array ();
-        $attributes_data = array ();
-        if (isset ($value)) {
-            if($priority == 'tag') {
+        $result = array();
+        $attributes_data = array();
+        if (isset($value)) {
+            if ($priority == 'tag') {
                 $result = $value;
-            }
-            else {
+            } else {
                 $result['value'] = $value;
             }
         }
-        if(isset($attributes) and $get_attributes) {
-            foreach($attributes as $attr => $val) {
-                if($priority == 'tag') {
+        if (isset($attributes) and $get_attributes) {
+            foreach ($attributes as $attr => $val) {
+                if ($priority == 'tag') {
                     $attributes_data[$attr] = $val;
-                }
-                else {
+                } else {
                     $result['attr'][$attr] = $val; //Set all the attributes in a array called 'attr'
                 }
             }
         }
         if ($type == "open") {
-            $parent[$level -1] = & $current;
-            if(!is_array($current) or (!in_array($tag, array_keys($current)))) {
+            $parent[$level - 1] = & $current;
+            if (!is_array($current) or (!in_array($tag, array_keys($current)))) {
                 $current[$tag] = $result;
-                if($attributes_data) {
+                if ($attributes_data) {
                     $current[$tag . '_attr'] = $attributes_data;
                 }
                 $repeated_tag_index[$tag . '_' . $level] = 1;
                 $current = & $current[$tag];
-            }
-            else {
-                if (isset ($current[$tag][0])) {
+            } else {
+                if (isset($current[$tag][0])) {
                     $current[$tag][$repeated_tag_index[$tag . '_' . $level]] = $result;
                     $repeated_tag_index[$tag . '_' . $level]++;
-                }
-                else {
-                    $current[$tag] = array($current[$tag],$result);
+                } else {
+                    $current[$tag] = array($current[$tag], $result);
                     $repeated_tag_index[$tag . '_' . $level] = 2;
-                    if(isset($current[$tag . '_attr'])) {
+                    if (isset($current[$tag . '_attr'])) {
                         $current[$tag]['0_attr'] = $current[$tag . '_attr'];
-                        unset ($current[$tag . '_attr']);
+                        unset($current[$tag . '_attr']);
                     }
                 }
                 $last_item_index = $repeated_tag_index[$tag . '_' . $level] - 1;
                 $current = & $current[$tag][$last_item_index];
             }
-        }
-        else if($type == "complete") {
-            if(!isset ($current[$tag])) {
+        } else if ($type == "complete") {
+            if (!isset($current[$tag])) {
                 $current[$tag] = $result;
                 $repeated_tag_index[$tag . '_' . $level] = 1;
-                if($priority == 'tag' and $attributes_data) {
+                if ($priority == 'tag' and $attributes_data) {
                     $current[$tag . '_attr'] = $attributes_data;
                 }
-            }
-            else {
-                if (isset ($current[$tag][0]) and is_array($current[$tag])) {
+            } else {
+                if (isset($current[$tag][0]) and is_array($current[$tag])) {
                     $current[$tag][$repeated_tag_index[$tag . '_' . $level]] = $result;
                     if ($priority == 'tag' and $get_attributes and $attributes_data) {
                         $current[$tag][$repeated_tag_index[$tag . '_' . $level] . '_attr'] = $attributes_data;
                     }
                     $repeated_tag_index[$tag . '_' . $level]++;
-                }
-                else {
-                    $current[$tag] = array($current[$tag],$result);
+                } else {
+                    $current[$tag] = array($current[$tag], $result);
                     $repeated_tag_index[$tag . '_' . $level] = 1;
                     if ($priority == 'tag' and $get_attributes) {
-                        if (isset ($current[$tag . '_attr'])) {
+                        if (isset($current[$tag . '_attr'])) {
                             $current[$tag]['0_attr'] = $current[$tag . '_attr'];
-                            unset ($current[$tag . '_attr']);
+                            unset($current[$tag . '_attr']);
                         }
                         if ($attributes_data) {
                             $current[$tag][$repeated_tag_index[$tag . '_' . $level] . '_attr'] = $attributes_data;
@@ -1334,9 +1344,8 @@ function epm_install_xml2array($url, $get_attributes = 1, $priority = 'tag') {
                     $repeated_tag_index[$tag . '_' . $level]++; //0 and 1 index is already taken
                 }
             }
-        }
-        else if($type == 'close') {
-            $current = & $parent[$level -1];
+        } else if ($type == 'close') {
+            $current = & $parent[$level - 1];
         }
     }
     return ($xml_array);

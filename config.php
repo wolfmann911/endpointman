@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Endpoint Manager config File
  *
@@ -8,12 +9,12 @@
  */
 // Check for safe mode
 
-if( ini_get('safe_mode') ){
-	die(_('Turn Off Safe Mode'));
+if (ini_get('safe_mode')) {
+    die(_('Turn Off Safe Mode'));
 }
 
-if(PHP_VERSION < '5.1.0') {
-    die(_('PHP Version MUST be greater than'). ' 5.1.0!');
+if (PHP_VERSION < '5.1.0') {
+    die(_('PHP Version MUST be greater than') . ' 5.1.0!');
 }
 
 include 'includes/functions.inc';
@@ -22,39 +23,35 @@ $debug = NULL;
 
 $endpoint = new endpointmanager();
 
-if(!file_exists($amp_conf['AMPWEBROOT'].'/admin/assets/endpointman/images/add.png')) {
-    echo "WARNING: Assets Missing! ^^Please click the Orange \"Apply Configuration Changes\" Bar";
+if (!file_exists(dirname(dirname(dirname(__FILE__))) . '/assets/endpointman/images/add.png')) {
+    echo "WARNING: Assets Missing! ^^Please click the \"Apply Configuration Changes\" Button";
 }
 
-if(!file_exists(PHONE_MODULES_PATH."temp/")) {
-	mkdir(PHONE_MODULES_PATH."temp/", 0764, TRUE);
+if (!is_writeable(LOCAL_PATH)) {
+    if (!chmod(LOCAL_PATH, 0764)) {
+        die('My own path is not writable (' . LOCAL_PATH . ')');
+    }
 }
 
-if(!is_writeable(LOCAL_PATH)) {
-	if(!chmod(LOCAL_PATH, 0764)) {
-            die('My own path is not writable ('.LOCAL_PATH.')');
-        }
-}
-
-if(!is_writeable(PHONE_MODULES_PATH)) {
+if (!is_writeable(PHONE_MODULES_PATH)) {
     chmod(PHONE_MODULES_PATH, 0764);
-    $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(PHONE_MODULES_PATH), RecursiveIteratorIterator::SELF_FIRST); 
-    foreach($iterator as $item) {
+    $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(PHONE_MODULES_PATH), RecursiveIteratorIterator::SELF_FIRST);
+    foreach ($iterator as $item) {
         chmod($item, 0764);
     }
 }
 
-if($amp_conf['AMPENGINE'] != 'asterisk') {
-	die(_("Sorry, Only Asterisk is supported currently"));
+if ($amp_conf['AMPENGINE'] != 'asterisk') {
+    die(_("Sorry, Only Asterisk is supported currently"));
 }
 
 if (isset($_REQUEST['page'])) {
-	$page = $_REQUEST['page'];
+    $page = $_REQUEST['page'];
 } else {
-	$page = "";
+    $page = "";
 }
 
 
-if($endpoint->global_cfg['debug']) {
-	$debug .= "Request Variables: \n".print_r($_REQUEST, TRUE);
+if ($endpoint->global_cfg['debug']) {
+    $debug .= "Request Variables: \n" . print_r($_REQUEST, TRUE);
 }

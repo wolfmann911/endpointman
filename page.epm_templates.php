@@ -7,6 +7,6 @@
  * @package Endpoint Manager
  */
 
-require_once $amp_conf['AMPWEBROOT'].'/admin/modules/endpointman/config.php';
+require_once dirname(__FILE__).'/config.php';
 
 include LOCAL_PATH.'includes/template_manager.inc';	

@@ -51,6 +51,7 @@ if((isset($_REQUEST['sub_type'])) AND ((!$no_add) OR (($_REQUEST['sub_type'] == 
 switch ($sub_type) {
     //Edit Mode
     case "edit":
+        $mode = "EDIT";
         switch ($sub_type_sub) {
             case "add_line_x":
                 $_REQUEST['id'] = $_REQUEST['edit_id'];
@@ -92,6 +93,7 @@ switch ($sub_type) {
                 $endpoint->prepare_configs($row);
 
                 $endpoint->message['edit_save'] = _("Saved")."!";
+                $mode = NULL;
                 break;
             case "delete":
                 $sql = 'SELECT mac_id FROM endpointman_line_list WHERE luid = '.$_REQUEST['edit_id'] ;
@@ -104,7 +106,6 @@ switch ($sub_type) {
         }
         $edit_row=$endpoint->get_phone_info($_REQUEST['edit_id']);
         $edit_row['id'] = $_REQUEST['edit_id'];
-        $mode = "EDIT";
         break;
     case "add" :
         $mac_id = $endpoint->add_device($_REQUEST['mac'],$_REQUEST['model_list'],$_REQUEST['ext_list'],$_REQUEST['template_list'],$_REQUEST['line_list']);
@@ -211,13 +212,14 @@ switch ($sub_type) {
                     $provisioner_lib->root_dir = PHONE_MODULES_PATH;
 
                     $provisioner_lib->engine = 'asterisk';
+                    $provisioner_lib->engine_location = !empty($endpoint->global_cfg['asterisk_location']) ? $endpoint->global_cfg['asterisk_location'] : 'asterisk';
                     $provisioner_lib->system = 'unix';
 
                     //have to because of versions less than php5.3
                     $provisioner_lib->brand_name = $phone_info['directory'];
                     $provisioner_lib->family_line = $phone_info['cfg_dir'];
-
-                    $provisioner_lib->lines[1] = array('ext' => $phone_info['line'][1]['ext']);
+                    
+                    $provisioner_lib->settings['line'][0] = array('username' => $phone_info['line'][1]['ext'], 'authname' => $phone_info['line'][1]['ext']);
                     $provisioner_lib->reboot();
                     unset($provisioner_lib);
                 }
