@@ -1284,7 +1284,7 @@ class endpointmanager {
                     foreach ($iterator as $file) {
                         $dir = $write_path . str_replace(PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/", "", dirname($file));
                         if (!file_exists($dir)) {
-                            if (!@mkdir($dir, 0755, TRUE)) {
+                            if (!@mkdir($dir, 0775, TRUE)) {
                                 $this->error['parse_configs'] = "Could Not Create Directory: " . $data;
                                 return(FALSE);
                             }
@@ -1293,7 +1293,7 @@ class endpointmanager {
                 } else {
                     $dir = $write_path . $data;
                     if (!file_exists($dir)) {
-                        if (!@mkdir($dir, 0755)) {
+                        if (!@mkdir($dir, 0775)) {
                             $this->error['parse_configs'] = "Could Not Create Directory: " . $data;
                             return(FALSE);
                         }
@@ -1331,7 +1331,7 @@ class endpointmanager {
                 //Move old file to backup
                 if (!$this->global_cfg['backup_check']) {
                     if (!file_exists($write_path . 'config_bkup')) {
-                        if (!@mkdir($write_path . 'config_bkup', 0755)) {
+                        if (!@mkdir($write_path . 'config_bkup', 0775)) {
                             $this->error['parse_configs'] = "Could Not Create Backup Directory";
                             return(FALSE);
                         }
@@ -1341,7 +1341,7 @@ class endpointmanager {
                     }
                 }
                 file_put_contents($write_path . $file, $data);
-                chmod($write_path . $file, 0755);
+                chmod($write_path . $file, 0775);
                 if (!file_exists($write_path . $file)) {
                     $this->error['parse_configs'] = "File (" . $file . ") not written to hard drive!";
                     return(FALSE);
