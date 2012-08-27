@@ -1333,7 +1333,7 @@ class endpointmanager {
                     }
                 }
                 file_put_contents($write_path . $file, $data);
-                chmod($write_path . $file, 0666);
+                chmod($write_path . $file, 0755);
                 if (!file_exists($write_path . $file)) {
                     $this->error['parse_configs'] = "File (" . $file . ") not written to hard drive!";
                     return(FALSE);
