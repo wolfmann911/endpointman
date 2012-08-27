@@ -66,7 +66,7 @@ class endpointmanager {
         } else {
             define("PHONE_MODULES_PATH", MODULES_PATH . "_ep_phone_modules/");
             if (!file_exists(PHONE_MODULES_PATH)) {
-                mkdir(PHONE_MODULES_PATH, 0764);
+                mkdir(PHONE_MODULES_PATH, 0775);
             }
 
             if (file_exists(PHONE_MODULES_PATH . "setup.php")) {
@@ -1313,6 +1313,14 @@ class endpointmanager {
                             $this->error['parse_configs'] = "Could Not Create File: " . $data;
                             return(FALSE);
                         }
+                    } else {
+                        if(file_exists(PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data)) {
+						    if(!file_exists(dirname($write_path . $data))) {
+							    !@mkdir(dirname($write_path . $data));
+						    }                        
+                            copy(PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data, $write_path . $data);
+                            chmod($write_path . $data, 0666);
+                        }
                     }
                 }
             }
@@ -1818,7 +1826,7 @@ class endpointmanager {
             $directory = "master";
         } else {
             if (!file_exists(PHONE_MODULES_PATH . '/' . $directory)) {
-                mkdir(PHONE_MODULES_PATH . '/' . $directory, 0764, TRUE);
+                mkdir(PHONE_MODULES_PATH . '/' . $directory, 0775, TRUE);
             }
             $destination_file = PHONE_MODULES_PATH . '/' . $directory . '/brand_data.json';
         }
@@ -1837,7 +1845,7 @@ class endpointmanager {
                 return(FALSE);
             } else {
                 rename($temp_file, $destination_file);
-                chmod($destination_file, 0764);
+                chmod($destination_file, 0775);
                 return(TRUE);
             }
         } else {
@@ -2157,7 +2165,7 @@ class endpointmanager {
                     if (is_dir($file)) {
                         $dir = str_replace($temp_directory . $directory . "/", "", $file);
                         if (!file_exists(PHONE_MODULES_PATH . "endpoint/" . $directory . "/" . $dir)) {
-                            mkdir(PHONE_MODULES_PATH . "endpoint/" . $directory . "/" . $dir, 0764, TRUE);
+                            mkdir(PHONE_MODULES_PATH . "endpoint/" . $directory . "/" . $dir, 0775, TRUE);
                             echo ".";
                         }
                     } else {
@@ -2167,7 +2175,7 @@ class endpointmanager {
                             if ($stats === FALSE) {
                                 echo "Error Moving " . basename($file);
                             }
-                            chmod(PHONE_MODULES_PATH . "endpoint/" . $directory . "/" . $dir, 0764);
+                            chmod(PHONE_MODULES_PATH . "endpoint/" . $directory . "/" . $dir, 0775);
                             echo ".";
                         }
                     }
