@@ -1974,6 +1974,7 @@ class endpointmanager {
             chdir(dirname(PHONE_MODULES_PATH));
             $path = $this->has_git();
             exec($path . ' git pull', $output);
+            exec($path . ' git checkout master', $output);
             chdir($o);
             $temp = $this->file2json(PHONE_MODULES_PATH . 'endpoint/master.json');
             $endpoint_package = $temp['data']['package'];

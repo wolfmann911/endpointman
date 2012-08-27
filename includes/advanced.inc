@@ -611,7 +611,23 @@ switch ($_REQUEST['subpage']) {
         }
 
         if ($endpoint->global_cfg['use_repo']) {
+            $endpoint->tpl->assign("git_enabled", TRUE);
             $use_repo = "checked";
+            $path = $endpoint->has_git();
+            $o = getcwd();
+            chdir(PHONE_MODULES_PATH);
+            exec($path.' branch -a',$output);
+            
+            foreach($output as $data) {
+                $selected = preg_match('/\*/i', $data) ? TRUE : FALSE;
+                $data = preg_replace('/\*/i', '', $data);
+                $branchoutput[] = array(
+                    'name' => $data,
+                    'selected' => $selected
+                );
+            }
+            $endpoint->tpl->assign("branches", $branchoutput);
+            chdir($o);
         } else {
             $use_repo = "";
         }

@@ -125,6 +125,18 @@
     <input type=checkbox name="use_repo" {$use_repo}>
   </label></td>
 </tr>
+{if condition="$git_enabled === TRUE"}
+<tr>
+  <td align='right'>GIT Branch <a href="#" class="info"><span>Select the live github repository branch (WARN: Beta!)</span></a></td>
+  <td align='left'>
+      <select>
+          {loop name="branches"}
+          <option value="{$value.name}" {if condition="$value.selected === TRUE"}selected{/if}>{$value.name}</option>
+          {/loop}
+      </select>
+  </td>
+</tr>
+{/if}
 <tr>
 <td colspan='2' align='center'><input type='Submit' name='button_update_globals' value='<?php echo _('Update Globals')?>'></td>
 </tr>
