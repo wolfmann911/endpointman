@@ -1314,12 +1314,12 @@ class endpointmanager {
                             return(FALSE);
                         }
                     } else {
-                        if(file_exists(PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data)) {
-						    if(!file_exists(dirname($write_path . $data))) {
-							    !@mkdir(dirname($write_path . $data));
-						    }                        
+                        if (file_exists(PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data)) {
+                            if (!file_exists(dirname($write_path . $data))) {
+                                !@mkdir(dirname($write_path . $data), 0775);
+                            }
                             copy(PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data, $write_path . $data);
-                            chmod($write_path . $data, 0666);
+                            chmod($write_path . $data, 0775);
                         }
                     }
                 }
@@ -1602,7 +1602,7 @@ class endpointmanager {
                         }
                     }
                 }
-                
+
                 $provisioner_lib->settings['mac'] = $phone_info['mac'];
                 $provisioner_lib->mac = $phone_info['mac'];
 
