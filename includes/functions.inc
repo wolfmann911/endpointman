@@ -1526,7 +1526,7 @@ class endpointmanager {
                 } else {
                     $new_template_data['provision']['type'] = 'file';
                     $new_template_data['provision']['protocol'] = 'tftp';
-                    $new_template_data['provision']['path'] = $_SERVER["SERVER_ADDR"];
+                    $new_template_data['provision']['path'] = $settings['srvip'];
                     $new_template_data['provision']['encryption'] = FALSE;
                 }
 
