@@ -611,7 +611,42 @@ switch ($_REQUEST['subpage']) {
         }
 
         if ($endpoint->global_cfg['use_repo']) {
+
+            $endpoint->tpl->assign("git_enabled", TRUE);
             $use_repo = "checked";
+            $path = $endpoint->has_git();
+            $o = getcwd();
+            chdir(PHONE_MODULES_PATH);
+            
+            if(isset($_REQUEST['git_branch'])) {
+                if(preg_match('/remotes\/origin\/(.*)/i', $_REQUEST['git_branch'],$matches)) {
+                    //Pull from a remote.
+                    if(!exec($path.' checkout origin_'. $matches[1])) {
+                        //We must remote track this branch
+                        exec($path . ' branch --track origin_'.$matches[1].' origin/'.$matches[1]);
+                        exec($path . ' checkout origin_'.$matches[1]);
+                    }
+                    exec($path . ' pull origin ' . $matches[1]);
+                } else {
+                    exec($path.' checkout '. $_REQUEST['git_branch'],$output);
+                }
+            }
+            
+            exec($path . ' fetch origin');
+            exec($path . ' branch -a',$output);
+            
+            foreach($output as $data) {
+                if(!preg_match('/Your branch is ahead of/i', $data)) {
+                    $selected = preg_match('/\*/i', $data) ? TRUE : FALSE;
+                    $data = preg_replace('/\*/i', '', $data);
+                    $branchoutput[] = array(
+                        'name' => $data,
+                        'selected' => $selected
+                    );
+                }
+            }
+            $endpoint->tpl->assign("branches", $branchoutput);
+            chdir($o);
         } else {
             $use_repo = "";
         }
