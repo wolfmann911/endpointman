@@ -2092,6 +2092,10 @@ class endpointmanager {
     function download_brand($id) {
         if (!$this->global_cfg['use_repo']) {
             $temp_directory = $this->sys_get_temp_dir() . "/epm_temp/";
+	    if (!file_exists($temp_directory)) {
+		echo "Creating EPM temp directory <br />";
+		mkdir($temp_directory);
+	    }
             $row = $this->eda->sql('SELECT * FROM  endpointman_brand_list WHERE id =' . $id, 'getAll', DB_FETCHMODE_ASSOC);
             echo "Downloading Brand JSON.....";
             $result = $this->download_file(UPDATE_PATH . $row[0]['directory'] . "/" . $row[0]['directory'] . ".json", PHONE_MODULES_PATH . "endpoint/" . $row[0]['directory'] . "/brand_data.json");
@@ -2140,7 +2144,10 @@ class endpointmanager {
      * Still needs way to determine when models move...perhaps another function?
      */
     function update_brand($package, $remote=TRUE) {
-        $temp_directory = $this->sys_get_temp_dir() . "/epm_temp/";
+	$debug = $this->global_cfg['debug'];
+	if ($debug) echo "update_brand(): Debug is set to $debug <br />";
+	$temp_directory = $this->sys_get_temp_dir() . "/epm_temp/";	
+        if ($debug) echo "Processing $temp_directory$package/brand_data.json... <br />";
         if (file_exists($temp_directory . $package . '/brand_data.json')) {
             $temp = $this->file2json($temp_directory . $package . '/brand_data.json');
             if (key_exists('directory', $temp['data']['brands'])) {
@@ -2153,7 +2160,7 @@ class endpointmanager {
                 $brand_version = $temp['data']['brands']['last_modified'];
 
                 //create directory structure and move files
-                echo "Creating Directory Structure/Moving Files..";
+                echo "Creating Directory Structure for Brand '$brand_name' and Moving Files ..";
 
                 if (!file_exists(PHONE_MODULES_PATH . "endpoint/" . $directory)) {
                     mkdir(PHONE_MODULES_PATH . "endpoint/" . $directory);
@@ -2180,7 +2187,7 @@ class endpointmanager {
                         }
                     }
                 }
-                echo "Done!<br />";
+                echo " Done!<br />";
 
                 if ($remote) {
                     $local = 0;
@@ -2190,11 +2197,12 @@ class endpointmanager {
 
                 $b_data = $this->eda->sql("SELECT id FROM endpointman_brand_list WHERE id = '" . $brand_id . "'", 'getOne');
                 if ($b_data) {
-                    echo "Updating data..........";
+                    echo "Updating $brand_name brand data..........<br/>";
                     $sql = "UPDATE endpointman_brand_list SET local = '" . $local . "', name = '" . $brand_name . "', cfg_ver = '" . $brand_version . "', installed = 1, hidden = 0 WHERE id = " . $brand_id;
                     $this->eda->sql($sql);
                 } else {
-                    $sql = "INSERT INTO endpointman_brand_list (id, name, directory, cfg_ver, local, installed) VALUES ('" . $brand_id . "', '" . $brand_name . "', '" . $directory . "', '" . $brand_version . "', '" . $local . "', '1')";
+                    echo "Inserting $brand_name brand data..........<br/>";
+		    $sql = "INSERT INTO endpointman_brand_list (id, name, directory, cfg_ver, local, installed) VALUES ('" . $brand_id . "', '" . $brand_name . "', '" . $directory . "', '" . $brand_version . "', '" . $local . "', '1')";
                     $this->eda->sql($sql);
                 }
 
@@ -2202,11 +2210,9 @@ class endpointmanager {
                 foreach ($temp['data']['brands']['family_list'] as $family_list) {
                     echo "Updating Family Lines.................<br/>";
 
-
                     $last_mod = max($last_mod, $family_list['last_modified']);
 
                     $family_line_xml = $this->file2json(PHONE_MODULES_PATH . '/endpoint/' . $directory . '/' . $family_list['directory'] . '/family_data.json');
-
                     $family_line_xml['data']['last_modified'] = isset($family_line_xml['data']['last_modified']) ? $family_line_xml['data']['last_modified'] : '';
 
                     $require_firmware = NULL;
@@ -2217,9 +2223,11 @@ class endpointmanager {
 
                     $data = $this->eda->sql("SELECT id FROM endpointman_product_list WHERE id='" . $brand_id . $family_line_xml['data']['id'] . "'", 'getOne');
                     $short_name = preg_replace("/\[(.*?)\]/si", "", $family_line_xml['data']['name']);
-                    if ($data) {
+		    if ($data) {
+			if ($debug) echo "-Updating Family $short_name<br/>";
                         $sql = "UPDATE endpointman_product_list SET short_name = '" . $short_name . "', long_name = '" . $family_line_xml['data']['name'] . "', cfg_ver = '" . $family_line_xml['data']['version'] . "', config_files='" . $family_line_xml['data']['configuration_files'] . "' WHERE id = '" . $brand_id . $family_line_xml['data']['id'] . "'";
                     } else {
+			if ($debug) echo "-Inserting Family $short_name<br/>";
                         $sql = "INSERT INTO endpointman_product_list (`id`, `brand`, `short_name`, `long_name`, `cfg_dir`, `cfg_ver`, `config_files`, `hidden`) VALUES ('" . $brand_id . $family_line_xml['data']['id'] . "', '" . $brand_id . "', '" . $short_name . "', '" . $family_line_xml['data']['name'] . "', '" . $family_line_xml['data']['directory'] . "', '" . $family_line_xml['data']['last_modified'] . "','" . $family_line_xml['data']['configuration_files'] . "', '0')";
                     }
 
@@ -2326,8 +2334,10 @@ class endpointmanager {
 
                         $m_data = $this->eda->sql("SELECT id FROM endpointman_model_list WHERE id='" . $brand_id . $family_line_xml['data']['id'] . $model_list['id'] . "'", 'getone');
                         if ($m_data) {
+			    if ($debug) echo "---Updating Model {$model_list['model']} <br />";
                             $sql = "UPDATE endpointman_model_list SET max_lines = '" . $model_list['lines'] . "', model = '" . $model_list['model'] . "', template_list = '" . $template_list . "' WHERE id = '" . $brand_id . $family_line_xml['data']['id'] . $model_list['id'] . "'";
                         } else {
+			    if ($debug) echo "---Inserting Model {$model_list['model']} <br />";
                             $sql = "INSERT INTO endpointman_model_list (`id`, `brand`, `model`, `max_lines`, `product_id`, `template_list`, `enabled`, `hidden`) VALUES ('" . $brand_id . $family_line_xml['data']['id'] . $model_list['id'] . "', '" . $brand_id . "', '" . $model_list['model'] . "', '" . $model_list['lines'] . "', '" . $brand_id . $family_line_xml['data']['id'] . "', '" . $template_list . "', '0', '0')";
                         }
                         $this->eda->sql($sql);
@@ -2359,6 +2369,10 @@ class endpointmanager {
                     }
                 }
 
+		if ($debug) {
+		    echo "Done!<br/>";
+		    echo "Updating OUI list in DB <br />";
+		}
                 foreach ($temp['data']['brands']['oui_list'] as $oui) {
                     $sql = "REPLACE INTO endpointman_oui_list (`oui`, `brand`, `custom`) VALUES ('" . $oui . "', '" . $brand_id . "', '0')";
                     $this->eda->sql($sql);
@@ -2366,7 +2380,7 @@ class endpointmanager {
 
                 echo "Done!<br/>";
             } else {
-                echo "Invalid XML Structure<br />";
+                echo "Invalid JSON Structure in $temp_directory$package/brand_data.json <br />";
             }
         } else {
             echo "No 'brand_data.xml' file exists!<br />";
