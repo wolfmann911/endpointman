@@ -81,8 +81,7 @@ if($_REQUEST['type'] == "brand") {
             }
             break;
         case "upload_brand":
-	    $debug = $endpoint->global_cfg['debug'];
-	    if ($debug) echo "upload_brand(): Debug is set to ". $debug ." <br />";
+	    if ($this->global_cfg['debug']) echo "upload_brand(): Debug is set to ". $this->global_cfg['debug'] ." <br />";
 //	    Bramd file (*.tgz) will have been copied into the location under which all endpoint definitions reside + /temp/
             if (file_exists(PHONE_MODULES_PATH."temp/".$_REQUEST['package'])) {
 //		The untarred brand file will go into /tmp (or wherever the "temporary" location the OS tells us) + /epm-temp/
@@ -91,8 +90,8 @@ if($_REQUEST['type'] == "brand") {
 		    echo "Creating EPM temp directory <br />";
                     mkdir($temp_directory);
                 }
-		if ($debug) {
-		    echo "Extracting Tarball ".PHONE_MODULES_PATH.'temp/'. $_REQUEST['package']." to $temp_directory ........";
+		if ($this->global_cfg['debug']) {
+		    echo "Extracting Tarball ".PHONE_MODULES_PATH.'temp/'. $_REQUEST['package']." to ".$temp_directory." ........";
 		} else {
 		    echo "Extracting Tarball........ ";
 		}
@@ -102,7 +101,7 @@ if($_REQUEST['type'] == "brand") {
                 $package = basename($_REQUEST['package'], ".tgz");    
                 $package = explode("-",$package);
 
-		if ($debug) echo "Looking for file $temp_directory$package[0] to pass on to update_brand() <br />";
+		if ($this->global_cfg['debug']) echo "Looking for file ".$temp_directory.$package[0]." to pass on to update_brand() <br />";
                 if(file_exists($temp_directory.$package[0])) {
 		    $endpoint->update_brand($package[0],FALSE);
 //                  Note: no need to delete/unlink/rmdir as this is handled in update_brand()
