@@ -51,10 +51,10 @@ function endpointman_configpageinit($pagename) {
 		} else {
 			$extdisplay = isset($_REQUEST['extdisplay']) ? $_REQUEST['extdisplay'] : null;
 		}
-		} else {
-			// we only care about extensions or devices, otherwise return
-			return true;
-		}
+	} else {
+		// we only care about extensions or devices, otherwise return
+		return true;
+	}
 	
     if (isset($extdisplay) && !empty($extdisplay)) {
         $sql = "SELECT tech FROM devices WHERE id = " . $extdisplay;
@@ -114,11 +114,8 @@ function endpointman_configpageinit($pagename) {
                     $temp = isset($_REQUEST['epm_temps']) ? $_REQUEST['epm_temps'] : null;
                     if (isset($_REQUEST['name'])) {
                         $name = isset($_REQUEST['name']) ? $_REQUEST['name'] : null;
-						echo "hi";
                     } else {
-						echo "hi";
                         $name = isset($_REQUEST['description']) ? $_REQUEST['description'] : null;
-						echo $name;
                     }
                     if (isset($_REQUEST['deviceid'])) {
                         if ($_REQUEST['devicetype'] == "fixed") {
@@ -175,6 +172,7 @@ function endpointman_configpageinit($pagename) {
                             $mac_id = $endpoint->add_device($mac, $model, $extdisplay, $temp, NULL, $name);
 
                             if ($mac_id) {
+                                debug('Write files?');
                                 $row = $endpoint->get_phone_info($mac_id);
                                 $endpoint->prepare_configs($row);
                             }

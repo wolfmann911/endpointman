@@ -61,7 +61,7 @@ $result = $db->query($sql);
 $sql = "DROP TABLE `endpointman_custom_configs`";
 $result = $db->query($sql);
 
-$sql = 'SELECT value FROM `admin` WHERE `variable` LIKE CONVERT(_utf8 \'version\' USING latin1) COLLATE latin1_swedish_ci';
+$sql = "SELECT value FROM `admin` WHERE `variable` LIKE 'version'";
 $amp_version = $db->getOne($sql);
 
 //Do unlinks ourself because retrieve_conf doesn't always remove stuff...

@@ -378,7 +378,7 @@ switch ($_REQUEST['subpage']) {
             $template_file_list[0]['value'] = "template_data_custom.xml";
             $template_file_list[0]['text'] = "template_data_custom.xml";
 
-            $sql = 'SELECT model FROM `endpointman_model_list` WHERE `product_id` LIKE CONVERT(_utf8 \'1-2\' USING latin1) COLLATE latin1_swedish_ci AND `enabled` = 1 AND `hidden` = 0';
+            $sql = "SELECT model FROM `endpointman_model_list` WHERE `product_id` LIKE '1-2' AND `enabled` = 1 AND `hidden` = 0";
             $data = & $endpoint->eda->sql($sql, 'getall', DB_FETCHMODE_ASSOC);
             $i = 1;
             foreach ($data as $list) {
