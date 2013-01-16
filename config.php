@@ -13,8 +13,8 @@ if (ini_get('safe_mode')) {
     die(_('Turn Off Safe Mode'));
 }
 
-if (PHP_VERSION < '5.1.0') {
-    die(_('PHP Version MUST be greater than') . ' 5.1.0!');
+if (PHP_VERSION < '5.3.0') {
+    die(_('PHP Version MUST be greater than') . ' 5.3.0!');
 }
 
 include 'includes/functions.inc';
@@ -22,10 +22,6 @@ include 'includes/functions.inc';
 $debug = NULL;
 
 $endpoint = new endpointmanager();
-
-if (!file_exists(dirname(dirname(dirname(__FILE__))) . '/assets/endpointman/images/add.png')) {
-    echo "WARNING: Assets Missing! ^^Please click the \"Apply Configuration Changes\" Button";
-}
 
 if (!is_writeable(LOCAL_PATH)) {
     if (!chmod(LOCAL_PATH, 0764)) {

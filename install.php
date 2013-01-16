@@ -106,7 +106,7 @@ $xml_full_version = $epm_module_xml['module']['version'];
 $version['major'] = $versions[1];
 $version['minor'] = $versions[2];
 
-$sql = 'SELECT value FROM `admin` WHERE `variable` LIKE CONVERT(_utf8 \'version\' USING latin1) COLLATE latin1_swedish_ci';
+$sql = "SELECT value FROM `admin` WHERE `variable` LIKE 'version'";
 preg_match('/^(\d*)\.(\d*)/', $db->getOne($sql), $versions);
 
 $amp_version['minor'] = $versions[2];

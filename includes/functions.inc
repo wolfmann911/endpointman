@@ -28,8 +28,12 @@ class endpointmanager {
     function __construct() {
         global $amp_conf;
         require_once('abstraction/freepbx.inc');
-        require_once('json.inc');
         $this->eda = new epm_data_abstraction();
+        
+        require_once('system_functions.class');
+        $this->system = new epm_system();
+        
+        require_once('json.inc');
 
         $this->global_cfg = $this->eda->get_stored_globals();
 
@@ -112,7 +116,7 @@ class endpointmanager {
             }
         }
 
-        $sql = 'SELECT value FROM `admin` WHERE `variable` LIKE CONVERT(_utf8 \'version\' USING latin1) COLLATE latin1_swedish_ci';
+        $sql = "SELECT value FROM `admin` WHERE `variable` LIKE 'version'";
 
         preg_match('/^(\d*)\.(\d*)/', $this->eda->sql($sql, 'getone'), $versions);
 
@@ -128,46 +132,6 @@ class endpointmanager {
         $this->tpl->assign("amp_ver", $this->global_cfg['amp_ver']['minor']);
     }
 
-    /**
-     * @author http://www.php.net/manual/en/function.socket-create.php#43057
-     * @param type $host
-     * @param type $filename
-     * @return type 
-     */
-    function tftp_fetch($host, $filename) {
-        //first off let's check if this is installed or disabled
-        $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
-
-        // create the request packet
-        $packet = chr(0) . chr(1) . $filename . chr(0) . 'octet' . chr(0);
-        // UDP is connectionless, so we just send on it.
-        socket_sendto($socket, $packet, strlen($packet), 0x100, $host, 69);
-
-        $buffer = '';
-        $port = '';
-        $ret = '';
-        $time = time();
-        do {
-            $new_time = time() - $time;
-            if ($new_time > 5) {
-                break;
-            }
-            // $buffer and $port both come back with information for the ack
-            // 516 = 4 bytes for the header + 512 bytes of data
-            socket_recvfrom($socket, $buffer, 516, 0, $host, $port);
-
-            // add the block number from the data packet to the ack packet
-            $packet = chr(0) . chr(4) . substr($buffer, 2, 2);
-            // send ack
-            socket_sendto($socket, $packet, strlen($packet), 0, $host, $port);
-
-            // append the data to the return variable
-            // for large files this function should take a file handle as an arg
-            $ret .= substr($buffer, 4);
-        } while (strlen($buffer) == 516);  // the first non-full packet is the last.
-        return $ret;
-    }
-
     function tftp_check() {
         //create a simple block here incase people have strange issues going on as we will kill http
         //by running this if the server isn't really running!
@@ -179,7 +143,7 @@ class endpointmanager {
             if (preg_match('/:69\s/i', $subject)) {
                 $rand = md5(rand(10, 2000));
                 if (file_put_contents($this->global_cfg['config_location'] . 'TEST', $rand)) {
-                    if ($this->tftp_fetch('127.0.0.1', 'TEST') != $rand) {
+                    if ($this->system->tftp_fetch('127.0.0.1', 'TEST') != $rand) {
                         $this->error['tftp_check'] = 'Local TFTP Server is not correctly configured';
                     }
                     unlink($this->global_cfg['config_location'] . 'TEST');
@@ -207,6 +171,11 @@ class endpointmanager {
         }
     }
 
+    /**
+     * Fixes the display are special strings so we can visible see them instead of them being transformed
+     * @param string $contents a string of course
+     * @return string fixed string
+     */
     function display_htmlspecialchars($contents) {
         $contents = str_replace("&amp;", "&amp;amp;", $contents);
         $contents = str_replace("&lt;", "&amp;lt;", $contents);
@@ -2610,6 +2579,7 @@ class endpointmanager {
      * @param bool $Strict
      * @param array $Path
      * @return array
+     * @package epm_system
      */
     function arraysearchrecursive($Needle, $Haystack, $NeedleKey="", $Strict=false, $Path=array()) {
         if (!is_array($Haystack))
@@ -2630,19 +2600,37 @@ class endpointmanager {
         return false;
     }
 
+    /**
+    * Send process to run in background
+    * @version 2.11
+    * @param string $command the command to run
+    * @param integer $Priority the Priority of the command to run
+    * @return int $PID process id
+    * @package epm_system
+    */
     function run_in_background($Command, $Priority = 0) {
-        if ($Priority)
-            $PID = shell_exec("nohup nice -n $Priority $Command 2> /dev/null & echo $!");
-        else
-            $PID = shell_exec("nohup $Command > /dev/null 2> /dev/null & echo $!");
-        return($PID);
+        return($Priority ? shell_exec("nohup nice -n $Priority $Command 2> /dev/null & echo $!") : shell_exec("nohup $Command > /dev/null 2> /dev/null & echo $!"));
     }
 
+    /**
+    * Check if process is running in background
+    * @version 2.11
+    * @param string $PID proccess ID
+    * @return bool true or false
+    * @package epm_system
+    */
     function is_process_running($PID) {
         exec("ps $PID", $ProcessState);
         return(count($ProcessState) >= 2);
     }
 
+    /**
+    * Downloads a file and places it in the destination defined with progress
+    * @version 2.11
+    * @param string $url_file URL of File
+    * @param string $destination_file Destination of file
+    * @package epm_system
+    */
     function download_file_with_progress_bar($url_file, $destination_file) {
         set_time_limit(0);
         $headers = get_headers($url_file, 1);
@@ -2667,10 +2655,27 @@ class endpointmanager {
         }
     }
 
+    /**
+    * Downloads a file and places it in the destination defined
+    * @version 2.11
+    * @param string $url_file URL of File
+    * @param string $destination_file Destination of file
+    * @package epm_system
+    */
     function download_file($url_file, $destination_file) {
-        $contents = file_get_contents($url_file);
-
-        if (preg_match('/200/', $http_response_header[0])) {
+        //Determine if file_get_contents_url exists which is the default FreePBX Standard for downloading straight files
+        if(function_exists('file_get_contents_url')) {
+            $contents = file_get_contents_url($url_file);
+        } else {
+            //I really hope we NEVER get here.
+            $contents = file_get_contents($url_file);
+            if (!preg_match('/200/', $http_response_header[0])) {
+                $this->error['download_file'] = "Unknown Error in Download_file";
+                return false;
+            }
+        }
+        //If contents are emtpy then we failed. Or something is wrong
+        if(!empty($contents)) {
             $dirname = dirname($destination_file);
             if (!file_exists($dirname)) {
                 mkdir($dirname);
@@ -2687,30 +2692,27 @@ class endpointmanager {
             }
             return true;
         } else {
-            $this->error['download_file'] = "Server Replied with error '" . $http_response_header[0] . "'. Unable to download files";
+            $this->error['download_file'] = "Contents of Remote file are blank! URL:".$url_file;
             return false;
         }
     }
 
-    //This function looks in common linux directories for system executable files. Like ARP & NMAP
+    /**
+    * Uses which to find executables that asterisk can run/use
+    * @version 2.11
+    * @param string $exec Executable to find
+    * @package epm_system
+    */
     function find_exec($exec) {
-        $usr_bin = glob("/usr/bin/" . $exec);
-        $usr_sbin = glob("/usr/sbin/" . $exec);
-        $sbin = glob("/sbin/" . $exec);
-        $bin = glob("/bin/" . $exec);
-        $etc = glob("/etc/" . $exec);
-        if (isset($usr_bin[0])) {
-            return("/usr/bin/" . $exec);
-        } elseif (isset($usr_sbin[0])) {
-            return("/usr/sbin/" . $exec);
-        } elseif (isset($sbin[0])) {
-            return("/sbin/" . $exec);
-        } elseif (isset($bin[0])) {
-            return("/bin/" . $exec);
-        } elseif (isset($etc[0])) {
-            return("/etc/" . $exec);
+        $o = exec('which '.$exec);
+        if($o) {
+            if(file_exists($o) && is_executable($o)) {
+                return($o);
+            } else {
+                return('');
+            }
         } else {
-            return($exec);
+            return('');
         }
     }
 
@@ -2719,6 +2721,8 @@ class endpointmanager {
      * Using RecursiveIteratorIterator is the only way PHP is able to see hidden files.
      * @author http://www.webcheatsheet.com/PHP/working_with_directories.php
      * @param string $dir Full Directory path to delete
+     * @version 2.11
+     * @package epm_system
      */
     function rmrf($dir) {
         if (file_exists($dir)) {
@@ -2737,14 +2741,13 @@ class endpointmanager {
 
     /**
      * Only used once in all of Endpoint Manager to determine if a table exists
-     * @param <type> $table
-     * @return <type>
+     * @param string $table Table to look for
+     * @return bool
      */
     function table_exists($table) {
         global $amp_conf;
         $sql = "SHOW TABLES FROM " . $amp_conf['AMPDBNAME'];
         $result = $this->eda->sql($sql, 'getAll');
-
         foreach ($result as $row) {
             if ($row[0] == $table) {
                 return TRUE;
@@ -2753,13 +2756,46 @@ class endpointmanager {
         return FALSE;
     }
 
+    /**
+     * Reads a file. Json decodes it and will report any errors back
+     * @param string $file location of file
+     * @return mixed false on error, array on success
+     * @version 2.11 
+     */
     function file2json($file) {
         if (file_exists($file)) {
             $json = file_get_contents($file);
             $data = json_decode($json, TRUE);
-            return($data);
+            if(function_exists('json_last_error')) {
+                switch (json_last_error()) {
+                    case JSON_ERROR_NONE:
+                        return($data);
+                        break;
+                    case JSON_ERROR_DEPTH:
+                        $this->error['file2json'] = 'Maximum stack depth exceeded';
+                        break;
+                    case JSON_ERROR_STATE_MISMATCH:
+                        $this->error['file2json'] = 'Underflow or the modes mismatch';
+                        break;
+                    case JSON_ERROR_CTRL_CHAR:
+                        $this->error['file2json'] = 'Unexpected control character found';
+                        break;
+                    case JSON_ERROR_SYNTAX:
+                        $this->error['file2json'] = 'Syntax error, malformed JSON';
+                        break;
+                    case JSON_ERROR_UTF8:
+                        $this->error['file2json'] = 'Malformed UTF-8 characters, possibly incorrectly encoded';
+                        break;
+                    default:
+                        $this->error['file2json'] = 'Unknown error';
+                        break;
+                }
+                return(false);
+            } else {
+                return($data);
+            }
         } else {
-            return(array());
+            return(false);
         }
     }
 
@@ -2779,7 +2815,7 @@ class endpointmanager {
                             "[0-9a-f][0-9a-f][:-]" .
                             "[0-9a-f][0-9a-f]/i", $mac)) {
                 return(strtoupper(str_replace(":", "", str_replace("-", "", $mac))));
-                //Is the string exactly 12 characters?
+            //Is the string exactly 12 characters?
             } elseif (strlen($mac) == "12") {
                 //Now is the string a valid HEX mac address?
                 if (preg_match("/[0-9a-f][0-9a-f]" .
@@ -2792,7 +2828,7 @@ class endpointmanager {
                 } else {
                     return(FALSE);
                 }
-                //Is the mac separated by whitespaces?
+            //Is the mac separated by whitespaces?
             } elseif (preg_match("/[0-9a-f][0-9a-f][\s]" .
                             "[0-9a-f][0-9a-f][\s]" .
                             "[0-9a-f][0-9a-f][\s]" .
@@ -2812,13 +2848,10 @@ class endpointmanager {
      * Check for valid netmast to avoid security issues
      * @param string $mask the complete netmask, eg [1.1.1.1/24]
      * @return boolean True if valid, False if not
+     * @version 2.11
      */
     function validate_netmask($mask) {
-        if (preg_match("/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\/(\d{1,2})$/", $mask)) {
-            return(TRUE);
-        } else {
-            return(FALSE);
-        }
+        return preg_match("/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\/(\d{1,2})$/", $mask) ? TRUE : FALSE;
     }
 
     /**
@@ -2826,14 +2859,16 @@ class endpointmanager {
      * nmap will actually discover 'unseen' devices that the VoIP server hasn't heard from
      * If the user just wishes to use the local arp cache they can tell the function to not use nmap
      * This results in a speed increase from 60 seconds to less than one second.
-     * @author tm1000
-     * @version 1.5
+     *
+     * This is the original function that started it all
+     * http://www.pbxinaflash.com/community/index.php?threads/end-point-configuration-manager-module-for-freepbx-part-1.4514/page-4#post-37671
+     *
+     * @version 2.11
      * @param mixed $netmask The netmask, eg [1.1.1.1/24]
      * @param boolean $use_nmap True use nmap, false don't use it
      * @return array List of devices found on the network
      */
     function discover_new($netmask, $use_nmap=TRUE) {
-
         if (($use_nmap) AND (file_exists($this->global_cfg['nmap_location'])) AND ($this->validate_netmask($netmask))) {
             shell_exec($this->global_cfg['nmap_location'] . ' -v -sP ' . $netmask);
         } elseif (!$this->validate_netmask($netmask)) {
@@ -2848,7 +2883,6 @@ class endpointmanager {
 
         //Throw arp list into an array, break by new lines
         $arp_array = explode("\n", $arp_list);
-
 
         //Find all references to active computers by searching out mac addresses.
         $temp = array_values(array_unique(preg_grep("/[0-9a-f][0-9a-f][:-]" .
@@ -2897,27 +2931,15 @@ class endpointmanager {
                 $epm_row = $this->eda->sql($epm_sql, 'getRow', DB_FETCHMODE_ASSOC);
 
                 $res = $this->eda->sql($epm_sql);
-                $epm_count = $res->numRows();
 
-                if ($epm_count) {
-                    $epm = TRUE;
-                } else {
-                    $epm = FALSE;
-                }
+                $epm = $res->numRows() ? TRUE : FALSE;
 
                 //Add into a final array
                 $final[$z] = array("ip" => $ip, "mac" => $mac, "mac_strip" => $mac_strip, "oui" => $oui, "brand" => $brand['name'], "brand_id" => $brand['id'], "endpoint_managed" => $epm);
                 $z++;
             }
         }
-
-        //$final = array_values($final);
-
-        if (!is_array($final)) {
-            return(FALSE);
-        } else {
-            return ($final);
-        }
+        return !is_array($final) ? FALSE : $final;
     }
 
     function areaAvailable($model, $area=NULL) {

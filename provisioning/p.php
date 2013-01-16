@@ -68,7 +68,7 @@ if(getMethod() == "GET") {
     if(preg_match('/[0-9A-Fa-f]{12}/i', $strip, $matches) && !(preg_match('/[0]{10}[0-9]{2}/i',$strip))) {
         $mac_address = $matches[0];
         
-        $sql = 'SELECT id FROM `endpointman_mac_list` WHERE `mac` LIKE CONVERT(_utf8 \'%' . $mac_address . '%\' USING latin1) COLLATE latin1_swedish_ci';
+        $sql = "SELECT id FROM `endpointman_mac_list` WHERE `mac` LIKE '%" . $mac_address . "%'";
 
         $mac_id = $endpoint->eda->sql($sql, 'getOne');
         $phone_info = $endpoint->get_phone_info($mac_id);
