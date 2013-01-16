@@ -22,12 +22,12 @@
             *2.XX.X.X* https://github.com/tm1000/freepbx-endpointmanager/commits/master
         </changelog>
 	<info>https://github.com/tm1000/freepbx-endpointmanager</info>
-	<location>release/2.11/endpointman-2.11.0.1.tgz</location>
+	<location>release/2.11/endpointman-2.11.4.8.tgz</location>
 	<depends>
 		<version>2.10</version>
 	</depends>
 	<requirements>
 		<module>fw_ari</module>
 	</requirements>
-<md5sum>2832e12476c29c6a72c85225fb7ad143</md5sum>
+<md5sum>e2f328eb2946e2baeb4fa8304379d9f0</md5sum>
 </module>
