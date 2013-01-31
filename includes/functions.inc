@@ -2792,9 +2792,11 @@ class endpointmanager {
                 }
                 return(false);
             } else {
+                //Probably an older version of PHP. That's ok though
                 return($data);
             }
         } else {
+            $this->error['file2json'] = 'Cant find file: '.$file ;
             return(false);
         }
     }
