@@ -658,7 +658,7 @@ class endpointmanager {
                 $phone_info['line'][$line['line']]['user_extension'] = $line['user'];
             }
         } else {
-            $sql = "SELECT id, mac, ext FROM endpointman_mac_list WHERE id =" . $mac_id;
+            $sql = "SELECT id, mac FROM endpointman_mac_list WHERE id =" . $mac_id;
             //Phone is unknown, we need to display this to the end user so that they can make corrections
             $row = $this->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
 
