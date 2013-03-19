@@ -2,7 +2,7 @@
 	<rawname>endpointman</rawname>
 	<repo>standard</repo>
 	<name>OSS PBX End Point Manager</name>
-	<version>2.11.4.10</version>
+	<version>2.11.4.11</version>
 	<type>setup</type>
 	<category>Connectivity</category>
 	<publisher>Andrew Nagy</publisher>
@@ -19,6 +19,7 @@
          The main differences between the two versions is that the developer of Commercial Endpoint works 30 hours a week paid by Schmoozecom to work on it.
      </description>
 	 <changelog>
+		 *2.11.4.11* Fixes #6426 (Fatal SQL error - Device cfg submit with apostrophe in extn text description) 
 		 *2.11.4.10* Fixes #6428
          *2.11.4.9* Fix a stupid error on my part with requiring php 5.3 SORRY! :-(
          *2.XX.X.X* https://github.com/tm1000/freepbx-endpointmanager/commits/master

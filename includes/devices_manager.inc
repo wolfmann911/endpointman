@@ -81,7 +81,7 @@ switch ($sub_type) {
                     $sql = "SELECT description FROM devices WHERE id = ".$_REQUEST['ext_list_'.$row['luid']];
                     $name = $endpoint->eda->sql($sql,'getOne');
 
-                    $sql = "UPDATE endpointman_line_list SET line = '".$_REQUEST['line_list_'.$row['luid']]."', ext = '".$_REQUEST['ext_list_'.$row['luid']]."', description = '".$name."' WHERE luid =  ". $row['luid'];
+                    $sql = "UPDATE endpointman_line_list SET line = '".$_REQUEST['line_list_'.$row['luid']]."', ext = '".$_REQUEST['ext_list_'.$row['luid']]."', description = '".mysql_real_escape_string($name)."' WHERE luid =  ". $row['luid'];
                     $endpoint->eda->sql($sql);
                 }
 
@@ -166,7 +166,7 @@ switch ($sub_type) {
         foreach($mac_list as $data) {
             $phone_info = $endpoint->get_phone_info($data['id']);
             foreach($phone_info['line'] as $line) {
-                $sql = "UPDATE endpointman_line_list SET description = '".$line['description']."' WHERE luid = ".$line['luid'];
+                $sql = "UPDATE endpointman_line_list SET description = '".mysql_real_escape_string($line['description'])."' WHERE luid = ".$line['luid'];
                 $endpoint->eda->sql($sql);
             }
             if(isset($_REQUEST['reboot'])) {
@@ -321,7 +321,7 @@ switch ($sub_type) {
                     $rebooted_msg = "";
                 }
                 foreach($phone_info['line'] as $line) {
-                    $sql = "UPDATE endpointman_line_list SET description = '".$line['description']."' WHERE luid = ".$line['luid'];
+                    $sql = "UPDATE endpointman_line_list SET description = '".mysql_real_escape_string($line['description'])."' WHERE luid = ".$line['luid'];
                     $endpoint->eda->sql($sql);
                 }
             }
@@ -348,7 +348,7 @@ switch ($sub_type) {
                     $rebooted_msg = "";
                 }
                 foreach($phone_info['line'] as $line) {
-                    $sql = "UPDATE endpointman_line_list SET description = '".$line['description']."' WHERE luid = ".$line['luid'];
+                    $sql = "UPDATE endpointman_line_list SET description = '".mysql_real_escape_string($line['description'])."' WHERE luid = ".$line['luid'];
                     $endpoint->eda->sql($sql);
                 }
             }
