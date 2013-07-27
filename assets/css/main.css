@@ -11,4 +11,32 @@
    Syntax recommendation http://www.w3.org/TR/REC-CSS2/
 */
 
+.red, .error {
+  color: #d9534f;
+  font-color: #d9534f;
+}
 
+.green, .success {
+  color: #5cb85c;
+  font-color: #5cb85c;
+}
+
+.yellow, .warning {
+  color: #f0ad4e;
+  font-color: #f0ad4e;
+}
+
+.cyan, .info {
+  color: #5bc0de;
+  font-color: #5bc0de;
+}
+
+.blue, .primary {
+  color: #428bca;
+  font-color: #428bca;
+}
+
+.gray, .disabled {
+  color: #474949;
+  font-color: #474949;
+}
