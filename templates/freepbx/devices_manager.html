@@ -1,5 +1,5 @@
 {include="global_header"}
-<h3><?php echo _('Device List');?></h3>
+<h2><?php echo _('Device List');?></h2>
 <hr>
 {if condition="isset($show_error_box)"}
 {include="message_box"}
@@ -438,87 +438,48 @@
     </tbody>
 </table>
 
-<hr>
-<center>
-    <h4>
-        <?php echo _('Selected Phone(s) Options')?>
-    </h4>
-</center>
-<table id="globalops" width='90%' align='center'>
-    <tr>
-        <td width="26%" align='center'><input type="submit" name="button_delete_selected_phones" onclick="managed_options('delete_selected_phones');" value="<?php echo ('Delete Selected Phones')?>"></td>
-        <td width="26%" align='center'><input type="submit" name="button_rebuild_selected" onclick="managed_options('rebuild_selected_phones');" value="<?php echo _('Rebuild Configs for Selected Phones')?>"><br /><input type="checkbox" name="reboot">Reboot Phones</td>
-        <td width="32%" align='center'><?php echo _('Change Selected Phones to')?>: <br /><?php echo _('Brand')?>:<select name="brand_list_selected" id="brand_list_selected">
-                {loop name="brand_ava"}
-                <option value="{$value.value}" {if condition="isset($value.selected)"}selected{/if}>{$value.text}</option>
-                {/loop}
-            </select> <?php echo _('Model')?>: <select name="model_list_selected" id="model_list_selected"><option></option></select><br /><input type="submit" name="button_update_phones" onclick="managed_options('change_brand');" value="<?php echo _('Update Phones')?>"><br /><input type="checkbox" name="reboot_change">Reboot Phones</td>
-    </tr>
-</table>
+<h4><?php echo _('Selected Phone(s) Options')?></h4>
+<p><button style="width: 100px" type="submit" style="vertical-align:middle" name="button_delete_selected_phones" onclick="managed_options('delete_selected_phones');"><i class="icon-trash red"></i> <?php echo _('Delete')?></button> <?php echo ('Delete Selected Phones')?></p>
+<p><button style="width: 100px" type="submit" name="button_rebuild_selected" onclick="managed_options('rebuild_selected_phones');"><i class="icon-refresh green"></i> <?php echo _('Rebuild')?></button> <?php echo _('Rebuild Configs for Selected Phones')?> (<label><input type="checkbox" name="reboot"><font size="-1">Reboot Phones</font></label>)</p>
+<p><button style="width: 100px" style="vertical-align:middle" type="submit" name="button_update_phones" onclick="managed_options('change_brand');"><i class='blue icon-random'></i> <?php echo _('Update')?></button>
+<?php echo _('Change Selected Phones to')?>&nbsp;
+<select name="brand_list_selected" id="brand_list_selected"><option><?php echo _('Brand')?></option>{loop name="brand_ava"}<option value="{$value.value}" {if condition="isset($value.selected)"}selected{/if}>{$value.text}</option>{/loop}</select> <select name="model_list_selected" id="model_list_selected"><option><?php echo _('Model')?></option></select> (<label><input type="checkbox" name="reboot_change"><font size="-1">Reboot Phones</font></label>)</p>
 </form>
-<hr>
-<center>
-    <h4><?php echo _('Global Phone Options')?></h4>
-    {if condition="$no_add == FALSE"}
-    <form id='go' action='config.php?type=tool&amp;display=epm_devices' method='POST'>
-        <label><?php echo _('Search for new devices in netmask')?>
-            <input name="netmask" type="text" value="{$netmask}">
-            <input type="Submit" name="button_go" id="button_go" onclick="find_devices();" value="<?php echo _('Go')?>">
-        </label>
-        <label>
-            <input name="nmap" type="checkbox" value="1" checked><?php echo _('Use NMAP')?>
-        </label>
-    </form>
-    <br>
-    {/if}
-</center>
 
-<table id="globalops2" width='90%' align='center'>
-    <tr>
-        <td align='center'>
-            <form action='' name='globalmanaged' id='globalmanaged' method='POST'>
-                <input type='Submit' name='button_rebuild_configs_for_all_phones' onclick="submit_global('rebuild_configs_for_all_phones');" value='<?php echo _('Rebuild Configs for All Phones')?>'>
-                       <br />
-                <input type="checkbox" name="reboot">Reboot Phones
-            </form>
-        </td>
-        <td align='center'>
-                <form action='' name='globalmanaged2' id='globalmanaged2' method='POST'><select name="rb_brand">
-                {loop name="brand_ava"}
-                            <option value="{$value.value}">{$value.text}</option>
-                {/loop}
-                </select><br/>
-                <input type='Submit' name='button_reboot_this_brand' onclick="submit_global2('reboot_brand');" value='<?php echo _('Reboot This Brand')?>'></form>
-        </td>
-        <td align='center'>
-            <form action='' name='globalmanaged3' id='globalmanaged3' method='POST'><?php echo _('Reconfigure all')?> (products)<br/> <select name="product_select" id="product_select">
-            {loop name="product_list"}
-                        <option value="{$value.value}">{$value.text}</option>
-            {/loop}
-                    </select><br/> <?php echo _('with')?>
-                    <label>
-                        <select name="template_selector" id="template_selector">
-                            <option></option>
-                        </select>
-                        <input type="submit" name="button_rebuild_reboot" onclick="submit_global3('rebuild_reboot');" value="<?php echo _('Rebuild')?>"><br /><input type="checkbox" name="reboot">Reboot Phones
-                    </label>
-            </td>
-        <td align='center'>
-            <form action='' name='globalmanaged4' id='globalmanaged4' method='POST'><?php echo _('Reconfigure all')?> (models)<br/> <select name="model_select" id="model_select">
-            {loop name="model_list"}
-                        <option value="{$value.value}">{$value.text}</option>
-            {/loop}
-                    </select><br/> <?php echo _('with')?>
-                    <label>
-                        <select name="model_template_selector" id="model_template_selector">
-                            <option></option>
-                        </select>
-                        <input type="submit" name="button_rebuild_reboot" onclick="submit_global3('mrebuild_reboot');" value="<?php echo _('Rebuild')?>"><br /><input type="checkbox" name="reboot">Reboot Phones
-                    </label>
-            </td>
-            
-    </tr>
-</table>
+<h4><?php echo _('Global Phone Options')?></h4>
+{if condition="$no_add == FALSE"}
+<p>
+<form id='go' action='config.php?type=tool&amp;display=epm_devices' method='POST'>
+  <button style="width: 100px" type="Submit" name="button_go" id="button_go" onclick="find_devices();"><i class='icon-search blue'></i> <?php echo _('Search')?></button>
+  <?php echo _('Search for new devices in netmask')?>
+  <input name="netmask" type="text" value="{$netmask}">
+  (<label><input name="nmap" type="checkbox" value="1" checked><font size="-1"><?php echo _('Use NMAP')?></font></label>)
+</form>
+</p>
+{/if}
+
+<p><form action='' name='globalmanaged' id='globalmanaged' method='POST'>
+<button style="width: 100px" type='Submit' name='button_rebuild_configs_for_all_phones' onclick="submit_global('rebuild_configs_for_all_phones');"><i class='icon-refresh green'></i> <?php echo _('Rebuild')?></button> <?php echo _('Rebuild Configs for All Phones')?>&nbsp;(<label><input type="checkbox" name="reboot"><font size="-1">Reboot Phones</font></label>)
+</form></p>
+
+<p><form action='' name='globalmanaged2' id='globalmanaged2' method='POST'>
+<button style="width: 100px" type='Submit' name='button_reboot_this_brand' onclick="submit_global2('reboot_brand');"><i class='icon-off red'></i> <?php echo _('Reboot')?></button> <?php echo _('Reboot This Brand')?> <select name="rb_brand">{loop name="brand_ava"}<option value="{$value.value}">{$value.text}</option>{/loop}</select>
+</form></p>
+
+<p><form action='' name='globalmanaged3' id='globalmanaged3' method='POST'>
+<button style="width: 100px" type="submit" name="button_rebuild_reboot" onclick="submit_global3('rebuild_reboot');"><i class="icon-random blue"></i> <?php echo _('Configure')?></button>&nbsp;
+<?php echo _('Reconfigure all')?> (products) <select name="product_select" id="product_select">{loop name="product_list"}<option value="{$value.value}">{$value.text}</option>{/loop}</select> <?php echo _('with')?>
+<label><select name="template_selector" id="template_selector"><option></option></select></label>
+(<label><input type="checkbox" name="reboot"><font size='-1'>Reboot Phones</font></label>)
+</form></p>
+
+<p><form action='' name='globalmanaged4' id='globalmanaged4' method='POST'>
+<button style="width: 100px" type="submit" name="button_rebuild_reboot" onclick="submit_global3('mrebuild_reboot');"><i class="icon-random blue"></i> <?php echo _('Configure')?></button>&nbsp;
+<?php echo _('Reconfigure all')?> (models) <select name="model_select" id="model_select">{loop name="model_list"}<option value="{$value.value}">{$value.text}</option>{/loop}</select> <?php echo _('with')?>
+<label><select name="model_template_selector" id="model_template_selector"><option></option></select></label>
+(<label><input type="checkbox" name="reboot"><font size='-1'>Reboot Phones</font></label>)
+</form></p>
+
 </form>
 
 {if condition="!isset($disable_help)"}
