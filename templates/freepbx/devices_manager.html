@@ -89,12 +89,14 @@
                 $("#img2"+rowClass).removeClass().addClass('info icon-chevron-up');
                 $("#img3"+rowClass).removeClass().addClass('info icon-chevron-up');
                 $('.'+rowClass).show();
-                $('#expander').html('<a onclick="toggleDisplayAll(\'collapse\')"><i class="info icon-chevron-up" id="toggle_all_img" title="Click to Collapse All Line Information"></i> Collapse All</a>');
+                $('#expander').hide();
+                $('#collapser').show();
             } else {
                 $("#img2"+rowClass).removeClass().addClass('info icon-chevron-down');
                 $("#img3"+rowClass).removeClass().addClass('info icon-chevron-down');
                 $('.'+rowClass).hide();
-                $('#expander').html('<a onclick="toggleDisplayAll(\'expand\')"><i class="info icon-chevron-down" id="toggle_all_img" title="Click to Expand All Line Information"></i> Expand All</a>');
+                $('#expander').show();
+                $('#collapser').hide();
             }
         });
     }
@@ -191,6 +193,9 @@
         newwindow=window.open('config.php?display=epm_config&quietmode=1&handler=file&file=popup.html.php&module=endpointman&pop_type=edit_specifics&edit_id=' + id + '&rand=' + new Date().getTime(),'name2','height=700,width=750,scrollbars=yes,location=no');
         if (window.focus) {newwindow.focus()}
         return false;
+    }
+    function togglePhones(action) {
+        $('#devList .device').prop('checked', action);
     }
 </script>
 
@@ -392,8 +397,11 @@
 
 <form id="managed" action='config.php?type=tool&amp;display=epm_devices' method='POST'>
 <h3><?php echo _('Current Managed Extensions')?></h3>
-<span colspan="7" id="expander"><a onclick="toggleDisplayAll('expand')"><i class="info icon-chevron-down" id="toggle_all_img" title="Click to Expand All Line Information"></i> Expand All Line Info</a></span>
 
+<button type="button" id="selecter"   style="zoom: 0.8" onclick="togglePhones(true)"  ><i class="info icon-check"       id="toggle_all_phones_on"  title="Click to Select All Phones"  ></i> Select All</button>
+<button type="button" id="deselecter" style="zoom: 0.8" onclick="togglePhones(false)" ><i class="info icon-check-empty" id="toggle_all_phones_off" title="Click to Deselect All Phones"></i> Deselect All</button>
+<button type="button" id="expander"   style="zoom: 0.8" onclick="toggleDisplayAll('expand')"  ><i class="info icon-chevron-down" id="toggle_all_img" title="Click to Expand All Line Information"  ></i> Expand All</button>
+<button type="button" id="collapser"  style="zoom: 0.8" onclick="toggleDisplayAll('collapse')"><i class="info icon-chevron-up"   id="toggle_all_img" title="Click to Collapse All Line Information"></i> Collapse All</button>
 <table width='97%' align='center' id='devList'>
     <thead>
     <tr class="headerRow">
@@ -411,7 +419,7 @@
     <tbody>
 	{loop name="list"}
         <tr class="headerRow">
-            <td align='center' width="3%"><i class="icon-off icon-large {if condition="$value.status.status === TRUE"}green{else}red{/if}" alt="{$value.status.ip}:{$value.status.port}"></i><input type="checkbox" name="selected[]" value="{$value.id}"></td>
+            <td align='center' width="3%"><i class="icon-off icon-large {if condition="$value.status.status === TRUE"}green{else}red{/if}" alt="{$value.status.ip}:{$value.status.port}"></i><input type="checkbox" class="device" name="selected[]" value="{$value.id}"></td>
             <td align='center' width='13%'>{$value.mac}</td>
             <td width="13%" align='center'>{$value.name}</td>
             <td width="14%" align='center'>{$value.model}</td>
@@ -487,4 +495,7 @@
     $("#demo img[title]").tooltip();
 </script>
 {/if}
+<script>
+    $("#collapser").hide();
+</script>
 {include="global_footer"}
