@@ -1,8 +1,9 @@
 {include="global_header"}
+<h3><?php echo _('Device List');?></h3>
+<hr>
 {if condition="isset($show_error_box)"}
 {include="message_box"}
 {/if}
-<br>
 <script type="text/javascript" charset="utf-8">
    $(function(){
         $("select#brand_edit").change(function(){
@@ -206,7 +207,10 @@
     </form>
     {/if}
 </center>
-<table align='center' width='90%'>
+<h3>{if condition="$mode != 'EDIT'"}<?php echo _('Add')?>{else}<?php echo _('Edit')?>{/if} <?php echo _('Device')?></h3>
+<form name="adding" id="adding" action='config.php?type=tool&amp;display=epm_devices' method='POST' />
+<table align='center' width='97%'>
+  <thead>
     <tr>
         <td align='center' width='45'></td>
         <td width="157" align='center'><h3><?php echo _('Mac Address')?></h3></td>
@@ -219,8 +223,8 @@
         <td width="234" align='center'></td>
         <td align='center'></td>
     </tr>
-        <form name="adding" id="adding" action='config.php?type=tool&amp;display=epm_devices' method='POST' />
-
+  </thead>
+  <tbody>
 	{if condition="$no_add == FALSE"}
     <tr>
     <td align='center' width='2%'>&nbsp;</td>
@@ -354,6 +358,7 @@
 </tr>
 {/if}
 {/if}
+  </tbody>
 </table>
 </form>
 
@@ -418,20 +423,13 @@
 	{/if}
 </table>
 {/if}
+
 <form id="managed" action='config.php?type=tool&amp;display=epm_devices' method='POST'>
-<table width='90%' align='center' id='devList'>
-    <tr class="headerRow">
-        <td width="3%" align='center'>&nbsp;</td>
-        <td align='center'>&nbsp;</td>
-        <td align='center'>&nbsp;</td>
-        <td colspan="3" style='vertical-align:text-bottom;text-align:center;'><h3><?php echo _('Current Managed Extensions')?></h3></td>
-        <td align='center'>&nbsp;</td>
-        <td align='center'></td>
-        <td align='center'></td>
-    </tr>
-    <tr>
-        <td colspan="7" id="expander"><a onclick="toggleDisplayAll('expand')"><img src="assets/endpointman/images/expand.png" id="toggle_all_img" title="Click to Expand All Line Information">Expand All Line Info</a></td>
-    </tr>
+<h3><?php echo _('Current Managed Extensions')?></h3>
+<span colspan="7" id="expander"><a onclick="toggleDisplayAll('expand')"><i class="info icon-chevron-down" id="toggle_all_img" title="Click to Expand All Line Information"></i> Expand All Line Info</a></span>
+
+<table width='97%' align='center' id='devList'>
+    <thead>
     <tr class="headerRow">
         <td width="3%" align='center'>&nbsp;</td>
         <td align='center'><h3>Mac Address</h3></td>
@@ -444,6 +442,8 @@
         <td align='center'><h3>Edit</h3></td>
         <td align='center'><h3>Delete</h3></td>
     </tr>
+    </thead>
+    <tbody>
 	{loop name="list"}
         <tr class="headerRow">
             <td align='center' width="5%"><div id="demo"><img src="assets/endpointman/images/circle_{if condition="$value.status.status === TRUE"}green{else}red{/if}.png" alt="{$value.status.ip}:{$value.status.port}"><input type="checkbox" name="selected[]" value="{$value.id}"></div></td>
@@ -472,6 +472,7 @@
         </tr>
         {/loop}
 	{/loop}
+    </tbody>
 </table>
 
 <hr>
