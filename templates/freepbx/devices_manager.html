@@ -194,19 +194,6 @@
     }
 </script>
 
-<center>
-    {if condition="$no_add == FALSE"}
-    <form id='go' action='config.php?type=tool&amp;display=epm_devices' method='POST'>
-        <label><?php echo _('Search for new devices in netmask')?>
-            <input name="netmask" type="text" value="{$netmask}">
-            <input type="Submit" name="button_go" id="button_go" onclick="find_devices();" value="<?php echo _('Go')?>">
-        </label>
-        <label>
-            <input name="nmap" type="checkbox" value="1" checked><?php echo _('Use NMAP')?>
-        </label>
-    </form>
-    {/if}
-</center>
 <h3>{if condition="$mode != 'EDIT'"}<?php echo _('Add')?>{else}<?php echo _('Edit')?>{/if} <?php echo _('Device')?></h3>
 <form name="adding" id="adding" action='config.php?type=tool&amp;display=epm_devices' method='POST' />
 <table align='center' width='97%'>
@@ -493,7 +480,20 @@
 <hr>
 <center>
     <h4><?php echo _('Global Phone Options')?></h4>
+    {if condition="$no_add == FALSE"}
+    <form id='go' action='config.php?type=tool&amp;display=epm_devices' method='POST'>
+        <label><?php echo _('Search for new devices in netmask')?>
+            <input name="netmask" type="text" value="{$netmask}">
+            <input type="Submit" name="button_go" id="button_go" onclick="find_devices();" value="<?php echo _('Go')?>">
+        </label>
+        <label>
+            <input name="nmap" type="checkbox" value="1" checked><?php echo _('Use NMAP')?>
+        </label>
+    </form>
+    <br>
+    {/if}
 </center>
+
 <table id="globalops2" width='90%' align='center'>
     <tr>
         <td align='center'>
