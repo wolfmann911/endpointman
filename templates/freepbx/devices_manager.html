@@ -86,27 +86,27 @@
         $(".toggle_all").each(function (i) {
             var rowClass = 'rowGroup'+$(this).attr('id');
             if(mode == 'expand') {
-                $("#img2"+rowClass).attr("src", "assets/endpointman/images/collapse.png");
-                $("#img3"+rowClass).attr("src", "assets/endpointman/images/collapse.png");
+                $("#img2"+rowClass).removeClass().addClass('info icon-chevron-up');
+                $("#img3"+rowClass).removeClass().addClass('info icon-chevron-up');
                 $('.'+rowClass).show();
-                $('#expander').html('<a onclick="toggleDisplayAll(\'collapse\')"><img src="assets/endpointman/images/collapse.png" id="toggle_all_img" title="Click to Collapse All Line Information">Collapse All</a>');
+                $('#expander').html('<a onclick="toggleDisplayAll(\'collapse\')"><i class="info icon-chevron-up" id="toggle_all_img" title="Click to Collapse All Line Information"></i> Collapse All</a>');
             } else {
-                $("#img2"+rowClass).attr("src", "assets/endpointman/images/expand.png");
-                $("#img3"+rowClass).attr("src", "assets/endpointman/images/expand.png");
+                $("#img2"+rowClass).removeClass().addClass('info icon-chevron-down');
+                $("#img3"+rowClass).removeClass().addClass('info icon-chevron-down');
                 $('.'+rowClass).hide();
-                $('#expander').html('<a onclick="toggleDisplayAll(\'expand\')"><img src="assets/endpointman/images/expand.png" id="toggle_all_img" title="Click to Expand All Line Information">Expand All</a>');
+                $('#expander').html('<a onclick="toggleDisplayAll(\'expand\')"><i class="info icon-chevron-down" id="toggle_all_img" title="Click to Expand All Line Information"></i> Expand All</a>');
             }
         });
     }
 
     function toggleDisplay(tbl, rowClass) {
-        if($("#img2"+rowClass).attr("src") == 'assets/endpointman/images/expand.png') {
-            $("#img2"+rowClass).attr("src", "assets/endpointman/images/collapse.png");
-            $("#img3"+rowClass).attr("src", "assets/endpointman/images/collapse.png");
+        if($("#img2"+rowClass).hasClass("icon-chevron-down")) {
+            $("#img2"+rowClass).removeClass().addClass('info icon-chevron-up');
+            $("#img3"+rowClass).removeClass().addClass('info icon-chevron-up');
             $('.'+rowClass).show();
         } else {
-            $("#img2"+rowClass).attr("src", "assets/endpointman/images/expand.png");
-            $("#img3"+rowClass).attr("src", "assets/endpointman/images/expand.png");
+            $("#img2"+rowClass).removeClass().addClass('info icon-chevron-down');
+            $("#img3"+rowClass).removeClass().addClass('info icon-chevron-down');
             $('.'+rowClass).hide();
         }
     }
@@ -212,16 +212,16 @@
 <table align='center' width='97%'>
   <thead>
     <tr>
-        <td align='center' width='45'></td>
-        <td width="157" align='center'><h3><?php echo _('Mac Address')?></h3></td>
-        <td width="187" align='center'><h3><?php echo _('Brand')?></h3></td>
-        <td width="216" align='center'><h3><?php echo _('Model of Phone')?></h3></td>
-        <td width="172" align='center'><h3><?php echo _('Line')?></h3></td>
-        <td width="275" align='center'><h3><?php echo _('Extension Number')?></h3></td>
-        <td width="154" align='center'><h3><?php echo _('Template')?></h3></td>
+        <th width="3%""></th>
+        <th width="13%" align='center'><?php echo _('MAC Address')?></th>
+        <th width="13%" align='center'><?php echo _('Brand')?></th>
+        <th width="14%" align='center'><?php echo _('Model of Phone')?></th>
+        <th width="10%" align='center'><?php echo _('Line')?></th>
+        <th width="19%" align='center'><?php echo _('Extension Number')?></th>
+        <th width="15%" align='center'><?php echo _('Template')?></th>
 
-        <td width="234" align='center'></td>
-        <td align='center'></td>
+        <th width="6%"></th>
+        <th width="7%"></th>
     </tr>
   </thead>
   <tbody>
@@ -266,17 +266,17 @@
                 <option value="{$value.value}" {if condition="isset($value.selected)"}selected{/if}>{$value.text}</option>
                 {/loop}
             </select>
-            <a href="#" onclick="return popitup('config.php?display=epm_config&amp;quietmode=1&amp;handler=file&amp;file=popup.html.php&amp;module=endpointman&amp;pop_type=edit_template&amp;edit_id={$edit_id}', 'Template Editor', '{$edit_id}')"><img src='assets/endpointman/images/edit.png' title="Edit Template Selected on the Left" border="0"></a></div>
+            <a href="#" onclick="return popitup('config.php?display=epm_config&amp;quietmode=1&amp;handler=file&amp;file=popup.html.php&amp;module=endpointman&amp;pop_type=edit_template&amp;edit_id={$edit_id}', 'Template Editor', '{$edit_id}')"><i class='icon-pencil'></i></a></div>
         </label></td>
     <td align='center'>
 	{if condition="$mode == 'EDIT'"}
-        <input type='Submit' name='button_save' onclick="edit_device('edit',{$edit_id},'button_save');" value='<?php echo _('Save')?>'>
+        <button type='submit' name='button_save' onclick="edit_device('edit',{$edit_id},'button_save');"><i class='icon-save blue'></i> <?php echo _('Save')?></button>
 	{else}
-               <input type='button' name='button_add' onclick="add_device();" value='<?php echo _('Add')?>'>
+        <button type='button' name='button_add' onclick="add_device();"><i class='icon-plus success'></i>&nbsp;<?php echo _('Add')?></button>
 	{/if}
     </td>
 
-    <td align='center'>{if condition="$mode != 'EDIT'"}<input type='reset' value='<?php echo _('Reset')?>'>{/if}</td>
+    <td align='center'>{if condition="$mode != 'EDIT'"}<button type='reset'><i class='icon-rotate-left red'></i> <?php echo _('Reset')?>{/if}</td>
 </tr>
 {loop name="line_list_edit"}
 <tr>
@@ -302,7 +302,7 @@
         </label>
     </td>
     <td align='center'></td>
-    <td align='center'>{if condition="!isset($disabled_delete_line)"}<div id="demo"><a href="#" onclick="edit_device('edit',{$value.luid},'delete');"><img src="assets/endpointman/images/delete.png" title="Delete Line from Device to the Left"></div>{/if}</a></td>
+    <td align='center'>{if condition="!isset($disabled_delete_line)"}<div id="demo"><a href="#" onclick="edit_device('edit',{$value.luid},'delete');"><i class="red icon-remove" title="Delete Line from Device to the Left"></i></div>{/if}</a></td>
     <td align='center'></td>
 </tr>
 {/loop}
@@ -341,7 +341,7 @@
     <td align='center'>&nbsp;</td>
     <td align='center'>&nbsp;</td>
     <td align='center'></td>
-    <td align='center'><div id="demo"><a href="#" onclick="edit_device('edit',{$edit_id},'add_line_x');"><img src="assets/endpointman/images/add.png" alt="Add Line" border="0" width="24" height="24" title="Add a Line to the device currently being edited"></a></div></td>
+    <td align='center'><div id="demo"><a href="#" onclick="edit_device('edit',{$edit_id},'add_line_x');"><i class="green icon-plus" title="Add a Line to the device currently being edited"></i></a></div></td>
     <td align='center'></td>
 </tr> 
 {else}
@@ -431,44 +431,41 @@
 <table width='97%' align='center' id='devList'>
     <thead>
     <tr class="headerRow">
-        <td width="3%" align='center'>&nbsp;</td>
-        <td align='center'><h3>Mac Address</h3></td>
-        <td align='center'><h3>Brand</h3></td>
-        <td align='center'><h3>Model of Phone</h3></td>
-        <td align='center'><h3>Line</h3></td>
-        <td align='center'><h3>Extension Number</h3></td>
-        <td align='center'><h3>Template</h3></td>
-        <td align='center'><h3>Specific</h3></td>
-        <td align='center'><h3>Edit</h3></td>
-        <td align='center'><h3>Delete</h3></td>
+        <th width="3%""></th>
+        <th width="13%" align='center'><?php echo _('MAC Address')?></th>
+        <th width="13%" align='center'><?php echo _('Brand')?></th>
+        <th width="14%" align='center'><?php echo _('Model of Phone')?></th>
+        <th width="10%" align='center'><?php echo _('Line')?></th>
+        <th width="19%" align='center'><?php echo _('Extension Number')?></th>
+        <th width="15%" align='center'><?php echo _('Template')?></th>
+        <th width="6%"><?php echo _('Edit')?></th>
+        <th width="7%"><?php echo _('Delete')?></th>
     </tr>
     </thead>
     <tbody>
 	{loop name="list"}
         <tr class="headerRow">
-            <td align='center' width="5%"><div id="demo"><img src="assets/endpointman/images/circle_{if condition="$value.status.status === TRUE"}green{else}red{/if}.png" alt="{$value.status.ip}:{$value.status.port}"><input type="checkbox" name="selected[]" value="{$value.id}"></div></td>
-            <td align='center' width='11%'>{$value.mac}</td>
+            <td align='center' width="3%"><i class="icon-off icon-large {if condition="$value.status.status === TRUE"}green{else}red{/if}" alt="{$value.status.ip}:{$value.status.port}"></i><input type="checkbox" name="selected[]" value="{$value.id}"></td>
+            <td align='center' width='13%'>{$value.mac}</td>
             <td width="13%" align='center'>{$value.name}</td>
             <td width="14%" align='center'>{$value.model}</td>
-            <td width="10%" align='center'><div id="demo"><a><img src="assets/endpointman/images/expand.png" id="img2rowGroup{$value.master_id}" onclick="toggleDisplay(document.getElementById('devList'),'rowGroup{$value.master_id}')" title="Click to Expand Line Information"></a></div></td>
-            <td width="19%" align='center'><div id="demo"><a><img src="assets/endpointman/images/expand.png" id="img3rowGroup{$value.master_id}" onclick="toggleDisplay(document.getElementById('devList'),'rowGroup{$value.master_id}')" title="Click to Expand Line Information"></a></div></td>
-            <td align='center' width='15%'>{$value.template_name}</td>
-            <td align='center'><div id="demo"><a href="#" onclick="submit_stype('edit',{$value.id});"><img src='assets/endpointman/images/edit.png' ALT='<?php echo _('Edit')?>' title='Edit Device' border='0'></a></div></td>
-            <td align='center' width='9%'><div id="demo"><a href="#" onclick="submit_wtype('edit',{$value.id});"><img src='assets/endpointman/images/edit.png' ALT='<?php echo _('Edit')?>' title='Edit Device' border='0'></a></div></td>
-            <td align='center' width='7%'><div id="demo"><a href="#" onclick="delete_device({$value.id});"><img src='assets/endpointman/images/delete.png' ALT='<?php echo _('Delete')?>' title='Delete Device' border='0'></a></div></td>
+            <td width="10%" align='center'><div id="demo"><a><i class="info icon-chevron-down" id="img2rowGroup{$value.master_id}" onclick="toggleDisplay(document.getElementById('devList'),'rowGroup{$value.master_id}')" title="Click to Expand Line Information"></i></a></div></td>
+            <td width="19%" align='center'><div id="demo"><a><i class="info icon-chevron-down" id="img3rowGroup{$value.master_id}" onclick="toggleDisplay(document.getElementById('devList'),'rowGroup{$value.master_id}')" title="Click to Expand Line Information"></i></a></div></td>
+            <td align='center' width='15%'><a href="#" onclick="submit_stype('edit',{$value.id});">{$value.template_name}</a></td>
+            <td align='center' width='6%'><div id="demo"><a href="#" onclick="submit_wtype('edit',{$value.id});"><i class='blue icon-pencil' alt='<?php echo _('Edit')?>' title="Edit phone"></i></a></div></td>
+            <td align='center' width='7%'><div id="demo"><a href="#" onclick="delete_device({$value.id});"><i class='red icon-trash' alt='<?php echo _('Delete')?>' title="Delete phone"></i></a></div></td>
         </tr>
         {loop name="value.line"}
         <tr class="rowGroup{$value.master_id} toggle_all" id="{$value.master_id}" style="display:none;">
-            <td align='center' ></td>
-            <td align='center' width='11%'></td>
+            <td align='center' width='3%' ></td>
+            <td align='center' width='13%'></td>
             <td width="13%" align='center'></td>
             <td width="14%" align='center'></td>
             <td width="10%" align='center'>{$value.line}</td>
             <td width="19%" align='center'>{$value.ext} - {$value.description}</td>
             <td align='center' width='15%'></td>
-            <td align='center' width='9%'></td>
-            <td></td>
-            <td align='center' width='7%'><div id="demo"><a href="#" onclick="submit_wtype('delete_line',{$value.luid});"><img src='assets/endpointman/images/delete.png' ALT='<?php echo _('Delete')?>' title='Delete Line' border='0'></a></div></td>
+            <td align='center' width='6%'></td>
+            <td align='center' width='7%'><div id="demo"><a href="#" onclick="submit_wtype('delete_line',{$value.luid});"><i class="red icon-remove" alt='<?php echo _('Delete')?>' title='Delete Line'></i></a></div></td>
         </tr>
         {/loop}
 	{/loop}
