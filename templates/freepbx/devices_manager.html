@@ -246,8 +246,25 @@
             <select name="model_list" id="model_new"><option></option></select>
 	{/if}
         </label></td>
+{if condition="$mode == 'EDIT'"}
     <td align='center'></td>
     <td align='center'></td>
+{else}
+    <td align='center'>
+        <label>
+            <select name="line_list" id="line_list" >
+                <option></option>
+            </select>
+        </label></td>
+    <td align='center'>
+        <select name="ext_list" id="select">
+            {loop name="display_ext"}
+            <option value="{$value.value}">{$value.text}</option>
+            {/loop}
+        </select>
+        </label>
+    </td>
+{/if}
     <td align='center'>  <div id="demo"><select name="template_list" id="template_list">
                 {loop name="display_templates"}
                 <option value="{$value.value}" {if condition="isset($value.selected)"}selected{/if}>{$value.text}</option>
@@ -293,32 +310,6 @@
     <td align='center'></td>
 </tr>
 {/loop}
-{if condition="$mode != 'EDIT'"}
-<tr>
-    <td align='center' width='2%'>&nbsp;</td>
-
-    <td align='center'></td>
-    <td align='center'></td>
-    <td align='center'></td>
-    <td align='center'>
-        <label>
-            <select name="line_list" id="line_list" >
-                <option></option>
-            </select>
-        </label></td>
-    <td align='center'>
-        <select name="ext_list" id="select">
-            {loop name="display_ext"}
-            <option value="{$value.value}">{$value.text}</option>
-            {/loop}
-        </select>
-        </label>
-    </td>
-    <td align='center'></td>
-    <td align='center'></a></td>
-    <td align='center'></td>
-</tr>
-{/if}
 {if condition="$mode == 'EDIT'"}
 <tr>
     <td align='center'>&nbsp;</td>
@@ -331,18 +322,6 @@
     <td align='center'><div id="demo"><a href="#" onclick="edit_device('edit',{$edit_id},'add_line_x');"><i class="green icon-plus" title="Add a Line to the device currently being edited"></i></a></div></td>
     <td align='center'></td>
 </tr> 
-{else}
-<tr>
-    <td align='center'>&nbsp;</td>
-    <td align='center'></td>
-    <td align='center'></td>
-    <td align='center'></td>
-    <td align='center'>&nbsp;</td>
-    <td align='center'>&nbsp;</td>
-    <td align='center'></td>
-    <td align='center'></td>
-    <td align='center'></td>
-</tr>
 {/if}
 {/if}
   </tbody>
