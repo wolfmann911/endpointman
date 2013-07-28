@@ -123,8 +123,8 @@ msgstr ""
 #~ msgid "OUI Manager"
 #~ msgstr "Gestion des OUI"
 
-#~ msgid "Product Options/Configuration Editor"
-#~ msgstr "Editeur de configuration/options du produit"
+#~ msgid "Product Configuration Editor"
+#~ msgstr "Editeur de configuration du produit"
 
 #~ msgid "Show/Hide Brands/Models"
 #~ msgstr "Montrer/Cacher les marques/modèles"
