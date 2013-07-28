@@ -170,24 +170,15 @@ switch ($_REQUEST['subpage']) {
             $endpoint->eda->sql($sql);
             $endpoint->message['oui_manager'] = "Deleted!";
         }
-        $sql = 'SELECT endpointman_oui_list.id, endpointman_oui_list.oui , endpointman_brand_list.name FROM endpointman_oui_list , endpointman_brand_list WHERE endpointman_oui_list.brand = endpointman_brand_list.id AND endpointman_oui_list.custom = 0';
+        $sql = 'SELECT endpointman_oui_list.id, endpointman_oui_list.oui , endpointman_brand_list.name, endpointman_oui_list.custom FROM endpointman_oui_list , endpointman_brand_list WHERE endpointman_oui_list.brand = endpointman_brand_list.id ORDER BY endpointman_oui_list.oui ASC';
         $data = & $endpoint->eda->sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
         $i = 0;
         $row_out = array();
         foreach ($data as $row) {
             $row_out[$i] = $row;
+            $endpoint->tpl->assign("oui_list", $row_out);
             $i++;
         }
-        $endpoint->tpl->assign("oui_list", $row_out);
-        $sql = 'SELECT endpointman_oui_list.id, endpointman_oui_list.oui , endpointman_brand_list.name FROM endpointman_oui_list , endpointman_brand_list WHERE endpointman_oui_list.brand = endpointman_brand_list.id AND endpointman_oui_list.custom = 1';
-        $data = $endpoint->eda->sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
-        $i = 0;
-        $row_out_custom = array();
-        foreach ($data as $row) {
-            $row_out_custom[$i] = $row;
-            $i++;
-        }
-        $endpoint->tpl->assign("oui_list_custom", $row_out_custom);
         $endpoint->tpl->assign("brand_ava", $endpoint->brands_available());
         $endpoint->prepare_message_box();
         echo $endpoint->tpl->draw('advanced_settings_oui');
