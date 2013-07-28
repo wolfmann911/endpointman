@@ -80,13 +80,13 @@
 <table width='800px' class='alt_table'>
 <tr>
   <td width="50%"><?php echo _("Enable FreePBX ARI Module")?> (<a href="http://wiki.provisioner.net/index.php/Endpoint_manager_manual_ari" target="_blank">What?</a>)</td>
-  <td align='left'><label>
+  <td><label>
     <input type=checkbox name="enable_ari" {$ari_selected}>
   </label></td>
 </tr>
 <tr>
-  <td align='right'><?php echo _("Enable Debug Mode")?> <a href="#" class="info"><span>Enable Advanced debugging mode for endpoint manager</span></a></td>
-  <td align='left'><label>
+  <td><?php echo _("Enable Debug Mode")?> <a href="#" class="info"><span>Enable Advanced debugging mode for endpoint manager</span></a></td>
+  <td><label>
     <input type=checkbox name="enable_debug" {$debug_selected}>
   </label></td>
 </tr>
@@ -139,7 +139,7 @@
 </tr>
 {/if}
 <tr>
-<td colspan='2' align='center'><input type='Submit' name='button_update_globals' value='<?php echo _('Update Globals')?>'></td>
+<td colspan='2' align='center'><button type='Submit' name='button_update_globals'><i class='icon-refresh blue'></i> <?php echo _('Update Globals')?></button></td>
 </tr>
 </table>
 </form>
