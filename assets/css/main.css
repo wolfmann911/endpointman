@@ -40,3 +40,18 @@
   color: #474949;
   font-color: #474949;
 }
+
+code.inline {
+  padding: 2px 4px;
+  font-size: 0.8em;
+  background-color: #f7f7f9;
+  border: 1px solid #e1e1e8;
+}
+
+ul.nobullets {
+    list-style-type: none;
+}
+
+li {
+  line-height: 24px;
+}
