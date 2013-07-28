@@ -55,3 +55,15 @@ ul.nobullets {
 li {
   line-height: 24px;
 }
+
+.button_Enable {
+  background: none;
+  color: #003300;
+  background-color: #66F966;
+}
+
+.button_Disable {
+  background: none;
+  color: #330000;
+  background-color: #F96666;
+}
