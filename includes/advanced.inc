@@ -157,55 +157,6 @@ switch ($_REQUEST['subpage']) {
         $endpoint->prepare_message_box();
         echo $endpoint->tpl->draw('advanced_settings_manual_upload');
         break;
-    case "sh_manager":
-        if (isset($_REQUEST['button_hide'])) {
-            if (isset($_REQUEST['model'])) {
-                $sql = "UPDATE endpointman_model_list SET hidden = 1 WHERE id = '" . $_REQUEST['model'] . "'";
-            } elseif (isset($_REQUEST['brand'])) {
-                $sql = "UPDATE endpointman_brand_list SET hidden = 1 WHERE id = " . $_REQUEST['brand'];
-            } elseif (isset($_REQUEST['product'])) {
-                $sql = "UPDATE endpointman_product_list SET hidden = 1 WHERE id = '" . $_REQUEST['product'] . "'";
-            }
-            $endpoint->eda->sql($sql);
-        } elseif (isset($_REQUEST['button_show'])) {
-            if (isset($_REQUEST['model'])) {
-                $sql = "UPDATE endpointman_model_list SET hidden = 0 WHERE id = '" . $_REQUEST['model'] . "'";
-            } elseif (isset($_REQUEST['brand'])) {
-                $sql = "UPDATE endpointman_brand_list SET hidden = 0 WHERE id = " . $_REQUEST['brand'];
-            } elseif (isset($_REQUEST['product'])) {
-                $sql = "UPDATE endpointman_product_list SET hidden = 0 WHERE id = '" . $_REQUEST['product'] . "'";
-            }
-            $endpoint->eda->sql($sql);
-        }
-        $sql = "SELECT * from endpointman_brand_list WHERE id > 0 ORDER BY id ASC ";
-        $result = & $endpoint->eda->sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
-        $i = 0;
-        foreach ($result as $row) {
-            $row_out[$i] = $row;
-            $row_out[$i]['count'] = $i;
-            if ($row['installed']) {
-                $j = 0;
-                $sql = 'SELECT * FROM endpointman_product_list WHERE brand = ' . $row['id'] . ' ORDER BY long_name ASC';
-                $result2 = & $endpoint->eda->sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
-                $xml_data = "";
-                foreach ($result2 as $row2) {
-                    $row_out[$i]['products'][$j] = $row2;
-                    $sql = 'SELECT * FROM endpointman_model_list WHERE product_id = ' . $row2['id'];
-                    $result3 = & $endpoint->eda->sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
-                    $k = 0;
-                    foreach ($result3 as $row3) {
-                        $row_out[$i]['products'][$j]['models'][$k] = $row3;
-                        $k++;
-                    }
-                    $j++;
-                }
-            }
-            $i++;
-        }
-        $endpoint->tpl->assign("brand2_list", $row_out);
-        $endpoint->prepare_message_box();
-        echo $endpoint->tpl->draw('advanced_settings_sh_manager');
-        break;
     case "oui_manager":
         if ((isset($_REQUEST['oui_sub'])) AND ($_REQUEST['rb_brand'] > 0) AND ($_REQUEST['oui'] != "")) {
             $sql = "INSERT INTO  endpointman_oui_list (oui, brand, custom) VALUES ('" . $_REQUEST['oui'] . "',  '" . $_REQUEST['rb_brand'] . "',  '1')";

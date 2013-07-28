@@ -1,19 +1,19 @@
-{include="global_header"}
-<h2>Package Manager</h2>
-<hr>
 {if condition="isset($show_error_box)"}
     {include="message_box"}
 {/if}
 <style type="text/css">
 <!--
-.brand {
-	border: thin dotted #000;
+.brand, .product {
+    margin-top: 10px;
 }
-.product {
-	border: thin dotted #000;
+button {
+    width: 90px;
 }
-.model {
-	border: thin dotted #000;
+button.wide {
+    width: 140px;
+}
+button.double-wide {
+    width: 160px;
 }
 -->
 </style>
@@ -25,7 +25,7 @@
 </script>
 <center>
 <form id='check' action='config.php?type=tool&amp;display=epm_config' method='POST'>
-	<button type="submit" name="button_check_for_updates" onclick="check();"><i class='icon-refresh blue'></i> <?php echo _('Check for Updates')?></button>
+	<button type="submit" name="button_check_for_updates" class='double-wide' onclick="check();"><i class='icon-refresh blue'></i> <?php echo _('Check for Updates')?></button>
 </form>
 </center>
 
@@ -185,23 +185,25 @@ process_module_actions();
 {/if}
 {if condition="1 == 1"}
     {loop name="brand2_list"}
+        <form action='config.php?type=tool&amp;display=epm_config' method='POST'><input type="hidden" name="brand" value="{$value.id}"><button type="submit" name="button_{if condition="$value.installed == '1'"}uninstall{else}install{/if}" class="button_{if condition="$value.installed == '1'"}Disable{else}Enable{/if}">{if condition="$value.installed == '1'"}<i class='icon-remove red'></i> <?php echo _('Uninstall')?>{else}<i class='icon-plus green'></i> <?php echo _('Install')?>{/if}</button>{if condition="array_key_exists('update',$value)"}{if condition="$value.update == 1"}New Package Modified [{$value.update_vers}]<input type="submit" name="button_update" class="button_update" value="<?php echo _('Update')?>">{/if}{/if}<font style='font-size: 1.2em; vertical-align: middle'><b>{$value.name}</b></font>
+        <div style='vertical-align: middle; float: right'>{if condition="$value.installed == '1'"}(<font size="-1"><?php echo _('Package Last Modified')?> [{$value.cfg_ver}]</font>) {/if}{if condition="$value.installed == '1'"}<input type="checkbox" name="vehicle" value="Bike" disabled {if condition="$value.local == 0"}checked{/if}/>Check Online{/if}</div></form>
+
         <table width="100%" class="brand" border="0" cellspacing="0" cellpadding="0">
             <tr>
-                <td colspan="2">{$value.name} {if condition="$value.installed == '1'"}(<font size="-1"><?php echo _('Package Last Modified')?> [{$value.cfg_ver}]</font>) {/if}{if condition="$value.installed == '1'"}<input type="checkbox" name="vehicle" value="Bike" disabled {if condition="$value.local == 0"}checked{/if}/>Check Online{/if}<form action='config.php?type=tool&amp;display=epm_config' method='POST'><input type="hidden" name="brand" value="{$value.id}"><button type="submit" name="button_{if condition="$value.installed == '1'"}uninstall{else}install{/if}" class="button_{if condition="$value.installed == '1'"}Disable{else}Enable{/if}">{if condition="$value.installed == '1'"}<i class='icon-remove red'></i> <?php echo _('Uninstall')?>{else}<i class='icon-plus green'></i> <?php echo _('Install')?>{/if}</button>{if condition="array_key_exists('update',$value)"}{if condition="$value.update == 1"}New Package Modified [{$value.update_vers}]<input type="submit" name="button_update" class="button_update" value="<?php echo _('Update')?>">{/if}{/if}</form></td>
             </tr>
             <tr>
                 <td width="3%">&nbsp;</td>
                 <td width="97%">{loop name="value.products"}
-                    <table width="100%" class="product" border="0" cellspacing="0" cellpadding="0">
+                    <table width="100%" class="product alt_table" border="0" cellspacing="0" cellpadding="0">
                         <tr>
-                            <td colspan="2">{$value.long_name} {if condition="$value.cfg_ver != ''"}{/if} <form action='config.php?type=tool&amp;display=epm_config' method='POST'><input type="hidden" name="product" value="{$value.id}">{if condition="array_key_exists('update',$value)"}{if condition="$value.update == 1"}<button type="submit" name="button_update" class="button_update"><i class='icon-refresh green'></i>Update</button>{/if}{/if}{if condition="$value.fw_type == 'install'"}<button type="submit" name="button_install_firmware" class="button_update button_Enable"><i class='icon-plus green'></i> <?php echo _('Install Firmware')?></button>{elseif condition="$value.fw_type == 'remove'"}<button type="submit" name="button_remove_firmware" class="button_update button_Disable"><i class='icon-remove red'></i> <?php echo _('Remove Firmware')?></button>{/if}{if condition="array_key_exists('update_fw',$value)"}{if condition="$value.update_fw == 1"}<button type="submit" name="button_update_firmware" class="button_update"><i class='icon-refresh blue'></i> <?php echo _('Update Firmware')?>">{/if}{/if}</form></td>
+                            <td colspan="2">{if condition="$value.cfg_ver != ''"}{/if} <form action='config.php?type=tool&amp;display=epm_config' method='POST'><input type="hidden" name="product" value="{$value.id}">{if condition="array_key_exists('update',$value)"}{if condition="$value.update == 1"}<button type="submit" name="button_update" class="button_update"><i class='icon-refresh green'></i>Update</button>{/if}{/if}{if condition="$value.fw_type == 'install'"}<button type="submit" name="button_install_firmware" class="button_update button_Enable wide"><i class='icon-plus green'></i> <?php echo _('Install Firmware')?></button>{elseif condition="$value.fw_type == 'remove'"}<button type="submit" name="button_remove_firmware" class="button_update button_Disable wide"><i class='icon-remove red'></i> <?php echo _('Remove Firmware')?></button>{/if}{if condition="array_key_exists('update_fw',$value)"}{if condition="$value.update_fw == 1"}<button type="submit" name="button_update_firmware" class="button_update"><i class='icon-refresh blue'></i> <?php echo _('Update Firmware')?>">{/if}{/if}<font style='vertical-align: middle'><b>{$value.long_name}</b></font></form></td>
                         </tr>
                         <tr>
                             <td width="4%">&nbsp;</td>
                             <td width="96%">{loop name="value.models"}
                                 <table width="100%" class="model" border="0" cellspacing="0" cellpadding="0">
                                     <tr>
-                                        <td>{$value.model} <form action='config.php?type=tool&amp;display=epm_config' method='POST'><input type="hidden" name="model" value="{$value.id}"><button type="submit" name="button_{if condition="$value.enabled == '1'"}disable{else}enable{/if}" class="button_{if condition="$value.enabled == '1'"}Disable{else}Enable{/if}">{if condition="$value.enabled == '1'"}<i class='icon-remove red'></i> <?php echo _('Disable')?>{else}<i class='icon-plus green'></i> <?php echo _('Enable')?>{/if}</button></form></td>
+                                        <td><form action='config.php?type=tool&amp;display=epm_config' method='POST'><input type="hidden" name="model" value="{$value.id}"><button type="submit" name="button_{if condition="$value.enabled == '1'"}disable{else}enable{/if}" class="button_{if condition="$value.enabled == '1'"}Disable{else}Enable{/if}">{if condition="$value.enabled == '1'"}<i class='icon-remove red'></i> <?php echo _('Disable')?>{else}<i class='icon-plus green'></i> <?php echo _('Enable')?>{/if}</button> <font style='vertical-align: middle'>{$value.model}</font></form></td>
                                     </tr>
                                 </table>{/loop}</td>
                         </tr>
@@ -215,8 +217,3 @@ process_module_actions();
 <hr>
 <h6 align='center'>Want to participate? Add new phones? Join us at <a href="http://provisioner.net" target="_blank">http://www.provisioner.net</a></h6>
 {include="global_footer"}
-
-  
-
-
-  
