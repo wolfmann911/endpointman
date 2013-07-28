@@ -10,7 +10,7 @@
 	<menuitems>
 		<epm_devices sort="1">OSS Endpoint Device List</epm_devices>
 		<epm_templates sort="2">OSS Endpoint Template Manager</epm_templates>
-		<epm_config sort="3">OSS Endpoint Configuration</epm_config>
+		<epm_config sort="3">OSS Endpoint Package Manager</epm_config>
 		<epm_advanced sort="4">OSS Endpoint Advanced Settings</epm_advanced>
 	</menuitems>
 	 <description>
