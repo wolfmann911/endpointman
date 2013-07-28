@@ -6,7 +6,7 @@
 <table width='800px' class='alt_table'>
 <tr>
 <td width='50%'><?php echo _("IP address of phone server")?>:</td>
-<td width='50%'><input type='text' id='srvip' name='srvip' value='{$srvip}'><a href='#' onclick="document.getElementById('srvip').value = '{$ip}'; "><?php echo _("Determine for me")?></a></td>
+<td width='50%'><input type='text' id='srvip' name='srvip' value='{$srvip}'><a href='#' onclick="document.getElementById('srvip').value = '{$ip}'; "><font style="font-size: 0.8em"><i class='icon-search'></i> <?php echo _("Determine for me")?></font></a></td>
 </tr>
 <tr>
   <td><?php echo _("Configuration Type")?></td>
@@ -28,7 +28,7 @@
 <h5>Time</h5>
 <table width='800px' class='alt_table'>
 <tr>
-<td width='50%'><?php echo _("Time Zone")?> (<?php echo _('like')?> USA-5)</td>
+<td width='50%'><?php echo _("Time Zone")?> (<font style="font-size: 0.8em"><?php echo _('like')?> <b>England/London</b></font>)</td>
 <td width='50%'><select name="tz" id="tz">
 	{loop name="list_tz"}
 	<option value="{$value.value}" {if condition="$value.selected == 1"}selected='selected'{/if}>{$value.text}</option>
