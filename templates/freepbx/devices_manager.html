@@ -1,8 +1,9 @@
 {include="global_header"}
+<h2><?php echo _('Device List');?></h2>
+<hr>
 {if condition="isset($show_error_box)"}
 {include="message_box"}
 {/if}
-<br>
 <script type="text/javascript" charset="utf-8">
    $(function(){
         $("select#brand_edit").change(function(){
@@ -85,27 +86,29 @@
         $(".toggle_all").each(function (i) {
             var rowClass = 'rowGroup'+$(this).attr('id');
             if(mode == 'expand') {
-                $("#img2"+rowClass).attr("src", "assets/endpointman/images/collapse.png");
-                $("#img3"+rowClass).attr("src", "assets/endpointman/images/collapse.png");
+                $("#img2"+rowClass).removeClass().addClass('info icon-chevron-up');
+                $("#img3"+rowClass).removeClass().addClass('info icon-chevron-up');
                 $('.'+rowClass).show();
-                $('#expander').html('<a onclick="toggleDisplayAll(\'collapse\')"><img src="assets/endpointman/images/collapse.png" id="toggle_all_img" title="Click to Collapse All Line Information">Collapse All</a>');
+                $('#expander').hide();
+                $('#collapser').show();
             } else {
-                $("#img2"+rowClass).attr("src", "assets/endpointman/images/expand.png");
-                $("#img3"+rowClass).attr("src", "assets/endpointman/images/expand.png");
+                $("#img2"+rowClass).removeClass().addClass('info icon-chevron-down');
+                $("#img3"+rowClass).removeClass().addClass('info icon-chevron-down');
                 $('.'+rowClass).hide();
-                $('#expander').html('<a onclick="toggleDisplayAll(\'expand\')"><img src="assets/endpointman/images/expand.png" id="toggle_all_img" title="Click to Expand All Line Information">Expand All</a>');
+                $('#expander').show();
+                $('#collapser').hide();
             }
         });
     }
 
     function toggleDisplay(tbl, rowClass) {
-        if($("#img2"+rowClass).attr("src") == 'assets/endpointman/images/expand.png') {
-            $("#img2"+rowClass).attr("src", "assets/endpointman/images/collapse.png");
-            $("#img3"+rowClass).attr("src", "assets/endpointman/images/collapse.png");
+        if($("#img2"+rowClass).hasClass("icon-chevron-down")) {
+            $("#img2"+rowClass).removeClass().addClass('info icon-chevron-up');
+            $("#img3"+rowClass).removeClass().addClass('info icon-chevron-up');
             $('.'+rowClass).show();
         } else {
-            $("#img2"+rowClass).attr("src", "assets/endpointman/images/expand.png");
-            $("#img3"+rowClass).attr("src", "assets/endpointman/images/expand.png");
+            $("#img2"+rowClass).removeClass().addClass('info icon-chevron-down');
+            $("#img3"+rowClass).removeClass().addClass('info icon-chevron-down');
             $('.'+rowClass).hide();
         }
     }
@@ -191,36 +194,29 @@
         if (window.focus) {newwindow.focus()}
         return false;
     }
+    function togglePhones(action) {
+        $('#devList .device').prop('checked', action);
+    }
 </script>
 
-<center>
-    {if condition="$no_add == FALSE"}
-    <form id='go' action='config.php?type=tool&amp;display=epm_devices' method='POST'>
-        <label><?php echo _('Search for new devices in netmask')?>
-            <input name="netmask" type="text" value="{$netmask}">
-            <input type="Submit" name="button_go" id="button_go" onclick="find_devices();" value="<?php echo _('Go')?>">
-        </label>
-        <label>
-            <input name="nmap" type="checkbox" value="1" checked><?php echo _('Use NMAP')?>
-        </label>
-    </form>
-    {/if}
-</center>
-<table align='center' width='90%'>
+<h3>{if condition="$mode != 'EDIT'"}<?php echo _('Add')?>{else}<?php echo _('Edit')?>{/if} <?php echo _('Device')?></h3>
+<form name="adding" id="adding" action='config.php?type=tool&amp;display=epm_devices' method='POST' />
+<table align='center' width='97%'>
+  <thead>
     <tr>
-        <td align='center' width='45'></td>
-        <td width="157" align='center'><h3><?php echo _('Mac Address')?></h3></td>
-        <td width="187" align='center'><h3><?php echo _('Brand')?></h3></td>
-        <td width="216" align='center'><h3><?php echo _('Model of Phone')?></h3></td>
-        <td width="172" align='center'><h3><?php echo _('Line')?></h3></td>
-        <td width="275" align='center'><h3><?php echo _('Extension Number')?></h3></td>
-        <td width="154" align='center'><h3><?php echo _('Template')?></h3></td>
+        <th width="7%""></th>
+        <th width="13%" align='center'><?php echo _('MAC Address')?></th>
+        <th width="13%" align='center'><?php echo _('Brand')?></th>
+        <th width="10%" align='center'><?php echo _('Model of Phone')?></th>
+        <th width="10%" align='center'><?php echo _('Line')?></th>
+        <th width="19%" align='center'><?php echo _('Extension Number')?></th>
+        <th width="15%" align='center'><?php echo _('Template')?></th>
 
-        <td width="234" align='center'></td>
-        <td align='center'></td>
+        <th width="6%"></th>
+        <th width="7%"></th>
     </tr>
-        <form name="adding" id="adding" action='config.php?type=tool&amp;display=epm_devices' method='POST' />
-
+  </thead>
+  <tbody>
 	{if condition="$no_add == FALSE"}
     <tr>
     <td align='center' width='2%'>&nbsp;</td>
@@ -255,24 +251,41 @@
             <select name="model_list" id="model_new"><option></option></select>
 	{/if}
         </label></td>
+{if condition="$mode == 'EDIT'"}
     <td align='center'></td>
     <td align='center'></td>
+{else}
+    <td align='center'>
+        <label>
+            <select name="line_list" id="line_list" >
+                <option></option>
+            </select>
+        </label></td>
+    <td align='center'>
+        <select name="ext_list" id="select">
+            {loop name="display_ext"}
+            <option value="{$value.value}">{$value.text}</option>
+            {/loop}
+        </select>
+        </label>
+    </td>
+{/if}
     <td align='center'>  <div id="demo"><select name="template_list" id="template_list">
                 {loop name="display_templates"}
                 <option value="{$value.value}" {if condition="isset($value.selected)"}selected{/if}>{$value.text}</option>
                 {/loop}
             </select>
-            <a href="#" onclick="return popitup('config.php?display=epm_config&amp;quietmode=1&amp;handler=file&amp;file=popup.html.php&amp;module=endpointman&amp;pop_type=edit_template&amp;edit_id={$edit_id}', 'Template Editor', '{$edit_id}')"><img src='assets/endpointman/images/edit.png' title="Edit Template Selected on the Left" border="0"></a></div>
+            <a href="#" onclick="return popitup('config.php?display=epm_config&amp;quietmode=1&amp;handler=file&amp;file=popup.html.php&amp;module=endpointman&amp;pop_type=edit_template&amp;edit_id={$edit_id}', 'Template Editor', '{$edit_id}')"><i class='icon-pencil'></i></a></div>
         </label></td>
     <td align='center'>
 	{if condition="$mode == 'EDIT'"}
-        <input type='Submit' name='button_save' onclick="edit_device('edit',{$edit_id},'button_save');" value='<?php echo _('Save')?>'>
+        <button type='submit' name='button_save' onclick="edit_device('edit',{$edit_id},'button_save');"><i class='icon-save blue'></i> <?php echo _('Save')?></button>
 	{else}
-               <input type='button' name='button_add' onclick="add_device();" value='<?php echo _('Add')?>'>
+        <button type='button' name='button_add' onclick="add_device();"><i class='icon-plus success'></i>&nbsp;<?php echo _('Add')?></button>
 	{/if}
     </td>
 
-    <td align='center'>{if condition="$mode != 'EDIT'"}<input type='reset' value='<?php echo _('Reset')?>'>{/if}</td>
+    <td align='center'>{if condition="$mode != 'EDIT'"}<button type='reset'><i class='icon-rotate-left red'></i> <?php echo _('Reset')?>{/if}</td>
 </tr>
 {loop name="line_list_edit"}
 <tr>
@@ -298,36 +311,10 @@
         </label>
     </td>
     <td align='center'></td>
-    <td align='center'>{if condition="!isset($disabled_delete_line)"}<div id="demo"><a href="#" onclick="edit_device('edit',{$value.luid},'delete');"><img src="assets/endpointman/images/delete.png" title="Delete Line from Device to the Left"></div>{/if}</a></td>
+    <td align='center'>{if condition="!isset($disabled_delete_line)"}<div id="demo"><a href="#" onclick="edit_device('edit',{$value.luid},'delete');"><i class="red icon-remove" title="Delete Line from Device to the Left"></i></div>{/if}</a></td>
     <td align='center'></td>
 </tr>
 {/loop}
-{if condition="$mode != 'EDIT'"}
-<tr>
-    <td align='center' width='2%'>&nbsp;</td>
-
-    <td align='center'></td>
-    <td align='center'></td>
-    <td align='center'></td>
-    <td align='center'>
-        <label>
-            <select name="line_list" id="line_list" >
-                <option></option>
-            </select>
-        </label></td>
-    <td align='center'>
-        <select name="ext_list" id="select">
-            {loop name="display_ext"}
-            <option value="{$value.value}">{$value.text}</option>
-            {/loop}
-        </select>
-        </label>
-    </td>
-    <td align='center'></td>
-    <td align='center'></a></td>
-    <td align='center'></td>
-</tr>
-{/if}
 {if condition="$mode == 'EDIT'"}
 <tr>
     <td align='center'>&nbsp;</td>
@@ -337,23 +324,12 @@
     <td align='center'>&nbsp;</td>
     <td align='center'>&nbsp;</td>
     <td align='center'></td>
-    <td align='center'><div id="demo"><a href="#" onclick="edit_device('edit',{$edit_id},'add_line_x');"><img src="assets/endpointman/images/add.png" alt="Add Line" border="0" width="24" height="24" title="Add a Line to the device currently being edited"></a></div></td>
+    <td align='center'><div id="demo"><a href="#" onclick="edit_device('edit',{$edit_id},'add_line_x');"><i class="green icon-plus" title="Add a Line to the device currently being edited"></i></a></div></td>
     <td align='center'></td>
 </tr> 
-{else}
-<tr>
-    <td align='center'>&nbsp;</td>
-    <td align='center'></td>
-    <td align='center'></td>
-    <td align='center'></td>
-    <td align='center'>&nbsp;</td>
-    <td align='center'>&nbsp;</td>
-    <td align='center'></td>
-    <td align='center'></td>
-    <td align='center'></td>
-</tr>
 {/if}
 {/if}
+  </tbody>
 </table>
 </form>
 
@@ -418,130 +394,100 @@
 	{/if}
 </table>
 {/if}
+
 <form id="managed" action='config.php?type=tool&amp;display=epm_devices' method='POST'>
-<table width='90%' align='center' id='devList'>
+<h3><?php echo _('Current Managed Extensions')?></h3>
+
+<button type="button" id="selecter"   style="zoom: 0.8" onclick="togglePhones(true)"  ><i class="info icon-check"       id="toggle_all_phones_on"  title="Click to Select All Phones"  ></i> Select All</button>
+<button type="button" id="deselecter" style="zoom: 0.8" onclick="togglePhones(false)" ><i class="info icon-check-empty" id="toggle_all_phones_off" title="Click to Deselect All Phones"></i> Deselect All</button>
+<button type="button" id="expander"   style="zoom: 0.8" onclick="toggleDisplayAll('expand')"  ><i class="info icon-chevron-down" id="toggle_all_img" title="Click to Expand All Line Information"  ></i> Expand All</button>
+<button type="button" id="collapser"  style="zoom: 0.8" onclick="toggleDisplayAll('collapse')"><i class="info icon-chevron-up"   id="toggle_all_img" title="Click to Collapse All Line Information"></i> Collapse All</button>
+<table width='97%' align='center' id='devList'>
+    <thead>
     <tr class="headerRow">
-        <td width="3%" align='center'>&nbsp;</td>
-        <td align='center'>&nbsp;</td>
-        <td align='center'>&nbsp;</td>
-        <td colspan="3" style='vertical-align:text-bottom;text-align:center;'><h3><?php echo _('Current Managed Extensions')?></h3></td>
-        <td align='center'>&nbsp;</td>
-        <td align='center'></td>
-        <td align='center'></td>
+        <th width="7%""></th>
+        <th width="13%" align='center'><?php echo _('MAC Address')?></th>
+        <th width="13%" align='center'><?php echo _('Brand')?></th>
+        <th width="10%" align='center'><?php echo _('Model of Phone')?></th>
+        <th width="10%" align='center'><?php echo _('Line')?></th>
+        <th width="19%" align='center'><?php echo _('Extension Number')?></th>
+        <th width="15%" align='center'><?php echo _('Template')?></th>
+        <th width="6%"><?php echo _('Edit')?></th>
+        <th width="7%"><?php echo _('Delete')?></th>
     </tr>
-    <tr>
-        <td colspan="7" id="expander"><a onclick="toggleDisplayAll('expand')"><img src="assets/endpointman/images/expand.png" id="toggle_all_img" title="Click to Expand All Line Information">Expand All Line Info</a></td>
-    </tr>
-    <tr class="headerRow">
-        <td width="3%" align='center'>&nbsp;</td>
-        <td align='center'><h3>Mac Address</h3></td>
-        <td align='center'><h3>Brand</h3></td>
-        <td align='center'><h3>Model of Phone</h3></td>
-        <td align='center'><h3>Line</h3></td>
-        <td align='center'><h3>Extension Number</h3></td>
-        <td align='center'><h3>Template</h3></td>
-        <td align='center'><h3>Specific</h3></td>
-        <td align='center'><h3>Edit</h3></td>
-        <td align='center'><h3>Delete</h3></td>
-    </tr>
+    </thead>
+    <tbody>
 	{loop name="list"}
         <tr class="headerRow">
-            <td align='center' width="5%"><div id="demo"><img src="assets/endpointman/images/circle_{if condition="$value.status.status === TRUE"}green{else}red{/if}.png" alt="{$value.status.ip}:{$value.status.port}"><input type="checkbox" name="selected[]" value="{$value.id}"></div></td>
-            <td align='center' width='11%'>{$value.mac}</td>
+            <td align='center' width="7%"><i class="icon-off icon-large {if condition="$value.status.status === TRUE"}green{else}red{/if}" alt="{$value.status.ip}:{$value.status.port}"></i><input type="checkbox" class="device" name="selected[]" value="{$value.id}"></td>
+            <td align='center' width='13%'>{$value.mac}</td>
             <td width="13%" align='center'>{$value.name}</td>
-            <td width="14%" align='center'>{$value.model}</td>
-            <td width="10%" align='center'><div id="demo"><a><img src="assets/endpointman/images/expand.png" id="img2rowGroup{$value.master_id}" onclick="toggleDisplay(document.getElementById('devList'),'rowGroup{$value.master_id}')" title="Click to Expand Line Information"></a></div></td>
-            <td width="19%" align='center'><div id="demo"><a><img src="assets/endpointman/images/expand.png" id="img3rowGroup{$value.master_id}" onclick="toggleDisplay(document.getElementById('devList'),'rowGroup{$value.master_id}')" title="Click to Expand Line Information"></a></div></td>
-            <td align='center' width='15%'>{$value.template_name}</td>
-            <td align='center'><div id="demo"><a href="#" onclick="submit_stype('edit',{$value.id});"><img src='assets/endpointman/images/edit.png' ALT='<?php echo _('Edit')?>' title='Edit Device' border='0'></a></div></td>
-            <td align='center' width='9%'><div id="demo"><a href="#" onclick="submit_wtype('edit',{$value.id});"><img src='assets/endpointman/images/edit.png' ALT='<?php echo _('Edit')?>' title='Edit Device' border='0'></a></div></td>
-            <td align='center' width='7%'><div id="demo"><a href="#" onclick="delete_device({$value.id});"><img src='assets/endpointman/images/delete.png' ALT='<?php echo _('Delete')?>' title='Delete Device' border='0'></a></div></td>
+            <td width="10%" align='center'>{$value.model}</td>
+            <td width="10%" align='center'><div id="demo"><a><i class="info icon-chevron-down" id="img2rowGroup{$value.master_id}" onclick="toggleDisplay(document.getElementById('devList'),'rowGroup{$value.master_id}')" title="Click to Expand Line Information"></i></a></div></td>
+            <td width="19%" align='center'><div id="demo"><a><i class="info icon-chevron-down" id="img3rowGroup{$value.master_id}" onclick="toggleDisplay(document.getElementById('devList'),'rowGroup{$value.master_id}')" title="Click to Expand Line Information"></i></a></div></td>
+            <td align='center' width='15%'><a href="#" onclick="submit_stype('edit',{$value.id});">{$value.template_name}</a></td>
+            <td align='center' width='6%'><div id="demo"><a href="#" onclick="submit_wtype('edit',{$value.id});"><i class='blue icon-pencil' alt='<?php echo _('Edit')?>' title="Edit phone"></i></a></div></td>
+            <td align='center' width='7%'><div id="demo"><a href="#" onclick="delete_device({$value.id});"><i class='red icon-trash' alt='<?php echo _('Delete')?>' title="Delete phone"></i></a></div></td>
         </tr>
         {loop name="value.line"}
         <tr class="rowGroup{$value.master_id} toggle_all" id="{$value.master_id}" style="display:none;">
-            <td align='center' ></td>
-            <td align='center' width='11%'></td>
+            <td align='center' width='7%' ></td>
+            <td align='center' width='13%'></td>
             <td width="13%" align='center'></td>
-            <td width="14%" align='center'></td>
+            <td width="10%" align='center'></td>
             <td width="10%" align='center'>{$value.line}</td>
             <td width="19%" align='center'>{$value.ext} - {$value.description}</td>
             <td align='center' width='15%'></td>
-            <td align='center' width='9%'></td>
-            <td></td>
-            <td align='center' width='7%'><div id="demo"><a href="#" onclick="submit_wtype('delete_line',{$value.luid});"><img src='assets/endpointman/images/delete.png' ALT='<?php echo _('Delete')?>' title='Delete Line' border='0'></a></div></td>
+            <td align='center' width='6%'></td>
+            <td align='center' width='7%'><div id="demo"><a href="#" onclick="submit_wtype('delete_line',{$value.luid});"><i class="red icon-remove" alt='<?php echo _('Delete')?>' title='Delete Line'></i></a></div></td>
         </tr>
         {/loop}
 	{/loop}
+    </tbody>
 </table>
 
-<hr>
-<center>
-    <h4>
-        <?php echo _('Selected Phone(s) Options')?>
-    </h4>
-</center>
-<table id="globalops" width='90%' align='center'>
-    <tr>
-        <td width="26%" align='center'><input type="submit" name="button_delete_selected_phones" onclick="managed_options('delete_selected_phones');" value="<?php echo ('Delete Selected Phones')?>"></td>
-        <td width="26%" align='center'><input type="submit" name="button_rebuild_selected" onclick="managed_options('rebuild_selected_phones');" value="<?php echo _('Rebuild Configs for Selected Phones')?>"><br /><input type="checkbox" name="reboot">Reboot Phones</td>
-        <td width="32%" align='center'><?php echo _('Change Selected Phones to')?>: <br /><?php echo _('Brand')?>:<select name="brand_list_selected" id="brand_list_selected">
-                {loop name="brand_ava"}
-                <option value="{$value.value}" {if condition="isset($value.selected)"}selected{/if}>{$value.text}</option>
-                {/loop}
-            </select> <?php echo _('Model')?>: <select name="model_list_selected" id="model_list_selected"><option></option></select><br /><input type="submit" name="button_update_phones" onclick="managed_options('change_brand');" value="<?php echo _('Update Phones')?>"><br /><input type="checkbox" name="reboot_change">Reboot Phones</td>
-    </tr>
-</table>
+<h4><?php echo _('Selected Phone(s) Options')?></h4>
+<p><button style="width: 100px" type="submit" style="vertical-align:middle" name="button_delete_selected_phones" onclick="managed_options('delete_selected_phones');"><i class="icon-trash red"></i> <?php echo _('Delete')?></button> <?php echo ('Delete Selected Phones')?></p>
+<p><button style="width: 100px" type="submit" name="button_rebuild_selected" onclick="managed_options('rebuild_selected_phones');"><i class="icon-refresh green"></i> <?php echo _('Rebuild')?></button> <?php echo _('Rebuild Configs for Selected Phones')?> (<label><input type="checkbox" name="reboot"><font size="-1">Reboot Phones</font></label>)</p>
+<p><button style="width: 100px" style="vertical-align:middle" type="submit" name="button_update_phones" onclick="managed_options('change_brand');"><i class='blue icon-random'></i> <?php echo _('Update')?></button>
+<?php echo _('Change Selected Phones to')?>&nbsp;
+<select name="brand_list_selected" id="brand_list_selected"><option><?php echo _('Brand')?></option>{loop name="brand_ava"}<option value="{$value.value}" {if condition="isset($value.selected)"}selected{/if}>{$value.text}</option>{/loop}</select> <select name="model_list_selected" id="model_list_selected"><option><?php echo _('Model')?></option></select> (<label><input type="checkbox" name="reboot_change"><font size="-1">Reboot Phones</font></label>)</p>
 </form>
-<hr>
-<center>
-    <h4><?php echo _('Global Phone Options')?></h4>
-</center>
-<table id="globalops2" width='90%' align='center'>
-    <tr>
-        <td align='center'>
-            <form action='' name='globalmanaged' id='globalmanaged' method='POST'>
-                <input type='Submit' name='button_rebuild_configs_for_all_phones' onclick="submit_global('rebuild_configs_for_all_phones');" value='<?php echo _('Rebuild Configs for All Phones')?>'>
-                       <br />
-                <input type="checkbox" name="reboot">Reboot Phones
-            </form>
-        </td>
-        <td align='center'>
-                <form action='' name='globalmanaged2' id='globalmanaged2' method='POST'><select name="rb_brand">
-                {loop name="brand_ava"}
-                            <option value="{$value.value}">{$value.text}</option>
-                {/loop}
-                </select><br/>
-                <input type='Submit' name='button_reboot_this_brand' onclick="submit_global2('reboot_brand');" value='<?php echo _('Reboot This Brand')?>'></form>
-        </td>
-        <td align='center'>
-            <form action='' name='globalmanaged3' id='globalmanaged3' method='POST'><?php echo _('Reconfigure all')?> (products)<br/> <select name="product_select" id="product_select">
-            {loop name="product_list"}
-                        <option value="{$value.value}">{$value.text}</option>
-            {/loop}
-                    </select><br/> <?php echo _('with')?>
-                    <label>
-                        <select name="template_selector" id="template_selector">
-                            <option></option>
-                        </select>
-                        <input type="submit" name="button_rebuild_reboot" onclick="submit_global3('rebuild_reboot');" value="<?php echo _('Rebuild')?>"><br /><input type="checkbox" name="reboot">Reboot Phones
-                    </label>
-            </td>
-        <td align='center'>
-            <form action='' name='globalmanaged4' id='globalmanaged4' method='POST'><?php echo _('Reconfigure all')?> (models)<br/> <select name="model_select" id="model_select">
-            {loop name="model_list"}
-                        <option value="{$value.value}">{$value.text}</option>
-            {/loop}
-                    </select><br/> <?php echo _('with')?>
-                    <label>
-                        <select name="model_template_selector" id="model_template_selector">
-                            <option></option>
-                        </select>
-                        <input type="submit" name="button_rebuild_reboot" onclick="submit_global3('mrebuild_reboot');" value="<?php echo _('Rebuild')?>"><br /><input type="checkbox" name="reboot">Reboot Phones
-                    </label>
-            </td>
-            
-    </tr>
-</table>
+
+<h4><?php echo _('Global Phone Options')?></h4>
+{if condition="$no_add == FALSE"}
+<p>
+<form id='go' action='config.php?type=tool&amp;display=epm_devices' method='POST'>
+  <button style="width: 100px" type="Submit" name="button_go" id="button_go" onclick="find_devices();"><i class='icon-search blue'></i> <?php echo _('Search')?></button>
+  <?php echo _('Search for new devices in netmask')?>
+  <input name="netmask" type="text" value="{$netmask}">
+  (<label><input name="nmap" type="checkbox" value="1" checked><font size="-1"><?php echo _('Use NMAP')?></font></label>)
+</form>
+</p>
+{/if}
+
+<p><form action='' name='globalmanaged' id='globalmanaged' method='POST'>
+<button style="width: 100px" type='Submit' name='button_rebuild_configs_for_all_phones' onclick="submit_global('rebuild_configs_for_all_phones');"><i class='icon-refresh green'></i> <?php echo _('Rebuild')?></button> <?php echo _('Rebuild Configs for All Phones')?>&nbsp;(<label><input type="checkbox" name="reboot"><font size="-1">Reboot Phones</font></label>)
+</form></p>
+
+<p><form action='' name='globalmanaged2' id='globalmanaged2' method='POST'>
+<button style="width: 100px" type='Submit' name='button_reboot_this_brand' onclick="submit_global2('reboot_brand');"><i class='icon-off red'></i> <?php echo _('Reboot')?></button> <?php echo _('Reboot This Brand')?> <select name="rb_brand">{loop name="brand_ava"}<option value="{$value.value}">{$value.text}</option>{/loop}</select>
+</form></p>
+
+<p><form action='' name='globalmanaged3' id='globalmanaged3' method='POST'>
+<button style="width: 100px" type="submit" name="button_rebuild_reboot" onclick="submit_global3('rebuild_reboot');"><i class="icon-random blue"></i> <?php echo _('Configure')?></button>
+<?php echo _('Reconfigure all')?> (products) <select name="product_select" id="product_select">{loop name="product_list"}<option value="{$value.value}">{$value.text}</option>{/loop}</select> <?php echo _('with')?>
+<label><select name="template_selector" id="template_selector"><option></option></select></label>
+(<label><input type="checkbox" name="reboot"><font size='-1'>Reboot Phones</font></label>)
+</form></p>
+
+<p><form action='' name='globalmanaged4' id='globalmanaged4' method='POST'>
+<button style="width: 100px" type="submit" name="button_rebuild_reboot" onclick="submit_global3('mrebuild_reboot');"><i class="icon-random blue"></i> <?php echo _('Configure')?></button>
+<?php echo _('Reconfigure all')?> (models) <select name="model_select" id="model_select">{loop name="model_list"}<option value="{$value.value}">{$value.text}</option>{/loop}</select> <?php echo _('with')?>
+<label><select name="model_template_selector" id="model_template_selector"><option></option></select></label>
+(<label><input type="checkbox" name="reboot"><font size='-1'>Reboot Phones</font></label>)
+</form></p>
+
 </form>
 
 {if condition="!isset($disable_help)"}
@@ -549,4 +495,7 @@
     $("#demo img[title]").tooltip();
 </script>
 {/if}
+<script>
+    $("#collapser").hide();
+</script>
 {include="global_footer"}

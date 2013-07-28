@@ -1,3 +1,6 @@
+<h2>Template Manager</h2>
+<h3>Template Editor</h3>
+<hr>
 {if condition="isset($in_ari)"}
 <html>
     <head>
@@ -72,26 +75,28 @@
         <strong><?php echo _('Line settings on this page')?></strong><i><font size="-2"> (Note: This is NOT the number of supported lines on the phone(s))</font></i>
 	{/if}
         <br />
-        <strong><?php echo _('Edit Global Settings Overrides')?>: </strong> <a href="#" onclick="return popitup3('config.php?type=tool&display=epm_config&amp;quietmode=1&amp;handler=file&amp;file=popup.html.php&amp;module=endpointman&amp;pop_type=global_over')"><img src='assets/endpointman/images/edit.png' ALT='<?php echo _('Edit')?>' border='0'></a>
+        <strong><?php echo _('Edit Global Settings Overrides')?>: </strong> <a href="#" onclick="return popitup3('config.php?type=tool&display=epm_config&amp;quietmode=1&amp;handler=file&amp;file=popup.html.php&amp;module=endpointman&amp;pop_type=global_over')"><?php echo _('Global Settings')?> <i class='icon-pencil blue' ALT='<?php echo _('Edit')?>'></i></a>
         <br />
 	{if condition="$alt != 0"}
-            <br/>
         {loop name="alt_configs"}
-            <strong><?php echo _('Select Alternative File Configurations for:')?></strong>
-            {$value.name} <select name="{$value.name}" id="altconfig_{$value.name}">';
-            <option value="0_{$value.name}">{$value.name} (Original)</option>';
+            <p><strong><?php echo _('Edit File Configurations for:')?></strong>
+            <a href="#" onclick="return popitup('config.php?type=tool&display=epm_config&amp;quietmode=1&amp;handler=file&amp;file=popup.html.php&amp;module=endpointman&amp;pop_type=alt_cfg_edit', '{$value.name}')">
+            <code>{$value.name}</code> <i class='icon-pencil blue' ALT='<?php echo _('Edit')?> {$value.name}'></i></a>
+            <br>
+            <strong><?php echo _('Select Alternative File Configurations for')?> <code>{$value.name}</code></strong>
+            <select name="{$value.name}" id="altconfig_{$value.name}">';
+            <option value="0_{$value.name}">{$value.name} (No Change)</option>';
             {loop name="value.list"}
                 <option value="{$value.id}_{$value.name}" {if condition="isset($value.selected)"}selected{/if}>{$value.name}</option>';
             {/loop}
             </select>
-            <a href="#" onclick="return popitup('config.php?type=tool&display=epm_config&amp;quietmode=1&amp;handler=file&amp;file=popup.html.php&amp;module=endpointman&amp;pop_type=alt_cfg_edit', '{$value.name}')"><img src='assets/endpointman/images/edit.png' ALT='<?php echo _('Edit')?>' border='0'></a>
             <br/>
         {/loop}
             <br/>
 	{/if}
         {loop name="only_configs"}
-            <strong><?php echo _('Edit File Configurations for:')?></strong> {$value.name}
-            <a href="#" onclick="return popitup2('config.php?type=tool&display=epm_config&amp;quietmode=1&amp;handler=file&amp;file=popup.html.php&amp;module=endpointman&amp;pop_type=alt_cfg_edit', '{$value.name}')"><img src='assets/endpointman/images/edit.png' ALT='<?php echo _('Edit')?>' border='0'></a>
+            <strong><?php echo _('Edit File Configurations for:')?></strong>&nbsp;
+            <a href="#" onclick="return popitup2('config.php?type=tool&display=epm_config&amp;quietmode=1&amp;handler=file&amp;file=popup.html.php&amp;module=endpointman&amp;pop_type=alt_cfg_edit', '{$value.name}')"><code>{$value.name}</code>&nbsp;<i class='icon-pencil blue' ALT='<?php echo _('Edit')?>'></i></a>
             <br/>
         {/loop}
             <br />
@@ -109,26 +114,31 @@
 					{loop name="value.data"}
                                 <tr>
                                     <td nowrap>
-					{if condition="$value.type == 'input'"}        
-					    <label>{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}: <input type='text' name='{$value.key}' id='{$value.key}' value='{$value.value}' size="{if condition="isset($value.max_chars)"}{$value.max_chars}{else}40{/if}"></label>
-					{elseif condition="$value.type == 'textarea'"}
-					    {if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}: <textarea rows="2" cols="20" name='{$value.key}' id='{$value.key}'>{$value.value}</textarea>
-					{elseif condition="$value.type == 'file'"}
-					    <label>{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}: <input type='file' name='{$value.key}' id='{$value.key}' value='{$value.value}'></label>
-					{elseif condition="$value.type == 'radio'"}
-						{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}:
+					    {if condition="$value.type == 'input'"}
+					                <label>{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}:
+                                    </td><td><input type='text' name='{$value.key}' id='{$value.key}' value='{$value.value}' size="{if condition="isset($value.max_chars)"}{$value.max_chars}{else}90{/if}"></label>
+					    {elseif condition="$value.type == 'textarea'"}
+					        {if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}: <textarea rows="2" cols="20" name='{$value.key}' id='{$value.key}'>{$value.value}</textarea>
+					    {elseif condition="$value.type == 'file'"}
+					                <label>{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}:
+                                    </td><td><input type='file' name='{$value.key}' id='{$value.key}' value='{$value.value}'></label>
+					    {elseif condition="$value.type == 'radio'"}
+						    {if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}:
 							{loop name="value.data"}
-                                                        <strong>[</strong><label>{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}: <input type='radio' name='{$value.key}' id='{$value.key}' value='{$value.value}' {if condition="array_key_exists('checked',$value)"}{$value.checked}{/if}></label><strong>]</strong>
+                                    <strong>[</strong><label>{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}:
+                                    </td><td><input type='radio' name='{$value.key}' id='{$value.key}' value='{$value.value}' {if condition="array_key_exists('checked',$value)"}{$value.checked}{/if}></label><strong>]</strong>
 							{/loop}
-					{elseif condition="$value.type == 'list'"}
-							{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}: <select name='{$value.key}' id='{$value.key}'>
-							{loop name="value.data"}
-							    <option value='{$value.value}' {if condition="array_key_exists('selected',$value)"}{$value.selected}{/if}>{$value.description}</option>
+					    {elseif condition="$value.type == 'list'"}
+							{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}:
+                                    </td><td><select name='{$value.key}' id='{$value.key}'>
+						    {loop name="value.data"}
+						            <option value='{$value.value}' {if condition="array_key_exists('selected',$value)"}{$value.selected}{/if}>{$value.description}</option>
 							{/loop}
-                                        </select>
-                                        {elseif condition="$value.type == 'checkbox'"}
-                                            <label>{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}: <input type='checkbox' name='{$value.key}' id='{$value.key}' value='{$value.value}'></label>
-					{/if}
+                                    </select>
+                        {elseif condition="$value.type == 'checkbox'"}
+                                    <label>{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}:
+                                    </td><td><input type='checkbox' name='{$value.key}' id='{$value.key}' value='{$value.value}'></label>
+					    {/if}
                                     </td><td width="90%">
 						{if condition="isset($value.aried)"}
                                         <label><input type='checkbox' name='ari_{$value.ari.key}' {if condition="isset($value.ari.checked)"}{$value.ari.checked}{/if}>End User Editable (<a href="http://projects.colsolgrp.net/documents/29" target="_blank">Through ARI Module</a>)</label>
@@ -151,8 +161,9 @@
             <input name="id" id="id" type="hidden" value="{$hidden_id}">
             <input name="custom" id="custom" type="hidden" value="{$hidden_custom}">
             {if condition="!isset($in_ari)"}
-            Reboot Phone(s) <input type='checkbox' name='epm_reboot'><br />
-            <input type="submit" name="button_save_template" value="<?php echo _('Save Template');?>">
+            <label>Reboot Phone(s) <input type='checkbox' name='epm_reboot'></label>
+            <br />
+            <button type="submit" name="button_save_template"><i class='icon-save blue'></i> <?php echo _('Save Template');?></button>
         </form>
         {include="global_footer"}
         {/if}
