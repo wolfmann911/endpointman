@@ -96,7 +96,7 @@ switch ($_REQUEST['subpage']) {
     case "manual_upload":
         $sql = "SELECT value FROM endpointman_global_vars WHERE var_name LIKE 'endpoint_vers'";
         $provisioner_ver = $endpoint->eda->sql($sql, 'getOne');
-        $provisioner_ver = date("n-j-y", $provisioner_ver) . " at " . date("g:ia", $provisioner_ver);
+        $provisioner_ver = date("d-M-Y", $provisioner_ver) . " at " . date("g:ia", $provisioner_ver);
         $endpoint->tpl->assign("provisioner_ver", $provisioner_ver);
         $endpoint->tpl->assign("brand_ava", $endpoint->brands_available());
 
