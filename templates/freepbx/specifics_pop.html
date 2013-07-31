@@ -1,8 +1,12 @@
 <html>
     <head>
         <title>PBX Endpoint Configuration Manager</title>
-        <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js" language="javascript"></script>
+        <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" language="javascript"></script>
+        <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/jquery-ui.min.js" language="javascript"></script>
+        <link href="assets/endpointman/css/main.css" rel="stylesheet" type="text/css">
         <link href="assets/css/mainstyle.css" rel="stylesheet" type="text/css" />
+        <link href="assets/css/jquery-ui.css" rel="stylesheet" type="text/css" />
+        <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
         <script language="javascript">
             function Close() {
                 self.close();
@@ -13,8 +17,8 @@
             }
         </script>
     </head>
-    <body face="Arial">
-        <br>
+    <body name="specific_pop">
+      <div id="page_body">
         <h1><face="Arial"><center><?php echo _('End Point Configuration Manager')?></center></h1>
         <hr>
 	{if condition="isset($show_error_box)"}
@@ -22,36 +26,36 @@
 	{/if}
         {include="variables"}
 	    <form name="myform" id="myform" method="post" action=""><input type="hidden" id="value" name="value" value="{$value}" />
-		<table width="90%" border="0" cellspacing="0" cellpadding="0">
+		<table width="90%" class="alt_table" border="0" cellspacing="0" cellpadding="0">
 {loop name="html_array"}
-<tr><td colspan="2">&nbsp;</td></tr>
-<tr><td colspan="2"><u><strong>{$value.title}</strong></u></td></tr>
+<tr><td colspan="3">&nbsp</td></tr>
+<tr><th align='left' colspan="2"><strong>{$value.title}</strong></th><th>Use Defaults</th></tr>
 {loop name="value.data"}
 {if condition="$value.type != 'break'"}
                                 <tr>
                                     <td width="50%" nowrap>
 					{if condition="$value.type == 'input'"}        
-					    <label>{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}: <input type='text' name='{$value.key}' id='{$value.key}' value='{$value.value}' size="{if condition="isset($value.max_chars)"}{$value.max_chars}{else}40{/if}"></label>
+					    <label>{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}:</td><td><input type='text' name='{$value.key}' id='{$value.key}' value='{$value.value}' size="{if condition="isset($value.max_chars)"}{$value.max_chars}{else}40{/if}"></label>
 					{elseif condition="$value.type == 'textarea'"}
-					    {if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}: <textarea rows="2" cols="20" name='{$value.key}' id='{$value.key}'>{$value.value}</textarea>
+					    {if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}:</td><td><textarea rows="2" cols="20" name='{$value.key}' id='{$value.key}'>{$value.value}</textarea>
 					{elseif condition="$value.type == 'file'"}
-					    <label>{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}: <input type='file' name='{$value.key}' id='{$value.key}' value='{$value.value}'></label>
+					    <label>{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}:</td><td><input type='file' name='{$value.key}' id='{$value.key}' value='{$value.value}'></label>
 					{elseif condition="$value.type == 'radio'"}
 						{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}
 							{loop name="value.data"}
-							    <label>{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}: <input type='radio' name='{$value.key}' id='{$value.key}' value='{$value.value}' {if condition="array_key_exists('checked',$value)"}{$value.checked}{/if}></label>
+							    <label>{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}:</td><td><input type='radio' name='{$value.key}' id='{$value.key}' value='{$value.value}' {if condition="array_key_exists('checked',$value)"}{$value.checked}{/if}></label>
 							{/loop}
 					{elseif condition="$value.type == 'list'"}
-							{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}: <select name='{$value.key}' id='{$value.key}'>
+							{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}:</td><td><select name='{$value.key}' id='{$value.key}'>
 							{loop name="value.data"}
 							    <option value='{$value.value}' {if condition="array_key_exists('selected',$value)"}{$value.selected}{/if}>{$value.description}</option>
 							{/loop}
                                         </select>
                                         {elseif condition="$value.type == 'checkbox'"}
-                                            <label>{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}: <input type='checkbox' name='{$value.key}' id='{$value.key}' value='{$value.value}' {if condition="$value.checked === TRUE"}checked{/if}></label>
+                                            <label>{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}:</td><td><input type='checkbox' name='{$value.key}' id='{$value.key}' value='{$value.value}' {if condition="$value.checked === TRUE"}checked{/if}></label>
 					{/if}
                                     </td>
-                                    <td><label><input type='checkbox' name='freepbx_{$value.key}' id='freepbx_{$value.key}' value='freepbx_{$value.value}' {if condition="$value.freepbx.checked === TRUE"}checked{/if}> FreePBX Controlled</label></td>
+                                        <td align='center'><label><input type='checkbox' name='freepbx_{$value.key}' id='freepbx_{$value.key}' value='freepbx_{$value.value}' {if condition="$value.freepbx.checked === TRUE"}checked{/if}></label></td>
                                 </tr>
                                 {/if}
 						{if condition="$value.type == 'break'"}
@@ -63,7 +67,11 @@
 					{/loop}
                                         {/loop}
 		</table>
-	    <input type="submit" value="Submit" onClick="javascript:submitform();" /><input type=button value="Close Window" onClick="javascript:Close();">
+        <p>
+	    <button type=submit onClick="javascript:submitform();"><i class="icon-check green"></i> Submit</button>
+        <button type=button onClick="javascript:Close();"><i class="icon-remove red"></i> Cancel</button>
+        </p>
       </form>
+    </div>
   </body>
 </html>
