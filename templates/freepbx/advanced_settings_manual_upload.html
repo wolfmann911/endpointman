@@ -57,32 +57,48 @@ process_module_actions();
 
 <div id="moduleBox" style="display:none;"></div>
 {/if}
-<h2>Import/Upload Packages</h2>
-<h4>Note: These files can be downloaded from: <a href="http://wiki.provisioner.net/index.php/Releases" target="_blank">http://wiki.provisioner.net/index.php/Releases</a></h4>
-<form action="" method="post" enctype="multipart/form-data" name="form1">
-    <label>Provisioner Package (.tgz):
+<h4>Import Packages</h4>
+<font style="font-size: 0.8em"><em>Download updated releases from </em><a href="http://wiki.provisioner.net/index.php/Releases" target="_blank">http://wiki.provisioner.net/index.php/Releases <i class='icon-globe'></i></a></font>
+<br><font style="font-size: 0.8em">Local Date Last Modified: {$provisioner_ver}</font>
+<p>
+<table>
+  <tr>
+    <form action="" method="post" enctype="multipart/form-data" name="form1">
+    <td>
+      <label><b>Provisioner Package</b> (<code>.tgz</code>):
+    </td><td>
+      <input type="file" name="package" id="fileField">
+      </label>
+    </td><td>
+    <button type="submit" name="upload_provisioner"><i class="icon-reply"></i> <?php echo _('Import')?></button>
+    <td>
+    </form>
+  </tr>
+  <tr>
+    <form action="" method="post" enctype="multipart/form-data" name="form1">
+    <td>
+      <label><b>Brand Package</b> (<code>.tgz</code>):
+    </td><td>
         <input type="file" name="package" id="fileField">
-    </label> Local Date Last Modified: {$provisioner_ver}
-    <br/>
-    <input type="submit" name="upload_provisioner" value="<?php echo _('Upload')?>">
-</form>
-    <br /><br />
-<form action="" method="post" enctype="multipart/form-data" name="form1">
-    <label>Brand Package (.tgz):
-        <input type="file" name="package" id="fileField">
-    </label>
-    <br /><font style="font-size: small">Note: The Brand XML File is no longer needed as it is contained within the Brand Package.<br /><br />Learn How to Create your own brand package here: <a target="_blank" href="http://www.provisioner.net/adding_new_phones">http://www.provisioner.net/adding_new_phones</a></font><br />
-    <input type="submit" name="upload_brand" value="<?php echo _('Upload')?>">
-</form>
+      </label>
+    </td><td>
+    <button type="submit" name="upload_brand"><i class="icon-reply"></i> <?php echo _('Import')?></button>
+    </td>
+    </form>
+  </tr>
+</table>
 <br/>
 <br/>
 
-<h2>Export Brand Packages</h2>
+<h4>Export Brand Packages</h4>
+<font style="font-size: 0.8em"><em>Learn how to create your own brand package at </em><a target="_blank" href="http://www.provisioner.net/adding_new_phones">http://www.provisioner.net/adding_new_phones <i class='icon-globe'></i></a></font>
+<p>
 <form action="" method="post" enctype="multipart/form-data" name="export">
     <select name="exp_brand">
 	{loop name="brand_ava"}
                     <option value="{$value.value}">{$value.text}</option>
 	{/loop}
     </select>
-    <input type="submit" name="export_brand" value="<?php echo _('Upload')?>">
+    <button type="submit" name="export_brand"><i class='icon-share-alt'></i> <?php echo _('Export')?></button>
 </form>
+</p>
