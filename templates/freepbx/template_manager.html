@@ -1,4 +1,6 @@
 {include="global_header"}
+<h2>Template Manager</h2>
+<hr>
 {if condition="isset($show_error_box)"}
     {include="message_box"}
 {/if}
@@ -18,37 +20,14 @@
         })
     })
 </script>
-<center>
-	<h3><?php echo _('Add New Template')?>:</h3><form action="config.php?type=tool&amp;display=epm_templates&amp;Submit=EditTemplate" method="POST">
-	  <?php echo _('Template Name')?>:
-	  <label>
-	    <input type="text" name="template_name" id="template_name">
-		<input type="hidden" name="page" value="template_manager">
-	  </label>
-	<?php echo _('Product Select')?>: 
-	<label>
-	  <select name="model_class" id="model_class">
-		{loop name="class_list"}
-	    <option value="{$value.value}">{$value.text}</option>
-		{/loop}
-	  </select>
-	</label>
-        Clone Template From:
-        <label>
-	  <select name="model_clone" id="model_clone">
-	  </select>
-	</label>
-	<label>
-	  <input type="submit" name="button_save" value="<?php echo _('Save')?>">
-	</label>
-	</form>
-<table width="80%" border="0" cellspacing="0" cellpadding="0">
+<h3><?php echo _('Current Templates')?></h3>
+<table width="97%" class="alt_table">
   <tr>
-    <td><h3><?php echo _('Template Name')?></h3></td>
-    <td><h3><?php echo _('Model Classification')?></h3></td>
-    <td><h3><?php echo _('Model Clone')?></h3></td>
-    <td align='center'><h3><?php echo _('Edit')?></h3></td>
-    <td align='center'><h3><?php echo _('Delete')?></h3></td>
+    <th><?php echo _('Template Name')?></td>
+    <th><?php echo _('Model Classification')?></td>
+    <th><?php echo _('Model Clone')?></td>
+    <th><?php echo _('Edit')?></td>
+    <th><?php echo _('Delete')?></td>
   </tr>
 {loop name="templates_list"}
   <tr>
@@ -56,12 +35,39 @@
     <td>{$value.model_class}</td>
     <td>{$value.model_clone}</td>
 
-	<td align='center' width='9%'><a href="config.php?type=tool&amp;edit_template=true&amp;display=epm_templates&amp;custom={$value.custom}&amp;id={$value.id}"><img src='assets/endpointman/images/edit.png' ALT='<?php echo _('Edit')?>' border='0'></a></td>
-	<td align='center' width='5%'>{if condition="$value.custom == 0"}
-	<a href="config.php?type=tool&amp;delete_template=true&amp;display=epm_templates&amp;id={$value.id}"><img src='assets/endpointman/images/delete.png' ALT='<?php echo _('Delete')?>' border='0'></a>{/if}</td>
+	<td align='center' width='9%'><a href="config.php?type=tool&amp;edit_template=true&amp;display=epm_templates&amp;custom={$value.custom}&amp;id={$value.id}"><i class='icon-pencil blue' alt='<?php echo _('Edit')?>'></i></a></td>
+	<td align='center' width='5%'>
+      {if condition="$value.custom == 0"}
+	    <a href="config.php?type=tool&amp;delete_template=true&amp;display=epm_templates&amp;id={$value.id}"><i class='icon-trash red' alt='<?php echo _('Delete')?>'</i></a>
+      {/if}
+    </td>
   </tr>
 {/loop}
 </table>
-</center>
+
+<h3><?php echo _('Add New Template')?></h3>
+<form action="config.php?type=tool&amp;display=epm_templates&amp;Submit=EditTemplate" method="POST">
+    <?php echo _('Template Name')?>:
+    <label>
+        <input type="text" name="template_name" id="template_name">
+    	<input type="hidden" name="page" value="template_manager">
+    </label>
+    <?php echo _('Product Select')?>: 
+    <label>
+        <select name="model_class" id="model_class">
+    	{loop name="class_list"}
+        <option value="{$value.value}">{$value.text}</option>
+    	{/loop}
+        </select>
+    </label>
+    Clone Template From:
+    <label>
+        <select name="model_clone" id="model_clone"></select>
+    </label>
+    <label>
+        <button type="submit" name="button_save"><i class='icon-save blue'></i> <?php echo _('Save')?></button>
+    </label>
+</form>
+
 {/if}
 {include="global_footer"}

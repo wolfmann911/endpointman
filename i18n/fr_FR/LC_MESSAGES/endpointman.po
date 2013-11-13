@@ -66,6 +66,12 @@ msgstr ""
 msgid "End Point Manager"
 msgstr ""
 
+#~ msgid "Device List"
+#~ msgstr "Liste des Périphériques"
+
+#~ msgid "Device"
+#~ msgstr "Périphérique"
+
 #~ msgid "My Devices List"
 #~ msgstr "Ma liste de terminaux"
 
@@ -117,8 +123,8 @@ msgstr ""
 #~ msgid "OUI Manager"
 #~ msgstr "Gestion des OUI"
 
-#~ msgid "Product Options/Configuration Editor"
-#~ msgstr "Editeur de configuration/options du produit"
+#~ msgid "Product Configuration Editor"
+#~ msgstr "Editeur de configuration du produit"
 
 #~ msgid "Show/Hide Brands/Models"
 #~ msgstr "Montrer/Cacher les marques/modèles"
@@ -136,7 +142,7 @@ msgstr ""
 #~ msgid "Use NMAP"
 #~ msgstr "Utiliser NMAP"
 
-#~ msgid "Mac Address"
+#~ msgid "MAC Address"
 #~ msgstr "Adresse MAC"
 
 #~ msgid "Model of Phone"

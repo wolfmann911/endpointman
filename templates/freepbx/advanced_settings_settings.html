@@ -2,14 +2,15 @@
     {include="message_box"}
 {/if}
 <form action='config.php?type=tool&amp;display=epm_advanced&amp;subpage=settings' method='POST'>
-<table width='90%' align='center'>
+
+<table width='800px' class='alt_table'>
 <tr>
-<td width='50%' align='right'><?php echo _("IP address of phone server")?>:</td>
-<td width='50%' align='left'><input type='text' id='srvip' name='srvip' value='{$srvip}'><a href='#' onclick="document.getElementById('srvip').value = '{$ip}'; "><?php echo _("Determine for me")?></a></td>
+<td width='50%'><?php echo _("IP address of phone server")?>:</td>
+<td width='50%'><input type='text' id='srvip' name='srvip' value='{$srvip}'><a href='#' onclick="document.getElementById('srvip').value = '{$ip}'; "><font style="font-size: 0.8em"><i class='icon-search'></i> <?php echo _("Determine for me")?></font></a></td>
 </tr>
 <tr>
-  <td align='right'><?php echo _("Configuration Type")?></td>
-  <td align='left'>
+  <td><?php echo _("Configuration Type")?></td>
+  <td>
       <select name="cfg_type" id="cfg_type">
             <option value="file" {if condition="isset($type_file)"}selected='selected'{/if}>File (TFTP/FTP)</option>
             <option value="http" {if condition="isset($type_http)"}selected='selected'{/if}>Web (HTTP)</option>
@@ -17,18 +18,18 @@
   </td>
 </tr>
 <tr>
-  <td align='right'><?php echo _("Global Final Config & Firmware Directory")?></td>
-  <td align='left'><label>
+  <td><?php echo _("Global Final Config & Firmware Directory")?></td>
+  <td><label>
     <input type="text" name="config_loc" value="{$config_location}">
   </label></td>
 </tr>
+</table>
+
+<h5>Time</h5>
+<table width='800px' class='alt_table'>
 <tr>
-  <td align='right'><br/></td>
-  <td align='left'></td>
-</tr>
-<tr>
-<td width='50%' align='right'><?php echo _("Time Zone")?> (<?php echo _('like')?> USA-5)</td>
-<td width='50%' align='left'><select name="tz" id="tz">
+<td width='50%'><?php echo _("Time Zone")?> (<font style="font-size: 0.8em"><?php echo _('like')?> <b>England/London</b></font>)</td>
+<td width='50%'><select name="tz" id="tz">
 	{loop name="list_tz"}
 	<option value="{$value.value}" {if condition="$value.selected == 1"}selected='selected'{/if}>{$value.text}</option>
 	{/loop}
@@ -36,99 +37,99 @@
 </td>
 </tr>
 <tr>
-<td width='50%' align='right'><?php echo _("Time Server (NTP Server)")?></td>
-  <td align='left'><label>
+<td width='50%'><?php echo _("Time Server (NTP Server)")?></td>
+  <td><label>
     <input type="text" name="ntp_server" value="{$ntp_server}">
   </label></td>
 </tr>
+</table>
+
+<h5>Local Paths</h5>
+<table width='800px' class='alt_table'>
 <tr>
-  <td align='right'><br/></td>
-  <td align='left'></td>
-</tr>
-<tr>
-  <td align='right'>NMAP <?php echo _("executable path")?>:</td>
-  <td align='left'><label>
+  <td width="50%">NMAP <?php echo _("executable path")?>:</td>
+  <td width="50%"><label>
     <input type="text" name="nmap_loc" value="{$nmap_location}">
   </label></td>
 </tr>
 <tr>
-  <td align='right'>ARP <?php echo _("executable path")?>:</td>
-  <td align='left'><label>
+  <td>ARP <?php echo _("executable path")?>:</td>
+  <td><label>
     <input type="text" name="arp_loc" value="{$arp_location}">
   </label></td>
 </tr>
 <tr>
-  <td align='right'>Asterisk <?php echo _("executable path")?>:</td>
-  <td align='left'><label>
+  <td>Asterisk <?php echo _("executable path")?>:</td>
+  <td><label>
     <input type="text" name="asterisk_loc" value="{$asterisk_location}">
   </label></td>
 </tr>
+</table>
+
+<h5>Web Directories</h5>
+<table width='800px' class='alt_table'>
 <tr>
-  <td align='right'><br/></td>
-  <td align='left'></td>
-</tr>
-<tr>
-  <td align='right'>Package Server:</td>
-  <td align='left'><label>
+  <td width="50%">Package Server:</td>
+  <td width="50%"><label>
     <input type="text" name="package_server" value="{$package_server}" size="50">
   </label></td>
 </tr>
+</table>
+
+<h5>Experimental</h5>
+<table width='800px' class='alt_table'>
 <tr>
-  <td align='right'><br/></td>
-  <td align='left'></td>
-</tr>
-<tr>
-  <td align='right'><?php echo _("Enable FreePBX ARI Module")?> (<a href="http://wiki.provisioner.net/index.php/Endpoint_manager_manual_ari" target="_blank">What?</a>)</td>
-  <td align='left'><label>
+  <td width="50%"><?php echo _("Enable FreePBX ARI Module")?> (<a href="http://wiki.provisioner.net/index.php/Endpoint_manager_manual_ari" target="_blank">What?</a>)</td>
+  <td><label>
     <input type=checkbox name="enable_ari" {$ari_selected}>
   </label></td>
 </tr>
 <tr>
-  <td align='right'><?php echo _("Enable Debug Mode")?> <a href="#" class="info"><span>Enable Advanced debugging mode for endpoint manager</span></a></td>
-  <td align='left'><label>
+  <td><?php echo _("Enable Debug Mode")?> <a href="#" class="info"><span>Enable Advanced debugging mode for endpoint manager</span></a></td>
+  <td><label>
     <input type=checkbox name="enable_debug" {$debug_selected}>
   </label></td>
 </tr>
 <tr>
-  <td align='right'><?php echo _("Disable Tooltips")?> <a href="#" class="info"><span>Disable Tooltip popups</span></a></td>
-  <td align='left'><label>
+  <td><?php echo _("Disable Tooltips")?> <a href="#" class="info"><span>Disable Tooltip popups</span></a></td>
+  <td><label>
     <input type=checkbox name="disable_help" {$help_selected}>
   </label></td>
 </tr>
 <tr>
-  <td align='right'><?php echo _("Allow Duplicate Extensions")?> <a href="#" class="info"><span>Assign the same extension to multiple phones (Note: This is not supported by Asterisk)</span></a></td>
-  <td align='left'><label>
+  <td><?php echo _("Allow Duplicate Extensions")?> <a href="#" class="info"><span>Assign the same extension to multiple phones (Note: This is not supported by Asterisk)</span></a></td>
+  <td><label>
     <input type=checkbox name="allow_dupext" {$dupext_selected}>
   </label></td>
 </tr>
 <tr>
-  <td align='right'><?php echo _("Allow Saving Over Default Configuration Files")?> <a href="#" class="info"><span>When editing the configuration files allows one to save over the global template default instead of saving directly to the database. These types of changes can and will be overwritten when updating the brand packages from the configuration/installation page</span></a></td>
-  <td align='left'><label>
+  <td><?php echo _("Allow Saving Over Default Configuration Files")?> <a href="#" class="info"><span>When editing the configuration files allows one to save over the global template default instead of saving directly to the database. These types of changes can and will be overwritten when updating the brand packages from the configuration/installation page</span></a></td>
+  <td><label>
     <input type=checkbox name="allow_hdfiles" {$hdfiles_selected}>
   </label></td>
 </tr>
 <tr>
-  <td align='right'><?php echo _("Disable TFTP Server Check")?> <a href="#" class="info"><span>Disable checking for a valid, working TFTP server which can sometimes cause Apache to crash</span></a></td>
-  <td align='left'><label>
+  <td><?php echo _("Disable TFTP Server Check")?> <a href="#" class="info"><span>Disable checking for a valid, working TFTP server which can sometimes cause Apache to crash</span></a></td>
+  <td><label>
     <input type=checkbox name="tftp_check" {$tftp_selected}>
   </label></td>
 </tr>
 <tr>
-  <td align='right'><?php echo _("Disable Configuration File Backups")?> <a href="#" class="info"><span>Disable backing up the tftboot directory on every phone rebuild or save</span></a></td>
-  <td align='left'><label>
+  <td><?php echo _("Disable Configuration File Backups")?> <a href="#" class="info"><span>Disable backing up the tftboot directory on every phone rebuild or save</span></a></td>
+  <td><label>
     <input type=checkbox name="backup_check" {$backup_selected}>
   </label></td>
 </tr>
 <tr>
-  <td align='right'><?php echo _("Use GITHUB Live Repo (Requires git to be installed)")?> <a href="#" class="info"><span>Use the live github repository (WARN: Beta!)</span></a></td>
-  <td align='left'><label>
+  <td><?php echo _("Use GITHUB Live Repo (Requires git to be installed)")?> <a href="#" class="info"><span>Use the live github repository (WARN: Beta!)</span></a></td>
+  <td><label>
     <input type=checkbox name="use_repo" {$use_repo}>
   </label></td>
 </tr>
 {if condition="$git_enabled === TRUE"}
 <tr>
-  <td align='right'>GIT Branch <a href="#" class="info"><span>Select the live github repository branch (WARN: Beta!)</span></a></td>
-  <td align='left'>
+  <td>GIT Branch <a href="#" class="info"><span>Select the live github repository branch (WARN: Beta!)</span></a></td>
+  <td>
       <select name="git_branch" id="git_branch">
           {loop name="branches"}
           <option value="{$value.name}" {if condition="$value.selected === TRUE"}selected{/if}>{$value.name}</option>
@@ -138,7 +139,7 @@
 </tr>
 {/if}
 <tr>
-<td colspan='2' align='center'><input type='Submit' name='button_update_globals' value='<?php echo _('Update Globals')?>'></td>
+<td colspan='2' align='center'><button type='Submit' name='button_update_globals'><i class='icon-refresh blue'></i> <?php echo _('Update Globals')?></button></td>
 </tr>
 </table>
 </form>
