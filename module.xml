@@ -34,5 +34,8 @@
 		<module>fw_ari</module>
         <phpversion>5.1.0</phpversion>
 	</requirements>
+	<supported>
+		<version>2.10</version>
+	</supported>
 <md5sum>a3f341e28698ea988c987efd72d0d9c8</md5sum>
 </module>
