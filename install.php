@@ -7,22 +7,6 @@
  * @license MPL / GPLv2 / LGPL
  * @package Endpoint Manager
  */
-if (!function_exists("out")) {
-
-    function out($text) {
-        echo $text . "<br />";
-    }
-
-}
-
-if (!function_exists("outn")) {
-
-    function outn($text) {
-        echo $text;
-    }
-
-}
-
 function epm_rmrf($dir) {
     if (file_exists($dir)) {
         $iterator = new RecursiveDirectoryIterator($dir);
@@ -82,73 +66,13 @@ if (!file_exists(PHONE_MODULES_PATH . "temp/")) {
     out("Creating temp folder");
 }
 
-//Detect Version
+$modinfo = module_getinfo('endpointman');
+$epmxmlversion = $modinfo['endpointman']['version'];
+$epmdbversion = !empty($modinfo['endpointman']['dbversion']) ? $modinfo['endpointman']['dbversion'] : null;
 
-function ep_table_exists($table) {
-    global $amp_conf, $db;
-    $sql = "SHOW TABLES FROM " . $amp_conf['AMPDBNAME'];
-    $result = $db->getAll($sql);
+if (!empty($epmdbversion)) {
 
-    foreach ($result as $row) {
-        if ($row[0] == $table) {
-            return TRUE;
-        }
-    }
-    return FALSE;
-}
-
-$epm_module_xml = epm_install_xml2array(LOCAL_PATH . "module.xml");
-
-preg_match('/^(\d*)\.(\d*)/', $epm_module_xml['module']['version'], $versions);
-
-$xml_full_version = $epm_module_xml['module']['version'];
-
-$version['major'] = $versions[1];
-$version['minor'] = $versions[2];
-
-$sql = "SELECT value FROM `admin` WHERE `variable` LIKE 'version'";
-preg_match('/^(\d*)\.(\d*)/', $db->getOne($sql), $versions);
-
-$amp_version['minor'] = $versions[2];
-
-if ($amp_version['minor'] < 9) {
-    out("<strong>Warning: Endpoint Manager is unsupported on FreePBX 2." . $amp_version['minor'] . ". We do check it on occasion but it is not a supported platform</strong>");
-}
-
-
-$sql = 'SELECT `version` FROM `modules` WHERE `modulename` = CONVERT(_utf8 \'endpointman\' USING latin1) COLLATE latin1_swedish_ci';
-$full_vers = $db->getOne($sql);
-
-
-if ($db->getOne($sql)) {
-    $new_install = FALSE;
-    $global_cfg = & $db->getAssoc("SELECT var_name, value FROM endpointman_global_vars");
-
-    if (preg_match('/^(\d*)\.(\d*)\.(\d*)$/', $full_vers, $versions)) {
-        
-    } elseif (preg_match('/^(\d*)\.(\d*)\.(\d*)\.(\d*)$/', $full_vers, $versions)) {
-        
-    } elseif (preg_match('/^(\d*)\.(\d*)\.(\d*)\.(\d*)\.(\d*)$/', $full_vers, $versions)) {
-        
-    }
-
-    $very['major'] = $versions[1];
-    $very['minor'] = isset($versions[2]) ? $versions[2] : '0';
-    $very['subminor'] = isset($versions[3]) ? $versions[3] : '0';
-    $very['subsubminor'] = isset($versions[4]) ? $versions[4] : '0';
-
-    $ver = $very['major'] . $very['minor'] . $very['subminor'] . $very['subsubminor'];
-
-    out('Version Identified as ' . $full_vers);
-    out('Internal Reference Number: ' . $ver);
-} else {
-    $new_install = TRUE;
-    out('New Installation Detected!');
-}
-
-if (!$new_install) {
-
-    if (($ver < "1900") AND ($ver > 0)) {
+    if (version_compare_freepbx($epmdbversion,'1.9','<')) {
         out("Please Wait While we upgrade your old setup");
         //Expand the value option
         $sql = 'ALTER TABLE `endpointman_global_vars` CHANGE `value` `value` VARCHAR(100) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT \'Data\'';
@@ -323,7 +247,7 @@ if (!$new_install) {
         out("DONE! You can now use endpoint manager!");
     }
 
-    if ($ver <= "1900") {
+    if (version_compare_freepbx($epmdbversion,'1.9','<=')) {
         out("Locating NMAP + ARP + ASTERISK Executables");
 
         $nmap = find_exec("nmap");
@@ -393,7 +317,7 @@ if (!$new_install) {
         $sql = "ALTER TABLE endpointman_mac_list CHANGE custom_cfg_data custom_cfg_data TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL";
         $db->query($sql);
     }
-    if ($ver <= "1910") {
+    if (version_compare_freepbx($epmdbversion,'1.9.1','<=')) {
         out("Create Custom Configs Table");
         $sql = "CREATE TABLE IF NOT EXISTS `endpointman_custom_configs` (
 	  `id` int(11) NOT NULL auto_increment,
@@ -448,11 +372,11 @@ if (!$new_install) {
         $sql = "ALTER TABLE endpointman_mac_list CHANGE custom_cfg_data custom_cfg_data TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL";
         $db->query($sql);
     }
-    if ($ver <= "1920") {
+    if (version_compare_freepbx($epmdbversion,'1.9.2','<=')) {
         out('Updating Global Variables');
     }
 
-    if ($ver <= "1990") {
+    if (version_compare_freepbx($epmdbversion,'1.9.9','<=')) {
         out("Adding Custom Field to OUI List");
         $sql = 'ALTER TABLE `endpointman_oui_list` ADD `custom` INT(1) NOT NULL DEFAULT \'0\'';
         $db->query($sql);
@@ -496,7 +420,7 @@ if (!$new_install) {
         $sql = "INSERT INTO cronmanager (module, id, time, freq, lasttime, command) VALUES ('endpointman', 'UPDATES', '23', '24', '0', 'php " . LOCAL_PATH . "includes/update_check.php')";
         $db->query($sql);
     }
-    if ($ver <= "2000") {
+    if (version_compare_freepbx($epmdbversion,'2.0','<=')) {
         out("Locating NMAP + ARP + ASTERISK Executables");
         $nmap = find_exec("nmap");
         $arp = find_exec("arp");
@@ -687,7 +611,7 @@ if (!$new_install) {
         }
     }
 
-    if ($ver <= "2220") {
+    if (version_compare_freepbx($epmdbversion,'2.2.2','<=')) {
 
         out("Remove all Dashes in IDs");
         $data = array();
@@ -731,16 +655,16 @@ if (!$new_install) {
             $db->query($sql);
         }
     }
-    if ($ver <= "2230") {
+    if (version_compare_freepbx($epmdbversion,'2.2.3','<=')) {
         $sql = "UPDATE endpointman_global_vars SET value = 'http://www.provisioner.net/release/' WHERE var_name = 'update_server'";
         $db->query($sql);
     }
 
-    if ($ver <= "2240") {
-        
+    if (version_compare_freepbx($epmdbversion,'2.2.4','<=')) {
+
     }
 
-    if ($ver <= "2250") {
+    if (version_compare_freepbx($epmdbversion,'2.2.5','<=')) {
         out("Fixing Permissions of Phone Modules Directory");
         $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(PHONE_MODULES_PATH), RecursiveIteratorIterator::SELF_FIRST);
         foreach ($iterator as $item) {
@@ -752,7 +676,7 @@ if (!$new_install) {
         $db->query($sql);
     }
 
-    if ($ver <= "2260") {
+    if (version_compare_freepbx($epmdbversion,'2.2.6','<=')) {
         $sql = "CREATE TABLE IF NOT EXISTS `endpointman_line_list` (
               `luid` int(11) NOT NULL AUTO_INCREMENT,
               `mac_id` int(11) NOT NULL,
@@ -803,7 +727,7 @@ if (!$new_install) {
         $db->query($sql);
     }
 
-    if ($ver <= "2280") {
+    if (version_compare_freepbx($epmdbversion,'2.2.8','<=')) {
         out("Fix Debug Left on Error, this turns off debug.");
         $sql = "UPDATE endpointman_global_vars SET value = '0' WHERE var_name = 'debug'";
         $db->query($sql);
@@ -812,7 +736,7 @@ if (!$new_install) {
         $db->query($sql);
     }
 
-    if ($ver <= "2400") {
+    if (version_compare_freepbx($epmdbversion,'2.4.0','<=')) {
         out("Uninstalling All Installed Brands (You'll just simply have to update again, no loss of data)");
         $db->query("UPDATE endpointman_brand_list SET  installed =  '0'");
         $sql = "UPDATE  endpointman_model_list SET  enabled =  '0', template_data = '" . serialize(array()) . "'";
@@ -836,23 +760,23 @@ if (!$new_install) {
         }
     }
 
-    if ($ver <= "2902") {
+    if (version_compare_freepbx($epmdbversion,'2.9.0.2','<=')) {
         $sql = 'INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (NULL, \'disable_help\', \'0\');';
         $db->query($sql);
     }
 
-    if ($ver <= "2903") {
+    if (version_compare_freepbx($epmdbversion,'2.9.0.3','<=')) {
         $sql = 'ALTER TABLE  `endpointman_custom_configs` CHANGE  `data`  `data` LONGBLOB NOT NULL';
         $db->query($sql);
     }
 
-    if ($ver <= "2904") {
+    if (version_compare_freepbx($epmdbversion,'2.9.0.4','<=')) {
         out("Adding 'local' column to brand_list");
         $sql = 'ALTER TABLE  `endpointman_brand_list` ADD  `local` INT( 1 ) NOT NULL DEFAULT  \'0\' AFTER  `cfg_ver`';
         $db->query($sql);
     }
 
-    if ($ver <= "2907") {
+    if (version_compare_freepbx($epmdbversion,'2.9.0.7','<=')) {
         out("Adding UNIQUE key to table global_vars for var_name");
         $sql = "ALTER TABLE `endpointman_global_vars` ADD UNIQUE `unique` (`var_name`)";
         $db->query($sql);
@@ -862,7 +786,7 @@ if (!$new_install) {
         $db->query($sql);
     }
 
-    if ($ver <= "2910") {
+    if (version_compare_freepbx($epmdbversion,'2.9.1','<=')) {
         out("Fix again to the 'Allow Duplicate Extensions' Error");
         $sql = 'ALTER TABLE `endpointman_global_vars` ADD UNIQUE `var_name` (`var_name`)';
         $db->query($sql);
@@ -870,7 +794,7 @@ if (!$new_install) {
         $db->query($sql);
     }
 
-    if ($ver <= "2920") {
+    if (version_compare_freepbx($epmdbversion,'2.9.2.0','<=')) {
         out("Adding new Network Time Protocol Setting");
         $sql = "INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (NULL, 'ntp', '" . $_SERVER["SERVER_ADDR"] . "')";
         $db->query($sql);
@@ -905,7 +829,7 @@ if (!$new_install) {
         $db->query($sql);
     }
 
-    if ($ver <= "21021") {
+    if (version_compare_freepbx($epmdbversion,'2.10.2.1','<=')) {
         out('Updating Mirror Location...again');
         $sql = "UPDATE endpointman_global_vars SET value = 'http://mirror.freepbx.org/provisioner/v3/' WHERE var_name ='update_server'";
         $db->query($sql);
@@ -936,7 +860,7 @@ if (!$new_install) {
         }
     }
 
-    if ($ver <= "21031") {
+    if (version_compare_freepbx($epmdbversion,'2.10.3.1','<=')) {
         out("Adding tftp server check and nmap search save values");
         $sql = 'INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (NULL, \'tftp_check\', \'0\');';
         $db->query($sql);
@@ -944,20 +868,20 @@ if (!$new_install) {
         $db->query($sql);
     }
 
-    if ($ver <= "21037") {
+    if (version_compare_freepbx($epmdbversion,'2.10.3.7','<=')) {
         out("Adding Config File Backups");
         $sql = 'INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (NULL, \'backup_check\', \'1\');';
         $db->query($sql);
     }
 
-    if ($ver <= "21038") {
+    if (version_compare_freepbx($epmdbversion,'2.10.3.8','<=')) {
         out("Adding Use Repo Option");
         $sql = 'INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES (NULL, \'use_repo\', \'0\');';
         $db->query($sql);
     }
 }
 
-if ($new_install) {
+if (empty($epmdbversion)) {
 
     out("Creating Brand List Table");
     $sql = "CREATE TABLE IF NOT EXISTS `endpointman_brand_list` (
@@ -1119,8 +1043,8 @@ if ($new_install) {
     }
 }
 
-out("Update Version Number to " . $xml_full_version);
-$sql = "UPDATE endpointman_global_vars SET value = '" . $xml_full_version . "' WHERE var_name = 'version'";
+out("Update Version Number to " . $epmxmlversion);
+$sql = "UPDATE endpointman_global_vars SET value = '" . $epmxmlversion . "' WHERE var_name = 'version'";
 $db->query($sql);
 
 $sql = "UPDATE endpointman_global_vars SET value = 'http://mirror.freepbx.org/provisioner/v3/' WHERE var_name = 'update_server'";
@@ -1140,213 +1064,4 @@ if (file_exists($amp_conf['AMPWEBROOT'] . "/recordings/theme/js/jquery.easing.1.
 
 if (file_exists($amp_conf['AMPWEBROOT'] . "/recordings/theme/coda-slider-2.0a.css")) {
     unlink($amp_conf['AMPWEBROOT'] . "/recordings/theme/coda-slider-2.0a.css");
-}
-
-if ($amp_version['minor'] < 9) {
-    //Do symlinks ourself because retrieve_conf is OLD
-    //images
-    $dir = $amp_conf['AMPWEBROOT'] . '/admin/assets/endpointman/images';
-    if (!file_exists($dir)) {
-        mkdir($dir, 0777, TRUE);
-    }
-    foreach (glob(LOCAL_PATH . "assets/images/*.*") as $filename) {
-        if (file_exists($dir . '/' . basename($filename))) {
-            unlink($dir . '/' . basename($filename));
-            symlink($filename, $dir . '/' . basename($filename));
-        } else {
-            symlink($filename, $dir . '/' . basename($filename));
-        }
-    }
-
-    //javascripts
-    $dir = $amp_conf['AMPWEBROOT'] . '/admin/assets/endpointman/js';
-    if (!file_exists($dir)) {
-        mkdir($dir, 0777, TRUE);
-    }
-    foreach (glob(LOCAL_PATH . "assets/js/*.*") as $filename) {
-        if (file_exists($dir . '/' . basename($filename))) {
-            unlink($dir . '/' . basename($filename));
-            symlink($filename, $dir . '/' . basename($filename));
-        } else {
-            symlink($filename, $dir . '/' . basename($filename));
-        }
-    }
-
-    //theme (css/stylesheets)
-    $dir = $amp_conf['AMPWEBROOT'] . '/admin/assets/endpointman/theme';
-    if (!file_exists($dir)) {
-        mkdir($dir, 0777, TRUE);
-    }
-    foreach (glob(LOCAL_PATH . "assets/theme/*.*") as $filename) {
-        if (file_exists($dir . '/' . basename($filename))) {
-            unlink($dir . '/' . basename($filename));
-            symlink($filename, $dir . '/' . basename($filename));
-        } else {
-            symlink($filename, $dir . '/' . basename($filename));
-        }
-    }
-
-    //ari-theme (css/stylesheets)
-    $dir = $amp_conf['AMPWEBROOT'] . '/recordings/theme';
-    if (!file_exists($dir)) {
-        mkdir($dir, 0777, TRUE);
-    }
-    foreach (glob(LOCAL_PATH . "ari/theme/*.*") as $filename) {
-        if (file_exists($dir . '/' . basename($filename))) {
-            unlink($dir . '/' . basename($filename));
-            symlink($filename, $dir . '/' . basename($filename));
-        } else {
-            symlink($filename, $dir . '/' . basename($filename));
-        }
-    }
-
-    //ari-images
-    $dir = $amp_conf['AMPWEBROOT'] . '/recordings/theme/images';
-    if (!file_exists($dir)) {
-        mkdir($dir, 0777, TRUE);
-    }
-    foreach (glob(LOCAL_PATH . "ari/images/*.*") as $filename) {
-        if (file_exists($dir . '/' . basename($filename))) {
-            unlink($dir . '/' . basename($filename));
-            symlink($filename, $dir . '/' . basename($filename));
-        } else {
-            symlink($filename, $dir . '/' . basename($filename));
-        }
-    }
-
-    //ari-js
-    $dir = $amp_conf['AMPWEBROOT'] . '/recordings/theme/js';
-    if (!file_exists($dir)) {
-        mkdir($dir, 0777, TRUE);
-    }
-    foreach (glob(LOCAL_PATH . "ari/js/*.*") as $filename) {
-        if (file_exists($dir . '/' . basename($filename))) {
-            unlink($dir . '/' . basename($filename));
-            symlink($filename, $dir . '/' . basename($filename));
-        } else {
-            symlink($filename, $dir . '/' . basename($filename));
-        }
-    }
-
-    //ari-modules
-    $dir = $amp_conf['AMPWEBROOT'] . '/recordings/modules';
-    if (!file_exists($dir)) {
-        mkdir($dir, 0777, TRUE);
-    }
-    foreach (glob(LOCAL_PATH . "ari/modules/*.*") as $filename) {
-        if (file_exists($dir . '/' . basename($filename))) {
-            unlink($dir . '/' . basename($filename));
-            symlink($filename, $dir . '/' . basename($filename));
-        } else {
-            symlink($filename, $dir . '/' . basename($filename));
-        }
-    }
-}
-
-function epm_install_xml2array($url, $get_attributes = 1, $priority = 'tag') {
-    $contents = "";
-    if (!function_exists('xml_parser_create')) {
-        return array();
-    }
-    $parser = xml_parser_create('');
-    if (!($fp = @ fopen($url, 'rb'))) {
-        return array();
-    }
-    while (!feof($fp)) {
-        $contents .= fread($fp, 8192);
-    }
-    fclose($fp);
-    xml_parser_set_option($parser, XML_OPTION_TARGET_ENCODING, "UTF-8");
-    xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, 0);
-    xml_parser_set_option($parser, XML_OPTION_SKIP_WHITE, 1);
-    xml_parse_into_struct($parser, trim($contents), $xml_values);
-    xml_parser_free($parser);
-    if (!$xml_values) {
-        return; //Hmm...
-    }
-    $xml_array = array();
-    $parents = array();
-    $opened_tags = array();
-    $arr = array();
-    $current = & $xml_array;
-    $repeated_tag_index = array();
-    foreach ($xml_values as $data) {
-        unset($attributes, $value);
-        extract($data);
-        $result = array();
-        $attributes_data = array();
-        if (isset($value)) {
-            if ($priority == 'tag') {
-                $result = $value;
-            } else {
-                $result['value'] = $value;
-            }
-        }
-        if (isset($attributes) and $get_attributes) {
-            foreach ($attributes as $attr => $val) {
-                if ($priority == 'tag') {
-                    $attributes_data[$attr] = $val;
-                } else {
-                    $result['attr'][$attr] = $val; //Set all the attributes in a array called 'attr'
-                }
-            }
-        }
-        if ($type == "open") {
-            $parent[$level - 1] = & $current;
-            if (!is_array($current) or (!in_array($tag, array_keys($current)))) {
-                $current[$tag] = $result;
-                if ($attributes_data) {
-                    $current[$tag . '_attr'] = $attributes_data;
-                }
-                $repeated_tag_index[$tag . '_' . $level] = 1;
-                $current = & $current[$tag];
-            } else {
-                if (isset($current[$tag][0])) {
-                    $current[$tag][$repeated_tag_index[$tag . '_' . $level]] = $result;
-                    $repeated_tag_index[$tag . '_' . $level]++;
-                } else {
-                    $current[$tag] = array($current[$tag], $result);
-                    $repeated_tag_index[$tag . '_' . $level] = 2;
-                    if (isset($current[$tag . '_attr'])) {
-                        $current[$tag]['0_attr'] = $current[$tag . '_attr'];
-                        unset($current[$tag . '_attr']);
-                    }
-                }
-                $last_item_index = $repeated_tag_index[$tag . '_' . $level] - 1;
-                $current = & $current[$tag][$last_item_index];
-            }
-        } else if ($type == "complete") {
-            if (!isset($current[$tag])) {
-                $current[$tag] = $result;
-                $repeated_tag_index[$tag . '_' . $level] = 1;
-                if ($priority == 'tag' and $attributes_data) {
-                    $current[$tag . '_attr'] = $attributes_data;
-                }
-            } else {
-                if (isset($current[$tag][0]) and is_array($current[$tag])) {
-                    $current[$tag][$repeated_tag_index[$tag . '_' . $level]] = $result;
-                    if ($priority == 'tag' and $get_attributes and $attributes_data) {
-                        $current[$tag][$repeated_tag_index[$tag . '_' . $level] . '_attr'] = $attributes_data;
-                    }
-                    $repeated_tag_index[$tag . '_' . $level]++;
-                } else {
-                    $current[$tag] = array($current[$tag], $result);
-                    $repeated_tag_index[$tag . '_' . $level] = 1;
-                    if ($priority == 'tag' and $get_attributes) {
-                        if (isset($current[$tag . '_attr'])) {
-                            $current[$tag]['0_attr'] = $current[$tag . '_attr'];
-                            unset($current[$tag . '_attr']);
-                        }
-                        if ($attributes_data) {
-                            $current[$tag][$repeated_tag_index[$tag . '_' . $level] . '_attr'] = $attributes_data;
-                        }
-                    }
-                    $repeated_tag_index[$tag . '_' . $level]++; //0 and 1 index is already taken
-                }
-            }
-        } else if ($type == 'close') {
-            $current = & $parent[$level - 1];
-        }
-    }
-    return ($xml_array);
 }
