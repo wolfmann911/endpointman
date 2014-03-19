@@ -29,10 +29,10 @@ class endpointmanager {
         global $amp_conf;
         require_once('abstraction/freepbx.inc');
         $this->eda = new epm_data_abstraction();
-        
+
         require_once('system_functions.class');
         $this->system = new epm_system();
-        
+
         require_once('json.inc');
 
         $this->global_cfg = $this->eda->get_stored_globals();
@@ -116,20 +116,11 @@ class endpointmanager {
             }
         }
 
-        $sql = "SELECT value FROM `admin` WHERE `variable` LIKE 'version'";
-
-        preg_match('/^(\d*)\.(\d*)/', $this->eda->sql($sql, 'getone'), $versions);
-
-        $this->global_cfg['amp_ver']['major'] = $versions[1];
-        $this->global_cfg['amp_ver']['minor'] = $versions[2];
-
         $this->tpl = new RainTPL(LOCAL_PATH . 'templates/freepbx', LOCAL_PATH . 'templates/freepbx/compiled', '/admin/assets/endpointman/images');
 
         if ($this->global_cfg['disable_help']) {
             $this->tpl->assign("disable_help", 1);
         }
-
-        $this->tpl->assign("amp_ver", $this->global_cfg['amp_ver']['minor']);
     }
 
     function tftp_check() {
@@ -1327,7 +1318,7 @@ class endpointmanager {
     }
 
     function display_configs() {
-        
+
     }
 
     /**
@@ -1997,7 +1988,7 @@ class endpointmanager {
                           echo "Firmware Requirment Detected!..........<br/>";
                           $this->install_firmware($family_line_xml['data']['id']);
                           }
-                         * 
+                         *
                          */
 
                         $data = $this->eda->sql("SELECT id FROM endpointman_product_list WHERE id='" . $brand_id . $family_line_xml['data']['id'] . "'", 'getOne');
@@ -2114,7 +2105,7 @@ class endpointmanager {
      */
     function update_brand($package, $remote=TRUE) {
 	if ($this->global_cfg['debug']) echo "update_brand(): Debug is set to ".$this->global_cfg['debug']." <br />";
-	$temp_directory = $this->sys_get_temp_dir() . "/epm_temp/";	
+	$temp_directory = $this->sys_get_temp_dir() . "/epm_temp/";
         if ($this->global_cfg['debug']) echo "Processing ".$temp_directory.$package."/brand_data.json... <br />";
         if (file_exists($temp_directory . $package . '/brand_data.json')) {
             $temp = $this->file2json($temp_directory . $package . '/brand_data.json');
@@ -2647,7 +2638,7 @@ class endpointmanager {
                 usleep('500');
                 endpointman_flush_buffers();
 
-                clearstatcache(); // make sure PHP actually checks dest. file size 
+                clearstatcache(); // make sure PHP actually checks dest. file size
             }
             return true;
         } else {
@@ -2760,7 +2751,7 @@ class endpointmanager {
      * Reads a file. Json decodes it and will report any errors back
      * @param string $file location of file
      * @return mixed false on error, array on success
-     * @version 2.11 
+     * @version 2.11
      */
     function file2json($file) {
         if (file_exists($file)) {

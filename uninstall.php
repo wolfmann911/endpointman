@@ -14,18 +14,6 @@ $endpoint = new endpointmanager();
 
 global $db;
 
-if (! function_exists("out")) {
-    function out($text) {
-        echo $text."<br />";
-    }
-}
-
-if (! function_exists("outn")) {
-    function outn($text) {
-        echo $text;
-    }
-}
-
 out("Removing Phone Modules Directory");
 $endpoint->rmrf(PHONE_MODULES_PATH);
 exec("rm -R ". PHONE_MODULES_PATH);
@@ -61,8 +49,6 @@ $result = $db->query($sql);
 $sql = "DROP TABLE `endpointman_custom_configs`";
 $result = $db->query($sql);
 
-$sql = "SELECT value FROM `admin` WHERE `variable` LIKE 'version'";
-$amp_version = $db->getOne($sql);
 
 //Do unlinks ourself because retrieve_conf doesn't always remove stuff...
 
