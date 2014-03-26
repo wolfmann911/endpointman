@@ -72,7 +72,7 @@ switch ($sub_type) {
                 }
                 break;
             case "button_save":
-                
+
                 $sql = 'SELECT * FROM endpointman_line_list WHERE mac_id = '. $_REQUEST['edit_id'];
 
                 $lines_list = $endpoint->eda->sql($sql,'getAll',DB_FETCHMODE_ASSOC);
@@ -81,7 +81,7 @@ switch ($sub_type) {
                     $sql = "SELECT description FROM devices WHERE id = ".$_REQUEST['ext_list_'.$row['luid']];
                     $name = $endpoint->eda->sql($sql,'getOne');
 
-                    $sql = "UPDATE endpointman_line_list SET line = '".$_REQUEST['line_list_'.$row['luid']]."', ext = '".$_REQUEST['ext_list_'.$row['luid']]."', description = '".$db->escapeSimple($name)."' WHERE luid =  ". $row['luid'];
+                    $sql = "UPDATE endpointman_line_list SET line = '".$_REQUEST['line_list_'.$row['luid']]."', ext = '".$_REQUEST['ext_list_'.$row['luid']]."', description = '".$endpoint->eda->escapeSimple($name)."' WHERE luid =  ". $row['luid'];
                     $endpoint->eda->sql($sql);
                 }
 
@@ -166,7 +166,7 @@ switch ($sub_type) {
         foreach($mac_list as $data) {
             $phone_info = $endpoint->get_phone_info($data['id']);
             foreach($phone_info['line'] as $line) {
-                $sql = "UPDATE endpointman_line_list SET description = '".$db->escapeSimple($line['description'])."' WHERE luid = ".$line['luid'];
+                $sql = "UPDATE endpointman_line_list SET description = '".$endpoint->eda->escapeSimple($line['description'])."' WHERE luid = ".$line['luid'];
                 $endpoint->eda->sql($sql);
             }
             if(isset($_REQUEST['reboot'])) {
@@ -191,21 +191,21 @@ switch ($sub_type) {
                     $phone_info = $endpoint->get_phone_info($row['id']);
 
                     $class = "endpoint_" . $phone_info['directory'] . "_" . $phone_info['cfg_dir'] . '_phone';
-					$base_class = "endpoint_" . $phone_info['directory']. '_base'; 
-					$master_class = "endpoint_base"; 
-					/**Fix for FreePBX Distro 
+					$base_class = "endpoint_" . $phone_info['directory']. '_base';
+					$master_class = "endpoint_base";
+					/**Fix for FreePBX Distro
 					* I seriously want to figure out why ONLY the FreePBX Distro can't do autoloads.
-					**/ 
-					if(!class_exists($master_class)) { 
-						ProvisionerConfig::endpointsAutoload($master_class); 
-					} 
-					if(!class_exists($base_class)) { 
-						ProvisionerConfig::endpointsAutoload($base_class); 
-					} 
-					if(!class_exists($class)) { 
-						ProvisionerConfig::endpointsAutoload($class); 
-					} 
-					//end quick fix 
+					**/
+					if(!class_exists($master_class)) {
+						ProvisionerConfig::endpointsAutoload($master_class);
+					}
+					if(!class_exists($base_class)) {
+						ProvisionerConfig::endpointsAutoload($base_class);
+					}
+					if(!class_exists($class)) {
+						ProvisionerConfig::endpointsAutoload($class);
+					}
+					//end quick fix
 
                     $provisioner_lib = new $class();
 
@@ -218,7 +218,7 @@ switch ($sub_type) {
                     //have to because of versions less than php5.3
                     $provisioner_lib->brand_name = $phone_info['directory'];
                     $provisioner_lib->family_line = $phone_info['cfg_dir'];
-                    
+
                     $provisioner_lib->settings['line'][0] = array('username' => $phone_info['line'][1]['ext'], 'authname' => $phone_info['line'][1]['ext']);
                     $provisioner_lib->reboot();
                     unset($provisioner_lib);
@@ -321,7 +321,7 @@ switch ($sub_type) {
                     $rebooted_msg = "";
                 }
                 foreach($phone_info['line'] as $line) {
-                    $sql = "UPDATE endpointman_line_list SET description = '".$db->escapeSimple($line['description'])."' WHERE luid = ".$line['luid'];
+                    $sql = "UPDATE endpointman_line_list SET description = '".$endpoint->eda->escapeSimple($line['description'])."' WHERE luid = ".$line['luid'];
                     $endpoint->eda->sql($sql);
                 }
             }
@@ -348,7 +348,7 @@ switch ($sub_type) {
                     $rebooted_msg = "";
                 }
                 foreach($phone_info['line'] as $line) {
-                    $sql = "UPDATE endpointman_line_list SET description = '".$db->escapeSimple($line['description'])."' WHERE luid = ".$line['luid'];
+                    $sql = "UPDATE endpointman_line_list SET description = '".$endpoint->eda->escapeSimple($line['description'])."' WHERE luid = ".$line['luid'];
                     $endpoint->eda->sql($sql);
                 }
             }
@@ -372,7 +372,7 @@ foreach($device_statuses as $key => $data) {
     preg_match('/\b(?:\d{1,3}\.){3}\d{1,3}\b/i', $data, $ipaddress);
     if(!empty($extout[1])) {
         if(preg_match('/OK \(.*\)/i', $data)) {
-           $devices_status[$extout[1]]['status'] = TRUE; 
+           $devices_status[$extout[1]]['status'] = TRUE;
            $devices_status[$extout[1]]['ip'] = $ipaddress[0];
         } else {
             $devices_status[$extout[1]]['status'] = FALSE;
@@ -406,7 +406,7 @@ foreach($devices_list as $devices_row) {
         $z++;
     }
     $ext = $list[$i]['line'][0]['ext'];
-    
+
     $list[$i]['status']['status'] = isset($devices_status[$ext]['status']) ?$devices_status[$ext]['status'] : FALSE;
     $list[$i]['status']['ip'] = isset($devices_status[$ext]['ip']) ? $devices_status[$ext]['ip'] : FALSE;
     $list[$i]['status']['port'] = '';
@@ -458,7 +458,7 @@ foreach($template_list as $row) {
 //initialize a Rain TPL object
 if (isset($template_editor)) {
 
-} else {    
+} else {
     $endpoint->tpl->assign("list", $list);
     $endpoint->tpl->assign("error", "");
     $serv_address = !empty($endpoint->global_cfg['nmap_search']) ? $endpoint->global_cfg['nmap_search'] : $_SERVER["SERVER_ADDR"].'/24';
@@ -479,7 +479,7 @@ if (isset($template_editor)) {
     $endpoint->tpl->assign("amp_conf_serial", base64_encode(serialize($amp_send)));
     $endpoint->tpl->assign("no_add", $no_add);
     $endpoint->tpl->assign("mode", $mode);
-    
+
     $edit_row['id'] = isset($edit_row['id']) ? $edit_row['id'] : '0';
     $endpoint->tpl->assign("edit_id", $edit_row['id']);
 
@@ -507,7 +507,7 @@ if (isset($template_editor)) {
             $endpoint->tpl->assign("models_ava", $ma);
 
             $endpoint->tpl->assign("display_templates", $endpoint->display_templates($edit_row['product_id'],$edit_row['template_id']));
-            
+
         } else {
             $message = _("You have disabled/removed all models that correspond to this brand. Please enable them in 'Brand Configurations/Setup' before trying to edit this phone");
             $endpoint->tpl->assign("mode", NULL);

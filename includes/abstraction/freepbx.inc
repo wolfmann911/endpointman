@@ -23,7 +23,7 @@ class epm_data_abstraction {
             $this->db = $db;
         }
     }
-    
+
     function sql($sql, $type="query", $fetchmode=null) {
         global $db;
         $results = $db->$type($sql, $fetchmode);
@@ -32,7 +32,7 @@ class epm_data_abstraction {
         }
         return $results;
     }
-    
+
     function sql_error($results) {
         echo "<h1>FATAL SQL ERROR! ::::: ";
         echo $results->getDebugInfo() . "SQL - <br /> $sql";
@@ -41,7 +41,7 @@ class epm_data_abstraction {
         var_dump(debug_backtrace());
         die();
     }
-    
+
     function get_stored_globals() {
         //Get all global variables
         $temp =& $this->sql("SELECT var_name, value FROM endpointman_global_vars",'getAssoc');
@@ -58,6 +58,11 @@ class epm_data_abstraction {
         $sql = 'SELECT endpointman_mac_list.id , endpointman_mac_list.mac , endpointman_model_list.model, endpointman_model_list.enabled , endpointman_brand_list.name, endpointman_mac_list.global_custom_cfg_data, endpointman_mac_list.template_id FROM endpointman_mac_list , endpointman_model_list , endpointman_brand_list WHERE ( endpointman_model_list.id = endpointman_mac_list.model ) AND ( endpointman_model_list.brand = endpointman_brand_list.id )';
         $temp =& $this->sql($sql,'getAll',DB_FETCHMODE_ASSOC);
         return($temp);
+    }
+
+    function escapeSimple($query) {
+        global $db;
+        return $db->escapeSimple($query);
     }
 
     /**
@@ -113,7 +118,7 @@ class epm_data_abstraction {
         $data =& $this->sql($sql,'getAll', DB_FETCHMODE_ASSOC);
         return($data);
     }
-    
+
     function all_models_by_product($product_id) {
         $sql="SELECT * FROM endpointman_model_list WHERE product_id = ".$product_id;
         $result1 =& $this->sql($sql, 'getAll',DB_FETCHMODE_ASSOC);

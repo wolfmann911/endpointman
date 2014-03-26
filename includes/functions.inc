@@ -410,7 +410,7 @@ class endpointmanager {
                         $sql = "SELECT description FROM devices WHERE id = " . $row['ext'];
                         $name = $this->eda->sql($sql, 'getOne');
 
-                        $sql = "UPDATE endpointman_line_list SET line = '" . $row['line'] . "', ext = '" . $row['ext'] . "', description = '" . $db->escapeSimple($name) . "' WHERE luid =  " . $row['luid'];
+                        $sql = "UPDATE endpointman_line_list SET line = '" . $row['line'] . "', ext = '" . $row['ext'] . "', description = '" . $this->eda->escapeSimple($name) . "' WHERE luid =  " . $row['luid'];
                         $this->eda->sql($sql);
                     }
 
@@ -501,7 +501,7 @@ class endpointmanager {
             if (!isset($line)) {
                 $line = $row['line'];
             }
-            $sql = "UPDATE endpointman_line_list SET line = '" . $line . "', ext = '" . $row['ext'] . "', description = '" . $db->escapeSimple($name) . "' WHERE luid =  " . $row['luid'];
+            $sql = "UPDATE endpointman_line_list SET line = '" . $line . "', ext = '" . $row['ext'] . "', description = '" . $this->eda->escapeSimple($name) . "' WHERE luid =  " . $row['luid'];
             $this->eda->sql($sql);
             return(TRUE);
         } else {
@@ -511,7 +511,7 @@ class endpointmanager {
                 $sql = "SELECT description FROM devices WHERE id = " . $row['ext'];
                 $name = $this->eda->sql($sql, 'getOne');
 
-                $sql = "UPDATE endpointman_line_list SET line = '" . $row['line'] . "', ext = '" . $row['ext'] . "', description = '" . $db->escapeSimple($name) . "' WHERE luid =  " . $row['luid'];
+                $sql = "UPDATE endpointman_line_list SET line = '" . $row['line'] . "', ext = '" . $row['ext'] . "', description = '" . $this->eda->escapeSimple($name) . "' WHERE luid =  " . $row['luid'];
                 $this->eda->sql($sql);
             }
             return(TRUE);
