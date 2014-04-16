@@ -5,7 +5,8 @@
 	<version>2.11.5.3</version>
 	<type>setup</type>
 	<category>Connectivity</category>
-	<license>GPL 2.0</license>
+	<license>GPLv2+</license>
+	<licenselink>http://www.gnu.org/licenses/gpl-2.0.txt</licenselink>
 	<menuitems>
 		<epm_devices sort="1">OSS Endpoint Device List</epm_devices>
 		<epm_templates sort="2">OSS Endpoint Template Manager</epm_templates>
