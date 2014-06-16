@@ -46,7 +46,7 @@ class phonesettings {
         $results = $_SESSION['dbh_asterisk']->getAll($sql, DB_FETCHMODE_ASSOC);
 
         // and we are not logged in as admin
-        if (($exten!=$ARI_ADMIN_USERNAME) AND ($results[0]['value'])) {
+        if (!DB::IsError($results) && ($exten!=$ARI_ADMIN_USERNAME) AND ($results[0]['value'])) {
             $ret .= "<p><small><small><a href='" . $_SESSION['ARI_ROOT'] . "?m=phonesettings&f=display'>" . _("Phone Settings") . "</a></small></small></p><br>";
         }
 
@@ -147,14 +147,14 @@ class phonesettings {
         if (!isset($_SESSION['dbh_asterisk'])) {
             die('No Database?');
         }
-        
+
 	global $amp_conf;
 
         $doc_root =	$amp_conf['AMPWEBROOT'] ."/admin/modules/endpointman/";
         require($doc_root . "includes/functions.inc");
 
         $endpoint = new endpointmanager();
-        
+
         $sql = "SELECT mac_id, line FROM endpointman_line_list WHERE ext = '".$_SESSION['ari_user']['extension']."' ";
 
         $res =& $endpoint->eda->sql($sql);

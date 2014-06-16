@@ -21,6 +21,7 @@
 		Pull Requests can be made to either of these and are encouraged.
      </description>
 	 <changelog>
+		*2.11.5.4* Fix fatals in ARI if database doesnt exist.
 		*2.11.5.3* Outstanding Issues from database abstraction
 		 *2.11.5.2* Use correct abstraction strings
 		 *2.11.5.1* Major cleanup work
