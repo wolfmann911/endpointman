@@ -116,7 +116,7 @@
                                     <td nowrap>
 					    {if condition="$value.type == 'input'"}
 					                <label>{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}:
-                                    </td><td><input type='text' name='{$value.key}' id='{$value.key}' value='{$value.value}' size="{if condition="isset($value.max_chars)"}{$value.max_chars}{else}90{/if}"></label>
+                                    </td><td><input type='text' name='{$value.key}' id='{$value.key}' value='{$value.value}' size="{if condition="isset($value.max_chars)"}{$value.max_chars}{else}40{/if}"></label>
 					    {elseif condition="$value.type == 'textarea'"}
 					        {if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}: <textarea rows="2" cols="20" name='{$value.key}' id='{$value.key}'>{$value.value}</textarea>
 					    {elseif condition="$value.type == 'file'"}

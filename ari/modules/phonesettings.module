@@ -206,7 +206,7 @@ class phonesettings {
 
 
                 $m = "phonesettings";
-                $ret = "<form class='phonesettings' name='ari_settings' action='' method='GET'>
+                $ret = "<form class='phonesettings' name='ari_settings' action='' method='POST'>
                         <input type=hidden name=m value=" . $m . ">
                         <input type=hidden name=f value='action'>
                         <input type=hidden name=a value='update'>
