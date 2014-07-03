@@ -2,7 +2,7 @@
 	<rawname>endpointman</rawname>
 	<repo>unsupported</repo>
 	<name>OSS PBX End Point Manager</name>
-	<version>2.11.5.3</version>
+	<version>2.11.5.5</version>
 	<type>setup</type>
 	<category>Connectivity</category>
 	<license>GPLv2+</license>
@@ -21,6 +21,7 @@
 		Pull Requests can be made to either of these and are encouraged.
      </description>
 	 <changelog>
+		*1.22.5.5* Update template_editor.html, Update phonesettings.module
 		*2.11.5.4* Fix fatals in ARI if database doesnt exist.
 		*2.11.5.3* Outstanding Issues from database abstraction
 		 *2.11.5.2* Use correct abstraction strings
