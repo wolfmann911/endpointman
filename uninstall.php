@@ -6,6 +6,10 @@
  * @license MPL / GPLv2 / LGPL
  * @package Endpoint Manager
  */
+$aridir = $amp_conf['AMPWEBROOT'].'/recordings/modules';
+if(file_exists($aridir.'/phonesettings.module')) {
+    unlink($aridir.'/phonesettings.module');
+}
 require dirname($_SERVER["SCRIPT_FILENAME"]). "/modules/endpointman/includes/functions.inc";
 
 global $endpoint;
