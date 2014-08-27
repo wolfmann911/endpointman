@@ -730,7 +730,7 @@ class endpointmanager {
         if (isset($_REQUEST['maxlines'])) {
             $areas = $this->areaAvailable($row['model_id'], $_REQUEST['maxlines']);
         } else {
-            $areas = $this->areaAvailable($row['model_id'], 3);
+            $areas = $this->areaAvailable($row['model_id'], 1);
         }
 
         $this->tpl->assign("area_ava", $areas);
@@ -776,7 +776,7 @@ class endpointmanager {
         $this->tpl->assign("alt_configs", $alt_configs);
         $this->tpl->assign("alt", $alt);
         if (!isset($_REQUEST['maxlines'])) {
-            $maxlines = 3;
+            $maxlines = 1;
         } else {
             $maxlines = $_REQUEST['maxlines'];
         }
@@ -1023,16 +1023,12 @@ class endpointmanager {
                 $template_variables_array['checked'] = $custom_cfg_data[$key] ? TRUE : NULL;
                 $template_variables_array['value'] = $key;
                 break;
-            case "file";
-                if ((!$admin) && (isset($user_cfg_data[$key]))) {
-                    $custom_cfg_data[$key] = $user_cfg_data[$key];
-                }
-                $template_variables_array['type'] = "file";
-                if (isset($cfg_data['max_chars'])) {
-                    $template_variables_array['max_chars'] = $cfg_data['max_chars'];
-                }
-                $template_variables_array['key'] = $key;
-                $template_variables_array['value'] = $custom_cfg_data[$key];
+            case "group";
+                $template_variables_array['type'] = "group";
+                $template_variables_array['description'] = $cfg_data['description'];
+                break;
+            case "header";
+                $template_variables_array['type'] = "header";
                 $template_variables_array['description'] = $cfg_data['description'];
                 break;
             case "textarea":
@@ -1040,8 +1036,11 @@ class endpointmanager {
                     $custom_cfg_data[$key] = $user_cfg_data[$key];
                 }
                 $template_variables_array['type'] = "textarea";
-                if (isset($cfg_data['max_chars'])) {
-                    $template_variables_array['max_chars'] = $cfg_data['max_chars'];
+                if (isset($cfg_data['rows'])) {
+                    $template_variables_array['rows'] = $cfg_data['rows'];
+                }
+                if (isset($cfg_data['cols'])) {
+                    $template_variables_array['cols'] = $cfg_data['cols'];
                 }
                 $template_variables_array['key'] = $key;
                 $template_variables_array['value'] = isset($custom_cfg_data[$key]) ? $custom_cfg_data[$key] : $cfg_data['default_value'];
@@ -2400,7 +2399,7 @@ class endpointmanager {
         }
     }
 
-    function merge_data($path, $template_list, $maxlines = 3) {
+    function merge_data($path, $template_list, $maxlines = 12) {
         //TODO: fix
         foreach ($template_list as $files_data) {
             $full_path = $path . $files_data;
