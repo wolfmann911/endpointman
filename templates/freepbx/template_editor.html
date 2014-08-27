@@ -111,47 +111,22 @@
                         <div class="panel-wrapper">
                             <h2 class="title">{$value.title}</h2>
                             <table width="100%" border="0" cellspacing="0" cellpadding="0">
-					{loop name="value.data"}
-                                <tr>
-                                    <td nowrap>
-					    {if condition="$value.type == 'input'"}
-					                <label>{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}:
-                                    </td><td><input type='text' name='{$value.key}' id='{$value.key}' value='{$value.value}' size="{if condition="isset($value.max_chars)"}{$value.max_chars}{else}40{/if}"></label>
-					    {elseif condition="$value.type == 'textarea'"}
-					        {if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}: <textarea rows="2" cols="20" name='{$value.key}' id='{$value.key}'>{$value.value}</textarea>
-					    {elseif condition="$value.type == 'file'"}
-					                <label>{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}:
-                                    </td><td><input type='file' name='{$value.key}' id='{$value.key}' value='{$value.value}'></label>
-					    {elseif condition="$value.type == 'radio'"}
-						    {if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}:
-							{loop name="value.data"}
-                                    <strong>[</strong><label>{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}:
-                                    </td><td><input type='radio' name='{$value.key}' id='{$value.key}' value='{$value.value}' {if condition="array_key_exists('checked',$value)"}{$value.checked}{/if}></label><strong>]</strong>
-							{/loop}
-					    {elseif condition="$value.type == 'list'"}
-							{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}:
-                                    </td><td><select name='{$value.key}' id='{$value.key}'>
-						    {loop name="value.data"}
-						            <option value='{$value.value}' {if condition="array_key_exists('selected',$value)"}{$value.selected}{/if}>{$value.description}</option>
-							{/loop}
-                                    </select>
-                        {elseif condition="$value.type == 'checkbox'"}
-                                    <label>{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}:
-                                    </td><td><input type='checkbox' name='{$value.key}' id='{$value.key}' value='{$value.value}'></label>
-					    {/if}
-                                    </td><td width="90%">
-						{if condition="isset($value.aried)"}
-                                        <label><input type='checkbox' name='ari_{$value.ari.key}' {if condition="isset($value.ari.checked)"}{$value.ari.checked}{/if}>End User Editable (<a href="http://projects.colsolgrp.net/documents/29" target="_blank">Through ARI Module</a>)</label>
-						{/if}
-                                    </td>
-                                </tr>
-						{if condition="$value.type == 'break'"}
-                                <tr>
-                                    <td>&nbsp;</td>
-                                    <td>&nbsp;</td>
-                                </tr>
-						{/if}
-					{/loop}
+                               {loop name="value.data"}
+                                 <tr>
+                                 {if condition="$value.type == 'input'"}<td nowrap>{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}:</td><td nowrap><input type='text' name='{$value.key}' id='{$value.key}' value='{$value.value}' size="{if condition="isset($value.max_chars)"}{$value.max_chars}{else}90{/if}">
+                                 {elseif condition="$value.type == 'textarea'"}<td nowrap>{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}:</td><td nowrap><textarea rows="{if condition="isset($value.rows)"}{$value.rows}{else}2{/if}" cols="{if condition="isset($value.cols)"}{$value.cols}{else}20{/if}" name='{$value.key}' id='{$value.key}'>{$value.value}</textarea>
+                                 {elseif condition="$value.type == 'radio'"}<td nowrap>{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}:</td><td nowrap>{loop name="value.data"}[<label>{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}: <input type='radio' name='{$value.key}' id='{$value.key}' value='{$value.value}' {if condition="array_key_exists('checked',$value)"}{$value.checked}{/if}></label>]{/loop}
+                                 {elseif condition="$value.type == 'list'"}<td nowrap>{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}:</td><td nowrap><select name='{$value.key}' id='{$value.key}'>{loop name="value.data"}<option value='{$value.value}' {if condition="array_key_exists('selected',$value)"}{$value.selected}{/if}>{$value.description}</option>{/loop}</select>
+                                 {elseif condition="$value.type == 'checkbox'"}<td nowrap>{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}:</td><td nowrap><input type='checkbox' name='{$value.key}' id='{$value.key}' value='{$value.value}'>
+                                 {elseif condition="$value.type == 'break'"}<td nowrap colspan="2">&nbsp;
+                                 {elseif condition="$value.type == 'group'"}<td nowrap colspan="2"><hr><H3>{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}</H3>
+                                 {elseif condition="$value.type == 'header'"}<td nowrap colspan="2"><strong>{if condition="isset($value.tooltip)"}<a href="#" class="info">{$value.description}<span>{$value.tooltip}</span></a>{else}{$value.description}{/if}</strong>
+                                 {/if}
+                                 {if condition="isset($value.aried)"}<label><input type='checkbox' name='ari_{$value.ari.key}' {if condition="isset($value.ari.checked)"}{$value.ari.checked}{/if}>End User Editable (<a href="http://projects.colsolgrp.net/documents/29" target="_blank">Through ARI Module</a>)</label></td>
+                                 {else}</td>
+                                 {/if}
+                                 </tr>
+                               {/loop}
                             </table>
                         </div>
                     </div>
