@@ -139,16 +139,16 @@ class epm_data_abstraction {
 
     function all_unused_registrations() {
         if($this->global_cfg['show_all_registrations']) {
-            $not_added="SELECT devices.id, devices.description FROM devices WHERE tech='sip' ORDER BY devices.id";
+            $not_added="SELECT devices.id, devices.description FROM devices WHERE tech in ('sip','pjsip') ORDER BY devices.id";
         } else {
-            $not_added="SELECT devices.id, devices.description FROM devices WHERE tech='sip' AND devices.id not in (SELECT devices.id FROM devices, endpointman_line_list WHERE tech='sip' AND devices.id = endpointman_line_list.ext ) ORDER BY devices.id";
+            $not_added="SELECT devices.id, devices.description FROM devices WHERE tech in('sip','pjsip') AND devices.id not in (SELECT devices.id FROM devices, endpointman_line_list WHERE tech in ('sip','pjsip') AND devices.id = endpointman_line_list.ext ) ORDER BY devices.id";
         }
         $result =& $this->sql($not_added,'getAll', DB_FETCHMODE_ASSOC);
         return($result);
     }
 
     function all_used_registrations() {
-        $not_added="SELECT devices.id, devices.description FROM devices WHERE tech='sip' AND devices.id in (SELECT devices.id FROM devices, endpointman_line_list WHERE tech='sip' AND devices.id = endpointman_line_list.ext ) ORDER BY devices.id";
+        $not_added="SELECT devices.id, devices.description FROM devices WHERE tech in ('sip','pjsip') AND devices.id in (SELECT devices.id FROM devices, endpointman_line_list WHERE tech in ('sip','pjsip') AND devices.id = endpointman_line_list.ext ) ORDER BY devices.id";
         $result =& $this->sql($not_added,'getAll', DB_FETCHMODE_ASSOC);
         return($result);
     }
