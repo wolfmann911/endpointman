@@ -20,7 +20,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2.10\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-30 00:04+0400\n"
+"POT-Creation-Date: 2015-02-11 17:50-0500\n"
 "PO-Revision-Date: 2012-11-01 22:35+0400\n"
 "Last-Translator: PostMet <ceo@postmet.com>\n"
 "Language-Team: Russian\n"
@@ -28,37 +28,40 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-msgid "Turn Off Safe Mode"
-msgstr "Выключить Безопасный режим"
-
-msgid "PHP Version MUST be greater than"
-msgstr "Версия PHP должна быть выше, чем"
-
-msgid "Sorry, Only Asterisk is supported currently"
-msgstr "Извините, сейчас поддерживается только Asterisk"
-
-msgid "PBX End Point Manager"
-msgstr "Менеджер абонентских устройств"
-
-msgid "Connectivity"
-msgstr "Подключения"
-
-msgid ""
-"PBX End Point Manager supports automated deployment of multiple "
-"manufacturers IP telephones."
-msgstr "Менеджер абонентских устройств управляет автоматической настройкой IP телефонов разных производителей"
-
-msgid "End Point Device List"
-msgstr "Список абонентских устройств"
-
-msgid "End Point Template Manager"
-msgstr "Менеджер шаблонов абонентских устройств"
-
-msgid "End Point Configuration"
-msgstr "Конфигурация абонентского устройства"
-
-msgid "End Point Advanced Settings"
-msgstr "Дополнительные настройки абонентского устройства"
-
+#: /usr/src/freepbx/endpointman/functions.inc.php:234
 msgid "End Point Manager"
 msgstr "Менеджер абонентских устройств"
+
+#~ msgid "Turn Off Safe Mode"
+#~ msgstr "Выключить Безопасный режим"
+
+#~ msgid "PHP Version MUST be greater than"
+#~ msgstr "Версия PHP должна быть выше, чем"
+
+#~ msgid "Sorry, Only Asterisk is supported currently"
+#~ msgstr "Извините, сейчас поддерживается только Asterisk"
+
+#~ msgid "PBX End Point Manager"
+#~ msgstr "Менеджер абонентских устройств"
+
+#~ msgid "Connectivity"
+#~ msgstr "Подключения"
+
+#~ msgid ""
+#~ "PBX End Point Manager supports automated deployment of multiple "
+#~ "manufacturers IP telephones."
+#~ msgstr ""
+#~ "Менеджер абонентских устройств управляет автоматической настройкой IP "
+#~ "телефонов разных производителей"
+
+#~ msgid "End Point Device List"
+#~ msgstr "Список абонентских устройств"
+
+#~ msgid "End Point Template Manager"
+#~ msgstr "Менеджер шаблонов абонентских устройств"
+
+#~ msgid "End Point Configuration"
+#~ msgstr "Конфигурация абонентского устройства"
+
+#~ msgid "End Point Advanced Settings"
+#~ msgstr "Дополнительные настройки абонентского устройства"
