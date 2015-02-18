@@ -1049,19 +1049,3 @@ $db->query($sql);
 
 $sql = "UPDATE endpointman_global_vars SET value = 'http://mirror.freepbx.org/provisioner/v3/' WHERE var_name = 'update_server'";
 $db->query($sql);
-
-if (file_exists($amp_conf['AMPWEBROOT'] . "/recordings/modules/phonesettings.module")) {
-    unlink($amp_conf['AMPWEBROOT'] . "/recordings/modules/phonesettings.module");
-}
-
-if (file_exists($amp_conf['AMPWEBROOT'] . "/recordings/theme/js/jquery.coda-slider-2.0.js")) {
-    unlink($amp_conf['AMPWEBROOT'] . "/recordings/theme/js/jquery.coda-slider-2.0.js");
-}
-
-if (file_exists($amp_conf['AMPWEBROOT'] . "/recordings/theme/js/jquery.easing.1.3.js")) {
-    unlink($amp_conf['AMPWEBROOT'] . "/recordings/theme/js/jquery.easing.1.3.js");
-}
-
-if (file_exists($amp_conf['AMPWEBROOT'] . "/recordings/theme/coda-slider-2.0a.css")) {
-    unlink($amp_conf['AMPWEBROOT'] . "/recordings/theme/coda-slider-2.0a.css");
-}
