@@ -20,7 +20,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: FreePBX\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-11 17:50-0500\n"
+"POT-Creation-Date: 2015-02-18 18:42-0500\n"
 "PO-Revision-Date: 2014-07-22 15:41+0200\n"
 "Last-Translator: Chavdar <chavdar_75@yahoo.com>\n"
 "Language-Team: Bulgarian <http://git.freepbx.org/projects/freepbx/"
@@ -32,9 +32,46 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: Weblate 1.10-dev\n"
 
-#: /usr/src/freepbx/endpointman/functions.inc.php:234
+#: endpointman.i18n.php:4
+msgid "Connectivity"
+msgstr ""
+
+#: functions.inc.php:234
 msgid "End Point Manager"
 msgstr "Конфигуриране на Телефонни Апарати"
+
+#: endpointman.i18n.php:13
+msgid "OSS Endpoint Advanced Settings"
+msgstr ""
+
+#: endpointman.i18n.php:10
+msgid "OSS Endpoint Device List"
+msgstr ""
+
+#: endpointman.i18n.php:12
+msgid "OSS Endpoint Package Manager"
+msgstr ""
+
+#: endpointman.i18n.php:11
+msgid "OSS Endpoint Template Manager"
+msgstr ""
+
+#: endpointman.i18n.php:3
+msgid "OSS PBX End Point Manager"
+msgstr ""
+
+#: endpointman.i18n.php:5
+msgid ""
+"OSS PBX End Point Manager is the free supported PBX Endpoint Manager for "
+"FreePBX.\n"
+"\t\tIt is ***NOT*** supported by Schmoozecom. If you are looking for a "
+"supported endpoint manager please look into the Commercial Endpoint Manager "
+"by Schmoozecom, INC.\n"
+"\t\tThe front end gui is hosted at: https://github.com/FreePBX/endpointman\n"
+"\t\tThe backend configurator is hosted at: https://github.com/provisioner/"
+"Provisioner\n"
+"\t\tPull Requests can be made to either of these and are encouraged."
+msgstr ""
 
 #~ msgid "PBX End Point Manager"
 #~ msgstr "PBX Конфигуриране на Телефонни Апарати"
