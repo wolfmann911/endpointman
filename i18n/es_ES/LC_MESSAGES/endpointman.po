@@ -10,41 +10,44 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-02-18 18:42-0500\n"
-"PO-Revision-Date: 2015-02-18 18:42-0500\n"
-"Last-Translator: Automatically generated\n"
-"Language-Team: none\n"
+"PO-Revision-Date: 2015-03-25 11:20+0200\n"
+"Last-Translator: Ernesto <ecasas@sangoma.com>\n"
+"Language-Team: Spanish "
+"<http://weblate.freepbx.org/projects/fpbxcn/endpointman/es_ES/>\n"
+"Language: es_ES\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 2.2-dev\n"
 
 #: endpointman.i18n.php:4
 msgid "Connectivity"
-msgstr ""
+msgstr "Conectividad"
 
 #: functions.inc.php:234
 msgid "End Point Manager"
-msgstr ""
+msgstr "Gestor de Dispositivos"
 
 #: endpointman.i18n.php:13
 msgid "OSS Endpoint Advanced Settings"
-msgstr ""
+msgstr "Configuración Avanzada OSS gestor de Dispositivos"
 
 #: endpointman.i18n.php:10
 msgid "OSS Endpoint Device List"
-msgstr ""
+msgstr "OSS Lista de Dispositivos"
 
 #: endpointman.i18n.php:12
 msgid "OSS Endpoint Package Manager"
-msgstr ""
+msgstr "OSS Paquete Gestor de Dispositivos"
 
 #: endpointman.i18n.php:11
 msgid "OSS Endpoint Template Manager"
-msgstr ""
+msgstr "OSS Gestor de Plantillas de Dispositivos"
 
 #: endpointman.i18n.php:3
 msgid "OSS PBX End Point Manager"
-msgstr ""
+msgstr "OSS Gestor de Dispositivos PBX"
 
 #: endpointman.i18n.php:5
 msgid ""
@@ -58,3 +61,14 @@ msgid ""
 "Provisioner\n"
 "\t\tPull Requests can be made to either of these and are encouraged."
 msgstr ""
+"Gerente OSS PBX End Point es el apoyado Manager gratis PBX Punto final para "
+"FreePBX.↵\n"
+"→→ Es *** *** NO apoyado por Schmoozecom. Si usted está buscando un gestor "
+"de punto final apoyado por favor mirar en el Endpoint Comercial por "
+"Schmoozecom, INC.↵\n"
+"→→ El gui extremo delantero está alojado en: "
+"https://github.com/FreePBX/endpointman↵\n"
+"→→ El configurador backend está alojado en: "
+"https://github.com/provisioner/Provisioner↵\n"
+" →→ solicitudes de tensión se pueden hacer a cualquiera de ellos y se les "
+"anima."
