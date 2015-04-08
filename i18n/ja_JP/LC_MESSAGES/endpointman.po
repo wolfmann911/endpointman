@@ -37,7 +37,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: FreePBX endpointman\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-18 18:42-0500\n"
+"POT-Creation-Date: 2015-04-08 19:20-0400\n"
 "PO-Revision-Date: 2014-02-24 06:17+0200\n"
 "Last-Translator: Kenichi Fukaumi <k.fukaumi@qloog.com>\n"
 "Language-Team: Japanese <http://192.168.30.85/projects/freepbx/endpointman/"
@@ -49,7 +49,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Weblate 1.8\n"
 
-#: endpointman.i18n.php:4
+#: endpointman.i18n.php:6 endpointman.i18n.php:12
 msgid "Connectivity"
 msgstr "接続"
 
@@ -57,7 +57,7 @@ msgstr "接続"
 msgid "End Point Manager"
 msgstr "端末管理"
 
-#: endpointman.i18n.php:13
+#: endpointman.i18n.php:18
 msgid "OSS Endpoint Advanced Settings"
 msgstr "OSS端末の詳細設定"
 
@@ -65,29 +65,27 @@ msgstr "OSS端末の詳細設定"
 msgid "OSS Endpoint Device List"
 msgstr "OSS端末デバイスリスト"
 
-#: endpointman.i18n.php:12
+#: endpointman.i18n.php:16
 msgid "OSS Endpoint Package Manager"
 msgstr ""
 
-#: endpointman.i18n.php:11
+#: endpointman.i18n.php:14
 msgid "OSS Endpoint Template Manager"
 msgstr "OSS端末テンプレート管理"
 
-#: endpointman.i18n.php:3
+#: endpointman.i18n.php:4
 msgid "OSS PBX End Point Manager"
 msgstr "OSS PBX端末管理"
 
-#: endpointman.i18n.php:5
+#: endpointman.i18n.php:8
 msgid ""
 "OSS PBX End Point Manager is the free supported PBX Endpoint Manager for "
-"FreePBX.\n"
-"\t\tIt is ***NOT*** supported by Schmoozecom. If you are looking for a "
-"supported endpoint manager please look into the Commercial Endpoint Manager "
-"by Schmoozecom, INC.\n"
-"\t\tThe front end gui is hosted at: https://github.com/FreePBX/endpointman\n"
-"\t\tThe backend configurator is hosted at: https://github.com/provisioner/"
-"Provisioner\n"
-"\t\tPull Requests can be made to either of these and are encouraged."
+"FreePBX.\t\tIt is ***NOT*** supported by Schmoozecom. If you are looking for "
+"a supported endpoint manager please look into the Commercial Endpoint "
+"Manager by Schmoozecom, INC.\t\tThe front end gui is hosted at: https://"
+"github.com/FreePBX/endpointman\t\tThe backend configurator is hosted at: "
+"https://github.com/provisioner/Provisioner\t\tPull Requests can be made to "
+"either of these and are encouraged."
 msgstr ""
 
 #~ msgid ""
