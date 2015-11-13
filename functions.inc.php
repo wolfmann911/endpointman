@@ -33,12 +33,12 @@ function endpointman_get_config($engine) {
 
 function endpointman_configpageinit($pagename) {
     global $currentcomponent, $amp_conf, $db;
-	
+
     $display = isset($_REQUEST['display']) ? $_REQUEST['display'] : null;
 	$type = '';
 	$tech = '';
 	$extdisplay = '';
-	
+
     if ($display == "extensions") {
         if (isset($_REQUEST['extension'])) {
             $extdisplay = isset($_REQUEST['extension']) ? $_REQUEST['extension'] : null;
@@ -55,7 +55,7 @@ function endpointman_configpageinit($pagename) {
 		// we only care about extensions or devices, otherwise return
 		return true;
 	}
-	
+
     if (isset($extdisplay) && !empty($extdisplay)) {
         $sql = "SELECT tech FROM devices WHERE id = " . $extdisplay;
         $tech = $db->getOne($sql);
@@ -68,7 +68,7 @@ function endpointman_configpageinit($pagename) {
 		}
     } elseif(isset($_REQUEST['tech_hardware']) OR isset($_REQUEST['tech'])) {
 		$tech = isset($_REQUEST['tech_hardware']) ? $_REQUEST['tech_hardware'] : $_REQUEST['tech'];
-		if(($tech == 'sip_generic') OR ($tech == 'sip')) { 
+		if(($tech == 'sip_generic') OR ($tech == 'sip')) {
         	$tech = "sip";
 			$type = 'new';
 		}
@@ -322,5 +322,26 @@ function endpointman_configpageload() {
 }
 
 function endpointman_hookProcess_core($viewing_itemid, $request) {
-    
+
+}
+
+function endpointman_module_install_check_callback($mods = array()) {
+    global $active_modules;
+
+    $ret = array();
+    $current_mod = 'endpointman';
+    $conflicting_mods = array('endpoint','restart');
+
+	foreach($mods as $k => $v) {
+		if (in_array($k, $conflicting_mods) && !in_array($active_modules[$current_mod]['status'],array(MODULE_STATUS_NOTINSTALLED,MODULE_STATUS_BROKEN))) {
+			$ret[] = $v['name'];
+		}
+	}
+
+	if (!empty($ret)) {
+		$modules = implode(',',$ret);
+		return _('Failed to install ' . $modules . ' due to the following conflicting module(s): ' . $active_modules[$current_mod]['displayname']);
+	}
+
+	return TRUE;
 }
