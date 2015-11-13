@@ -20,7 +20,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: FreePBX\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-04-08 19:20-0400\n"
+"POT-Creation-Date: 2015-11-13 14:12-0800\n"
 "PO-Revision-Date: 2014-07-22 15:41+0200\n"
 "Last-Translator: Chavdar <chavdar_75@yahoo.com>\n"
 "Language-Team: Bulgarian <http://git.freepbx.org/projects/freepbx/"
@@ -39,6 +39,10 @@ msgstr ""
 #: functions.inc.php:234
 msgid "End Point Manager"
 msgstr "Конфигуриране на Телефонни Апарати"
+
+#: functions.inc.php:343
+msgid "Failed to install "
+msgstr ""
 
 #: endpointman.i18n.php:18
 msgid "OSS Endpoint Advanced Settings"

@@ -20,7 +20,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2.10\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-04-08 19:20-0400\n"
+"POT-Creation-Date: 2015-11-13 14:12-0800\n"
 "PO-Revision-Date: 2012-11-01 22:35+0400\n"
 "Last-Translator: PostMet <ceo@postmet.com>\n"
 "Language-Team: Russian\n"
@@ -35,6 +35,10 @@ msgstr "Подключения"
 #: functions.inc.php:234
 msgid "End Point Manager"
 msgstr "Менеджер абонентских устройств"
+
+#: functions.inc.php:343
+msgid "Failed to install "
+msgstr ""
 
 #: endpointman.i18n.php:18
 msgid "OSS Endpoint Advanced Settings"

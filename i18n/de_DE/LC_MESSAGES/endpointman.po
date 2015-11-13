@@ -9,15 +9,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-04-08 19:20-0400\n"
+"POT-Creation-Date: 2015-11-13 14:12-0800\n"
 "PO-Revision-Date: 2015-11-12 14:01+0200\n"
 "Last-Translator: Matthias <it@mitterhuemer.at>\n"
-"Language-Team: German "
-"<http://weblate.freepbx.org/projects/fpbxcn/endpointman/de_DE/>\n"
-"Language: de_DE\n"
+"Language-Team: German <http://weblate.freepbx.org/projects/fpbxcn/"
+"endpointman/de_DE/>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: de_DE\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: Weblate 2.2-dev\n"
 
@@ -28,6 +28,10 @@ msgstr "Verbindung"
 #: functions.inc.php:234
 msgid "End Point Manager"
 msgstr "End Point Manager"
+
+#: functions.inc.php:343
+msgid "Failed to install "
+msgstr ""
 
 #: endpointman.i18n.php:18
 msgid "OSS Endpoint Advanced Settings"

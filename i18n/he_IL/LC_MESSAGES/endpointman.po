@@ -20,7 +20,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-04-08 19:20-0400\n"
+"POT-Creation-Date: 2015-11-13 14:12-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -34,6 +34,10 @@ msgstr ""
 
 #: functions.inc.php:234
 msgid "End Point Manager"
+msgstr ""
+
+#: functions.inc.php:343
+msgid "Failed to install "
 msgstr ""
 
 #: endpointman.i18n.php:18
