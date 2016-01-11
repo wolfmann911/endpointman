@@ -1516,48 +1516,50 @@ class endpointmanager {
                     $li++;
                 }
 
-                foreach ($specific_settings['data'] as $key => $data) {
-                    $default_exp = preg_split("/\|/i", $key);
-                    if (isset($default_exp[2])) {
-                        //lineloop
-                        $var = $default_exp[2];
-                        $line = $default_exp[1];
-                        $loc = $this->arraysearchrecursive($line, $provisioner_lib->settings['line'], 'line');
-                        if ($loc !== FALSE) {
-                            $k = $loc[0];
-                            $provisioner_lib->settings['line'][$k][$var] = $data;
-                        } else {
-                            //Adding a new line-ish type options
-                            if (isset($specific_settings['data']['line|' . $line . '|line_enabled'])) {
-                                $lastkey = array_pop(array_keys($provisioner_lib->settings['line']));
-                                $lastkey++;
-                                $provisioner_lib->settings['line'][$lastkey]['line'] = $line;
-                                $provisioner_lib->settings['line'][$lastkey][$var] = $data;
+                if (array_key_exists('data', $specific_settings)) {
+                   foreach ($specific_settings['data'] as $key => $data) {
+                       $default_exp = preg_split("/\|/i", $key);
+                        if (isset($default_exp[2])) {
+                            //lineloop
+                            $var = $default_exp[2];
+                            $line = $default_exp[1];
+                            $loc = $this->arraysearchrecursive($line, $provisioner_lib->settings['line'], 'line');
+                            if ($loc !== FALSE) {
+                                $k = $loc[0];
+                                $provisioner_lib->settings['line'][$k][$var] = $data;
+                            } else {
+                                //Adding a new line-ish type options
+                                if (isset($specific_settings['data']['line|' . $line . '|line_enabled'])) {
+                                    $lastkey = array_pop(array_keys($provisioner_lib->settings['line']));
+                                    $lastkey++;
+                                    $provisioner_lib->settings['line'][$lastkey]['line'] = $line;
+                                    $provisioner_lib->settings['line'][$lastkey][$var] = $data;
+                                }
                             }
-                        }
-                    } else {
-                        switch ($key) {
-                            case "connection_type":
-                                $provisioner_lib->settings['network'][$key] = $data;
-                                break;
-                            case "ip4_address":
-                                $provisioner_lib->settings['network']['ipv4'] = $data;
-                                break;
-                            case "ip6_address":
-                                $provisioner_lib->settings['network']['ipv6'] = $data;
-                                break;
-                            case "subnet_mask":
-                                $provisioner_lib->settings['network']['subnet'] = $data;
-                                break;
-                            case "gateway_address":
-                                $provisioner_lib->settings['network']['gateway'] = $data;
-                                break;
-                            case "primary_dns":
-                                $provisioner_lib->settings['network'][$key] = $data;
-                                break;
-                            default:
-                                $provisioner_lib->settings[$key] = $data;
-                                break;
+                        } else {
+                            switch ($key) {
+                                case "connection_type":
+                                    $provisioner_lib->settings['network'][$key] = $data;
+                                    break;
+                                case "ip4_address":
+                                    $provisioner_lib->settings['network']['ipv4'] = $data;
+                                    break;
+                                case "ip6_address":
+                                    $provisioner_lib->settings['network']['ipv6'] = $data;
+                                    break;
+                                case "subnet_mask":
+                                    $provisioner_lib->settings['network']['subnet'] = $data;
+                                    break;
+                                case "gateway_address":
+                                    $provisioner_lib->settings['network']['gateway'] = $data;
+                                    break;
+                                case "primary_dns":
+                                    $provisioner_lib->settings['network'][$key] = $data;
+                                    break;
+                                default:
+                                    $provisioner_lib->settings[$key] = $data;
+                                    break;
+                            }
                         }
                     }
                 }
@@ -1881,10 +1883,12 @@ class endpointmanager {
 
                             $temp = $temp['data']['brands'];
 
-                            foreach ($temp['oui_list'] as $oui) {
-                                $sql = "REPLACE INTO endpointman_oui_list (`oui`, `brand`, `custom`) VALUES ('" . $oui . "', '" . $temp['brand_id'] . "', '0')";
-                                $this->eda->sql($sql);
-                            }
+														if (array_key_exists('oui_list', $temp)) {
+                            	foreach ($temp['oui_list'] as $oui) {
+                              	  $sql = "REPLACE INTO endpointman_oui_list (`oui`, `brand`, `custom`) VALUES ('" . $oui . "', '" . $temp['brand_id'] . "', '0')";
+                               		$this->eda->sql($sql);
+															}
+														}
 
                             $brand_name = $temp['directory'];
                             $version[$brand_name] = $temp['last_modified'];
