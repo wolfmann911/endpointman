@@ -1480,7 +1480,7 @@ class endpointmanager {
                 if (!$write) {
                     $new_template_data['provision']['type'] = 'dynamic';
                     $new_template_data['provision']['protocol'] = 'http';
-                    $new_template_data['provision']['path'] = $_SERVER["SERVER_ADDR"] . dirname($_SERVER['REQUEST_URI']) . '/';
+                    $new_template_data['provision']['path'] = rtrim($settings['srvip'] . dirname($_SERVER['REQUEST_URI']) . '/', '/');
                     $new_template_data['provision']['encryption'] = FALSE;
                 } else {
                     $new_template_data['provision']['type'] = 'file';
