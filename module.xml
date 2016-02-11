@@ -13,31 +13,31 @@
 		<epm_config sort="3">OSS Endpoint Package Manager</epm_config>
 		<epm_advanced sort="4">OSS Endpoint Advanced Settings</epm_advanced>
 	</menuitems>
-	 <description>
+	<description>
 		OSS PBX End Point Manager is the free supported PBX Endpoint Manager for FreePBX.
 		It is ***NOT*** supported by Schmoozecom. If you are looking for a supported endpoint manager please look into the Commercial Endpoint Manager by Schmoozecom, INC.
 		The front end gui is hosted at: https://github.com/FreePBX/endpointman
 		The backend configurator is hosted at: https://github.com/provisioner/Provisioner
 		Pull Requests can be made to either of these and are encouraged.
-     </description>
-		 <changelog>
+    </description>
+	<changelog>
 		*2.11.12* Made server IP configurable for HTTP provisioning by fdeschenes
 		*2.11.11* FC-124
 		*2.11.10* Dont let endpoint and restart conflict with this module
 		*2.11.9* FC-88 Since update to OSS End Point Manager 2.11.8 not able to save a Template under FreePBX 11, 12
 		*2.11.8* Fix depends and coda slider
 		*2.11.7* Partial support for PJSIP
-		 *2.11.6* Template Manager and  Usability and Readability improvements
+		*2.11.6* Template Manager and  Usability and Readability improvements
 		*2.11.5.5* Update template_editor.html, Update phonesettings.module
 		*2.11.5.4* Fix fatals in ARI if database doesnt exist.
 		*2.11.5.3* Outstanding Issues from database abstraction
-		 *2.11.5.2* Use correct abstraction strings
-		 *2.11.5.1* Major cleanup work
-	 	 *2.11.5.0* Major cosmetic changes thanks to jnovack!
-		 *2.11.4.11* Fixes #6426 (Fatal SQL error - Device cfg submit with apostrophe in extn text description)
-		 *2.11.4.10* Fixes #6428
-         *2.11.4.9* Fix a stupid error on my part with requiring php 5.3 SORRY! :-(
-     </changelog>
+		*2.11.5.2* Use correct abstraction strings
+		*2.11.5.1* Major cleanup work
+	 	*2.11.5.0* Major cosmetic changes thanks to jnovack!
+		*2.11.4.11* Fixes #6426 (Fatal SQL error - Device cfg submit with apostrophe in extn text description)
+		*2.11.4.10* Fixes #6428
+        *2.11.4.9* Fix a stupid error on my part with requiring php 5.3 SORRY! :-(
+    </changelog>
 	<info></info>
 	<location>release/2.11/endpointman-2.11.4.11.tgz</location>
 	<depends>
@@ -47,5 +47,10 @@
 	<supported>
 		<version>2.10</version>
 	</supported>
+	<hooks>
+    <framework namespace="FreePBX\Console\Command" class="Chown">
+        <method namespace="FreePBX\modules" class="Endpointman" callingMethod="fwcChownFiles">chownFreepbx</method>
+    </framework>
+</hooks>
 <md5sum>a3f341e28698ea988c987efd72d0d9c8</md5sum>
 </module>
