@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-13 14:12-0800\n"
+"POT-Creation-Date: 2016-02-11 10:35-0800\n"
 "PO-Revision-Date: 2015-02-18 18:42-0500\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -18,16 +18,483 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: zh_CN\n"
 
+#: Endpointman.class.php:1370
+msgid "- Copied %_FILE_% to %_FILETO_%."
+msgstr ""
+
+#: Endpointman.class.php:1583
+msgid "- Error Moving %_FILENAME_%!"
+msgstr ""
+
+#: Endpointman.class.php:1366
+msgid "- Failed To Copy %_FILE_%!"
+msgstr ""
+
+#: Endpointman.class.php:1637
+msgid "-- Updating Model Lines................"
+msgstr ""
+
+#: Endpointman.class.php:1648
+msgid "----Old Data Detected! Migrating......"
+msgstr ""
+
+#: Endpointman.class.php:1743
+msgid "---Inserting Model %_NAMEMOD_%"
+msgstr ""
+
+#: Endpointman.class.php:1739
+msgid "---Updating Model %_NAMEMOD_%"
+msgstr ""
+
+#: views/epm_advanced_oui_manager.page.php:63
+msgid "Add"
+msgstr ""
+
+#: views/epm_advanced_oui_manager.page.php:50
+msgid "Add Custom"
+msgstr ""
+
+#: page.epm_advanced.php:14
+msgid "Advanced Settings"
+msgstr ""
+
+#: Endpointman.class.php:1455
+msgid "All Done!"
+msgstr ""
+
+#: views/epm_advanced_settings.page.php:199
+msgid "Allow Duplicate Extensions"
+msgstr ""
+
+#: views/epm_advanced_settings.page.php:205
+msgid "Allow Saving Over Default Configuration Files"
+msgstr ""
+
+#: Endpointman.class.php:1556
+msgid "Appears to be a valid Provisioner.net JSON file.....Continuing"
+msgstr ""
+
+#: views/epm_advanced_iedl.page.php:20 views/epm_advanced_iedl.page.php:23
+#: views/epm_advanced_oui_manager.page.php:31
+msgid "Brand"
+msgstr ""
+
+#: views/epm_config_editor.page.php:7
+msgid "Brands/Modules"
+msgstr ""
+
+#: views/epm_advanced_iedl.page.php:19
+msgid "CSV File Format"
+msgstr ""
+
+#: Endpointman.class.php:1528
+msgid "Can't Find Downloaded File!"
+msgstr ""
+
+#: Endpointman.class.php:998
+msgid "Cant find file:"
+msgstr ""
+
+#: Endpointman.class.php:166
+msgid "Check Online "
+msgstr ""
+
+#: views/epm_config_manager.page.php:10
+msgid "Check for Update"
+msgstr ""
+
+#: Endpointman.class.php:165
+msgid "Check for Update "
+msgstr ""
+
+#: Endpointman.class.php:181
+msgid "Check for Updates..."
+msgstr ""
+
+#: Endpointman.class.php:182
+msgid "Check for Updates... Ok!"
+msgstr ""
+
+#: Endpointman.class.php:1350
+msgid "Checking MD5sum of Package..."
+msgstr ""
+
+#: Endpointman.class.php:1513
+msgid "Checking MD5sum of Package...."
+msgstr ""
+
+#: Endpointman.class.php:218 Endpointman.class.php:236
+msgid "Command not found!"
+msgstr ""
+
+#: Endpointman.class.php:103
+msgid ""
+"Configuration Directory is not a directory or does not exist! Please change "
+"the location here:"
+msgstr ""
+
+#: Endpointman.class.php:95
+msgid "Configuration Directory is not writable!"
+msgstr ""
+
+#: views/epm_advanced_settings.page.php:108
+msgid "Configuration Type"
+msgstr ""
+
 #: endpointman.i18n.php:6 endpointman.i18n.php:12
 msgid "Connectivity"
+msgstr ""
+
+#: Endpointman.class.php:1382
+msgid "Copy Error Detected! Aborting Install!"
+msgstr ""
+
+#: Endpointman.class.php:1564
+msgid "Creating Directory Structure for Brand '%_NAME_%' and Moving Files .."
+msgstr ""
+
+#: Endpointman.class.php:1489
+msgid "Creating EPM temp directory"
+msgstr ""
+
+#: views/epm_advanced_poce.page.php:28
+msgid "Custom Template Files"
+msgstr ""
+
+#: views/epm_advanced_oui_manager.page.php:41
+#: views/epm_advanced_poce.page.php:41
+msgid "Delete"
+msgstr ""
+
+#: views/epm_advanced_settings.page.php:105
+msgid "Determine for me"
+msgstr ""
+
+#: Endpointman.class.php:174
+msgid "Disable"
+msgstr ""
+
+#: views/epm_advanced_settings.page.php:217
+msgid "Disable Configuration File Backups"
+msgstr ""
+
+#: views/epm_advanced_settings.page.php:211
+msgid "Disable TFTP Server Check"
+msgstr ""
+
+#: views/epm_advanced_settings.page.php:193
+msgid "Disable Tooltips"
+msgstr ""
+
+#: Endpointman.class.php:1334 Endpointman.class.php:1346
+#: Endpointman.class.php:1387 Endpointman.class.php:1419
+#: Endpointman.class.php:1473 Endpointman.class.php:1501
+#: Endpointman.class.php:1508 Endpointman.class.php:1515
+#: Endpointman.class.php:1519 Endpointman.class.php:1590
+#: Endpointman.class.php:1668 Endpointman.class.php:1704
+#: Endpointman.class.php:1733 Endpointman.class.php:1775
+#: Endpointman.class.php:1783 Endpointman.class.php:1793
+msgid "Done!"
+msgstr ""
+
+#: Endpointman.class.php:1497
+msgid "Downloading Brand JSON....."
+msgstr ""
+
+#: Endpointman.class.php:1506
+msgid "Downloading Brand Package..."
+msgstr ""
+
+#: Endpointman.class.php:1328 Endpointman.class.php:1340
+msgid "Downloading firmware..."
+msgstr ""
+
+#: Endpointman.class.php:173
+msgid "Enable"
+msgstr ""
+
+#: views/epm_advanced_settings.page.php:187
+msgid "Enable Debug Mode"
+msgstr ""
+
+#: views/epm_advanced_settings.page.php:181
+msgid "Enable FreePBX ARI Module"
+msgstr ""
+
+#: page.epm_advanced.php:13 page.epm_config.php:12
+msgid "End Point Configuraction Manager"
 msgstr ""
 
 #: functions.inc.php:234
 msgid "End Point Manager"
 msgstr "终端管理"
 
+#: Endpointman.class.php:1534
+msgid ""
+"Error Connecting to the Package Repository. Module not installed. Please Try "
+"again later."
+msgstr ""
+
+#: Endpointman.class.php:1491
+msgid "Error creating directory: %_DIR_%"
+msgstr ""
+
+#: Endpointman.class.php:1531
+msgid "Error download Brand package!"
+msgstr ""
+
+#: Endpointman.class.php:1331 Endpointman.class.php:1343
+msgid "Error download frimware package!"
+msgstr ""
+
+#: Endpointman.class.php:176 Endpointman.class.php:193
+msgid "Error!"
+msgstr ""
+
+#: Endpointman.class.php:599 Endpointman.class.php:636
+msgid "Error: Command not found!"
+msgstr ""
+
+#: views/epm_advanced_iedl.page.php:28
+msgid "Examples"
+msgstr ""
+
+#: views/epm_advanced_iedl.page.php:6
+#: views/epm_advanced_manual_upload.page.php:55
+msgid "Export"
+msgstr ""
+
+#: views/epm_advanced_iedl.page.php:4
+msgid "Export CSV"
+msgstr ""
+
+#: views/epm_advanced_iedl.page.php:5
+msgid "Export CSV file of devices"
+msgstr ""
+
+#: views/epm_advanced_iedl.page.php:20 views/epm_advanced_iedl.page.php:25
+msgid "Extension"
+msgstr ""
+
+#: Endpointman.class.php:1517
+msgid "Extracting Tarball........"
+msgstr ""
+
 #: functions.inc.php:343
 msgid "Failed to install "
+msgstr ""
+
+#: views/epm_advanced_poce.page.php:6
+msgid "File Configuration Editor"
+msgstr ""
+
+#: Endpointman.class.php:1391
+msgid "Firmware MD5 didn't match!"
+msgstr ""
+
+#: Endpointman.class.php:1620
+msgid "Firmware Requirment Detected!.........."
+msgstr ""
+
+#: views/epm_advanced_settings.page.php:117
+msgid "Global Final Config & Firmware Directory"
+msgstr ""
+
+#: Endpointman.class.php:96 Endpointman.class.php:103
+msgid "Here"
+msgstr ""
+
+#: Endpointman.class.php:191
+msgid "Hide"
+msgstr ""
+
+#: Endpointman.class.php:422
+msgid "ID Brand not is numbre"
+msgstr ""
+
+#: Endpointman.class.php:407
+msgid "ID Producto not is number"
+msgstr ""
+
+#: Endpointman.class.php:657 Endpointman.class.php:799
+msgid "ID send is not number!"
+msgstr ""
+
+#: Endpointman.class.php:676 Endpointman.class.php:822
+msgid "IDType invalid: "
+msgstr ""
+
+#: views/epm_advanced_settings.page.php:104
+msgid "IP address of phone server"
+msgstr ""
+
+#: Endpointman.class.php:160
+msgid ""
+"If we can activate the model set terminals of the models.<br /> If this "
+"model is disabled will not appear in the list of models that can be "
+"configured for PBX."
+msgstr ""
+
+#: Endpointman.class.php:188
+msgid ""
+"If you select Hide disappear all models of the product selected from the "
+"Install/Uninstall list."
+msgstr ""
+
+#: Endpointman.class.php:189
+msgid "If you select Hide disappear this model the Install/Uninstall list."
+msgstr ""
+
+#: Endpointman.class.php:187
+msgid ""
+"If you select Hide this brand will disappear and all products and models on "
+"the list of Install/Uninstall."
+msgstr ""
+
+#: views/epm_advanced_iedl.page.php:11
+#: views/epm_advanced_manual_upload.page.php:24
+#: views/epm_advanced_manual_upload.page.php:36
+msgid "Import"
+msgstr ""
+
+#: views/epm_advanced_iedl.page.php:8
+msgid "Import CSV"
+msgstr ""
+
+#: views/epm_advanced_iedl.page.php:10
+msgid "Import CSV file of devices"
+msgstr ""
+
+#: Endpointman.class.php:342
+msgid "Import/Export My Devices List"
+msgstr ""
+
+#: Endpointman.class.php:1604
+msgid "Inserting %_BRANDNAME_% brand data.........."
+msgstr ""
+
+#: Endpointman.class.php:167
+msgid "Install"
+msgstr ""
+
+#: Endpointman.class.php:170
+msgid "Install Firmware"
+msgstr ""
+
+#: Endpointman.class.php:316
+msgid "Install/Unistall"
+msgstr ""
+
+#: Endpointman.class.php:1359
+msgid "Installing Firmware..."
+msgstr ""
+
+#: Endpointman.class.php:1539
+msgid "Installing brands is disabled while in repo mode!"
+msgstr ""
+
+#: Endpointman.class.php:1785
+msgid "Invalid JSON Structure in %_PATH_%/brand_data.json"
+msgstr ""
+
+#: Endpointman.class.php:2696
+msgid "Invalid MAC Address"
+msgstr ""
+
+#: Endpointman.class.php:2691
+msgid "Invalid Model Selected, Can't Sync System"
+msgstr ""
+
+#: Endpointman.class.php:184 Endpointman.class.php:198
+msgid "Invalid Option!"
+msgstr ""
+
+#: Endpointman.class.php:790
+msgid "Invalid Value!"
+msgstr ""
+
+#: views/epm_advanced_iedl.page.php:20 views/epm_advanced_iedl.page.php:26
+msgid "Line"
+msgstr ""
+
+#: views/epm_config_manager.page.php:19
+msgid "List Packages Manager"
+msgstr ""
+
+#: views/epm_config_editor.page.php:11 views/epm_config_manager.page.php:23
+msgid "Loading data...."
+msgstr ""
+
+#: assets/js/epm_config.js:320
+msgid "Loading.."
+msgstr ""
+
+#: views/epm_advanced_poce.page.php:34
+msgid "Local File Configs"
+msgstr ""
+
+#: views/epm_advanced_iedl.page.php:20 views/epm_advanced_iedl.page.php:22
+msgid "MAC Address"
+msgstr ""
+
+#: Endpointman.class.php:1525
+msgid "MD5 Did not match!"
+msgstr ""
+
+#: Endpointman.class.php:986
+msgid "Malformed UTF-8 characters, possibly incorrectly encoded"
+msgstr ""
+
+#: Endpointman.class.php:1352
+msgid "Matches!"
+msgstr ""
+
+#: Endpointman.class.php:974
+msgid "Maximum stack depth exceeded"
+msgstr ""
+
+#: views/epm_advanced_iedl.page.php:20 views/epm_advanced_iedl.page.php:24
+msgid "Model"
+msgstr ""
+
+#: Endpointman.class.php:1758
+msgid "Moving/Removing Model '%_NAMEMOD_%' not present in JSON file......"
+msgstr ""
+
+#: Endpointman.class.php:163
+msgid "New Package Modified"
+msgstr ""
+
+#: Endpointman.class.php:1788
+msgid "No 'brand_data.xml' file exists!"
+msgstr ""
+
+#: Endpointman.class.php:2728 Endpointman.class.php:2746
+msgid "No Devices/Extensions Left to Add"
+msgstr ""
+
+#: Endpointman.class.php:2732 Endpointman.class.php:2750
+msgid "No Lines Left to Add"
+msgstr ""
+
+#: Endpointman.class.php:651 Endpointman.class.php:793
+msgid "No send id!"
+msgstr ""
+
+#: Endpointman.class.php:654 Endpointman.class.php:796
+msgid "No send idtype!"
+msgstr ""
+
+#: Endpointman.class.php:645 Endpointman.class.php:783
+msgid "No send name!"
+msgstr ""
+
+#: Endpointman.class.php:648 Endpointman.class.php:786
+msgid "No send value!"
+msgstr ""
+
+#: Endpointman.class.php:1476
+msgid "Not allowed in repo mode!!"
 msgstr ""
 
 #: endpointman.i18n.php:18
@@ -59,4 +526,258 @@ msgid ""
 "github.com/FreePBX/endpointman\t\tThe backend configurator is hosted at: "
 "https://github.com/provisioner/Provisioner\t\tPull Requests can be made to "
 "either of these and are encouraged."
+msgstr ""
+
+#: Endpointman.class.php:334
+msgid "OUI Manager"
+msgstr ""
+
+#: Endpointman.class.php:1688 Endpointman.class.php:1713
+msgid "Old Data Detected! Migrating......"
+msgstr ""
+
+#: Endpointman.class.php:97
+msgid "Or run this command on SSH:"
+msgstr ""
+
+#: Endpointman.class.php:346
+msgid "Package Import/Export"
+msgstr ""
+
+#: Endpointman.class.php:164
+msgid "Package Last Modified"
+msgstr ""
+
+#: page.epm_config.php:13
+msgid "Package Manager"
+msgstr ""
+
+#: Endpointman.class.php:1384 Endpointman.class.php:1492
+msgid "Please Check Directory/Permissions!"
+msgstr ""
+
+#: Endpointman.class.php:96
+msgid "Please change the location:"
+msgstr ""
+
+#: Endpointman.class.php:1551
+msgid "Processing %_PATH_%/brand_data.json..."
+msgstr ""
+
+#: Endpointman.class.php:338
+msgid "Product Configuration Editor"
+msgstr ""
+
+#: Endpointman.class.php:175 Endpointman.class.php:192
+#: Endpointman.class.php:196
+msgid "Ready!"
+msgstr ""
+
+#: Endpointman.class.php:171
+msgid "Remove Firmware"
+msgstr ""
+
+#: Endpointman.class.php:1791
+msgid "Removing Temporary Files.............."
+msgstr ""
+
+#: views/epm_advanced_poce.page.php:54
+msgid "Save"
+msgstr ""
+
+#: views/epm_advanced_poce.page.php:59
+msgid "Save As"
+msgstr ""
+
+#: Endpointman.class.php:178 Endpointman.class.php:194
+msgid "Saving Changes..."
+msgstr ""
+
+#: Endpointman.class.php:179 Endpointman.class.php:195
+msgid "Saving Changes... Ok!"
+msgstr ""
+
+#: views/epm_advanced_poce.page.php:8
+msgid "Select"
+msgstr ""
+
+#: views/epm_config_editor.page.php:4
+msgid ""
+"Select brands, products or models that do not need to hide from the list."
+msgstr ""
+
+#: Endpointman.class.php:330
+msgid "Settings"
+msgstr ""
+
+#: Endpointman.class.php:190
+msgid "Show"
+msgstr ""
+
+#: Endpointman.class.php:320
+msgid "Show/Hide"
+msgstr ""
+
+#: Endpointman.class.php:1324
+msgid "Skipping download..."
+msgstr ""
+
+#: Endpointman.class.php:983
+msgid "Syntax error, malformed JSON"
+msgstr ""
+
+#: Endpointman.class.php:1749
+msgid "System Error in Sync Model Function, Load Failure!"
+msgstr ""
+
+#: Endpointman.class.php:242
+msgid "Tab is not valid!"
+msgstr ""
+
+#: Endpointman.class.php:162
+msgid ""
+"The \"Install\" button installs the configuration package brand models we "
+"selected.<br /> The \"Uninstall\" button removes the package configuration "
+"models of the brand selected.<br /> The \"Update\" button appears if a new "
+"version of the package that is already installed to upgrade to the latest "
+"version is detected."
+msgstr ""
+
+#: Endpointman.class.php:161
+msgid ""
+"The button \"Install Firmware\" installs the necessary files to the server "
+"for the terminal alone are updated via TFTP or HTTP.<br /> The button "
+"\"Remove frimware\" delete files server products.<br /> The button \"Update "
+"frimware\" appears if a newer frimware detected on the server and asks if "
+"you want to update.<br /> The \"Update\" button appears when a new version "
+"of this model pack is detected."
+msgstr ""
+
+#: Endpointman.class.php:1536
+msgid "Then Use Manual Upload in Advanced Settings."
+msgstr ""
+
+#: views/epm_advanced_settings.page.php:139
+msgid "Time Server (NTP Server)"
+msgstr ""
+
+#: views/epm_advanced_settings.page.php:127
+msgid "Time Zone"
+msgstr ""
+
+#: Endpointman.class.php:977
+msgid "Underflow or the modes mismatch"
+msgstr ""
+
+#: Endpointman.class.php:980
+msgid "Unexpected control character found"
+msgstr ""
+
+#: Endpointman.class.php:168
+msgid "Uninstall"
+msgstr ""
+
+#: Endpointman.class.php:1427
+msgid "Uninstalla Brand..."
+msgstr ""
+
+#: Endpointman.class.php:1404
+msgid "Uninstalla frimware..."
+msgstr ""
+
+#: Endpointman.class.php:2613
+msgid "Unknown"
+msgstr ""
+
+#: Endpointman.class.php:989
+msgid "Unknown error"
+msgstr ""
+
+#: Endpointman.class.php:169
+msgid "Update"
+msgstr ""
+
+#: Endpointman.class.php:183
+msgid "Update Content..."
+msgstr ""
+
+#: Endpointman.class.php:172
+msgid "Update Firmware"
+msgstr ""
+
+#: views/epm_advanced_settings.page.php:245
+msgid "Update Globals"
+msgstr ""
+
+#: Endpointman.class.php:177
+msgid "Update!"
+msgstr ""
+
+#: Endpointman.class.php:1600
+msgid "Updating %_BRANDNAME_% brand data.........."
+msgstr ""
+
+#: Endpointman.class.php:1611
+msgid "Updating Family Lines................."
+msgstr ""
+
+#: Endpointman.class.php:1776
+msgid "Updating OUI list in DB"
+msgstr ""
+
+#: Endpointman.class.php:180 Endpointman.class.php:197
+msgid "Upload Content!"
+msgstr ""
+
+#: views/epm_advanced_settings.page.php:223
+msgid "Use GITHUB Live Repo (Requires git to be installed)"
+msgstr ""
+
+#: views/epm_advanced_poce.page.php:38
+msgid "User File Configs"
+msgstr ""
+
+#: Endpointman.class.php:1535
+msgid ""
+"You Can Also Manually Update The Repository By Downloading Files here: %"
+"_URL_INI_% Release Repo %_URL_END_%"
+msgstr ""
+
+#: Endpointman.class.php:2627
+msgid "You Must Select A Model From the Drop Down"
+msgstr ""
+
+#: Endpointman.class.php:2630
+msgid "You Must Select an Extension/Device From the Drop Down"
+msgstr ""
+
+#: Endpointman.class.php:2847
+msgid "You can't remove the only line left"
+msgstr ""
+
+#: Endpointman.class.php:1395
+msgid "Your Firmware is already up to date"
+msgstr ""
+
+#: views/epm_advanced_iedl.page.php:23 views/epm_advanced_iedl.page.php:24
+#: views/epm_advanced_iedl.page.php:25 views/epm_advanced_iedl.page.php:26
+msgid "can be blank"
+msgstr ""
+
+#: views/epm_advanced_settings.page.php:149
+#: views/epm_advanced_settings.page.php:155
+#: views/epm_advanced_settings.page.php:161
+msgid "executable path"
+msgstr ""
+
+#: views/epm_advanced_iedl.page.php:22
+msgid "is required"
+msgstr ""
+
+#: views/epm_advanced_settings.page.php:127
+msgid "like"
+msgstr ""
+
+#: Endpointman.class.php:1548
+msgid "update_brand(): Debug is set to %_DEBUG_MODE_%"
 msgstr ""
