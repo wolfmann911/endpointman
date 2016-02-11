@@ -2,7 +2,7 @@
 	<rawname>endpointman</rawname>
 	<repo>unsupported</repo>
 	<name>OSS PBX End Point Manager</name>
-	<version>13.0.1</version>
+	<version>13.0.2</version>
 	<type>setup</type>
 	<category>Connectivity</category>
 	<license>GPLv2+</license>
@@ -21,6 +21,7 @@
 		Pull Requests can be made to either of these and are encouraged.
     </description>
 	<changelog>
+		*13.0.2* Missing updated file
 		*13.0.1* Updates from Community member Javier Pastor Garcia
 		*2.11.12* Made server IP configurable for HTTP provisioning by fdeschenes
 		*2.11.11* FC-124

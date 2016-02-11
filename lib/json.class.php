@@ -56,6 +56,8 @@
  * @link        http://pear.php.net/pepr/pepr-proposal-show.php?id=198
  */
 
+namespace FreePBX\modules;
+ 
 if(!function_exists('json_decode')) {
 
 /**
