@@ -7,10 +7,15 @@
  * @package Endpoint Manager
  */
 $aridir = $amp_conf['AMPWEBROOT'].'/recordings/modules';
-
+if(file_exists($aridir.'/phonesettings.module')) {
+    unlink($aridir.'/phonesettings.module');
+}
+require dirname($_SERVER["SCRIPT_FILENAME"]). "/modules/endpointman/includes/functions.inc";
 
 global $endpoint;
+
 $endpoint = new endpointmanager();
+
 global $db;
 
 out("Removing Phone Modules Directory");
@@ -51,13 +56,86 @@ $result = $db->query($sql);
 
 //Do unlinks ourself because retrieve_conf doesn't always remove stuff...
 
+//images
+$dir = $amp_conf['AMPWEBROOT'].'/admin/assets/endpointman/images';
+foreach (glob(LOCAL_PATH."assets/images/*.*") as $filename) {
+    if(file_exists($dir.'/'.basename($filename)) && (readlink($dir.'/'.basename($filename)) == $filename)) {
+        unlink($dir.'/'.basename($filename));
+    }
+}
+if(is_link($dir)) {
+    unlink($dir);
+}
 
 
+//javascripts
+$dir = $amp_conf['AMPWEBROOT'].'/admin/assets/endpointman/js';
+foreach (glob(LOCAL_PATH."assets/js/*.*") as $filename) {
+    if(file_exists($dir.'/'.basename($filename)) && (readlink($dir.'/'.basename($filename)) == $filename)) {
+        unlink($dir.'/'.basename($filename));
+    }
+}
+if(is_link($dir)) {
+    unlink($dir);
+}
+
+//javascripts
+$dir = $amp_conf['AMPWEBROOT'].'/admin/assets/endpointman/css';
+foreach (glob(LOCAL_PATH."assets/css/*.*") as $filename) {
+    if(file_exists($dir.'/'.basename($filename)) && (readlink($dir.'/'.basename($filename)) == $filename)) {
+        unlink($dir.'/'.basename($filename));
+    }
+}
+if(is_link($dir)) {
+    unlink($dir);
+}
+
+//theme
+$dir = $amp_conf['AMPWEBROOT'].'/admin/assets/endpointman/theme';
+foreach (glob(LOCAL_PATH."assets/theme/*.*") as $filename) {
+    if(file_exists($dir.'/'.basename($filename)) && (readlink($dir.'/'.basename($filename)) == $filename)) {
+        unlink($dir.'/'.basename($filename));
+    }
+}
+if(is_link($dir)) {
+    unlink($dir);
+}
 out('Removing symlink to web provisioner');
 if(is_link($amp_conf['AMPWEBROOT']."/provisioning")) {
     unlink($amp_conf['AMPWEBROOT']."/provisioning");
 }
 
+//ari-modules
+$dir = $amp_conf['AMPWEBROOT'].'/recordings/modules';
+foreach (glob(LOCAL_PATH."ari/modules/*.*") as $filename) {
+    if(file_exists($dir.'/'.basename($filename)) && (readlink($dir.'/'.basename($filename)) == $filename)) {
+        unlink($dir.'/'.basename($filename));
+    }
+}
+
+//ari-images
+$dir = $amp_conf['AMPWEBROOT'].'/recordings/theme/images';
+foreach (glob(LOCAL_PATH."ari/images/*.*") as $filename) {
+    if(file_exists($dir.'/'.basename($filename)) && (readlink($dir.'/'.basename($filename)) == $filename)) {
+        unlink($dir.'/'.basename($filename));
+    }
+}
+
+//ari-js
+$dir = $amp_conf['AMPWEBROOT'].'/recordings/theme/js';
+foreach (glob(LOCAL_PATH."ari/js/*.*") as $filename) {
+    if(file_exists($dir.'/'.basename($filename)) && (readlink($dir.'/'.basename($filename)) == $filename)) {
+        unlink($dir.'/'.basename($filename));
+    }
+}
+
+//ari-theme
+$dir = $amp_conf['AMPWEBROOT'].'/recordings/theme';
+foreach (glob(LOCAL_PATH."ari/theme/*.*") as $filename) {
+    if(file_exists($dir.'/'.basename($filename)) && (readlink($dir.'/'.basename($filename)) == $filename)) {
+        unlink($dir.'/'.basename($filename));
+    }
+}
 if(!is_link($amp_conf['AMPWEBROOT'].'/admin/assets/endpointman')) {
     $endpoint->rmrf($amp_conf['AMPWEBROOT'].'/admin/assets/endpointman');
 }
