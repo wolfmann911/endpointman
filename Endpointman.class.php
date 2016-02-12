@@ -211,6 +211,7 @@ class Endpointman implements \BMO {
 							break;
 						
 						case "check_for_updates":
+							$this->update_check();
 							$retarr = array("status" => true, "message" => "OK", "datlist" => $this->epm_config_manager_hardware_get_list_all(true));
 							break;
 						
