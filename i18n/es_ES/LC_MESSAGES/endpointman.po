@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-02-11 10:35-0800\n"
+"POT-Creation-Date: 2016-02-12 12:29-0800\n"
 "PO-Revision-Date: 2016-02-07 23:39+0100\n"
 "Last-Translator: Javier Pastor <jpastor@cerebelum.net>\n"
 "Language-Team: \n"
@@ -25,31 +25,31 @@ msgstr ""
 "X-Poedit-SearchPathExcluded-0: _old\n"
 "X-Poedit-SearchPathExcluded-1: i18n\n"
 
-#: Endpointman.class.php:1370
+#: Endpointman.class.php:1371
 msgid "- Copied %_FILE_% to %_FILETO_%."
 msgstr ""
 
-#: Endpointman.class.php:1583
+#: Endpointman.class.php:1584
 msgid "- Error Moving %_FILENAME_%!"
 msgstr ""
 
-#: Endpointman.class.php:1366
+#: Endpointman.class.php:1367
 msgid "- Failed To Copy %_FILE_%!"
 msgstr ""
 
-#: Endpointman.class.php:1637
+#: Endpointman.class.php:1638
 msgid "-- Updating Model Lines................"
 msgstr ""
 
-#: Endpointman.class.php:1648
+#: Endpointman.class.php:1649
 msgid "----Old Data Detected! Migrating......"
 msgstr ""
 
-#: Endpointman.class.php:1743
+#: Endpointman.class.php:1744
 msgid "---Inserting Model %_NAMEMOD_%"
 msgstr ""
 
-#: Endpointman.class.php:1739
+#: Endpointman.class.php:1740
 msgid "---Updating Model %_NAMEMOD_%"
 msgstr ""
 
@@ -65,7 +65,7 @@ msgstr "Añadir Personalizada"
 msgid "Advanced Settings"
 msgstr ""
 
-#: Endpointman.class.php:1455
+#: Endpointman.class.php:1456
 msgid "All Done!"
 msgstr "Todo Correcto!"
 
@@ -77,7 +77,7 @@ msgstr ""
 msgid "Allow Saving Over Default Configuration Files"
 msgstr ""
 
-#: Endpointman.class.php:1556
+#: Endpointman.class.php:1557
 msgid "Appears to be a valid Provisioner.net JSON file.....Continuing"
 msgstr ""
 
@@ -94,11 +94,11 @@ msgstr "Marca/Modelo"
 msgid "CSV File Format"
 msgstr ""
 
-#: Endpointman.class.php:1528
+#: Endpointman.class.php:1529
 msgid "Can't Find Downloaded File!"
 msgstr ""
 
-#: Endpointman.class.php:998
+#: Endpointman.class.php:999
 msgid "Cant find file:"
 msgstr "No se puede encontrar el archivo:"
 
@@ -122,15 +122,15 @@ msgstr "Buscar actualizaciones..."
 msgid "Check for Updates... Ok!"
 msgstr "Buscar actualizaciones... Listo!"
 
-#: Endpointman.class.php:1350
+#: Endpointman.class.php:1351
 msgid "Checking MD5sum of Package..."
 msgstr "Comprobando MD5sum en Paquete..."
 
-#: Endpointman.class.php:1513
+#: Endpointman.class.php:1514
 msgid "Checking MD5sum of Package...."
 msgstr "Comprobando MD5sum de paquete..."
 
-#: Endpointman.class.php:218 Endpointman.class.php:236
+#: Endpointman.class.php:219 Endpointman.class.php:237
 msgid "Command not found!"
 msgstr "Comando no valido!"
 
@@ -154,15 +154,15 @@ msgstr "Tipo de Configuracion"
 msgid "Connectivity"
 msgstr ""
 
-#: Endpointman.class.php:1382
+#: Endpointman.class.php:1383
 msgid "Copy Error Detected! Aborting Install!"
 msgstr "Detectado error al copiar! Abortada la Instalacion!"
 
-#: Endpointman.class.php:1564
+#: Endpointman.class.php:1565
 msgid "Creating Directory Structure for Brand '%_NAME_%' and Moving Files .."
 msgstr ""
 
-#: Endpointman.class.php:1489
+#: Endpointman.class.php:1490
 msgid "Creating EPM temp directory"
 msgstr "Creando directorio temporal para EPM"
 
@@ -195,26 +195,26 @@ msgstr ""
 msgid "Disable Tooltips"
 msgstr ""
 
-#: Endpointman.class.php:1334 Endpointman.class.php:1346
-#: Endpointman.class.php:1387 Endpointman.class.php:1419
-#: Endpointman.class.php:1473 Endpointman.class.php:1501
-#: Endpointman.class.php:1508 Endpointman.class.php:1515
-#: Endpointman.class.php:1519 Endpointman.class.php:1590
-#: Endpointman.class.php:1668 Endpointman.class.php:1704
-#: Endpointman.class.php:1733 Endpointman.class.php:1775
-#: Endpointman.class.php:1783 Endpointman.class.php:1793
+#: Endpointman.class.php:1335 Endpointman.class.php:1347
+#: Endpointman.class.php:1388 Endpointman.class.php:1420
+#: Endpointman.class.php:1474 Endpointman.class.php:1502
+#: Endpointman.class.php:1509 Endpointman.class.php:1516
+#: Endpointman.class.php:1520 Endpointman.class.php:1591
+#: Endpointman.class.php:1669 Endpointman.class.php:1705
+#: Endpointman.class.php:1734 Endpointman.class.php:1776
+#: Endpointman.class.php:1784 Endpointman.class.php:1794
 msgid "Done!"
 msgstr "Correcto!"
 
-#: Endpointman.class.php:1497
+#: Endpointman.class.php:1498
 msgid "Downloading Brand JSON....."
 msgstr "Descargando JSON Marca...."
 
-#: Endpointman.class.php:1506
+#: Endpointman.class.php:1507
 msgid "Downloading Brand Package..."
 msgstr "Descargando paquete de Marca...."
 
-#: Endpointman.class.php:1328 Endpointman.class.php:1340
+#: Endpointman.class.php:1329 Endpointman.class.php:1341
 msgid "Downloading firmware..."
 msgstr "Descargando Frimware..."
 
@@ -238,21 +238,21 @@ msgstr "Configurar Administracion End Point"
 msgid "End Point Manager"
 msgstr "Administracion End Point"
 
-#: Endpointman.class.php:1534
+#: Endpointman.class.php:1535
 msgid ""
 "Error Connecting to the Package Repository. Module not installed. Please Try "
 "again later."
 msgstr ""
 
-#: Endpointman.class.php:1491
+#: Endpointman.class.php:1492
 msgid "Error creating directory: %_DIR_%"
 msgstr ""
 
-#: Endpointman.class.php:1531
+#: Endpointman.class.php:1532
 msgid "Error download Brand package!"
 msgstr ""
 
-#: Endpointman.class.php:1331 Endpointman.class.php:1343
+#: Endpointman.class.php:1332 Endpointman.class.php:1344
 msgid "Error download frimware package!"
 msgstr ""
 
@@ -260,7 +260,7 @@ msgstr ""
 msgid "Error!"
 msgstr "Error!"
 
-#: Endpointman.class.php:599 Endpointman.class.php:636
+#: Endpointman.class.php:600 Endpointman.class.php:637
 msgid "Error: Command not found!"
 msgstr "Error: Comando no valido!"
 
@@ -285,7 +285,7 @@ msgstr ""
 msgid "Extension"
 msgstr "Extension"
 
-#: Endpointman.class.php:1517
+#: Endpointman.class.php:1518
 msgid "Extracting Tarball........"
 msgstr ""
 
@@ -297,11 +297,11 @@ msgstr "Fallo de installacion"
 msgid "File Configuration Editor"
 msgstr "Editar Archivo de Configuracion"
 
-#: Endpointman.class.php:1391
+#: Endpointman.class.php:1392
 msgid "Firmware MD5 didn't match!"
 msgstr "MD5 de Frimware no coincide!"
 
-#: Endpointman.class.php:1620
+#: Endpointman.class.php:1621
 msgid "Firmware Requirment Detected!.........."
 msgstr ""
 
@@ -317,19 +317,19 @@ msgstr "Aquí"
 msgid "Hide"
 msgstr "Ocultar"
 
-#: Endpointman.class.php:422
+#: Endpointman.class.php:423
 msgid "ID Brand not is numbre"
 msgstr "ID Marca no es numero"
 
-#: Endpointman.class.php:407
+#: Endpointman.class.php:408
 msgid "ID Producto not is number"
 msgstr "ID Producto no es numero"
 
-#: Endpointman.class.php:657 Endpointman.class.php:799
+#: Endpointman.class.php:658 Endpointman.class.php:800
 msgid "ID send is not number!"
 msgstr "ID enviado no es numero!"
 
-#: Endpointman.class.php:676 Endpointman.class.php:822
+#: Endpointman.class.php:677 Endpointman.class.php:823
 msgid "IDType invalid: "
 msgstr "IDType no valido:"
 
@@ -383,11 +383,11 @@ msgstr ""
 msgid "Import CSV file of devices"
 msgstr ""
 
-#: Endpointman.class.php:342
+#: Endpointman.class.php:343
 msgid "Import/Export My Devices List"
 msgstr "Importar/exportar mi lista de dispositivos"
 
-#: Endpointman.class.php:1604
+#: Endpointman.class.php:1605
 msgid "Inserting %_BRANDNAME_% brand data.........."
 msgstr ""
 
@@ -399,27 +399,27 @@ msgstr "Instalar"
 msgid "Install Firmware"
 msgstr "Instalar Firmware"
 
-#: Endpointman.class.php:316
+#: Endpointman.class.php:317
 msgid "Install/Unistall"
 msgstr "Instalar/Desisntalar"
 
-#: Endpointman.class.php:1359
+#: Endpointman.class.php:1360
 msgid "Installing Firmware..."
 msgstr "Instalando Frimware..."
 
-#: Endpointman.class.php:1539
+#: Endpointman.class.php:1540
 msgid "Installing brands is disabled while in repo mode!"
 msgstr ""
 
-#: Endpointman.class.php:1785
+#: Endpointman.class.php:1786
 msgid "Invalid JSON Structure in %_PATH_%/brand_data.json"
 msgstr ""
 
-#: Endpointman.class.php:2696
+#: Endpointman.class.php:2697
 msgid "Invalid MAC Address"
 msgstr "Direccion MAC no valida"
 
-#: Endpointman.class.php:2691
+#: Endpointman.class.php:2692
 msgid "Invalid Model Selected, Can't Sync System"
 msgstr "Seleccionada Modelo no válido, no puede Sistema de sincronización"
 
@@ -427,7 +427,7 @@ msgstr "Seleccionada Modelo no válido, no puede Sistema de sincronización"
 msgid "Invalid Option!"
 msgstr "Opcion no valida!"
 
-#: Endpointman.class.php:790
+#: Endpointman.class.php:791
 msgid "Invalid Value!"
 msgstr "Valor no valido!"
 
@@ -443,7 +443,7 @@ msgstr "Administracion Lista de Paquetes"
 msgid "Loading data...."
 msgstr "Cargando datos..."
 
-#: assets/js/epm_config.js:320
+#: assets/js/epm_config.js:321
 msgid "Loading.."
 msgstr "Cargando..."
 
@@ -455,19 +455,19 @@ msgstr "Cargar Archivo de Configuracion"
 msgid "MAC Address"
 msgstr "Direccion MAC"
 
-#: Endpointman.class.php:1525
+#: Endpointman.class.php:1526
 msgid "MD5 Did not match!"
 msgstr "- MD5 no coincide!"
 
-#: Endpointman.class.php:986
+#: Endpointman.class.php:987
 msgid "Malformed UTF-8 characters, possibly incorrectly encoded"
 msgstr "Malformados caracteres UTF-8, posiblemente incorrectamente codificada"
 
-#: Endpointman.class.php:1352
+#: Endpointman.class.php:1353
 msgid "Matches!"
 msgstr "Correcto!"
 
-#: Endpointman.class.php:974
+#: Endpointman.class.php:975
 msgid "Maximum stack depth exceeded"
 msgstr "Superó capacidad de la pila máximo"
 
@@ -475,7 +475,7 @@ msgstr "Superó capacidad de la pila máximo"
 msgid "Model"
 msgstr "Modelo"
 
-#: Endpointman.class.php:1758
+#: Endpointman.class.php:1759
 msgid "Moving/Removing Model '%_NAMEMOD_%' not present in JSON file......"
 msgstr ""
 
@@ -483,35 +483,35 @@ msgstr ""
 msgid "New Package Modified"
 msgstr "Nuevo paquete Modificado"
 
-#: Endpointman.class.php:1788
+#: Endpointman.class.php:1789
 msgid "No 'brand_data.xml' file exists!"
 msgstr ""
 
-#: Endpointman.class.php:2728 Endpointman.class.php:2746
+#: Endpointman.class.php:2729 Endpointman.class.php:2747
 msgid "No Devices/Extensions Left to Add"
 msgstr "No hay dispositivos / Extensiones a la izquierdo para Añadir"
 
-#: Endpointman.class.php:2732 Endpointman.class.php:2750
+#: Endpointman.class.php:2733 Endpointman.class.php:2751
 msgid "No Lines Left to Add"
 msgstr "No hay líneas de a la izquierdo para Añadir"
 
-#: Endpointman.class.php:651 Endpointman.class.php:793
+#: Endpointman.class.php:652 Endpointman.class.php:794
 msgid "No send id!"
 msgstr "No se ha enviado ID!"
 
-#: Endpointman.class.php:654 Endpointman.class.php:796
+#: Endpointman.class.php:655 Endpointman.class.php:797
 msgid "No send idtype!"
 msgstr "No se ha enviado IDType!"
 
-#: Endpointman.class.php:645 Endpointman.class.php:783
+#: Endpointman.class.php:646 Endpointman.class.php:784
 msgid "No send name!"
 msgstr "No se ha enviado NOMBRE!"
 
-#: Endpointman.class.php:648 Endpointman.class.php:786
+#: Endpointman.class.php:649 Endpointman.class.php:787
 msgid "No send value!"
 msgstr "No se ha enviado VALOR!"
 
-#: Endpointman.class.php:1476
+#: Endpointman.class.php:1477
 msgid "Not allowed in repo mode!!"
 msgstr ""
 
@@ -546,11 +546,11 @@ msgid ""
 "either of these and are encouraged."
 msgstr ""
 
-#: Endpointman.class.php:334
+#: Endpointman.class.php:335
 msgid "OUI Manager"
 msgstr ""
 
-#: Endpointman.class.php:1688 Endpointman.class.php:1713
+#: Endpointman.class.php:1689 Endpointman.class.php:1714
 msgid "Old Data Detected! Migrating......"
 msgstr ""
 
@@ -558,7 +558,7 @@ msgstr ""
 msgid "Or run this command on SSH:"
 msgstr "O ejecute este comando en SSH:"
 
-#: Endpointman.class.php:346
+#: Endpointman.class.php:347
 msgid "Package Import/Export"
 msgstr "Paquete de importación/exportación"
 
@@ -570,7 +570,7 @@ msgstr "Paquete última actualización"
 msgid "Package Manager"
 msgstr "Administracion de Paquetes"
 
-#: Endpointman.class.php:1384 Endpointman.class.php:1492
+#: Endpointman.class.php:1385 Endpointman.class.php:1493
 msgid "Please Check Directory/Permissions!"
 msgstr "Compruebe los permisos del directorio!"
 
@@ -578,11 +578,11 @@ msgstr "Compruebe los permisos del directorio!"
 msgid "Please change the location:"
 msgstr "Por favor, cambia la ubicación:"
 
-#: Endpointman.class.php:1551
+#: Endpointman.class.php:1552
 msgid "Processing %_PATH_%/brand_data.json..."
 msgstr ""
 
-#: Endpointman.class.php:338
+#: Endpointman.class.php:339
 msgid "Product Configuration Editor"
 msgstr "Editor de configuración de producto"
 
@@ -595,7 +595,7 @@ msgstr "Listo!"
 msgid "Remove Firmware"
 msgstr "Eliminar Firmware"
 
-#: Endpointman.class.php:1791
+#: Endpointman.class.php:1792
 msgid "Removing Temporary Files.............."
 msgstr ""
 
@@ -626,7 +626,7 @@ msgstr ""
 "Seleccione las Marcas, Productos y modelos que no necesite para ocultarlo en "
 "la lista de Instalar/Desisntalar."
 
-#: Endpointman.class.php:330
+#: Endpointman.class.php:331
 msgid "Settings"
 msgstr "Configuración"
 
@@ -634,23 +634,23 @@ msgstr "Configuración"
 msgid "Show"
 msgstr "Mostrar"
 
-#: Endpointman.class.php:320
+#: Endpointman.class.php:321
 msgid "Show/Hide"
 msgstr "Mostrar/Ocultar"
 
-#: Endpointman.class.php:1324
+#: Endpointman.class.php:1325
 msgid "Skipping download..."
 msgstr "Omitir descarga..."
 
-#: Endpointman.class.php:983
+#: Endpointman.class.php:984
 msgid "Syntax error, malformed JSON"
 msgstr "Error de sintaxis, JSON malformada"
 
-#: Endpointman.class.php:1749
+#: Endpointman.class.php:1750
 msgid "System Error in Sync Model Function, Load Failure!"
 msgstr ""
 
-#: Endpointman.class.php:242
+#: Endpointman.class.php:243
 msgid "Tab is not valid!"
 msgstr "Tab no es valida!"
 
@@ -685,7 +685,7 @@ msgstr ""
 "<br /> El boton \"Actualizar\" aparece cuando se detecta una nueva version "
 "de Paquete de este modelo."
 
-#: Endpointman.class.php:1536
+#: Endpointman.class.php:1537
 msgid "Then Use Manual Upload in Advanced Settings."
 msgstr ""
 
@@ -697,11 +697,11 @@ msgstr "Servidor de Tiempo (NTP Server)"
 msgid "Time Zone"
 msgstr "Zona Horaria"
 
-#: Endpointman.class.php:977
+#: Endpointman.class.php:978
 msgid "Underflow or the modes mismatch"
 msgstr ""
 
-#: Endpointman.class.php:980
+#: Endpointman.class.php:981
 msgid "Unexpected control character found"
 msgstr "Carácter de control inesperado encontró"
 
@@ -709,19 +709,19 @@ msgstr "Carácter de control inesperado encontró"
 msgid "Uninstall"
 msgstr "Desisntalar"
 
-#: Endpointman.class.php:1427
+#: Endpointman.class.php:1428
 msgid "Uninstalla Brand..."
 msgstr "Desisntalando Marca..."
 
-#: Endpointman.class.php:1404
+#: Endpointman.class.php:1405
 msgid "Uninstalla frimware..."
 msgstr "Desisntalando Frimware..."
 
-#: Endpointman.class.php:2613
+#: Endpointman.class.php:2614
 msgid "Unknown"
 msgstr "Desconocido"
 
-#: Endpointman.class.php:989
+#: Endpointman.class.php:990
 msgid "Unknown error"
 msgstr "Error desconocido."
 
@@ -745,15 +745,15 @@ msgstr ""
 msgid "Update!"
 msgstr "Actualizado!"
 
-#: Endpointman.class.php:1600
+#: Endpointman.class.php:1601
 msgid "Updating %_BRANDNAME_% brand data.........."
 msgstr ""
 
-#: Endpointman.class.php:1611
+#: Endpointman.class.php:1612
 msgid "Updating Family Lines................."
 msgstr ""
 
-#: Endpointman.class.php:1776
+#: Endpointman.class.php:1777
 msgid "Updating OUI list in DB"
 msgstr ""
 
@@ -769,25 +769,25 @@ msgstr ""
 msgid "User File Configs"
 msgstr "Usar Archivo de Configuracion"
 
-#: Endpointman.class.php:1535
+#: Endpointman.class.php:1536
 msgid ""
 "You Can Also Manually Update The Repository By Downloading Files here: %"
 "_URL_INI_% Release Repo %_URL_END_%"
 msgstr ""
 
-#: Endpointman.class.php:2627
+#: Endpointman.class.php:2628
 msgid "You Must Select A Model From the Drop Down"
 msgstr "Usted debe seleccionar un modelo de la gota de Down"
 
-#: Endpointman.class.php:2630
+#: Endpointman.class.php:2631
 msgid "You Must Select an Extension/Device From the Drop Down"
 msgstr "Tu deves seleeciona una Extension/Disposito de listado de abajo"
 
-#: Endpointman.class.php:2847
+#: Endpointman.class.php:2848
 msgid "You can't remove the only line left"
 msgstr "No se puede quitar la única línea de la izquierda"
 
-#: Endpointman.class.php:1395
+#: Endpointman.class.php:1396
 msgid "Your Firmware is already up to date"
 msgstr "Tu Frimware ya esta actualizado"
 
@@ -810,7 +810,7 @@ msgstr "es requerido"
 msgid "like"
 msgstr ""
 
-#: Endpointman.class.php:1548
+#: Endpointman.class.php:1549
 msgid "update_brand(): Debug is set to %_DEBUG_MODE_%"
 msgstr ""
 
