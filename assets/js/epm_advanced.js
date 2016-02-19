@@ -1,7 +1,6 @@
 var v_sTimerUpdateAjax = "";
 var v_sTimerSelectTab = "";
 var box;
-var box_exit_cancel = true;
 
 $(document).ready(function() {
 	$.getScript("modules/endpointman/assets/js/epm_global.js");
@@ -16,32 +15,13 @@ $(document).ready(function() {
 	
 	
 	//TAB OUT_MANAGER
-	$("#btdialognewouiopen")
-	.colorbox({
-		inline		: true, 
-		width		: "500px",
-		closeButton : false,
-		opacity		: 0.4,
-		onCleanup	:function(){
-			//Empezar proceso cierre.
-		},
-		onClosed	:function(){
-			if (box_exit_cancel == true) {
-				fpbxToast('Process new OUI cancel!','Info!','warning');
-			}
-			box_exit_cancel = true;
-			$("#brand_new_oui").val("");
-			$("#number_new_oui").val("");
-		}
+	$('#AddDlgModal').on('show.bs.modal', function (event) {
+		$(this).find('input, select').val("");
 	});
-		
-	
-	
+	$('#AddDlgModal_bt_new').on("click", function(){ epm_advanced_tab_oui_manager_bt_new(); });
 	
 	
 	//TAB POCE
-	
-
 	//Demo: http://files.aw20.net/jquery-linedtextarea/jquery-linedtextarea.html
 	//http://alan.blog-city.com/jquerylinedtextarea.htm
 	//$("#config_textarea").linedtextarea();
@@ -85,15 +65,6 @@ function epm_advanced_select_tab_ajax()
 	}
 	return true;
 }
-/**** END: FUNCTION GLOBAL SEC ****/
-
-
-
-
-
-
-
-
 
 function close_module_actions(goback) 
 {
@@ -102,6 +73,82 @@ function close_module_actions(goback)
 		location.reload();
 	}
 }
+/**** END: FUNCTION GLOBAL SEC ****/
+
+
+
+
+/**** INI: FUNCTION TAB UPLOAD_MANUAL ****/
+function epm_config_tab_manual_upload_bt_explor_brand() 
+{
+	var packageid = $('#brand_export_pack_selected').val();
+	
+	if (packageid == "") {
+		alert ("You have not selected a brand from the list!");
+	}
+	else if (packageid < 0) {
+		alert ("The id of the selected mark is invalid!");
+	}
+	else {
+		epm_config_tab_manual_upload_bt_upload("export_brands_availables&package="+packageid, iedl_form_import_cvs);
+	}
+}
+
+function epm_config_tab_manual_upload_bt_upload(command, formname)
+{
+	if (command == "") { return; }
+	if (formname == "") { return; }
+	
+	var urlStr = "config.php?display=epm_advanced&subpage=manual_upload&command="+command;
+	box = $('<div id="moduledialogwrapper" ></div>')
+	.dialog({
+		title: 'Status',
+		resizable: false,
+		dialogClass: '',
+		modal: true,
+		width: 410,
+		maxHeight: 410,
+		height: 'auto',
+		maxHeight: 350,
+		scroll: true,
+		position: { my: "top-175", at: "center", of: window },
+		open: function (e) {
+			$('#moduledialogwrapper').html(_('Loading..' ) + '<i class="fa fa-spinner fa-spin fa-2x">');
+			
+			var form = document.forms.namedItem(formname);
+			var oData = new FormData(form);
+			
+			var xhr = new XMLHttpRequest(),
+			timer = null;
+			xhr.open('POST', urlStr, true);
+			xhr.send(oData);
+			timer = window.setInterval(function() {
+				$('#moduledialogwrapper').animate({ scrollTop: $(this).scrollTop() + $(this).height() });
+				if (xhr.readyState == XMLHttpRequest.DONE) {
+					window.clearTimeout(timer);
+				}
+				if (xhr.responseText.length > 0) {
+					if ($('#moduledialogwrapper').html().trim() != xhr.responseText.trim()) {
+						$('#moduledialogwrapper').html(xhr.responseText);
+						$('#moduleprogress').scrollTop(1E10);
+					}
+				}
+				if (xhr.readyState == XMLHttpRequest.DONE) {
+					$("#moduleprogress").css("overflow", "auto");
+					$('#moduleprogress').scrollTop(1E10);
+					$("#moduleBoxContents a").focus();
+				}
+			}, 500);
+			
+		},
+		close: function(e) {
+			close_module_actions(false);
+			$(e.target).dialog("destroy").remove();
+		}
+	});
+}
+/**** END: FUNCTION TAB UPLOAD_MANUAL ****/
+
 
 
 
@@ -164,15 +211,8 @@ function epm_config_tab_iedl_bt_import()
 
 
 
-
-
-
-
-
-
 /**** INI: FUNCTION TAB POCE ****/
 /**** END: FUNCTION TAB POCE ****/
-
 
 
 
@@ -222,7 +262,13 @@ function epm_advanced_tab_oui_manager_bt_new()
 	}
 	else {
 		var data_ajax = { module: "endpointman", module_sec: "epm_advanced", module_tab: "oui_manager", command: "oui_add", number_new_oui: new_oui, brand_new_oui: new_brand };
-		epm_advanced_tab_oui_manager_ajax("new", data_ajax);
+		if (epm_advanced_tab_oui_manager_ajax(data_ajax) == true) {
+			fpbxToast("New OUI add Ok!", '', 'success');
+			$("#mygrid").bootstrapTable('refresh');
+			$("#AddDlgModal").modal('hide');
+		}
+
+		//epm_advanced_tab_oui_manager_ajax("new", data_ajax, objbox);
 	}
 }
 
@@ -233,14 +279,20 @@ function epm_advanced_tab_oui_manager_bt_del(id_del)
 	}
 	else {
 		var data_ajax = { module: "endpointman", module_sec: "epm_advanced", module_tab: "oui_manager", command: "oui_del", id_del: id_del };
-		epm_advanced_tab_oui_manager_ajax("del", data_ajax);
+		if (epm_advanced_tab_oui_manager_ajax(data_ajax) == true) {
+			fpbxToast("OUI delete Ok!", '', 'success');	
+			$("#mygrid").bootstrapTable('refresh');
+		}
+		
+		//epm_advanced_tab_oui_manager_ajax("del", data_ajax);
 	}
 }
 
-function epm_advanced_tab_oui_manager_ajax (opt, data_ajax = ""){
-	var bRturn = false;
+function epm_advanced_tab_oui_manager_ajax (data_ajax = ""){
+	var response = false;
 	if (data_ajax != "") { 
 		$.ajax({
+	        async: false,
 			type: 'POST',
 			url: "ajax.php",
 			data:  data_ajax,
@@ -248,34 +300,23 @@ function epm_advanced_tab_oui_manager_ajax (opt, data_ajax = ""){
 			timeout: 60000,
 			error: function(xhr, ajaxOptions, thrownError) {
 				fpbxToast('ERROR AJAX:' + thrownError,'ERROR (' + xhr.status + ')!','error');
-				return;
+				return false;
 			},
 			success: function(data) {
 				if (data.status == true) {
-					$("#mygrid").bootstrapTable('refresh');
-					
-					if (opt == "new") {
-						fpbxToast("New OUI add Ok!", '', 'success');
-						box_exit_cancel = false;
-						$.fn.colorbox.close();
-					}
-					else if (opt == "del") {
-						fpbxToast("OUI delete Ok!", '', 'success');	
-					}
-					
-					bRturn = true;
-					return;
+					response  = true;
 				} 
 				else {
 					fpbxToast(data.message, "Error!", 'error');
-					return;
+					response  = false;
 				}
 			}
 		});
 	}
-	return bRturn;
+	return response;
 }
 /**** END: FUNCTION TAB OUI MANAGER ****/
+
 
 
 
@@ -331,6 +372,7 @@ function epm_advanced_tab_setting_input_change(obt)
 				//if (data.reload == true) { location.reload(); }
 				//if (data.name == "tftp_check") { location.reload(); }
 				//if (data.name == "use_repo") { location.reload(); }
+				
 				
 				return true;
 			} 

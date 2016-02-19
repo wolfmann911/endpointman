@@ -3,15 +3,10 @@
 	
 	FreePBX::Endpointman()->configmod->getConfigModuleSQL(false);
 	
-	$cfg_type = FreePBX::Endpointman()->configmod->get("cfg_type");
-	if (($cfg_type == 'file') AND (FreePBX::Endpointman()->epm_advanced_config_loc_is_writable())) {
+	
+	if ((FreePBX::Endpointman()->configmod->get("server_type") == 'file') AND (FreePBX::Endpointman()->epm_advanced_config_loc_is_writable())) {
 		FreePBX::Endpointman()->tftp_check();
 	}
-	if ($cfg_type == 'http') {
-		//$endpoint->message['advanced_settings'] = "Updated! - Point your phones to: http://" . $_SERVER['SERVER_ADDR'] . "/provisioning/p.php/";
-		echo "<br><br>Updated! - Point your phones to: http://" . $_SERVER['SERVER_ADDR'] . "/provisioning/p.php/";
-	}
-	unset($cfg_type);
 	
 	if (FreePBX::Endpointman()->configmod->get("use_repo") == "1") {
 		if (FreePBX::Endpointman()->has_git()) {
@@ -55,8 +50,12 @@
 							<i class="fa fa-question-circle fpbx-help-icon" data-for="srvip"></i>
 						</div>
 						<div class="col-md-9">
-							<input type="text" class="form-control localnet validate=ip" id="srvip" name="srvip" value="<?php echo FreePBX::Endpointman()->configmod->get("srvip"); ?>">
-							<button class='btn btn-default' id='autodetect' onclick="epm_advanced_tab_setting_input_value_change_bt('#srvip', sValue = '<?php echo $_SERVER["SERVER_ADDR"]; ?>', bSaveChange = true);"><i class='fa fa-search'></i> <?php echo _("Determine for Me")?></button>
+							<div class="input-group">
+      							<input type="text" class="form-control" placeholder="Server PBX..." id="srvip" name="srvip" value="<?php echo FreePBX::Endpointman()->configmod->get("srvip"); ?>">
+      							<span class="input-group-btn">
+        							<button class="btn btn-default" type="button" id='autodetect' onclick="epm_advanced_tab_setting_input_value_change_bt('#srvip', sValue = '<?php echo $_SERVER["SERVER_ADDR"]; ?>', bSaveChange = true);"><i class='fa fa-search'></i> <?php echo _("Determine for Me")?></button>
+      							</span>
+    						</div>
 						</div>
 					</div>
 				</div>
@@ -71,13 +70,7 @@
 	<!--END IP address of phone server-->
 	<!--Configuration Type-->
 	<?php
-		if (FreePBX::Endpointman()->configmod->get("server_type") == 'http') {
-			$server_type_http = "yes";
-			$server_type_file = "";
-		} else {
-			$server_type_http = "";
-			$server_type_file = "yes";
-		}
+		$server_type = FreePBX::Endpointman()->configmod->get("server_type");
 	?>
 	<div class="element-container">
 		<div class="row">
@@ -90,9 +83,12 @@
 						</div>
 						<div class="col-md-9">
 							<select name="cfg_type" class="form-control" id="cfg_type">
-								<option value="file" <?php echo ($server_type_file == "yes" ? "selected" : "") ?> ><?php echo _("File (TFTP/FTP)")?></option>
-								<option value="http" <?php echo ($server_type_http == "yes "? "selected" : "") ?> ><?php echo _("Web (HTTP)")?></option>
+								<option value="file" <?php echo ($server_type == "file" ? "selected" : "") ?> ><?php echo _("File (TFTP/FTP)")?></option>
+								<option value="http" <?php echo ($server_type == "http"? "selected" : "") ?> ><?php echo _("Web (HTTP)")?></option>
 							</select>
+							<div class="alert alert-info" role="alert" id="cfg_type_alert">
+								<strong><?php echo _("Updated!"); ?></strong><?php echo _(" - Point your phones to: "); ?><a href="http://<?php echo $_SERVER['SERVER_ADDR']; ?>/provisioning/p.php/" class="alert-link" target="_blank">http://<?php echo $_SERVER['SERVER_ADDR']; ?>/provisioning/p.php/</a>.
+							</div>
 						</div>
 					</div>
 				</div>
@@ -105,8 +101,7 @@
 		</div>
 	</div>
 	<?php
-		unset($server_type_http);
-		unset($server_type_file);
+		unset($server_type);
 	?>
 	<!--END Configuration Type-->
 	<!--Global Final Config & Firmware Directory-->
@@ -158,10 +153,14 @@
 							<i class="fa fa-question-circle fpbx-help-icon" data-for="tz"></i>
 						</div>
 						<div class="col-md-9">
-							<select name="tz" class="form-control" id="tz">
+							<div class="input-group">
+      							<select name="tz" class="form-control" id="tz">
 								<?php echo $lnhtm; ?>
-							</select>
-							<button class='btn btn-default' id='tzphp' onclick="epm_advanced_tab_setting_input_value_change_bt('#tz', sValue = '<?php echo FreePBX::Endpointman()->config->get('PHPTIMEZONE'); ?>', bSaveChange = true);"><i class="fa fa-clock-o"></i> <?php echo _("TimeZone by PBX Setting")?></button>
+								</select>
+      							<span class="input-group-btn">
+        							<button class="btn btn-default" type="button" id='tzphp' onclick="epm_advanced_tab_setting_input_value_change_bt('#tz', sValue = '<?php echo FreePBX::Endpointman()->config->get('PHPTIMEZONE'); ?>', bSaveChange = true);"><i class="fa fa-clock-o"></i> <?php echo _("TimeZone by PBX Setting")?></button>
+      							</span>
+    						</div>
 						</div>
 					</div>
 				</div>
@@ -186,7 +185,13 @@
 							<i class="fa fa-question-circle fpbx-help-icon" data-for="ntp_server"></i>
 						</div>
 						<div class="col-md-9">
-							<input type="text" class="form-control" id="ntp_server" name="ntp_server" value="<?php echo FreePBX::Endpointman()->configmod->get("ntp"); ?>">
+							<div class="input-group">
+      							<input type="text" class="form-control" placeholder="Server NTP..." id="ntp_server" name="ntp_server" value="<?php echo FreePBX::Endpointman()->configmod->get("ntp"); ?>">
+      							<span class="input-group-btn">
+        							<button class="btn btn-default" type="button" id='autodetectntp' onclick="epm_advanced_tab_setting_input_value_change_bt('#ntp_server', sValue = '<?php echo $_SERVER["SERVER_ADDR"]; ?>', bSaveChange = true);"><i class='fa fa-search'></i> <?php echo _("Determine for Me")?></button>
+      							</span>
+    						</div>
+							
 						</div>
 					</div>
 				</div>
@@ -294,8 +299,12 @@
 							<i class="fa fa-question-circle fpbx-help-icon" data-for="package_server"></i>
 						</div>
 						<div class="col-md-9">
-							<input type="text" class="form-control" id="package_server" name="package_server" value="<?php echo FreePBX::Endpointman()->configmod->get("update_server"); ?>">
-							<button class='btn btn-default' id='default_package_server' onclick="epm_advanced_tab_setting_input_value_change_bt('#package_server', sValue = 'http://mirror.freepbx.org/provisioner/v3/', bSaveChange = true);"><i class='fa fa-search'></i> <?php echo _("Default Mirror FreePBX")?></button>
+							<div class="input-group">
+      							<input type="text" class="form-control" placeholder="Server Packages..." id="package_server" name="package_server" value="<?php echo FreePBX::Endpointman()->configmod->get("update_server"); ?>">
+      							<span class="input-group-btn">
+        							<button class="btn btn-default" type="button" id='default_package_server' onclick="epm_advanced_tab_setting_input_value_change_bt('#package_server', sValue = 'http://mirror.freepbx.org/provisioner/v3/', bSaveChange = true);"><i class='fa fa-undo'></i> <?php echo _("Default Mirror FreePBX")?></button>
+      							</span>
+    						</div>
 						</div>
 					</div>
 				</div>

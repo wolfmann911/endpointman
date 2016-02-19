@@ -189,7 +189,8 @@ echo "Deleted!";
 <div class="container-fluid">
     <div class="row">
         <div class="col-sm-9">
-        	<br />
+        	<br/>
+        	<p><b>Product:</b><code><?php echo _("No Selected"); ?></code></p>
 			<p><b>File:</b><code class='inline' id='poce_file_name_path'><?php echo (isset($location) ? $location : "No selected") ?></code></p>
 			<br />
 				
