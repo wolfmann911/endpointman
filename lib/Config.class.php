@@ -18,11 +18,32 @@ class Config {
 		}
 	}
 	
-	public function isExiste($var) 	{ return isset($this->module_conf[$var]); }
-	public function get($var) 		{ if ($this->isExiste($var)) { return $this->module_conf[$var]; } }
-	public function getall() 		{ return $this->module_conf; }
-	public function set($var, $val) { $this->module_conf[$var] = $val; }
-	public function del($var) 		{ if ($this->isExiste($var)) { unset($this->module_conf[$var]); } }
+	
+	public function getall() {
+		return $this->module_conf;
+	}
+	public function isExiste($var) 	{ 
+		return isset($this->module_conf[$var]); 
+	}
+	public function get($var, $defvar="") {
+		$varreturn = "";
+		if ($this->isExiste($var)) { 
+			$varreturn = $this->module_conf[$var]; 
+		}
+		elseif ($defvar != "") {
+			$this->module_conf[$var] = $defvar;
+		}
+		if ($varreturn == "") {
+			$varreturn = $defvar;
+		}
+		return $varreturn;
+	}
+	public function set($var, $val) {
+		$this->module_conf[$var] = $val;
+	}
+	public function del($var) { 
+		if ($this->isExiste($var)) { unset($this->module_conf[$var]); } 
+	}
 }
 
 ?>

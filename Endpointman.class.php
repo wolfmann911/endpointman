@@ -35,6 +35,7 @@ class Endpointman implements \BMO {
 		require_once('lib/json.class.php');
 		require_once('lib/Config.class.php');
 		require_once('lib/epm_system.class.php');
+		require_once('lib/datetimezone.class.php');
 		require_once('lib/epm_data_abstraction.class.php');
 		
 		
@@ -358,7 +359,7 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 								break;
 								
 							case "manual_install":
-								$this->epm_config_manager_manual_install();
+								$this->epm_config_manual_install();
 								echo "<br /><hr><br />";
 								exit;
 								break;
@@ -400,6 +401,34 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 								break;
 						}
 						break;
+						
+					case "manual_upload":
+						switch ($command) {
+							case "export_brands_availables":
+								$this->epm_advanced_manual_upload_export_brans_available();
+								echo "<br /><hr><br />";
+								exit;
+								break;
+								
+							case "export_brands_availables_file":
+								$this->epm_advanced_manual_upload_export_brans_available_file();
+								exit;
+								break;
+								
+							case "upload_brand":
+								$this->epm_advanced_manual_upload_brand();
+								echo "<br /><hr><br />";
+								exit;
+								break;
+								
+							case "upload_provisioner":
+								$this->epm_advanced_manual_upload_provisioner();
+								echo "<br /><hr><br />";
+								exit;
+								break;
+						}
+						break;
+							break;
 				}
 				break;
 		}
@@ -601,6 +630,285 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 	
 	
 	
+	
+	
+	
+	
+	
+	
+	
+	private function epm_config_manual_install($install_type = "", $package ="")
+	{
+		if ($install_type == "") {
+			throw new \Exception("Not send install_type!");
+		}
+	
+		switch($install_type) {
+			case "export_brand":
+
+				break;
+	
+			case "upload_master_xml":
+				if (file_exists($this->PHONE_MODULES_PATH."temp/master.xml")) {
+					$handle = fopen($this->PHONE_MODULES_PATH."temp/master.xml", "rb");
+					$contents = stream_get_contents($handle);
+					fclose($handle);
+					@$a = simplexml_load_string($contents);
+					if($a===FALSE) {
+						echo "Not a valid xml file";
+						break;
+					} else {
+						rename($this->PHONE_MODULES_PATH."temp/master.xml", $this->PHONE_MODULES_PATH."master.xml");
+						echo "Move Successful<br />";
+						$this->update_check();
+						echo "Updating Brands<br />";
+					}
+				} else {
+				}
+				break;
+	
+			case "upload_provisioner":
+				
+				break;
+	
+			case "upload_brand":
+			
+				break;
+		}
+	}
+	
+	
+	
+	
+	
+
+
+	/************************************************************
+	 **** FUNCIONES SEC MODULO "epm_advanced\manual_upload". ****
+	 ***********************************************************/
+	
+	public function epm_advanced_manual_upload_brand()
+	{
+		if (count($_FILES["files"]["error"]) == 0) {
+			echo format_txt(_("Can Not Find Uploaded Files!"), "error");
+		}
+		else
+		{
+			foreach ($_FILES["files"]["error"] as $key => $error) {
+				echo format_txt(_("Importing brand file %_FILE_%..."), "", array("%_FILE_%" => $_FILES["files"]["name"][$key]));
+			
+				if ($error != UPLOAD_ERR_OK) {
+					echo format_txt($this->file_upload_error_message($error), "error");
+				}
+				else 
+				{
+		 			
+					$uploads_dir = $this->PHONE_MODULES_PATH . "temp";
+					$name = $_FILES["files"]["name"][$key];
+					$extension = pathinfo($name, PATHINFO_EXTENSION);
+					if ($extension == "tgz") {
+						
+						$tmp_name = $_FILES["files"]["tmp_name"][$key];
+						$uploads_dir_file = $uploads_dir."/".$name;
+						move_uploaded_file($tmp_name, $uploads_dir_file);
+						
+						if (file_exists($uploads_dir_file)) 
+						{
+							$temp_directory = sys_get_temp_dir() . "/epm_temp/";
+							if (!file_exists($temp_directory)) {
+								echo format_txt(_("Creating EPM temp directory..."));
+								if (mkdir($temp_directory) == true) {
+									echo format_txt(_("Done!"), "done");
+								}
+								else {
+									echo format_txt(_("Error!"), "error");
+								}
+							}
+							if (file_exists($temp_directory)) 
+							{
+								if ($this->configmod->get('debug')) {
+									echo format_txt(_("Extracting Tarball %_FILEPACKAGE_% to %_TEMPDIR_%........"),"",array("%_FILEPACKAGE_%" => $uploads_dir_file, "%_TEMPDIR_%" => $temp_directory));
+								} else {
+									echo format_txt(_("Extracting Tarball........ "));
+								}
+								exec("tar -xvf ".$uploads_dir_file." -C ".$temp_directory);
+								echo format_txt(_("Done!"), "done");
+								
+								$package = basename($name, ".tgz");
+								$package = explode("-",$package);
+								
+								if ($this->configmod->get('debug')) {
+									echo format_txt(_("Looking for file %_FILEPACKAGE_% to pass on to update_brand()..."),"",array("%_FILEPACKAGE_%" => $temp_directory.$package[0]));
+								} else {
+									echo format_txt(_("Looking file and update brand's...."));
+								}
+								
+								if(file_exists($temp_directory.$package[0])) {
+									$this->update_brand($package[0],FALSE);
+									//                  Note: no need to delete/unlink/rmdir as this is handled in update_brand()
+								} else {
+									echo format_txt(_("Please name the Package the same name as your brand!"));
+								}
+							}
+						} 
+						else {
+							echo format_txt(_("No File Provided!"), "error");
+							//echo "File ".$this->PHONE_MODULES_PATH."temp/".$_REQUEST['package']." not found. <br />";
+						}
+					} 
+					else {
+						echo format_txt(_("Invalid File Extension!"), "error");
+					}
+		 		}
+			}
+		}
+	}
+	
+	public function epm_advanced_manual_upload_provisioner ()
+	{
+		if (count($_FILES["files"]["error"]) == 0) {
+			echo format_txt(_("Can Not Find Uploaded Files!"), "error");
+		}
+		else
+		{
+			foreach ($_FILES["files"]["error"] as $key => $error) {
+				echo format_txt(_("Importing Provisioner file %_FILE_%..."), "", array("%_FILE_%" => $_FILES["files"]["name"][$key]));
+			
+				if ($error != UPLOAD_ERR_OK) {
+					echo format_txt($this->file_upload_error_message($error), "error");
+				}
+				else 
+				{
+					$uploads_dir = $this->PHONE_MODULES_PATH . "temp";
+					$name = $_FILES["files"]["name"][$key];
+					$extension = pathinfo($name, PATHINFO_EXTENSION);
+					if ($extension == "tgz") 
+					{
+						$tmp_name = $_FILES["files"]["tmp_name"][$key];
+						$uploads_dir_file = $uploads_dir."/".$name;
+						move_uploaded_file($tmp_name, $uploads_dir_file);
+						
+						if (file_exists($uploads_dir_file)) {
+							echo format_txt(_("Extracting Provisioner Package..."));
+							exec("tar -xvf ".$uploads_dir_file." -C ".$uploads_dir."/");
+							echo format_txt(_("Done!"), "done");
+							
+							if(!file_exists($this->PHONE_MODULES_PATH."endpoint")) {
+								echo format_txt(_("Creating Provisioner Directory..."));
+								if (mkdir($this->PHONE_MODULES_PATH."endpoint") == true) {
+									echo format_txt(_("Done!"), "done");
+								}
+								else {
+									echo format_txt(_("Error!"), "error");
+								}
+							}
+							
+							if(file_exists($this->PHONE_MODULES_PATH."endpoint")) 
+							{
+								$endpoint_last_mod = filemtime($this->PHONE_MODULES_PATH."temp/endpoint/base.php");
+								rename($this->PHONE_MODULES_PATH."temp/endpoint/base.php", $this->PHONE_MODULES_PATH."endpoint/base.php");
+								
+								echo format_txt(_("Updating Last Modified..."));
+								$sql = "UPDATE endpointman_global_vars SET value = '".$endpoint_last_mod."' WHERE var_name = 'endpoint_vers'";
+								sql($sql);
+								echo format_txt(_("Done!"),"done");
+							}
+							
+						} else { 
+							echo format_txt(_("File Temp no Exists!"), "error");
+						}
+					} else {
+						echo format_txt(_("Invalid File Extension!"), "error");
+					}
+				}
+			}
+		}
+	}
+	
+	public function epm_advanced_manual_upload_export_brans_available_file()
+	{
+		if ((! isset($_REQUEST['file_package'])) OR ($_REQUEST['file_package'] == "")) {
+			header('HTTP/1.0 404 Not Found', true, 404);
+			echo "<h1>Error 404 Not Found</h1>";
+			echo "No send name file!";
+			die();
+		}
+		else {
+			$dget['file_package'] = $_REQUEST['file_package'];
+			$path_tmp_file = $this->PHONE_MODULES_PATH."/temp/export/".$_REQUEST['file_package'];
+			
+			if (! file_exists($path_tmp_file)) {
+				header('HTTP/1.0 404 Not Found', true, 404);
+				echo "<h1>Error 404 Not Found</h1>";
+				echo "File no exist!";
+				die();
+			}
+			else {
+				header('Content-Description: File Transfer');
+				header('Content-Type: application/octet-stream');
+				header('Content-Disposition: attachment; filename="'.basename($dget['file_package']).'"');
+				header('Expires: 0');
+				header('Cache-Control: must-revalidate');
+				header('Pragma: public');
+				header('Content-Length: ' . filesize($path_tmp_file));
+				readfile($path_tmp_file);
+				exit;
+			}
+			unset ($path_tmp_file);
+			unset ($dget);
+		}
+		exit;
+	}
+	
+	public function epm_advanced_manual_upload_export_brans_available()
+	{
+		if ((! isset($_REQUEST['package'])) OR ($_REQUEST['package'] == "")) {
+			echo format_txt(_("No package set!"), "error");
+		}
+		elseif ((! is_numeric($_REQUEST['package'])) OR ($_REQUEST['package'] < 0)) {
+			echo format_txt(_("Package not valid!"), "error");
+		}
+		else {
+			$dget['package'] = $_REQUEST['package'];
+			
+			$sql = 'SELECT `name`, `directory` FROM `endpointman_brand_list` WHERE `id` = '.$dget['package'].'';
+			$row = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
+			
+			if ($row == "") {
+				echo format_txt(_("ID Package send not valid, brand not exist!"), "error");
+			}
+			else {
+				echo format_txt(_("Exporting %_NAME_%"), "", array("%_NAME_%" => $row['name']));
+				
+				if(!file_exists($this->PHONE_MODULES_PATH."/temp/export/")) {
+					mkdir($this->PHONE_MODULES_PATH."/temp/export/");
+				}
+				$time = time();
+				exec("tar zcf ".$this->PHONE_MODULES_PATH."temp/export/".$row['directory']."-".$time.".tgz --exclude .svn --exclude firmware -C ".$this->PHONE_MODULES_PATH."/endpoint ".$row['directory']);
+				
+				
+				echo format_txt(_("Done!"), "done");
+				echo format_txt(_("Click this link to download:"));
+				echo "<a href='config.php?display=epm_advanced&subpage=manual_upload&command=export_brands_availables_file&file_package=".$row['directory']."-".$time.".tgz' target='_blank'>";
+				echo format_txt(_("Here"));
+				echo "</a>";
+				//echo "Done! Click this link to download:<a href='modules/_ep_phone_modules/temp/export/".$row['directory']."-".$time.".tgz' target='_blank'>Here</a>";
+			}
+			unset ($dget);
+		}
+	}
+	
+	/********************
+	 * END SEC FUNCTIONS *
+	 ********************/
+	
+	
+	
+	
+	
+	
+	
+	
 	/***************************************************
 	 **** FUNCIONES SEC MODULO "epm_advanced\iedl". ****
 	 **************************************************/
@@ -623,13 +931,6 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 	//Dave B's Q&D file upload security code (http://us2.php.net/manual/en/features.file-upload.php)
 	public function epm_advanced_iedl_import()
 	{
-		/*
-		echo "<textarea>";
-		print_R($_FILES);
-		echo "</textarea>";
-		exit;
-		*/
-		
 		if (count($_FILES["files"]["error"]) == 0) {
 			echo format_txt(_("Can Not Find Uploaded Files!"), "error");
 		}
@@ -638,98 +939,78 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 			$allowedExtensions = array("application/csv", "text/plain");
 			
 			foreach ($_FILES["files"]["error"] as $key => $error) {
-				echo format_txt(_("Importing file %_FILE_%..."), "", array("%_FILE_%" => $_FILES["files"]["name"][$key]));
+				echo format_txt(_("Importing CVS file %_FILE_%..."), "", array("%_FILE_%" => $_FILES["files"]["name"][$key]));
 				
-				switch($error) {
-					case UPLOAD_ERR_OK:
-						if (!in_array($_FILES["files"]["type"][$key], $allowedExtensions)) {
-							echo format_txt(_("We support only CVS and TXT files, type file %_FILE_% no support!"), "error", array("%_FILE_%" => $_FILES["files"]["name"][$key]));
-						}
-						elseif ($_FILES["files"]["size"][$key] == 0) {
-							echo format_txt(_("File %_FILE_% size is 0!"), "error", array("%_FILE_%" => $_FILES["files"]["name"][$key]));
-						}
-						else {
-							$uploadfile = $this->LOCAL_PATH . basename($_FILES["files"]["name"][$key]);
-							$uploadtemp = $_FILES["files"]["tmp_name"][$key];
-							
-							if (move_uploaded_file($uploadtemp, $uploadfile)) {
-								//Parse the uploaded file
-								$handle = fopen($uploadfile, "r");
-								$i = 1;
-								while (($device = fgetcsv($handle, filesize($uploadfile))) !== FALSE) {
-									if ($device[0] != "") {
-										if ($mac = $this->mac_check_clean($device[0])) {
-											$sql = "SELECT id FROM endpointman_brand_list WHERE name LIKE '%" . $device[1] . "%' LIMIT 1";
-											$res = sql($sql);
+				if ($error != UPLOAD_ERR_OK) {
+					echo format_txt($this->file_upload_error_message($error), "error");
+				}
+				else
+				{
+					if (!in_array($_FILES["files"]["type"][$key], $allowedExtensions)) {
+						echo format_txt(_("We support only CVS and TXT files, type file %_FILE_% no support!"), "error", array("%_FILE_%" => $_FILES["files"]["name"][$key]));
+					}
+					elseif ($_FILES["files"]["size"][$key] == 0) {
+						echo format_txt(_("File %_FILE_% size is 0!"), "error", array("%_FILE_%" => $_FILES["files"]["name"][$key]));
+					}
+					else {
+						$uploadfile = $this->LOCAL_PATH . basename($_FILES["files"]["name"][$key]);
+						$uploadtemp = $_FILES["files"]["tmp_name"][$key];
+						
+						if (move_uploaded_file($uploadtemp, $uploadfile)) {
+							//Parse the uploaded file
+							$handle = fopen($uploadfile, "r");
+							$i = 1;
+							while (($device = fgetcsv($handle, filesize($uploadfile))) !== FALSE) {
+								if ($device[0] != "") {
+									if ($mac = $this->mac_check_clean($device[0])) {
+										$sql = "SELECT id FROM endpointman_brand_list WHERE name LIKE '%" . $device[1] . "%' LIMIT 1";
+										$res = sql($sql);
+										
+										if ($res->numRows() > 0) {
+											$brand_id = sql($sql, 'getOne');
+											$brand_id = $brand_id[0];
 											
-											if ($res->numRows() > 0) {
-												$brand_id = sql($sql, 'getOne');
-												$brand_id = $brand_id[0];
+											$sql_model = "SELECT id FROM endpointman_model_list WHERE brand = " . $brand_id . " AND model LIKE '%" . $device[2] . "%' LIMIT 1";
+											$sql_ext = "SELECT extension, name FROM users WHERE extension LIKE '%" . $device[3] . "%' LIMIT 1";
+											
+											$line_id = isset($device[4]) ? $device[4] : 1;
+											
+											$res_model = sql($sql_model);
+											if ($res_model->numRows()) {
+												$model_id = sql($sql_model, 'getRow', DB_FETCHMODE_ASSOC);
+												$model_id = $model_id['id'];
 												
-												$sql_model = "SELECT id FROM endpointman_model_list WHERE brand = " . $brand_id . " AND model LIKE '%" . $device[2] . "%' LIMIT 1";
-												$sql_ext = "SELECT extension, name FROM users WHERE extension LIKE '%" . $device[3] . "%' LIMIT 1";
-												
-												$line_id = isset($device[4]) ? $device[4] : 1;
-												
-												$res_model = sql($sql_model);
-												if ($res_model->numRows()) {
-													$model_id = sql($sql_model, 'getRow', DB_FETCHMODE_ASSOC);
-													$model_id = $model_id['id'];
+												$res_ext = sql($sql_ext);
+												if ($res_ext->numRows()) {
+													$ext = sql($sql_ext, 'getRow', DB_FETCHMODE_ASSOC);
+													$description = $ext['name'];
+													$ext = $ext['extension'];
 													
-													$res_ext = sql($sql_ext);
-													if ($res_ext->numRows()) {
-														$ext = sql($sql_ext, 'getRow', DB_FETCHMODE_ASSOC);
-														$description = $ext['name'];
-														$ext = $ext['extension'];
-														
-														$this->add_device($mac, $model_id, $ext, 0, $line_id, $description);
-														
-														echo format_txt(_("Done!"), "done");
-													} else {
-														echo format_txt(_("Invalid Extension Specified on line %_LINE_%!"), "error", array("%_LINE_%" => $i));
-													}
+													$this->add_device($mac, $model_id, $ext, 0, $line_id, $description);
+													
+													echo format_txt(_("Done!"), "done");
 												} else {
-													echo format_txt(_("Invalid Model Specified on line %_LINE_%!"), "error", array("%_LINE_%" => $i));
+													echo format_txt(_("Invalid Extension Specified on line %_LINE_%!"), "error", array("%_LINE_%" => $i));
 												}
 											} else {
-												echo format_txt(_("Invalid Brand Specified on line %_LINE_%!"), "error", array("%_LINE_%" => $i));
+												echo format_txt(_("Invalid Model Specified on line %_LINE_%!"), "error", array("%_LINE_%" => $i));
 											}
 										} else {
-											echo format_txt(_("Invalid Mac on line %_LINE_%!"), "error", array("%_LINE_%" => $i));
+											echo format_txt(_("Invalid Brand Specified on line %_LINE_%!"), "error", array("%_LINE_%" => $i));
 										}
+									} else {
+										echo format_txt(_("Invalid Mac on line %_LINE_%!"), "error", array("%_LINE_%" => $i));
 									}
-									$i++;
 								}
-								fclose($handle);
-								unlink($uploadfile);
-								echo format_txt(_("Please reboot & rebuild all imported phones"), "done");
-							} else {
-								echo format_txt(_("Possible file upload attack!"), "error");
+								$i++;
 							}
+							fclose($handle);
+							unlink($uploadfile);
+							echo format_txt(_("Please reboot & rebuild all imported phones"), "done");
+						} else {
+							echo format_txt(_("Possible file upload attack!"), "error");
 						}
-						break;
-						
-					case UPLOAD_ERR_INI_SIZE:
-						echo format_txt(_("The uploaded file exceeds the upload_max_filesize directive in php.ini"), "error");
-						break;
-					case UPLOAD_ERR_FORM_SIZE:
-						echo format_txt(_("The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form"), "error");
-						break;
-					case UPLOAD_ERR_PARTIAL:
-						echo format_txt(_("The uploaded file was only partially uploaded"), "error");
-						break;
-					case UPLOAD_ERR_NO_FILE:
-						echo format_txt(_("No file was uploaded"), "error");
-						break;
-					case UPLOAD_ERR_NO_TMP_DIR:
-						echo format_txt(_("Missing a temporary folder"), "error");
-						break;
-					case UPLOAD_ERR_CANT_WRITE:
-						echo format_txt(_("Failed to write file to disk"), "error");
-						break;
-					case UPLOAD_ERR_EXTENSION:
-						echo format_txt(_("A PHP extension stopped the file upload"), "error");
-						break;
+					}
 				}
 			}
 		}
@@ -981,102 +1262,6 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 		return $retarr;
 	}
 	
-	
-	private function epm_config_manager_manual_install()
-	{
-		if (! isset($_REQUEST['install_type'])) { 
-			throw new \Exception("Not send install_type!");
-		}
-		
-		switch($_REQUEST['install_type']) {
-			case "export_brand":
-				$sql = 'SELECT `name`, `directory` FROM `endpointman_brand_list` WHERE `id` = '.$_REQUEST['package'].'';
-				$row = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
-				echo "Exporting ". $row['name']."<br/>";
-				if(!file_exists($this->PHONE_MODULES_PATH."/temp/export/")) {
-					mkdir($this->PHONE_MODULES_PATH."/temp/export/");
-				}
-				$time = time();
-				exec("tar zcf ".$this->PHONE_MODULES_PATH."temp/export/".$row['directory']."-".$time.".tgz --exclude .svn --exclude firmware -C ".$this->PHONE_MODULES_PATH."/endpoint ".$row['directory']);
-				echo "Done! Click this link to download:<a href='modules/_ep_phone_modules/temp/export/".$row['directory']."-".$time.".tgz'>Here</a>";
-				break;
-				
-			case "upload_master_xml":
-				if (file_exists($this->PHONE_MODULES_PATH."temp/master.xml")) {
-					$handle = fopen($this->PHONE_MODULES_PATH."temp/master.xml", "rb");
-					$contents = stream_get_contents($handle);
-					fclose($handle);
-					@$a = simplexml_load_string($contents);
-					if($a===FALSE) {
-						echo "Not a valid xml file";
-						break;
-					} else {
-						rename($this->PHONE_MODULES_PATH."temp/master.xml", $this->PHONE_MODULES_PATH."master.xml");
-						echo "Move Successful<br />";
-						$this->update_check();
-						echo "Updating Brands<br />";
-					}
-				} else {
-				}
-				break;
-				
-			case "upload_provisioner":
-				if (file_exists($this->PHONE_MODULES_PATH."temp/".$_REQUEST['package'])) {
-					echo "Extracting Provisioner Package <br />";
-					exec("tar -xvf ".$this->PHONE_MODULES_PATH.'temp/'. $_REQUEST['package'] ." -C ".$this->PHONE_MODULES_PATH."temp/");
-
-					if(!file_exists($this->PHONE_MODULES_PATH."endpoint")) {
-						echo "Creating Provisioner Directory <br />";
-						mkdir($this->PHONE_MODULES_PATH."endpoint");
-					}
-
-					$endpoint_last_mod = filemtime($this->PHONE_MODULES_PATH."temp/endpoint/base.php");
-
-					rename($this->PHONE_MODULES_PATH."temp/endpoint/base.php", $this->PHONE_MODULES_PATH."endpoint/base.php");
-
-					echo "Updating Last Modified <br />";
-					$sql = "UPDATE endpointman_global_vars SET value = '".$endpoint_last_mod."' WHERE var_name = 'endpoint_vers'";
-					sql($sql);
-				}
-				break;
-				
-			case "upload_brand":
-				if ($this->configmod->get('debug')) echo "upload_brand(): Debug is set to ". $this->configmod->get('debug') ." <br />";
-		//	    Bramd file (*.tgz) will have been copied into the location under which all endpoint definitions reside + /temp/
-				if (file_exists($this->PHONE_MODULES_PATH."temp/".$_REQUEST['package'])) {
-		//		The untarred brand file will go into /tmp (or wherever the "temporary" location the OS tells us) + /epm-temp/
-					$temp_directory = sys_get_temp_dir() . "/epm_temp/";
-			if (!file_exists($temp_directory)) {
-				echo "Creating EPM temp directory <br />";
-						mkdir($temp_directory);
-					}
-			if ($this->configmod->get('debug')) {
-				echo "Extracting Tarball ".$this->PHONE_MODULES_PATH.'temp/'. $_REQUEST['package']." to ".$temp_directory." ........";
-			} else {
-				echo "Extracting Tarball........ ";
-			}
-					exec("tar -xvf ".$this->PHONE_MODULES_PATH.'temp/'. $_REQUEST['package'] ." -C ".$temp_directory);
-					echo "Done!<br />";
-
-					$package = basename($_REQUEST['package'], ".tgz");    
-					$package = explode("-",$package);
-
-			if ($this->configmod->get('debug')) echo "Looking for file ".$temp_directory.$package[0]." to pass on to update_brand() <br />";
-					if(file_exists($temp_directory.$package[0])) {
-						$this->update_brand($package[0],FALSE);
-		//                  Note: no need to delete/unlink/rmdir as this is handled in update_brand()
-					} else {
-						echo "Please name the Package the same name as your brand! <br />";
-					}       
-				} else {
-		//		Did not find the <brand>.tgz file
-					$this->error['upload'] = "No File Provided";
-			echo "File ".$this->PHONE_MODULES_PATH."temp/".$_REQUEST['package']." not found. <br />";
-				}
-				break;
-		}
-	}
-	
 	private function epm_config_manager_brand()
 	{
 		if (! isset($_REQUEST['command_sub'])) { 
@@ -1201,7 +1386,6 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 		$row_out = array();
 		$i = 0;
 		$brand_list = $this->epm_config_hardware_get_list_brand(true);
-		if($check_for_updates) 	$brand_up = $this->update_check();
 		foreach ($brand_list as $row) 
 		{
 			$row_out[$i] = $row;
@@ -1210,6 +1394,7 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 			
 			if($check_for_updates) 
 			{
+				$brand_up = $this->update_check();
 				$id = $this->system->arraysearchrecursive($row['name'], $brand_up,'name');
 				$id = $id[0];
 				if((isset($brand_up[$id]['update'])) AND ($row['installed'] == 1)) {
@@ -2776,24 +2961,556 @@ $this->message['add_line'] .= "Added " . $name . " to line " . $line . "<br/>";
     	return($temp);
     }
 	
+    
+    /**
+     * Taken from PHP.net. A list of errors returned when uploading files.
+     * @param <type> $error_code
+     * @return string
+     */
+    function file_upload_error_message($error_code) {
+    	switch ($error_code) {
+    		case UPLOAD_ERR_INI_SIZE:
+    			return _('The uploaded file exceeds the upload_max_filesize directive in php.ini');
+    		case UPLOAD_ERR_FORM_SIZE:
+    			return _('The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form');
+    		case UPLOAD_ERR_PARTIAL:
+    			return _('The uploaded file was only partially uploaded');
+    		case UPLOAD_ERR_NO_FILE:
+    			return _('No file was uploaded');
+    		case UPLOAD_ERR_NO_TMP_DIR:
+    			return _('Missing a temporary folder');
+    		case UPLOAD_ERR_CANT_WRITE:
+    			return _('Failed to write file to disk');
+    		case UPLOAD_ERR_EXTENSION:
+    			return _('File upload stopped by extension');
+    		default:
+    			return _('Unknown upload error');
+    	}
+    }
+    
+    /**
+     * Send this function an ID from the mac devices list table and you'll get all the information we have on that particular phone
+     * @param integer $mac_id ID number reference from the MySQL database referencing the table endpointman_mac_list
+     * @return array
+     * @example
+     * Final Output will look something similar to this
+     *  Array
+     *       (
+     *            [config_files_override] =>
+     *            [global_user_cfg_data] => N;
+     *            [model_id] => 213
+     *            [brand_id] => 2
+     *            [name] => Grandstream
+     *            [directory] => grandstream
+     *            [model] => GXP2000
+     *            [mac] => 000B820D0050
+     *            [template_id] => 0
+     *            [global_custom_cfg_data] => Serialized Data (Changed Template Values)
+     *            [long_name] => GXP Enterprise IP series [280,1200,2000,2010,2020]
+     *            [product_id] => 21
+     *            [cfg_dir] => gxp
+     *            [cfg_ver] => 1.5
+     *            [template_data] => Serialized Data (The default Template Values)
+     *            [enabled] => 1
+     *            [line] => Array
+     *                (
+     *                    [1] => Array
+     *                        (
+     *                            [luid] => 2
+     *                            [mac_id] => 2
+     *                            [line] => 1
+     *                            [ext] => 1000
+     *                            [description] => Description
+     *                            [custom_cfg_data] =>
+     *                            [user_cfg_data] =>
+     *                            [secret] => secret
+     *                            [id] => 1000
+     *                            [tech] => sip
+     *                            [dial] => SIP/1000
+     *                            [devicetype] => fixed
+     *                            [user] => 1000
+     *                            [emergency_cid] =>
+     *                        )
+     *                )
+     *         )
+     */
+    function get_phone_info($mac_id=NULL) {
+    	//You could screw up a phone if the mac_id is blank
+    	if (!isset($mac_id)) {
+$this->error['get_phone_info'] = "Mac ID is not set";
+    		return(FALSE);
+    	}
+    	$sql = "SELECT id FROM endpointman_mac_list WHERE model > 0 AND id =" . $mac_id;
+    
+    	$res = sql($sql);
+    	if ($res->numRows()) {
+    		//Returns Brand Name, Brand Directory, Model Name, Mac Address, Extension (FreePBX), Custom Configuration Template, Custom Configuration Data, Product Name, Product ID, Product Configuration Directory, Product Configuration Version, Product XML name,
+    		$sql = "SELECT endpointman_mac_list.specific_settings, endpointman_mac_list.config_files_override, endpointman_mac_list.global_user_cfg_data, endpointman_model_list.id as model_id, endpointman_brand_list.id as brand_id, endpointman_brand_list.name, endpointman_brand_list.directory, endpointman_model_list.model, endpointman_mac_list.mac, endpointman_mac_list.template_id, endpointman_mac_list.global_custom_cfg_data, endpointman_product_list.long_name, endpointman_product_list.id as product_id, endpointman_product_list.cfg_dir, endpointman_product_list.cfg_ver, endpointman_model_list.template_data, endpointman_model_list.enabled, endpointman_mac_list.global_settings_override FROM endpointman_line_list, endpointman_mac_list, endpointman_model_list, endpointman_brand_list, endpointman_product_list WHERE endpointman_mac_list.model = endpointman_model_list.id AND endpointman_brand_list.id = endpointman_model_list.brand AND endpointman_product_list.id = endpointman_model_list.product_id AND endpointman_mac_list.id = endpointman_line_list.mac_id AND endpointman_mac_list.id = " . $mac_id;
+    		$phone_info = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
+    
+    		if (!$phone_info) {
+$this->error['get_phone_info'] = "Error with SQL Statement";
+    		}
+    
+    		//If there is a template associated with this phone then pull that information and put it into the array
+    		if ($phone_info['template_id'] > 0) {
+    			$sql = "SELECT name, global_custom_cfg_data, config_files_override, global_settings_override FROM endpointman_template_list WHERE id = " . $phone_info['template_id'];
+    			$phone_info['template_data_info'] = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
+    		}
+    
+    		$sql = "SELECT endpointman_line_list.*, sip.data as secret, devices.*, endpointman_line_list.description AS epm_description FROM endpointman_line_list, sip, devices WHERE endpointman_line_list.ext = devices.id AND endpointman_line_list.ext = sip.id AND sip.keyword = 'secret' AND mac_id = " . $mac_id . " ORDER BY endpointman_line_list.line ASC";
+    		$lines_info = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
+    		foreach ($lines_info as $line) {
+    			$phone_info['line'][$line['line']] = $line;
+    			$phone_info['line'][$line['line']]['description'] = $line['epm_description'];
+    			$phone_info['line'][$line['line']]['user_extension'] = $line['user'];
+    		}
+    	} else {
+    		$sql = "SELECT id, mac FROM endpointman_mac_list WHERE id =" . $mac_id;
+    		//Phone is unknown, we need to display this to the end user so that they can make corrections
+    		$row = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
+    
+			$brand = $this->get_brand_from_mac($row['mac']);
+    		if ($brand) {
+    			$phone_info['brand_id'] = $brand['id'];
+    			$phone_info['name'] = $brand['name'];
+    		} else {
+    			$phone_info['brand_id'] = 0;
+    			$phone_info['name'] = 'Unknown';
+    		}
+    
+    		$phone_info['id'] = $mac_id;
+    		$phone_info['model_id'] = 0;
+    		$phone_info['product_id'] = 0;
+    		$phone_info['custom_cfg_template'] = 0;
+    		$phone_info['mac'] = $row['mac'];
+    		$sql = "SELECT endpointman_line_list.*, sip.data as secret, devices.* FROM endpointman_line_list, sip, devices WHERE endpointman_line_list.ext = devices.id AND endpointman_line_list.ext = sip.id AND sip.keyword = 'secret' AND mac_id = " . $mac_id;
+    		$lines_info = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
+    		foreach ($lines_info as $line) {
+    			$phone_info['line'][$line['line']] = $line;
+    		}
+    	}
+    	return $phone_info;
+    }
+	
+    /**
+     * Get the brand from any mac sent to this function
+     * @param string $mac
+     * @return array
+     */
+    function get_brand_from_mac($mac) {
+    	//Check for valid mac address first
+		if (!$this->mac_check_clean($mac)) {
+    		return(FALSE);
+    	}
+    
+    	//Get the OUI only
+    	$oui = substr($this->mac_check_clean($mac), 0, 6);
+    	//Find the matching brand model to the oui
+    	$oui_sql = "SELECT endpointman_brand_list.name, endpointman_brand_list.id FROM endpointman_oui_list, endpointman_brand_list WHERE oui LIKE '%" . $oui . "%' AND endpointman_brand_list.id = endpointman_oui_list.brand AND endpointman_brand_list.installed = 1 LIMIT 1";
+    	$brand = sql($oui_sql, 'getRow', DB_FETCHMODE_ASSOC);
+    
+    	$res = sql($oui_sql);
+    	$brand_count = $res->numRows();
+    
+    	if (!$brand_count) {
+    		//oui doesn't have a matching mysql reference, probably a PC/router/wap/printer of some sort.
+    		$phone_info['id'] = 0;
+    		$phone_info['name'] = _("Unknown");
+    	} else {
+    		$phone_info['id'] = $brand['id'];
+    		$phone_info['name'] = $brand['name'];
+    	}
+    
+    	return($phone_info);
+    }
+	
+	
+	
+    /**
+     * Prepare and then send the data that Provisioner expects, then take what provisioner gives us and do what it says
+     * @param array $phone_info Everything from get_phone_info
+     * @param bool  $reboot Reboot the Phone after write
+     * @param bool  $write  Write out Directory structure.
+     */
+    function prepare_configs($phone_info, $reboot=TRUE, $write=TRUE) 
+    {
+    	$this->PROVISIONER_BASE = $this->PHONE_MODULES_PATH;
+//define('PROVISIONER_BASE', $this->PROVISIONER_BASE);
+    	if (file_exists($this->PHONE_MODULES_PATH . 'autoload.php')) {
+    		if (!class_exists('ProvisionerConfig')) {
+    			require($this->PHONE_MODULES_PATH . 'autoload.php');
+    		}
+    
+    		//Load Provisioner
+    		$class = "endpoint_" . $phone_info['directory'] . "_" . $phone_info['cfg_dir'] . '_phone';
+    		$base_class = "endpoint_" . $phone_info['directory'] . '_base';
+    		$master_class = "endpoint_base";
+    		if (!class_exists($master_class)) {
+    			ProvisionerConfig::endpointsAutoload($master_class);
+    		}
+    		if (!class_exists($base_class)) {
+    			ProvisionerConfig::endpointsAutoload($base_class);
+    		}
+    		if (!class_exists($class)) {
+    			ProvisionerConfig::endpointsAutoload($class);
+    		}
+    
+    		if (class_exists($class)) {
+				$provisioner_lib = new $class();
+    
+    			//Determine if global settings have been overridden
+    			if ($phone_info['template_id'] > 0) {
+    				if (isset($phone_info['template_data_info']['global_settings_override'])) {
+    					$settings = unserialize($phone_info['template_data_info']['global_settings_override']);
+    				} else {
+    					$settings['srvip'] = $this->configmod->get('srvip');
+    					$settings['ntp'] = $this->configmod->get('ntp');
+    					$settings['config_location'] = $this->configmod->get('config_location');
+    					$settings['tz'] = $this->configmod->get('tz');
+    				}
+    			} else {
+    				if (isset($phone_info['global_settings_override'])) {
+    					$settings = unserialize($phone_info['global_settings_override']);
+    				} else {
+    					$settings['srvip'] = $this->configmod->get('srvip');
+    					$settings['ntp'] = $this->configmod->get('ntp');
+    					$settings['config_location'] = $this->configmod->get('config_location');
+    					$settings['tz'] = $this->configmod->get('tz');
+    				}
+    			}
+    
+    
+    
+    			//Tell the system who we are and were to find the data.
+    			$provisioner_lib->root_dir = $this->PHONE_MODULES_PATH;
+    			$provisioner_lib->engine = 'asterisk';
+    			$provisioner_lib->engine_location = $this->configmod->get('asterisk_location','asterisk');
+    			$provisioner_lib->system = 'unix';
+    
+    			//have to because of versions less than php5.3
+    			$provisioner_lib->brand_name = $phone_info['directory'];
+    			$provisioner_lib->family_line = $phone_info['cfg_dir'];
+    
+    
+    
+    			//Phone Model (Please reference family_data.xml in the family directory for a list of recognized models)
+    			//This has to match word for word. I really need to fix this....
+    			$provisioner_lib->model = $phone_info['model'];
+    
+    			//Timezone
+    			try {
+    				$provisioner_lib->DateTimeZone = new DateTimeZone($settings['tz']);
+    			} catch (Exception $e) {
+$this->error['parse_configs'] = 'Error Returned From Timezone Library: ' . $e->getMessage();
+    				return(FALSE);
+    			}
+    
+    			$temp = "";
+    			$template_data = unserialize($phone_info['template_data']);
+    			$global_user_cfg_data = unserialize($phone_info['global_user_cfg_data']);
+    			if ($phone_info['template_id'] > 0) {
+    				$global_custom_cfg_data = unserialize($phone_info['template_data_info']['global_custom_cfg_data']);
+    				//Provide alternate Configuration file instead of the one from the hard drive
+    				if (!empty($phone_info['template_data_info']['config_files_override'])) {
+    					$temp = unserialize($phone_info['template_data_info']['config_files_override']);
+    					foreach ($temp as $list) {
+    						$sql = "SELECT original_name,data FROM endpointman_custom_configs WHERE id = " . $list;
+    						$res = sql($sql);
+    						if ($res->numRows()) {
+    							$data = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
+    							$provisioner_lib->config_files_override[$data['original_name']] = $data['data'];
+    						}
+    					}
+    				}
+    			} else {
+    				$global_custom_cfg_data = unserialize($phone_info['global_custom_cfg_data']);
+    				//Provide alternate Configuration file instead of the one from the hard drive
+    				if (!empty($phone_info['config_files_override'])) {
+    					$temp = unserialize($phone_info['config_files_override']);
+    					foreach ($temp as $list) {
+    						$sql = "SELECT original_name,data FROM endpointman_custom_configs WHERE id = " . $list;
+    						$res = sql($sql);
+    						if ($res->numRows()) {
+    							$data = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
+    							$provisioner_lib->config_files_override[$data['original_name']] = $data['data'];
+    						}
+    					}
+    				}
+    			}
+    
+    			if (!empty($global_custom_cfg_data)) {
+    				if (array_key_exists('data', $global_custom_cfg_data)) {
+    					$global_custom_cfg_ari = $global_custom_cfg_data['ari'];
+    					$global_custom_cfg_data = $global_custom_cfg_data['data'];
+    				} else {
+    					$global_custom_cfg_data = array();
+    					$global_custom_cfg_ari = array();
+    				}
+    			}
+    
+    			$new_template_data = array();
+    			$line_ops = array();
+    			if (is_array($global_custom_cfg_data)) {
+    				foreach ($global_custom_cfg_data as $key => $data) {
+    					//TODO: clean up with reg-exp
+    					$full_key = $key;
+    					$key = explode('|', $key);
+    					$count = count($key);
+    					switch ($count) {
+    						case 1:
+    							if (($this->global_cfg['enable_ari'] == 1) AND (isset($global_custom_cfg_ari[$full_key])) AND (isset($global_user_cfg_data[$full_key]))) {
+    								$new_template_data[$full_key] = $global_user_cfg_data[$full_key];
+    							} else {
+    								$new_template_data[$full_key] = $global_custom_cfg_data[$full_key];
+    							}
+    							break;
+    						case 2:
+    							$breaks = explode('_', $key[1]);
+    							if (($this->global_cfg['enable_ari'] == 1) AND (isset($global_custom_cfg_ari[$full_key])) AND (isset($global_user_cfg_data[$full_key]))) {
+    								$new_template_data['loops'][$breaks[0]][$breaks[2]][$breaks[1]] = $global_user_cfg_data[$full_key];
+    							} else {
+    								$new_template_data['loops'][$breaks[0]][$breaks[2]][$breaks[1]] = $global_custom_cfg_data[$full_key];
+    							}
+    							break;
+    						case 3:
+    							if (($this->global_cfg['enable_ari'] == 1) AND (isset($global_custom_cfg_ari[$full_key])) AND (isset($global_user_cfg_data[$full_key]))) {
+    								$line_ops[$key[1]][$key[2]] = $global_user_cfg_data[$full_key];
+    							} else {
+    								$line_ops[$key[1]][$key[2]] = $global_custom_cfg_data[$full_key];
+    							}
+    							break;
+    					}
+    				}
+    			}
+    
+    			if (!$write) {
+    				$new_template_data['provision']['type'] = 'dynamic';
+    				$new_template_data['provision']['protocol'] = 'http';
+    				$new_template_data['provision']['path'] =  rtrim($settings['srvip'] . dirname($_SERVER['REQUEST_URI']) . '/', '/');
+    				$new_template_data['provision']['encryption'] = FALSE;
+    			} else {
+    				$new_template_data['provision']['type'] = 'file';
+    				$new_template_data['provision']['protocol'] = 'tftp';
+    				$new_template_data['provision']['path'] = $settings['srvip'];
+    				$new_template_data['provision']['encryption'] = FALSE;
+    			}
+    
+    			$new_template_data['ntp'] = $settings['ntp'];
+    
+    			//Overwrite all specific settings variables now
+    			if (!empty($phone_info['specific_settings'])) {
+    				$specific_settings = unserialize($phone_info['specific_settings']);
+    				$specific_settings = is_array($specific_settings) ? $specific_settings : array();
+    			} else {
+    				$specific_settings = array();
+    			}
+    
+    			//Set Variables according to the template_data files included. We can include different template.xml files within family_data.xml also one can create
+    			//template_data_custom.xml which will get included or template_data_<model_name>_custom.xml which will also get included
+    			//line 'global' will set variables that aren't line dependant
+    
+    
+    			$provisioner_lib->settings = $new_template_data;
+    
+    			//Loop through Lines!
+    			$li = 0;
+    			foreach ($phone_info['line'] as $line) {
+    				$line_options = is_array($line_ops[$line['line']]) ? $line_ops[$line['line']] : array();
+    				$line_statics = array('line' => $line['line'], 'username' => $line['ext'], 'authname' => $line['ext'], 'secret' => $line['secret'], 'displayname' => $line['description'], 'server_host' => $this->global_cfg['srvip'], 'server_port' => '5060', 'user_extension' => $line['user_extension']);
+    
+    				$provisioner_lib->settings['line'][$li] = array_merge($line_options, $line_statics);
+    				$li++;
+    			}
+    
+    			if (array_key_exists('data', $specific_settings)) {
+    				foreach ($specific_settings['data'] as $key => $data) {
+    					$default_exp = preg_split("/\|/i", $key);
+    					if (isset($default_exp[2])) {
+    						//lineloop
+    						$var = $default_exp[2];
+    						$line = $default_exp[1];
+    						$loc = $this->system->arraysearchrecursive($line, $provisioner_lib->settings['line'], 'line');
+    						if ($loc !== FALSE) {
+    							$k = $loc[0];
+    							$provisioner_lib->settings['line'][$k][$var] = $data;
+    						} else {
+    							//Adding a new line-ish type options
+    							if (isset($specific_settings['data']['line|' . $line . '|line_enabled'])) {
+    								$lastkey = array_pop(array_keys($provisioner_lib->settings['line']));
+    								$lastkey++;
+    								$provisioner_lib->settings['line'][$lastkey]['line'] = $line;
+    								$provisioner_lib->settings['line'][$lastkey][$var] = $data;
+    							}
+    						}
+    					} else {
+    						switch ($key) {
+    							case "connection_type":
+    								$provisioner_lib->settings['network'][$key] = $data;
+    								break;
+    							case "ip4_address":
+    								$provisioner_lib->settings['network']['ipv4'] = $data;
+    								break;
+    							case "ip6_address":
+    								$provisioner_lib->settings['network']['ipv6'] = $data;
+    								break;
+    							case "subnet_mask":
+    								$provisioner_lib->settings['network']['subnet'] = $data;
+    								break;
+    							case "gateway_address":
+    								$provisioner_lib->settings['network']['gateway'] = $data;
+    								break;
+    							case "primary_dns":
+    								$provisioner_lib->settings['network'][$key] = $data;
+    								break;
+    							default:
+    								$provisioner_lib->settings[$key] = $data;
+    								break;
+    						}
+    					}
+    				}
+    			}
+    
+    			$provisioner_lib->settings['mac'] = $phone_info['mac'];
+    			$provisioner_lib->mac = $phone_info['mac'];
+    
+    			//Setting a line variable here...these aren't defined in the template_data.xml file yet. however they will still be parsed
+    			//and if they have defaults assigned in a future template_data.xml or in the config file using pipes (|) those will be used, pipes take precedence
+    			$provisioner_lib->processor_info = "EndPoint Manager Version " . $this->global_cfg['version'];
+    
+    			// Because every brand is an extension (eventually) of endpoint, you know this function will exist regardless of who it is
+    			//Start timer
+    			$time_start = microtime(true);
+    
+    			$provisioner_lib->debug = TRUE;
+    
+    			try {
+    				$returned_data = $provisioner_lib->generate_all_files();
+    			} catch (Exception $e) {
+$this->error['prepare_configs'] = 'Error Returned From Provisioner Library: ' . $e->getMessage();
+    				return(FALSE);
+    			}
+    			//print_r($provisioner_lib->debug_return);
+    			//End timer
+    			$time_end = microtime(true);
+    			$time = $time_end - $time_start;
+    			if ($time > 360) {
+$this->error['generate_time'] = "It took an awfully long time to generate configs...(" . round($time, 2) . " seconds)";
+    			}
+    			if ($write) {
+    				$this->write_configs($provisioner_lib, $reboot, $settings['config_location'], $phone_info, $returned_data);
+    			} else {
+    				return ($returned_data);
+    			}
+    			return(TRUE);
+    		} else {
+$this->error['parse_configs'] = "Can't Load \"" . $class . "\" Class!";
+    			return(FALSE);
+    		}
+    	} else {
+$this->error['parse_configs'] = "Can't Load the Autoloader!";
+    		return(FALSE);
+    	}
+    }
+	
+    function write_configs($provisioner_lib, $reboot, $write_path, $phone_info, $returned_data) {
+    	//Create Directory Structure (If needed)
+    	if (isset($provisioner_lib->directory_structure)) {
+    		foreach ($provisioner_lib->directory_structure as $data) {
+    			if (file_exists($this->PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data)) {
+    				$dir_iterator = new \RecursiveDirectoryIterator($this->PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data . "/");
+    				$iterator = new \RecursiveIteratorIterator($dir_iterator, \RecursiveIteratorIterator::SELF_FIRST);
+    				// could use CHILD_FIRST if you so wish
+    				foreach ($iterator as $file) {
+    					$dir = $write_path . str_replace($this->PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/", "", dirname($file));
+    					if (!file_exists($dir)) {
+    						if (!@mkdir($dir, 0775, TRUE)) {
+$this->error['parse_configs'] = "Could Not Create Directory: " . $data;
+    							return(FALSE);
+    						}
+    					}
+    				}
+    			} else {
+    				$dir = $write_path . $data;
+    				if (!file_exists($dir)) {
+    					if (!@mkdir($dir, 0775)) {
+$this->error['parse_configs'] = "Could Not Create Directory: " . $data;
+    						return(FALSE);
+    					}
+    				}
+    			}
+    		}
+    	}
+    
+    	//Copy Files (If needed)
+    	if (isset($provisioner_lib->copy_files)) {
+    		foreach ($provisioner_lib->copy_files as $data) {
+    			if (file_exists($this->PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data)) {
+    				$file = $write_path . $data;
+    				$orig = $this->PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data;
+    				if (!file_exists($file)) {
+    					if (!@copy($orig, $file)) {
+$this->error['parse_configs'] = "Could Not Create File: " . $data;
+    						return(FALSE);
+    					}
+    				} else {
+    					if (file_exists($this->PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data)) {
+    						if (!file_exists(dirname($write_path . $data))) {
+    							!@mkdir(dirname($write_path . $data), 0775);
+    						}
+    						copy($this->PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data, $write_path . $data);
+    						chmod($write_path . $data, 0775);
+    					}
+    				}
+    			}
+    		}
+    	}
+    
+    	foreach ($returned_data as $file => $data) {
+    		if (((file_exists($write_path . $file)) AND (is_writable($write_path . $file)) AND (!in_array($file, $provisioner_lib->protected_files))) OR (!file_exists($write_path . $file))) {
+    			//Move old file to backup
+    			if (!$this->global_cfg['backup_check']) {
+    				if (!file_exists($write_path . 'config_bkup')) {
+    					if (!@mkdir($write_path . 'config_bkup', 0775)) {
+$this->error['parse_configs'] = "Could Not Create Backup Directory";
+    						return(FALSE);
+    					}
+    				}
+    				if (file_exists($write_path . $file)) {
+    					copy($write_path . $file, $write_path . 'config_bkup/' . $file . '.' . time());
+    				}
+    			}
+    			file_put_contents($write_path . $file, $data);
+    			chmod($write_path . $file, 0775);
+    			if (!file_exists($write_path . $file)) {
+$this->error['parse_configs'] = "File (" . $file . ") not written to hard drive!";
+    				return(FALSE);
+    			}
+    		} elseif (!in_array($file, $provisioner_lib->protected_files)) {
+$this->error['parse_configs'] = "File not written to hard drive!";
+    			return(FALSE);
+    		}
+    	}
+    
+    	if ($reboot) {
+    		$provisioner_lib->reboot();
+    	}
+    }
 	
 	
 	
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 	
 	
 	
@@ -3295,63 +4012,8 @@ $this->message['add_line'] .= "Added " . $name . " to line " . $line . "<br/>";
 
    
 
-    /**
-     * Taken from PHP.net. A list of errors returned when uploading files.
-     * @param <type> $error_code
-     * @return string
-     */
-    function file_upload_error_message($error_code) {
-        switch ($error_code) {
-            case UPLOAD_ERR_INI_SIZE:
-                return 'The uploaded file exceeds the upload_max_filesize directive in php.ini';
-            case UPLOAD_ERR_FORM_SIZE:
-                return 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form';
-            case UPLOAD_ERR_PARTIAL:
-                return 'The uploaded file was only partially uploaded';
-            case UPLOAD_ERR_NO_FILE:
-                return 'No file was uploaded';
-            case UPLOAD_ERR_NO_TMP_DIR:
-                return 'Missing a temporary folder';
-            case UPLOAD_ERR_CANT_WRITE:
-                return 'Failed to write file to disk';
-            case UPLOAD_ERR_EXTENSION:
-                return 'File upload stopped by extension';
-            default:
-                return 'Unknown upload error';
-        }
-    }
-
-    /**
-     * Get the brand from any mac sent to this function
-     * @param string $mac
-     * @return array
-     */
-    function get_brand_from_mac($mac) {
-        //Check for valid mac address first
-        if (!$this->mac_check_clean($mac)) {
-            return(FALSE);
-        }
-
-        //Get the OUI only
-        $oui = substr($this->mac_check_clean($mac), 0, 6);
-        //Find the matching brand model to the oui
-        $oui_sql = "SELECT endpointman_brand_list.name, endpointman_brand_list.id FROM endpointman_oui_list, endpointman_brand_list WHERE oui LIKE '%" . $oui . "%' AND endpointman_brand_list.id = endpointman_oui_list.brand AND endpointman_brand_list.installed = 1 LIMIT 1";
-        $brand = $this->eda->sql($oui_sql, 'getRow', DB_FETCHMODE_ASSOC);
-
-        $res = $this->eda->sql($oui_sql);
-        $brand_count = $res->numRows();
-
-        if (!$brand_count) {
-            //oui doesn't have a matching mysql reference, probably a PC/router/wap/printer of some sort.
-            $phone_info['id'] = 0;
-            $phone_info['name'] = _("Unknown");
-        } else {
-            $phone_info['id'] = $brand['id'];
-            $phone_info['name'] = $brand['name'];
-        }
-
-        return($phone_info);
-    }
+    
+   
 
 
 
@@ -3453,112 +4115,6 @@ $this->message['add_line'] .= "Added " . $name . " to line " . $line . "<br/>";
         }
     }
 
-    /**
-     * Send this function an ID from the mac devices list table and you'll get all the information we have on that particular phone
-     * @param integer $mac_id ID number reference from the MySQL database referencing the table endpointman_mac_list
-     * @return array
-     * @example
-     * Final Output will look something similar to this
-     *  Array
-     *       (
-     *            [config_files_override] =>
-     *            [global_user_cfg_data] => N;
-     *            [model_id] => 213
-     *            [brand_id] => 2
-     *            [name] => Grandstream
-     *            [directory] => grandstream
-     *            [model] => GXP2000
-     *            [mac] => 000B820D0050
-     *            [template_id] => 0
-     *            [global_custom_cfg_data] => Serialized Data (Changed Template Values)
-     *            [long_name] => GXP Enterprise IP series [280,1200,2000,2010,2020]
-     *            [product_id] => 21
-     *            [cfg_dir] => gxp
-     *            [cfg_ver] => 1.5
-     *            [template_data] => Serialized Data (The default Template Values)
-     *            [enabled] => 1
-     *            [line] => Array
-     *                (
-     *                    [1] => Array
-     *                        (
-     *                            [luid] => 2
-     *                            [mac_id] => 2
-     *                            [line] => 1
-     *                            [ext] => 1000
-     *                            [description] => Description
-     *                            [custom_cfg_data] =>
-     *                            [user_cfg_data] =>
-     *                            [secret] => secret
-     *                            [id] => 1000
-     *                            [tech] => sip
-     *                            [dial] => SIP/1000
-     *                            [devicetype] => fixed
-     *                            [user] => 1000
-     *                            [emergency_cid] =>
-     *                        )
-     *                )
-     *         )
-     */
-    function get_phone_info($mac_id=NULL) {
-        //You could screw up a phone if the mac_id is blank
-        if (!isset($mac_id)) {
-            $this->error['get_phone_info'] = "Mac ID is not set";
-            return(FALSE);
-        }
-        $sql = "SELECT id FROM endpointman_mac_list WHERE model > 0 AND id =" . $mac_id;
-
-        $res = $this->eda->sql($sql);
-        if ($res->numRows()) {
-            //Returns Brand Name, Brand Directory, Model Name, Mac Address, Extension (FreePBX), Custom Configuration Template, Custom Configuration Data, Product Name, Product ID, Product Configuration Directory, Product Configuration Version, Product XML name,
-            $sql = "SELECT endpointman_mac_list.specific_settings, endpointman_mac_list.config_files_override, endpointman_mac_list.global_user_cfg_data, endpointman_model_list.id as model_id, endpointman_brand_list.id as brand_id, endpointman_brand_list.name, endpointman_brand_list.directory, endpointman_model_list.model, endpointman_mac_list.mac, endpointman_mac_list.template_id, endpointman_mac_list.global_custom_cfg_data, endpointman_product_list.long_name, endpointman_product_list.id as product_id, endpointman_product_list.cfg_dir, endpointman_product_list.cfg_ver, endpointman_model_list.template_data, endpointman_model_list.enabled, endpointman_mac_list.global_settings_override FROM endpointman_line_list, endpointman_mac_list, endpointman_model_list, endpointman_brand_list, endpointman_product_list WHERE endpointman_mac_list.model = endpointman_model_list.id AND endpointman_brand_list.id = endpointman_model_list.brand AND endpointman_product_list.id = endpointman_model_list.product_id AND endpointman_mac_list.id = endpointman_line_list.mac_id AND endpointman_mac_list.id = " . $mac_id;
-
-            $phone_info = $this->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
-
-            if (!$phone_info) {
-                $this->error['get_phone_info'] = "Error with SQL Statement";
-            }
-
-            //If there is a template associated with this phone then pull that information and put it into the array
-            if ($phone_info['template_id'] > 0) {
-                $sql = "SELECT name, global_custom_cfg_data, config_files_override, global_settings_override FROM endpointman_template_list WHERE id = " . $phone_info['template_id'];
-
-                $phone_info['template_data_info'] = $this->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
-            }
-
-            $sql = "SELECT endpointman_line_list.*, sip.data as secret, devices.*, endpointman_line_list.description AS epm_description FROM endpointman_line_list, sip, devices WHERE endpointman_line_list.ext = devices.id AND endpointman_line_list.ext = sip.id AND sip.keyword = 'secret' AND mac_id = " . $mac_id . " ORDER BY endpointman_line_list.line ASC";
-            $lines_info = $this->eda->sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
-            foreach ($lines_info as $line) {
-                $phone_info['line'][$line['line']] = $line;
-                $phone_info['line'][$line['line']]['description'] = $line['epm_description'];
-                $phone_info['line'][$line['line']]['user_extension'] = $line['user'];
-            }
-        } else {
-            $sql = "SELECT id, mac FROM endpointman_mac_list WHERE id =" . $mac_id;
-            //Phone is unknown, we need to display this to the end user so that they can make corrections
-            $row = $this->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
-
-            $brand = $this->get_brand_from_mac($row['mac']);
-            if ($brand) {
-                $phone_info['brand_id'] = $brand['id'];
-                $phone_info['name'] = $brand['name'];
-            } else {
-                $phone_info['brand_id'] = 0;
-                $phone_info['name'] = 'Unknown';
-            }
-
-            $phone_info['id'] = $mac_id;
-            $phone_info['model_id'] = 0;
-            $phone_info['product_id'] = 0;
-            $phone_info['custom_cfg_template'] = 0;
-            $phone_info['mac'] = $row['mac'];
-            $sql = "SELECT endpointman_line_list.*, sip.data as secret, devices.* FROM endpointman_line_list, sip, devices WHERE endpointman_line_list.ext = devices.id AND endpointman_line_list.ext = sip.id AND sip.keyword = 'secret' AND mac_id = " . $mac_id;
-            $lines_info = $this->eda->sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
-            foreach ($lines_info as $line) {
-                $phone_info['line'][$line['line']] = $line;
-            }
-        }
-        return $phone_info;
-    }
 
     /**
      * Custom Means specific to that MAC
@@ -4116,380 +4672,13 @@ $this->message['add_line'] .= "Added " . $name . " to line " . $line . "<br/>";
         }
     }
 
-    function write_configs($provisioner_lib, $reboot, $write_path, $phone_info, $returned_data) {
-        //Create Directory Structure (If needed)
-        if (isset($provisioner_lib->directory_structure)) {
-            foreach ($provisioner_lib->directory_structure as $data) {
-                if (file_exists($this->PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data)) {
-                    $dir_iterator = new \RecursiveDirectoryIterator($this->PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data . "/");
-                    $iterator = new RecursiveIteratorIterator($dir_iterator, RecursiveIteratorIterator::SELF_FIRST);
-                    // could use CHILD_FIRST if you so wish
-                    foreach ($iterator as $file) {
-                        $dir = $write_path . str_replace($this->PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/", "", dirname($file));
-                        if (!file_exists($dir)) {
-                            if (!@mkdir($dir, 0775, TRUE)) {
-                                $this->error['parse_configs'] = "Could Not Create Directory: " . $data;
-                                return(FALSE);
-                            }
-                        }
-                    }
-                } else {
-                    $dir = $write_path . $data;
-                    if (!file_exists($dir)) {
-                        if (!@mkdir($dir, 0775)) {
-                            $this->error['parse_configs'] = "Could Not Create Directory: " . $data;
-                            return(FALSE);
-                        }
-                    }
-                }
-            }
-        }
-
-        //Copy Files (If needed)
-        if (isset($provisioner_lib->copy_files)) {
-            foreach ($provisioner_lib->copy_files as $data) {
-                if (file_exists($this->PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data)) {
-                    $file = $write_path . $data;
-                    $orig = $this->PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data;
-                    if (!file_exists($file)) {
-                        if (!@copy($orig, $file)) {
-                            $this->error['parse_configs'] = "Could Not Create File: " . $data;
-                            return(FALSE);
-                        }
-                    } else {
-                        if (file_exists($this->PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data)) {
-                            if (!file_exists(dirname($write_path . $data))) {
-                                !@mkdir(dirname($write_path . $data), 0775);
-                            }
-                            copy($this->PHONE_MODULES_PATH . "endpoint/" . $phone_info['directory'] . "/" . $phone_info['cfg_dir'] . "/" . $data, $write_path . $data);
-                            chmod($write_path . $data, 0775);
-                        }
-                    }
-                }
-            }
-        }
-
-        foreach ($returned_data as $file => $data) {
-            if (((file_exists($write_path . $file)) AND (is_writable($write_path . $file)) AND (!in_array($file, $provisioner_lib->protected_files))) OR (!file_exists($write_path . $file))) {
-                //Move old file to backup
-                if (!$this->global_cfg['backup_check']) {
-                    if (!file_exists($write_path . 'config_bkup')) {
-                        if (!@mkdir($write_path . 'config_bkup', 0775)) {
-                            $this->error['parse_configs'] = "Could Not Create Backup Directory";
-                            return(FALSE);
-                        }
-                    }
-                    if (file_exists($write_path . $file)) {
-                        copy($write_path . $file, $write_path . 'config_bkup/' . $file . '.' . time());
-                    }
-                }
-                file_put_contents($write_path . $file, $data);
-                chmod($write_path . $file, 0775);
-                if (!file_exists($write_path . $file)) {
-                    $this->error['parse_configs'] = "File (" . $file . ") not written to hard drive!";
-                    return(FALSE);
-                }
-            } elseif (!in_array($file, $provisioner_lib->protected_files)) {
-                $this->error['parse_configs'] = "File not written to hard drive!";
-                return(FALSE);
-            }
-        }
-
-        if ($reboot) {
-            $provisioner_lib->reboot();
-        }
-    }
+    
 
     function display_configs() {
 
     }
 
-    /**
-     * Prepare and then send the data that Provisioner expects, then take what provisioner gives us and do what it says
-     * @param array $phone_info Everything from get_phone_info
-     * @param bool  $reboot Reboot the Phone after write
-     * @param bool  $write  Write out Directory structure.
-     */
-    function prepare_configs($phone_info, $reboot=TRUE, $write=TRUE) {
-
-        $this->PROVISIONER_BASE = $this->PHONE_MODULES_PATH;
-define('PROVISIONER_BASE', $this->PROVISIONER_BASE);
-        if (file_exists($this->PHONE_MODULES_PATH . 'autoload.php')) {
-            if (!class_exists('ProvisionerConfig')) {
-                require($this->PHONE_MODULES_PATH . 'autoload.php');
-            }
-
-            //Load Provisioner
-            $class = "endpoint_" . $phone_info['directory'] . "_" . $phone_info['cfg_dir'] . '_phone';
-            $base_class = "endpoint_" . $phone_info['directory'] . '_base';
-            $master_class = "endpoint_base";
-            if (!class_exists($master_class)) {
-                ProvisionerConfig::endpointsAutoload($master_class);
-            }
-            if (!class_exists($base_class)) {
-                ProvisionerConfig::endpointsAutoload($base_class);
-            }
-            if (!class_exists($class)) {
-                ProvisionerConfig::endpointsAutoload($class);
-            }
-
-            if (class_exists($class)) {
-                $provisioner_lib = new $class();
-
-                //Determine if global settings have been overridden
-                if ($phone_info['template_id'] > 0) {
-                    if (isset($phone_info['template_data_info']['global_settings_override'])) {
-                        $settings = unserialize($phone_info['template_data_info']['global_settings_override']);
-                    } else {
-                        $settings['srvip'] = $this->global_cfg['srvip'];
-                        $settings['ntp'] = $this->global_cfg['ntp'];
-                        $settings['config_location'] = $this->global_cfg['config_location'];
-                        $settings['tz'] = $this->global_cfg['tz'];
-                    }
-                } else {
-                    if (isset($phone_info['global_settings_override'])) {
-                        $settings = unserialize($phone_info['global_settings_override']);
-                    } else {
-                        $settings['srvip'] = $this->global_cfg['srvip'];
-                        $settings['ntp'] = $this->global_cfg['ntp'];
-                        $settings['config_location'] = $this->global_cfg['config_location'];
-                        $settings['tz'] = $this->global_cfg['tz'];
-                    }
-                }
-
-
-
-                //Tell the system who we are and were to find the data.
-                $provisioner_lib->root_dir = $this->PHONE_MODULES_PATH;
-                $provisioner_lib->engine = 'asterisk';
-                $provisioner_lib->engine_location = !empty($this->global_cfg['asterisk_location']) ? $this->global_cfg['asterisk_location'] : 'asterisk';
-                $provisioner_lib->system = 'unix';
-
-                //have to because of versions less than php5.3
-                $provisioner_lib->brand_name = $phone_info['directory'];
-                $provisioner_lib->family_line = $phone_info['cfg_dir'];
-
-
-
-                //Phone Model (Please reference family_data.xml in the family directory for a list of recognized models)
-                //This has to match word for word. I really need to fix this....
-                $provisioner_lib->model = $phone_info['model'];
-
-                //Timezone
-                require('timezone.inc');
-                try {
-                    $provisioner_lib->DateTimeZone = new DateTimeZone($settings['tz']);
-                } catch (Exception $e) {
-                    $this->error['parse_configs'] = 'Error Returned From Timezone Library: ' . $e->getMessage();
-                    return(FALSE);
-                }
-
-                $temp = "";
-                $template_data = unserialize($phone_info['template_data']);
-                $global_user_cfg_data = unserialize($phone_info['global_user_cfg_data']);
-                if ($phone_info['template_id'] > 0) {
-                    $global_custom_cfg_data = unserialize($phone_info['template_data_info']['global_custom_cfg_data']);
-                    //Provide alternate Configuration file instead of the one from the hard drive
-                    if (!empty($phone_info['template_data_info']['config_files_override'])) {
-                        $temp = unserialize($phone_info['template_data_info']['config_files_override']);
-                        foreach ($temp as $list) {
-                            $sql = "SELECT original_name,data FROM endpointman_custom_configs WHERE id = " . $list;
-                            $res = $this->eda->sql($sql);
-                            if ($res->numRows()) {
-                                $data = $this->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
-                                $provisioner_lib->config_files_override[$data['original_name']] = $data['data'];
-                            }
-                        }
-                    }
-                } else {
-                    $global_custom_cfg_data = unserialize($phone_info['global_custom_cfg_data']);
-                    //Provide alternate Configuration file instead of the one from the hard drive
-                    if (!empty($phone_info['config_files_override'])) {
-                        $temp = unserialize($phone_info['config_files_override']);
-                        foreach ($temp as $list) {
-                            $sql = "SELECT original_name,data FROM endpointman_custom_configs WHERE id = " . $list;
-                            $res = $this->eda->sql($sql);
-                            if ($res->numRows()) {
-                                $data = $this->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
-                                $provisioner_lib->config_files_override[$data['original_name']] = $data['data'];
-                            }
-                        }
-                    }
-                }
-
-                if (!empty($global_custom_cfg_data)) {
-                    if (array_key_exists('data', $global_custom_cfg_data)) {
-                        $global_custom_cfg_ari = $global_custom_cfg_data['ari'];
-                        $global_custom_cfg_data = $global_custom_cfg_data['data'];
-                    } else {
-                        $global_custom_cfg_data = array();
-                        $global_custom_cfg_ari = array();
-                    }
-                }
-
-                $new_template_data = array();
-                $line_ops = array();
-                if (is_array($global_custom_cfg_data)) {
-                    foreach ($global_custom_cfg_data as $key => $data) {
-                        //TODO: clean up with reg-exp
-                        $full_key = $key;
-                        $key = explode('|', $key);
-                        $count = count($key);
-                        switch ($count) {
-                            case 1:
-                                if (($this->global_cfg['enable_ari'] == 1) AND (isset($global_custom_cfg_ari[$full_key])) AND (isset($global_user_cfg_data[$full_key]))) {
-                                    $new_template_data[$full_key] = $global_user_cfg_data[$full_key];
-                                } else {
-                                    $new_template_data[$full_key] = $global_custom_cfg_data[$full_key];
-                                }
-                                break;
-                            case 2:
-                                $breaks = explode('_', $key[1]);
-                                if (($this->global_cfg['enable_ari'] == 1) AND (isset($global_custom_cfg_ari[$full_key])) AND (isset($global_user_cfg_data[$full_key]))) {
-                                    $new_template_data['loops'][$breaks[0]][$breaks[2]][$breaks[1]] = $global_user_cfg_data[$full_key];
-                                } else {
-                                    $new_template_data['loops'][$breaks[0]][$breaks[2]][$breaks[1]] = $global_custom_cfg_data[$full_key];
-                                }
-                                break;
-                            case 3:
-                                if (($this->global_cfg['enable_ari'] == 1) AND (isset($global_custom_cfg_ari[$full_key])) AND (isset($global_user_cfg_data[$full_key]))) {
-                                    $line_ops[$key[1]][$key[2]] = $global_user_cfg_data[$full_key];
-                                } else {
-                                    $line_ops[$key[1]][$key[2]] = $global_custom_cfg_data[$full_key];
-                                }
-                                break;
-                        }
-                    }
-                }
-
-                if (!$write) {
-                    $new_template_data['provision']['type'] = 'dynamic';
-                    $new_template_data['provision']['protocol'] = 'http';
-                    $new_template_data['provision']['path'] =  rtrim($settings['srvip'] . dirname($_SERVER['REQUEST_URI']) . '/', '/');
-                    $new_template_data['provision']['encryption'] = FALSE;
-                } else {
-                    $new_template_data['provision']['type'] = 'file';
-                    $new_template_data['provision']['protocol'] = 'tftp';
-                    $new_template_data['provision']['path'] = $settings['srvip'];
-                    $new_template_data['provision']['encryption'] = FALSE;
-                }
-
-                $new_template_data['ntp'] = $settings['ntp'];
-
-                //Overwrite all specific settings variables now
-                if (!empty($phone_info['specific_settings'])) {
-                    $specific_settings = unserialize($phone_info['specific_settings']);
-                    $specific_settings = is_array($specific_settings) ? $specific_settings : array();
-                } else {
-                    $specific_settings = array();
-                }
-
-                //Set Variables according to the template_data files included. We can include different template.xml files within family_data.xml also one can create
-                //template_data_custom.xml which will get included or template_data_<model_name>_custom.xml which will also get included
-                //line 'global' will set variables that aren't line dependant
-
-
-                $provisioner_lib->settings = $new_template_data;
-
-                //Loop through Lines!
-                $li = 0;
-                foreach ($phone_info['line'] as $line) {
-                    $line_options = is_array($line_ops[$line['line']]) ? $line_ops[$line['line']] : array();
-                    $line_statics = array('line' => $line['line'], 'username' => $line['ext'], 'authname' => $line['ext'], 'secret' => $line['secret'], 'displayname' => $line['description'], 'server_host' => $this->global_cfg['srvip'], 'server_port' => '5060', 'user_extension' => $line['user_extension']);
-
-                    $provisioner_lib->settings['line'][$li] = array_merge($line_options, $line_statics);
-                    $li++;
-                }
-
-                if (array_key_exists('data', $specific_settings)) {
-                   foreach ($specific_settings['data'] as $key => $data) {
-                       $default_exp = preg_split("/\|/i", $key);
-                        if (isset($default_exp[2])) {
-                            //lineloop
-                            $var = $default_exp[2];
-                            $line = $default_exp[1];
-                            $loc = $this->system->arraysearchrecursive($line, $provisioner_lib->settings['line'], 'line');
-                            if ($loc !== FALSE) {
-                                $k = $loc[0];
-                                $provisioner_lib->settings['line'][$k][$var] = $data;
-                            } else {
-                                //Adding a new line-ish type options
-                                if (isset($specific_settings['data']['line|' . $line . '|line_enabled'])) {
-                                    $lastkey = array_pop(array_keys($provisioner_lib->settings['line']));
-                                    $lastkey++;
-                                    $provisioner_lib->settings['line'][$lastkey]['line'] = $line;
-                                    $provisioner_lib->settings['line'][$lastkey][$var] = $data;
-                                }
-                            }
-                        } else {
-                            switch ($key) {
-                                case "connection_type":
-                                    $provisioner_lib->settings['network'][$key] = $data;
-                                    break;
-                                case "ip4_address":
-                                    $provisioner_lib->settings['network']['ipv4'] = $data;
-                                    break;
-                                case "ip6_address":
-                                    $provisioner_lib->settings['network']['ipv6'] = $data;
-                                    break;
-                                case "subnet_mask":
-                                    $provisioner_lib->settings['network']['subnet'] = $data;
-                                    break;
-                                case "gateway_address":
-                                    $provisioner_lib->settings['network']['gateway'] = $data;
-                                    break;
-                                case "primary_dns":
-                                    $provisioner_lib->settings['network'][$key] = $data;
-                                    break;
-                                default:
-                                    $provisioner_lib->settings[$key] = $data;
-                                    break;
-                            }
-                        }
-                    }
-                }
-
-                $provisioner_lib->settings['mac'] = $phone_info['mac'];
-                $provisioner_lib->mac = $phone_info['mac'];
-
-                //Setting a line variable here...these aren't defined in the template_data.xml file yet. however they will still be parsed
-                //and if they have defaults assigned in a future template_data.xml or in the config file using pipes (|) those will be used, pipes take precedence
-                $provisioner_lib->processor_info = "EndPoint Manager Version " . $this->global_cfg['version'];
-
-                // Because every brand is an extension (eventually) of endpoint, you know this function will exist regardless of who it is
-                //Start timer
-                $time_start = microtime(true);
-
-                $provisioner_lib->debug = TRUE;
-
-                try {
-                    $returned_data = $provisioner_lib->generate_all_files();
-                } catch (Exception $e) {
-                    $this->error['prepare_configs'] = 'Error Returned From Provisioner Library: ' . $e->getMessage();
-                    return(FALSE);
-                }
-                //print_r($provisioner_lib->debug_return);
-                //End timer
-                $time_end = microtime(true);
-                $time = $time_end - $time_start;
-                if ($time > 360) {
-                    $this->error['generate_time'] = "It took an awfully long time to generate configs...(" . round($time, 2) . " seconds)";
-                }
-                if ($write) {
-                    $this->write_configs($provisioner_lib, $reboot, $settings['config_location'], $phone_info, $returned_data);
-                } else {
-                    return ($returned_data);
-                }
-                return(TRUE);
-            } else {
-                $this->error['parse_configs'] = "Can't Load \"" . $class . "\" Class!";
-                return(FALSE);
-            }
-        } else {
-            $this->error['parse_configs'] = "Can't Load the Autoloader!";
-            return(FALSE);
-        }
-    }
+   
 
 }
 ?>
