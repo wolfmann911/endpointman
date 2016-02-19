@@ -1,7 +1,7 @@
-function epm_global_html_find_hide_and_remove(name, tDelay = 1)
+function epm_global_html_find_hide_and_remove(name, tDelay = 1, bSlow = false)
 {
 	if ($(name).length > 0) {
-		$(name).delay(tDelay).hide("slow", function () {
+		$(name).delay(tDelay).hide(((bSlow == true)  ? "slow" : ""), function () {
 			$(this).remove();
 		});
 	}
