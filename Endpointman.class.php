@@ -1386,6 +1386,7 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 		$row_out = array();
 		$i = 0;
 		$brand_list = $this->epm_config_hardware_get_list_brand(true);
+		if($check_for_updates) 	$brand_up = $this->update_check();
 		foreach ($brand_list as $row) 
 		{
 			$row_out[$i] = $row;
@@ -1394,7 +1395,6 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 			
 			if($check_for_updates) 
 			{
-				$brand_up = $this->update_check();
 				$id = $this->system->arraysearchrecursive($row['name'], $brand_up,'name');
 				$id = $id[0];
 				if((isset($brand_up[$id]['update'])) AND ($row['installed'] == 1)) {
