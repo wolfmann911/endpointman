@@ -8,10 +8,10 @@
 namespace FreePBX\modules;
  
 class epm_data_abstraction {
-    public $global_cfg;
-
-    function __construct() {
-        
+    function __construct($config, $configmod) {
+    	
+    	$this->config = $config;
+    	$this->configmod = $configmod;
     }
 	
     function all_products() {
@@ -103,12 +103,12 @@ class epm_data_abstraction {
     }
 
     function all_unused_registrations() {
-        if($this->global_cfg['show_all_registrations']) {
+        if($this->configmod->get('show_all_registrations')) {
             $not_added="SELECT devices.id, devices.description FROM devices WHERE tech in ('sip','pjsip') ORDER BY devices.id";
         } else {
             $not_added="SELECT devices.id, devices.description FROM devices WHERE tech in('sip','pjsip') AND devices.id not in (SELECT devices.id FROM devices, endpointman_line_list WHERE tech in ('sip','pjsip') AND devices.id = endpointman_line_list.ext ) ORDER BY devices.id";
         }
-        $result =& $this->sql($not_added,'getAll', DB_FETCHMODE_ASSOC);
+        $result = sql($not_added,'getAll', DB_FETCHMODE_ASSOC);
         return($result);
     }
 
@@ -126,7 +126,7 @@ class epm_data_abstraction {
 
     function get_line_information($line_id) {
         $sql = 'SELECT * FROM endpointman_line_list WHERE luid = '.$line_id;
-        $line_list =& $this->sql($sql,'getRow',DB_FETCHMODE_ASSOC);
+        $line_list =& sql($sql,'getRow',DB_FETCHMODE_ASSOC);
         return($line_list);
     }
 }

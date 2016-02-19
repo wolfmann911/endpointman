@@ -7,7 +7,13 @@
  * @package Endpoint Manager
  */
 $epm = FreePBX::create()->Endpointman;
+
+if ((! isset($_REQUEST['subpage'])) || ($_REQUEST['subpage'] == "")) {
+	$_REQUEST['subpage'] = "manager";
+}
+
 ?>
+
 <div class="container-fluid">
 	<h1><?php echo _("End Point Configuraction Manager")?></h1>
 	<h2><?php echo _("Package Manager")?></h2>
@@ -21,14 +27,14 @@ $epm = FreePBX::create()->Endpointman;
 						<div class="wrapper">
 							<ul class="nav nav-tabs list" role="tablist" id="list-tabs-epm_config">
 								<?php foreach($epm->myShowPage() as $key => $page) { ?>
-									<li data-name="<?php echo $key?>" class="change-tab <?php echo $key == 'manager' ? 'active' : ''?>"><a href="#<?php echo $key?>" aria-controls="<?php echo $key?>" role="tab" data-toggle="tab"><?php echo $page['name']?></a></li>
+									<li data-name="<?php echo $key?>" class="change-tab <?php echo $key == $_REQUEST['subpage'] ? 'active' : ''?>"><a href="#<?php echo $key?>" aria-controls="<?php echo $key?>" role="tab" data-toggle="tab"><?php echo $page['name']?></a></li>
 								<?php } ?>
 							</ul>
 						</div>
 					</div>
 					<div class="tab-content display">
 						<?php foreach($epm->myShowPage() as $key => $page) { ?>
-							<div id="<?php echo $key?>" class="tab-pane <?php echo $key == 'manager' ? 'active' : ''?>">
+							<div id="<?php echo $key?>" class="tab-pane <?php echo $key == $_REQUEST['subpage'] ? 'active' : ''?>">
 								<?php echo $page['content']?>
 							</div>
 						<?php } ?>
