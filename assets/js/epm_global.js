@@ -22,6 +22,18 @@ function epm_global_html_find_show_hide(name, bShow, tDelay = 1, slow = false)
 	}
 }
 
+function epm_global_html_css_name(name, bStatus, classname)
+{
+	if ($(name).length > 0) {
+		if (bStatus == true) 		{ $(name).addClass(classname); }
+		else if (bStatus == false)	{ $(name).removeClass(classname); }
+		else if (bStatus == "auto")	{
+			if($(name).hasClass(classname)) { $(name).removeClass(classname); }
+			else							{ $(name).addClass(classname); }
+		}
+	}
+}
+
 function epm_global_get_tab_actual()
 {
 	var sTab = "";

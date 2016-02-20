@@ -22,16 +22,18 @@ $(document).ready(function() {
 	
 	
 	//TAB POCE
-	//Demo: http://files.aw20.net/jquery-linedtextarea/jquery-linedtextarea.html
-	//http://alan.blog-city.com/jquerylinedtextarea.htm
 	//$("#config_textarea").linedtextarea();
-	//activar al serleccionar archivo, si se pone en el general javascript entra en bucle y no termina.
-	
 	
 	//TAB IEDL
 	
 	
 	//TAB MANUAL_UPLOAD
+	$('#manual_upload a.collapse-item').on("click", function(){
+		epm_global_html_css_name(this,"auto","active");
+		$(this).blur();
+	});
+	
+	
 	
 	
 });
@@ -211,7 +213,279 @@ function epm_config_tab_iedl_bt_import()
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /**** INI: FUNCTION TAB POCE ****/
+
+
+
+
+function epm_advanced_tab_poce_select_product(idsel)
+{
+	if ($.isNumeric(idsel) == false) { return; }
+	$("div.list-group>a.active").removeClass("active");
+	$("#list_product_"+idsel).addClass("active").blur();
+    
+	$.ajax({
+		type: 'POST',
+		url: "ajax.php",
+		data: {
+			module: "endpointman",
+			module_sec: "epm_advanced",
+			module_tab: "poce",
+			command: "poce_select",
+			product_select:  idsel
+		},
+		dataType: 'json',
+		timeout: 60000,
+		error: function(xhr, ajaxOptions, thrownError) {
+			fpbxToast('ERROR AJAX:' + thrownError,'ERROR (' + xhr.status + ')!','error');
+			return false;
+		},
+		success: function(data) {
+			
+			$("#poce_file_name_path").text("No Selected");
+			$("#config_textarea").text("");
+			$('#config_textarea').prop('readonly', true);
+			
+			$("#box_bt_save").hide("slow");
+			$("#box_bt_share").hide("slow");
+			$("#box_bt_save_as").hide("slow");
+			$("#save_as_name").val("");
+		
+			if (data.status == true) {
+				epm_advanced_tab_poce_create_file_list("#select_product_list_files_config", data.file_list, data.product_select, "file");
+				epm_advanced_tab_poce_create_file_list("#select_product_list_files_template_custom", data.template_file_list, data.product_select, "tfile");
+				epm_advanced_tab_poce_create_file_list("#select_product_list_files_user_config", data.sql_file_list, data.product_select, "sql");
+				
+				$("#poce_NameProductSelect").text(data.product_select_info.long_name);
+				fpbxToast('Load date Done!', '', 'success');
+				return true;
+			} 
+			else {
+				epm_advanced_tab_poce_create_file_list("#select_product_list_files_config", "Error");
+				epm_advanced_tab_poce_create_file_list("#select_product_list_files_template_custom", "Error");
+				epm_advanced_tab_poce_create_file_list("#select_product_list_files_user_config", "Error");
+				
+				$("#poce_NameProductSelect").text("Error get data!");
+				
+				fpbxToast(data.message, data.txt.error, 'error');
+				return false;
+			}
+		},
+	});	
+}
+
+
+function epm_advanced_tab_poce_create_file_list(idname, data = "", product_select = "", typefile="") 
+{
+	$(idname + " div.dropdown-menu").empty();
+	
+	if (Array.isArray(data) == false)
+	{
+		$(idname + " span.label").text(0);
+		if (data == null) { data = "Emtry"; }
+		$(idname + " div.dropdown-menu")
+		.append(
+			$('<a/>', { 'href' : '#', 'class' : 'dropdown-item disable' }).text(data)
+		)
+		return;
+	}
+	
+	$(idname + " span.label").text(data.length);
+	$(data).each(function(index, itemData) 
+	{
+		$(idname + " div.dropdown-menu")
+		.append(
+			$('<a/>', { 
+				'href' : 'javascript:epm_advanced_tab_poce_select_file_edit("'+ product_select +'", "'+ itemData.text +'", "'+ itemData.value +'", "'+ typefile +'");', 
+				'class' : 'dropdown-item bt' 
+			})
+			.text(itemData.text)
+		)
+	});
+	return;
+}
+
+
+function epm_advanced_tab_poce_select_file_edit (idpro_select, txtnamefile, idnamefile, typefile)
+{
+	$.ajax({
+		type: 'POST',
+		url: "ajax.php",
+		data: {
+			module: "endpointman",
+			module_sec: "epm_advanced",
+			module_tab: "poce",
+			command: "poce_select_file",
+			product_select:  idpro_select,
+			file_id : idnamefile,
+			file_name : txtnamefile,
+			type_file : typefile
+		},
+		dataType: 'json',
+		timeout: 60000,
+		error: function(xhr, ajaxOptions, thrownError) {
+			fpbxToast('ERROR AJAX:' + thrownError,'ERROR (' + xhr.status + ')!','error');
+			$("#poce_file_name_path").text("Error ajax!");
+			$("#config_textarea").text("");
+			$('#config_textarea').prop('readonly', true);
+			$("#box_bt_save").hide("slow");
+			$("#box_bt_share").hide("slow");
+			$("#box_bt_save_as").hide("slow");
+			$("#save_as_name").val("");
+			return false;
+		},
+		success: function(data) {
+			if (data.status == true) {
+				$("#poce_file_name_path").text(data.location);
+				$('#config_textarea').prop('readonly', false);
+				$("#config_textarea").text(data.config_data);
+				
+				if (data.type == "file") {
+					$("#box_bt_save").show("slow");
+					$("#box_bt_share").show("slow");
+					$("#box_bt_save_as").hide("slow");
+					$("#save_as_name").val("");
+				}
+				else if (data.type == "tfile") {
+					$("#box_bt_save").show("slow");
+					$("#box_bt_save_as").show("slow");
+					$("#save_as_name").val(data.save_as_name_value);
+					$("#box_bt_share").show("slow");
+				}
+				else if (data.type == "sql") {
+					$("#box_bt_save").show("slow");
+					$("#box_bt_share").show("slow");
+					$("#box_bt_save_as").show("slow");
+					$("#save_as_name").val(data.save_as_name_value);
+				}
+				
+				//$("#config_textarea").linedtextarea();
+				
+				fpbxToast('File Load date Done!', '', 'success');
+				return true;
+			} 
+			else {
+				$("#poce_file_name_path").text("Error obteniendo datos!");
+				$("#config_textarea").text("");
+				$('#config_textarea').prop('readonly', true);
+				$("#box_bt_save").hide("slow");
+				$("#box_bt_share").hide("slow");
+				$("#box_bt_save_as").hide("slow");
+				$("#save_as_name").val("");
+				
+				fpbxToast(data.message, data.txt.error, 'error');
+				return false;
+			}
+		},
+	});	
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function epm_advanced_tab_poce_create_sql_file_list(data = "", product_select = "") 
+{
+	$("#select_product_list_files_user_config div.dropdown-menu").empty();
+	
+	if (Array.isArray(data) == true)
+	{
+		$("#select_product_list_files_user_config span.label").text(data.length);
+		$(data).each(function(index, itemData) 
+		{
+			$("#select_product_list_files_user_config div.dropdown-menu")
+			.append(
+				$('<a/>', { 'href' : 'config.php?display=epm_advanced&subpage=poce&product_select='+product_select+'&sql='+itemData.value })
+				.append(
+					$('<code/>', { 'style' : 'font-size: 0.8em' }).text(itemData.text)
+				)
+			)
+			.append(
+				$('<a/>', { 'href' : 'config.php?display=epm_advanced&subpage=poce&product_select='+product_select+'&sql='+itemData.value+'&delete=yes' })
+				.append(
+					$('<i/>', { 'class' : 'fa fa-trash-o', 'alt' : 'Delete' })
+				)
+			)
+			.append( $('<br/>', {}) )
+			.append(
+				$('<font/>', { 'style' : 'font-size:0.8em' })
+				.text("ref:")
+				.append(
+					$('<code/>', { })
+					.text(itemData.ref)
+				)
+			)
+			.append( $('<br/>', {}) );
+		});
+	}
+	else 
+	{
+		$("#select_product_list_files_user_config span.label").text(0);
+		if (data == null) { data = "Emtry"; }
+		$("#select_product_list_files_user_config div.dropdown-menu")
+		.append(
+			$('<code/>', { 'style' : 'font-size: 0.8em' }).text(data)
+		)
+		.append( $('<br/>', {}) );
+	}
+}
+
+
+
+
+
+
+
 /**** END: FUNCTION TAB POCE ****/
 
 
