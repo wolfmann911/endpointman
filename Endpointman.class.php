@@ -162,6 +162,8 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 					case "poce_select_file":
 					case "poce_save_file":
 					case "poce_save_as_file":
+					case "poce_sendid":
+					case "poce_delete_config_custom":
 					case "saveconfig": 
 						$setting['authenticate'] = true;
 						$setting['allowremote'] = false;
@@ -341,6 +343,14 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 						case "poce_save_file":
 						case "poce_save_as_file":
 							$retarr = $this->epm_advanced_poce_save_file();
+							break;
+						
+						case "poce_sendid":
+							$retarr = $this->epm_advanced_poce_sendid();
+							break;
+							
+						case "poce_delete_config_custom":
+							$retarr = $this->epm_advanced_poce_delete_config_custom();
 							break;
 								
 						default:
@@ -892,21 +902,13 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 			}
 			elseif ($dget['type_file'] == "tfile") {
 				
-				$save_as_name_value ="";
+				$save_as_name_value = $dget['file_name'];
 				$filename = $dget['file_name'];
 				$sendidt = "";
 				$type = $dget['type_file'];
-				$location = "New ".$dget['file_name'];
+				$location = $dget['file_name'];
 				$config_data = "";
 			}
-			
-			
-			//$endpoint->tpl->assign("config_data", $row['data']);
-			//$endpoint->tpl->assign("save_as_name_value", $row['name']);
-			//$endpoint->tpl->assign("filename", $row['original_name']);
-			//$endpoint->tpl->assign('sendid', $_REQUEST['sql']);
-			//$endpoint->tpl->assign("type", 'sql');
-			
 			
 			$retarr = array("status" => true, 
 							"message" => "OK", 
@@ -915,8 +917,9 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 							"save_as_name_value" => $save_as_name_value,
 							"sendidt" => $sendidt,
 							"type" => $type,
-							"location" => $location);
-			
+							"location" => $location,
+							"original_name" => $filename
+			);
 			unset($dget);
 		}
 		return $retarr;
@@ -924,25 +927,42 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 	
 	function epm_advanced_poce_sendid()
 	{
-		$dget['type_file'] = $_REQUEST['type_file'];
-		$dget['sendid'] = $_REQUEST['sendid'];
-		$dget['product_select'] = $_REQUEST['product_select'];
-		
-		
-		
-		if ($dget['type_file'] == "sql") {
-			$sql = "SELECT cfg_dir,directory,config_files FROM endpointman_product_list,endpointman_brand_list WHERE endpointman_product_list.brand = endpointman_brand_list.id AND endpointman_product_list.id = '" . $dget['product_select'] . "'";
-			$row = sql($sql, 'getrow', DB_FETCHMODE_ASSOC);
-			
-			$this->submit_config($row['directory'], $row['cfg_dir'], $row_original['original_name'], $row_original['data']);
-			$retarr = array("status" => true, "message" => "Sent! Thanks :-)");
+		if (! isset($_REQUEST['product_select'])) {
+			$retarr = array("status" => false, "message" => _("No send Product Select!"));
 		}
-		elseif ($dget['type_file'] == "file") {
-			$error = $this->submit_config($row['directory'], $row['cfg_dir'], $config_files[$_REQUEST['file']], $contents);
-			$retarr = array("status" => true, "message" => "Sent! Thanks :-)");
+		elseif (! isset($_REQUEST['type_file'])) {
+			$retarr = array("status" => false, "message" => _("No send Type File!"));
+		}
+		elseif (! isset($_REQUEST['sendid'])) {
+			$retarr = array("status" => false, "message" => _("No send SendID!"));
 		}
 		else {
-			$retarr = array("status" => false, "message" => "Type not valid!");
+			$dget['product_select'] = $_REQUEST['product_select'];
+			$dget['type_file'] = $_REQUEST['type_file'];
+			$dget['sendid'] = $_REQUEST['sendid'];
+			$dget['original_name'] = $_REQUEST['original_name'];
+			$dget['config_text'] = $_REQUEST['config_text'];
+			
+			
+			
+			//DEBUGGGGGGGGGGGGG
+			return;
+			if ($dget['type_file'] == "sql") {
+				$sql = "SELECT cfg_dir,directory,config_files FROM endpointman_product_list,endpointman_brand_list WHERE endpointman_product_list.brand = endpointman_brand_list.id AND endpointman_product_list.id = '" . $dget['product_select'] . "'";
+				$row = sql($sql, 'getrow', DB_FETCHMODE_ASSOC);
+				$this->submit_config($row['directory'], $row['cfg_dir'], $dget['original_name'], $dget['config_text']);
+				$retarr = array("status" => true, "message" => "Sent! Thanks :-)");
+			}
+			elseif ($dget['type_file'] == "file") {
+				$sql = "SELECT cfg_dir,directory,config_files FROM endpointman_product_list,endpointman_brand_list WHERE endpointman_product_list.brand = endpointman_brand_list.id AND endpointman_product_list.id = '" . $dget['product_select'] . "'";
+				$row = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
+				$error = $this->submit_config($row['directory'], $row['cfg_dir'], $dget['original_name'], $dget['config_text']);
+				$retarr = array("status" => true, "message" => "Sent! Thanks :-)");
+			}
+			else {
+				$retarr = array("status" => false, "message" => "Type not valid!");
+			}
+			unset ($dget);
 		}
 		return $retarr;
 	}
@@ -973,9 +993,9 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 			$dget['save_as_name'] = $_REQUEST['save_as_name'];
 			$dget['file'] = $_REQUEST['file'];
 			
-			
 			if ($dget['type_file'] == "sql") {
-				
+//NO SE HA PROBADO AUN
+return;
 				if ($dget['command'] == "poce_save_file") {
 					$sql = "UPDATE endpointman_custom_configs SET data = '" . addslashes($dget['config_text']) . "' WHERE id = " . $dget['product_select'];
 					sql($sql);
@@ -995,10 +1015,31 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 			elseif (($dget['type_file'] == "file") || ($dget['type_file'] == "tfile")) 
 			{
 				if ($dget['command'] == "poce_save_file") {
-					$wfh = fopen($dget['file'], 'w');
-					fwrite($wfh, $dget['config_text']);
-					fclose($wfh);
-					$retarr = array("status" => true, "message" => "Saved to Hard Drive!");
+					$sql = "SELECT cfg_dir,directory,config_files FROM endpointman_product_list,endpointman_brand_list WHERE endpointman_product_list.brand = endpointman_brand_list.id AND endpointman_product_list.id = '" . $dget['product_select'] . "'";
+					$row = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
+					$config_files = explode(",", $row['config_files']);
+					
+					if ((is_array($config_files)) AND (in_array($dget['file'], $config_files)))
+					{
+						$pathdir = $this->PHONE_MODULES_PATH . 'endpoint/' . $row['directory'] . "/" . $row['cfg_dir'] . "/";
+						$pathfile = $pathdir . $dget['file'];
+						if ((! file_exists($pathfile)) AND (! is_writable($pathdir))) {
+							$retarr = array("status" => false, "message" => "Directory is not Writable (".$pathdir.")!");
+						}
+						elseif (! is_writable($pathfile)) {
+							$retarr = array("status" => false, "message" => "File is not Writable (".$pathfile.")!");
+						}
+						else 
+						{
+							$wfh = fopen($pathfile, 'w');
+							fwrite($wfh, $dget['config_text']);
+							fclose($wfh);
+							$retarr = array("status" => true, "message" => "Saved to Hard Drive!");
+						}
+					}
+					else {
+						$retarr = array("status" => false, "message" => "The File no existe in the DataBase!");
+					}
 				}
 				elseif ($dget['command'] == "poce_save_as_file") {
 					$sql = 'INSERT INTO endpointman_custom_configs (name, original_name, product_id, data) VALUES ("' . addslashes($dget['save_as_name']) . '","' . addslashes($dget['file']) . '","' . $dget['product_select'] . '","' . addslashes($dget['config_text']) . '")';
@@ -1020,6 +1061,33 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 		return $retarr;
 	}
 	
+	function epm_advanced_poce_delete_config_custom()
+	{
+		if (! isset($_REQUEST['sql_select'])) {
+			$retarr = array("status" => false, "message" => _("No send SQL Select!"));
+		}
+		elseif (! isset($_REQUEST['type_file'])) {
+			$retarr = array("status" => false, "message" => _("No send Type File!"));
+		}
+		else {
+			$dget['sql_select'] = $_REQUEST['sql_select'];
+			$dget['type_file'] = $_REQUEST['type_file'];
+			
+			if ($dget['type_file'] == "sql") {
+				$sql = "DELETE FROM endpointman_custom_configs WHERE id =" . $dget['sql_select'];
+echo "Pendiente de probar!!!";
+return;
+				sql($sql);
+				unset ($sql);
+				$retarr = array("status" => true, "message" => "File delete ok!");
+			}
+			else {
+				$retarr = array("status" => false, "message" => _("Type File not valid!"));
+			}
+			unset($dget);
+		}
+		return $retarr;
+	}
 	/********************
 	 * END SEC FUNCTIONS *
 	 ********************/

@@ -48,6 +48,25 @@ function epm_global_get_tab_actual()
 	return sTab;
 }
 
+function epm_advanced_get_value_by_form(sform, snameopt, formtype = "name")
+{
+	var rdata = null;
+	$('form['+formtype+'='+sform+']')
+	.find("input, textarea, select")
+	.each(function(index){  
+		var input = $(this);
+		if (snameopt == input.attr('name'))
+		{
+			rdata = input.val();
+		}
+		//alert('Type: ' + input.attr('type') + ' - Name: ' + input.attr('name') + ' - Value: ' + input.val());
+	});
+	return rdata;
+}
+
+
+
+
 
 // **** INI: CODIGO DE FREEPBX ****
 function epm_global_update_jquery_msg_help()

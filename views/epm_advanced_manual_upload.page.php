@@ -128,7 +128,7 @@
 						<div class="col-md-9 text-right">
 						
 							<?php if ($brand_ava == "") : ?>
-								<div class="alert alert-info text-left" role="alert"> <strong><?php echo _("Heads up!"); ?></strong> <?php echo _("List Bran's Availables emtry."); ?> <i class='icon-globe'></i></div>
+								<div class="alert alert-info text-left" role="alert"> <strong><?php echo _("Heads up!"); ?></strong> <?php echo _("List Bran's Availables empty."); ?> <i class='icon-globe'></i></div>
 							<?php else: ?>
 							<span>
 								<div class="styled-select">
