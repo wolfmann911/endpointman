@@ -2,29 +2,12 @@ var box;
 var cmeditor = null;
 
 $(document).ready(function() {
-	//$.getScript("modules/endpointman/assets/js/epm_global.js");
-	//$.getScript("modules/endpointman/assets/js/codemirror.js");
-	//$.getScript("modules/endpointman/assets/js/addon/simplescrollbars.js");
-	//$.getScript( "assets/endpointman/js/addon/simplescrollbars.js");
-	
-	
-	var x = document.createElement('script');
-	x.src = 'assets/endpointman/js/addon/simplescrollbars.js';
-	document.getElementsByTagName("head")[0].appendChild(x);
-	
-	x = document.createElement('script');
-	x.src = 'assets/endpointman/js/mode/xml.js';
-	document.getElementsByTagName("head")[0].appendChild(x);
-	
-	x = document.createElement('script');
-	x.src = 'assets/endpointman/js/addon/fullscreen.js';
-	document.getElementsByTagName("head")[0].appendChild(x);
-	
-	
-	
-	
-	
-	
+	var arrayJs = ['assets/endpointman/js/addon/simplescrollbars.js', 'assets/endpointman/js/mode/xml.js', 'assets/endpointman/js/addon/fullscreen.js'];
+	arrayJs.forEach(function (item, index, array) {
+		var x = document.createElement('script');
+		x.src = item;
+		document.getElementsByTagName("head")[0].appendChild(x);
+	});
 	
 	
 	//TAB SETTING
@@ -41,7 +24,7 @@ $(document).ready(function() {
 	
 	
 	//TAB POCE
-
+	
 	
 	//TAB IEDL
 	
@@ -104,22 +87,15 @@ function epm_advanced_select_tab_ajax(idtab)
 	return true;
 }
 
-
-
-
-
-
-
-
-
-function close_module_actions(goback) 
+function close_module_actions_epm_advanced(goback, acctionname = "")
 {
-	box.dialog("destroy").remove();
-	if (goback) {
-		location.reload();
-	}
+	
 }
 /**** END: FUNCTION GLOBAL SEC ****/
+
+
+
+
 
 
 
@@ -128,7 +104,6 @@ function close_module_actions(goback)
 function epm_config_tab_manual_upload_bt_explor_brand() 
 {
 	var packageid = $('#brand_export_pack_selected').val();
-	
 	if (packageid == "") {
 		alert ("You have not selected a brand from the list!");
 	}
@@ -146,54 +121,13 @@ function epm_config_tab_manual_upload_bt_upload(command, formname)
 	if (formname == "") { return; }
 	
 	var urlStr = "config.php?display=epm_advanced&subpage=manual_upload&command="+command;
-	box = $('<div id="moduledialogwrapper" ></div>')
-	.dialog({
-		title: 'Status',
-		resizable: false,
-		dialogClass: '',
-		modal: true,
-		width: 410,
-		maxHeight: 410,
-		height: 'auto',
-		maxHeight: 350,
-		scroll: true,
-		position: { my: "top-175", at: "center", of: window },
-		open: function (e) {
-			$('#moduledialogwrapper').html(_('Loading..' ) + '<i class="fa fa-spinner fa-spin fa-2x">');
-			
-			var form = document.forms.namedItem(formname);
-			var oData = new FormData(form);
-			
-			var xhr = new XMLHttpRequest(),
-			timer = null;
-			xhr.open('POST', urlStr, true);
-			xhr.send(oData);
-			timer = window.setInterval(function() {
-				$('#moduledialogwrapper').animate({ scrollTop: $(this).scrollTop() + $(this).height() });
-				if (xhr.readyState == XMLHttpRequest.DONE) {
-					window.clearTimeout(timer);
-				}
-				if (xhr.responseText.length > 0) {
-					if ($('#moduledialogwrapper').html().trim() != xhr.responseText.trim()) {
-						$('#moduledialogwrapper').html(xhr.responseText);
-						$('#moduleprogress').scrollTop(1E10);
-					}
-				}
-				if (xhr.readyState == XMLHttpRequest.DONE) {
-					$("#moduleprogress").css("overflow", "auto");
-					$('#moduleprogress').scrollTop(1E10);
-					$("#moduleBoxContents a").focus();
-				}
-			}, 500);
-			
-		},
-		close: function(e) {
-			close_module_actions(false);
-			$(e.target).dialog("destroy").remove();
-		}
-	});
+	box = epm_config_dialog_action("manual_upload_bt_upload", urlStr, formname);
 }
 /**** END: FUNCTION TAB UPLOAD_MANUAL ****/
+
+
+
+
 
 
 
@@ -202,55 +136,8 @@ function epm_config_tab_manual_upload_bt_upload(command, formname)
 function epm_config_tab_iedl_bt_import() 
 {
 	var urlStr = "config.php?display=epm_advanced&subpage=iedl&command=import";
-	box = $('<div id="moduledialogwrapper" ></div>')
-	.dialog({
-		title: 'Status',
-		resizable: false,
-		dialogClass: '',
-		modal: true,
-		width: 410,
-		maxHeight: 410,
-		height: 'auto',
-		maxHeight: 350,
-		scroll: true,
-		position: { my: "top-175", at: "center", of: window },
-		open: function (e) {
-			$('#moduledialogwrapper').html(_('Loading..' ) + '<i class="fa fa-spinner fa-spin fa-2x">');
-			
-			var form = document.forms.namedItem("iedl_form_import_cvs");
-			var oData = new FormData(form);
-			
-			var xhr = new XMLHttpRequest(),
-			timer = null;
-			xhr.open('POST', urlStr, true);
-			xhr.send(oData);
-			timer = window.setInterval(function() {
-				$('#moduledialogwrapper').animate({ scrollTop: $(this).scrollTop() + $(this).height() });
-				if (xhr.readyState == XMLHttpRequest.DONE) {
-					window.clearTimeout(timer);
-					//epm_config_select_tab_ajax();
-				}
-				if (xhr.responseText.length > 0) {
-					if ($('#moduledialogwrapper').html().trim() != xhr.responseText.trim()) {
-						$('#moduledialogwrapper').html(xhr.responseText);
-						$('#moduleprogress').scrollTop(1E10);
-					}
-				}
-				if (xhr.readyState == XMLHttpRequest.DONE) {
-					$("#moduleprogress").css("overflow", "auto");
-					$('#moduleprogress').scrollTop(1E10);
-					$("#moduleBoxContents a").focus();
-				}
-			}, 500);
-			
-			
-			
-		},
-		close: function(e) {
-			close_module_actions(false);
-			$(e.target).dialog("destroy").remove();
-		}
-	});
+	var formname = "iedl_form_import_cvs";
+	box = epm_config_dialog_action("iedlimport", urlStr, formname);
 }
 /**** END: FUNCTION TAB IEDL ****/
 
@@ -261,29 +148,8 @@ function epm_config_tab_iedl_bt_import()
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /**** INI: FUNCTION TAB POCE ****/
-function epm_advanced_tab_poce_select_product(idsel)
+function epm_advanced_tab_poce_select_product(idsel, bclear = true)
 {
 	if ($.isNumeric(idsel) == false) { return; }
 	$("div.list-group>a.active").removeClass("active");
@@ -306,26 +172,29 @@ function epm_advanced_tab_poce_select_product(idsel)
 			return false;
 		},
 		success: function(data) {
-			
-			$("#poce_file_name_path").text("No Selected");
-			$('#config_textarea').prop('disabled', true);
-			if (cmeditor != null) {
-				cmeditor.setValue("Select file to config...");
-				cmeditor.setOption("readOnly",true);
+			if (bclear == true) {
+				$("#poce_file_name_path").text("No Selected");
+				$('#config_textarea').prop('disabled', true);
+				if (cmeditor != null) {
+					cmeditor.setValue("Select file to config...");
+					cmeditor.setOption("readOnly",true);
+				}
+				$("#box_sec_source button").prop('disabled', true);
+				$("#box_bt_save button").prop('disabled', true);
+				$("#box_bt_share button").prop('disabled', true);
+				$("#box_bt_save_as button").prop('disabled', true);
+				$("#box_bt_save_as input").prop('disabled', true).val("");
+				$('form[name=form_config_text_sec_button] input[name=datosok]').val("false");
 			}
-			$("#box_sec_source button").prop('disabled', true);
-			$("#box_bt_save button").prop('disabled', true);
-			$("#box_bt_share button").prop('disabled', true);
-			$("#box_bt_save_as button").prop('disabled', true);
-			$("#box_bt_save_as input").prop('disabled', true).val("");
-			$('form[name=form_config_text_sec_button] input[name=datosok]').val("false");
-		
+			
 			if (data.status == true) {
 				epm_advanced_tab_poce_create_file_list("#select_product_list_files_config", data.file_list, data.product_select, "file");
 				epm_advanced_tab_poce_create_file_list("#select_product_list_files_template_custom", data.template_file_list, data.product_select, "tfile");
 				epm_advanced_tab_poce_create_file_list("#select_product_list_files_user_config", data.sql_file_list, data.product_select, "sql");
 				
-				$("#poce_NameProductSelect").text(data.product_select_info.long_name);
+				if (bclear == true) {
+					$("#poce_NameProductSelect").text(data.product_select_info.long_name);
+				}
 				fpbxToast('Load date Done!', '', 'success');
 				return true;
 			} 
@@ -346,7 +215,6 @@ function epm_advanced_tab_poce_select_product(idsel)
 function epm_advanced_tab_poce_create_file_list(idname, data = "", product_select = "", typefile="") 
 {
 	$(idname + " div.dropdown-menu").empty();
-	
 	if (Array.isArray(data) == false)
 	{
 		$(idname + " span.label").text(0);
@@ -357,15 +225,15 @@ function epm_advanced_tab_poce_create_file_list(idname, data = "", product_selec
 		)
 		return;
 	}
-	
 	$(idname + " span.label").text(data.length);
 	$(data).each(function(index, itemData) 
 	{
 		$(idname + " div.dropdown-menu")
 		.append(
 			$('<a/>', { 
-				'href' : 'javascript:epm_advanced_tab_poce_select_file_edit("'+ product_select +'", "'+ itemData.text +'", "'+ itemData.value +'", "'+ typefile +'");', 
-				'class' : 'dropdown-item bt' 
+				'href' 	: 'javascript:epm_advanced_tab_poce_select_file_edit("'+ product_select +'", "'+ itemData.text +'", "'+ itemData.value +'", "'+ typefile +'");', 
+				'class' : 'dropdown-item bt',
+				'id'	: typefile + '_' +  product_select + '_' + itemData.text +'_'+ itemData.value 
 			})
 			.text(itemData.text)
 		)
@@ -418,7 +286,8 @@ function epm_advanced_tab_poce_select_file_edit (idpro_select, txtnamefile, idna
 				}
 				
 				if (data.type == "file") {
-					$("#box_bt_save button").prop('disabled', false);
+					$("#box_bt_save button[name=button_save]").prop('disabled', false);
+					$("#box_bt_save button[name=button_delete]").prop('disabled', true);
 					$("#box_bt_share button").prop('disabled', false);
 				
 					$("#box_bt_save_as button").prop('disabled', true);
@@ -432,19 +301,20 @@ function epm_advanced_tab_poce_select_file_edit (idpro_select, txtnamefile, idna
 					$("#box_bt_save_as input").prop('disabled', false).val(data.save_as_name_value);
 				}
 				else if (data.type == "sql") {
-					$("#box_bt_save button").prop('disabled', true);
-					$("#box_bt_share button").prop('disabled', true);
-				
-					$("#box_bt_save_as button").prop('disabled', false);
-					$("#box_bt_save_as input").prop('disabled', false).val(data.save_as_name_value);
+					$("#box_bt_save button").prop('disabled', false);
+					$("#box_bt_share button").prop('disabled', false);
+					
+					$("#box_bt_save_as button").prop('disabled', true);
+					$("#box_bt_save_as input").prop('disabled', true).val(data.save_as_name_value);
 				}
 				
-				$('form[name=form_config_text_sec_button] input[name=product_select]').val(data.product_select);
-				$('form[name=form_config_text_sec_button] input[name=sendid]').val(data.sendidt);
 				$('form[name=form_config_text_sec_button] input[name=type_file]').val(data.type);
-				$('form[name=form_config_text_sec_button] input[name=original_name]').val(data.original_name);
-				$('form[name=form_config_text_sec_button] input[name=location]').val(data.location);
+				$('form[name=form_config_text_sec_button] input[name=sendid]').val(data.sendidt);
+				$('form[name=form_config_text_sec_button] input[name=product_select]').val(data.product_select);
 				$('form[name=form_config_text_sec_button] input[name=save_as_name]').val(data.save_as_name_value);
+				$('form[name=form_config_text_sec_button] input[name=original_name]').val(data.original_name);
+				$('form[name=form_config_text_sec_button] input[name=filename]').val(data.filename);
+				$('form[name=form_config_text_sec_button] input[name=location]').val(data.location);
 				$('form[name=form_config_text_sec_button] input[name=datosok]').val("true");
 				
 				fpbxToast('File Load date Done!', '', 'success');
@@ -484,22 +354,28 @@ function epm_advanced_tab_poce_bt_acction (command)
 	
 	if (epm_advanced_get_value_by_form("form_config_text_sec_button","datosok") == false)
 	{
-		alert ("El formulario no esta listo!");
+		fpbxToast("The form is not ready!", "Error!", 'error');
 		return false;
 	}
 	
 	switch(obj_name) {
     	case "button_save":
+    		if (confirm("Are you sure to save your changes will be overwritten irreversibly?") == false) {
+    		    return;
+    		}
+    		
     		var cfg_data = {
     			module: "endpointman",
     			module_sec: "epm_advanced",
     			module_tab: "poce",
     			command: "poce_save_file",
     			type_file: epm_advanced_get_value_by_form("form_config_text_sec_button","type_file"),
+    			sendid : epm_advanced_get_value_by_form("form_config_text_sec_button","sendid"),
     			product_select: epm_advanced_get_value_by_form("form_config_text_sec_button","product_select"),
-    			config_text: cmeditor.getValue(),
-    			file: epm_advanced_get_value_by_form("form_config_text_sec_button","original_name"),
-    			save_as_name: ""
+    			save_as_name: epm_advanced_get_value_by_form("form_config_text_sec_button","save_as_name"),
+    			original_name: epm_advanced_get_value_by_form("form_config_text_sec_button","original_name"),
+    			file_name: epm_advanced_get_value_by_form("form_config_text_sec_button","filename"),
+    			config_text: cmeditor.getValue()
     		};
     		break;
     	
@@ -510,22 +386,28 @@ function epm_advanced_tab_poce_bt_acction (command)
     			module_tab: "poce",
     			command: "poce_save_as_file",
     			type_file: epm_advanced_get_value_by_form("form_config_text_sec_button","type_file"),
+    			sendid : epm_advanced_get_value_by_form("form_config_text_sec_button","sendid"),
     			product_select: epm_advanced_get_value_by_form("form_config_text_sec_button","product_select"),
-    			config_text: cmeditor.getValue(),
-    			file: epm_advanced_get_value_by_form("form_config_text_sec_button","original_name"),
-    			save_as_name: epm_advanced_get_value_by_form("form_config_text_sec_button","save_as_name")
-    				
+    			save_as_name: epm_advanced_get_value_by_form("form_config_text_sec_button","save_as_name"),
+    			original_name: epm_advanced_get_value_by_form("form_config_text_sec_button","original_name"),
+    			file_name: epm_advanced_get_value_by_form("form_config_text_sec_button","filename"),
+    			config_text: cmeditor.getValue()
     		};
     		break;
     		
     	case "button_delete":
+    		if (confirm("Are you sure you want to delete this file from the database?") == false) {
+    		    return;
+    		}
+    		
     		var cfg_data = {
     			module: "endpointman",
     			module_sec: "epm_advanced",
     			module_tab: "poce",
     			command: "poce_delete_config_custom",
-    			sql_select : epm_advanced_get_value_by_form("form_config_text_sec_button","product_select"),
-    			type_file : epm_advanced_get_value_by_form("form_config_text_sec_button","type_file")
+    			type_file : epm_advanced_get_value_by_form("form_config_text_sec_button","type_file"),
+    			product_select: epm_advanced_get_value_by_form("form_config_text_sec_button","product_select"),
+    			sql_select: epm_advanced_get_value_by_form("form_config_text_sec_button","sendid"),
     		};
     		break;
     	
@@ -535,10 +417,11 @@ function epm_advanced_tab_poce_bt_acction (command)
     			module_sec: "epm_advanced",
     			module_tab: "poce",
     			command: "poce_sendid",
-    			product_select : epm_advanced_get_value_by_form("form_config_text_sec_button","product_select"),
     			type_file : epm_advanced_get_value_by_form("form_config_text_sec_button","type_file"),
     			sendid : epm_advanced_get_value_by_form("form_config_text_sec_button","sendid"),
-    			original_name : epm_advanced_get_value_by_form("form_config_text_sec_button","original_name"),
+    			product_select: epm_advanced_get_value_by_form("form_config_text_sec_button","product_select"),
+    			original_name: epm_advanced_get_value_by_form("form_config_text_sec_button","original_name"),
+    			file_name: epm_advanced_get_value_by_form("form_config_text_sec_button","filename"),
     			config_text : cmeditor.getValue()
     		};
     		break;
@@ -563,14 +446,29 @@ function epm_advanced_tab_poce_bt_acction (command)
 			if (data.status == true) {
 				switch(obj_name) {
 			    	case "button_save":
+			    		
+			    		epm_advanced_tab_poce_select_product(epm_advanced_get_value_by_form("form_config_text_sec_button","product_select"), false);
 			    		fpbxToast(data.message, 'Save!', 'success');
 			    		break;
 			    	
 			    	case "button_save_as":
-			    		fpbxToast(data.message, 'Save as!', 'success');
+			    		$('form[name=form_config_text_sec_button] input[name=type_file]').val(data.type_file);
+						$('form[name=form_config_text_sec_button] input[name=sendid]').val(data.sendidt);
+						$('form[name=form_config_text_sec_button] input[name=location]').val(data.location);
+						
+						$("#poce_file_name_path").text(data.location);
+						$("#box_bt_save button").prop('disabled', false);
+						$("#box_bt_share button").prop('disabled', false);
+						$("#box_bt_save_as button").prop('disabled', true);
+						$("#box_bt_save_as input").prop('disabled', true);
+						
+						epm_advanced_tab_poce_select_product(epm_advanced_get_value_by_form("form_config_text_sec_button","product_select"), false);
+						fpbxToast(data.message, 'Save as!', 'success');
 			    		break;
 			    		
 			    	case "button_delete":
+			    		
+			    		epm_advanced_tab_poce_select_product(epm_advanced_get_value_by_form("form_config_text_sec_button","product_select"));
 			    		fpbxToast(data.message, 'Delete!', 'success');
 			    		break;
 			    	
@@ -592,26 +490,6 @@ function epm_advanced_tab_poce_bt_acction (command)
 	
 }
 /**** END: FUNCTION TAB POCE ****/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

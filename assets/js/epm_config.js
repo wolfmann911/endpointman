@@ -1,9 +1,8 @@
 var v_sTimerUpdateAjax = "";
-var v_sTimerSelectTab = "";
-var box;
 
 $(document).ready(function() {
-	$.getScript("modules/endpointman/assets/js/epm_global.js");
+
+
 });
 
 $(window).load(function() {
@@ -11,24 +10,25 @@ $(window).load(function() {
 	epm_config_tab_check_activa();
 });
 
+
+
+/**** INI: FUNCTION GLOBAL SEC ****/
 function epm_config_tab_check_activa(oldtab = "")
 {
-	clearTimeout(v_sTimerSelectTab);
 	var actTab = epm_global_get_tab_actual();
 	if (oldtab != actTab) 
 	{
 		$("#epm_config_" + actTab + "_all_list_box").children("div").hide("slow", function () {
 			$(this).remove();
 		});
-		epm_config_select_tab_ajax();
+		epm_config_select_tab_ajax(actTab);
 	}
-	v_sTimerSelectTab = setTimeout(function () { epm_config_tab_check_activa(actTab); }, 1000);
+	setTimeout(function () { epm_config_tab_check_activa(actTab); }, 500);
 }
 
-function epm_config_select_tab_ajax()
+function epm_config_select_tab_ajax(idtab)
 {	
 	clearTimeout(v_sTimerUpdateAjax);
-	idtab = epm_global_get_tab_actual();
 	if (idtab == "") {
 		fpbxToast('epm_config_select_tab_ajax -> id invalid (' + idtab + ')!','JS!','warning');
 		return false;
@@ -46,6 +46,20 @@ function epm_config_select_tab_ajax()
 		}
 	});
 	return true;
+}
+
+function end_module_actions_epm_config(acctionname = "")
+{
+	var actTab = epm_global_get_tab_actual();
+	switch(acctionname) {
+		case "bt_update_chkeck":
+			epm_config_select_tab_ajax(actTab);
+			break;
+	
+		case "manager_bt":
+			epm_config_select_tab_ajax(actTab);
+			break;
+	}
 }
 
 function epm_config_LoadContenidoAjax(idtab, opt)
@@ -148,14 +162,6 @@ function epm_config_html_ordenar_lista(box_root, orden)
 		$(elemLista).each( function(ind, elem) { $(lista).append(elem); });
 	}else{
 		$(elemLista).each( function(ind, elem) { $(lista).prepend(elem); });
-	}
-}
-
-function close_module_actions(goback) 
-{
-	box.dialog("destroy").remove();
-	if (goback) {
-		location.reload();
 	}
 }
 
@@ -280,6 +286,7 @@ function CrearSubListItem(iL0)
 		$('#' + iL0.boxappend).append( $('<div/>', { 'class' : 'sortable', 'id' : iL0.boxsubite }) )
 	}
 }
+/**** END: FUNCTION GLOBAL SEC ****/
 
 
 
@@ -290,109 +297,10 @@ function CrearSubListItem(iL0)
 
 
 /**** INI: TAB/MANAGER ****/
-function epm_config_tab_manager_bt_update_check_click(idtab) 
-{
-	idtab = idtab.trim();
-	if (idtab == "") { return false; }
-	clearTimeout(v_sTimerUpdateAjax);
-	var urlStr = "config.php?display=epm_config&quietmode=1&module_tab=" + idtab + "&command=check_for_updates";
-	box = $('<div id="moduledialogwrapper" ></div>')
-	.dialog({
-		title: 'Status',
-		resizable: false,
-		dialogClass: '',
-		modal: true,
-		width: 410,
-		maxHeight: 410,
-		height: 'auto',
-		maxHeight: 350,
-		scroll: true,
-		position: { my: "top-175", at: "center", of: window },
-		open: function (e) {
-			$('#moduledialogwrapper').html(_('Loading..' ) + '<i class="fa fa-spinner fa-spin fa-2x">');
-			var xhr = new XMLHttpRequest(),
-			timer = null;
-			xhr.open('POST', urlStr, true);
-			xhr.send(null);
-			timer = window.setInterval(function() {
-				$('#moduledialogwrapper').animate({ scrollTop: $(this).scrollTop() + $(this).height() });
-				if (xhr.readyState == XMLHttpRequest.DONE) {
-					window.clearTimeout(timer);
-					epm_config_select_tab_ajax();
-				}
-				if (xhr.responseText.length > 0) {
-					if ($('#moduledialogwrapper').html().trim() != xhr.responseText.trim()) {
-						$('#moduledialogwrapper').html(xhr.responseText);
-						$('#moduleprogress').scrollTop(1E10);
-					}
-				}
-				if (xhr.readyState == XMLHttpRequest.DONE) {
-					$("#moduleprogress").css("overflow", "auto");
-					$('#moduleprogress').scrollTop(1E10);
-					$("#moduleBoxContents a").focus();
-				}
-			}, 500);
-		},
-		close: function(e) {
-			close_module_actions(false);
-			$(e.target).dialog("destroy").remove();
-		}
-	});
-}
-
-function epm_config_tab_manager_bt(idtab, opt, idfw, command) 
-{
-	if ((idtab == "") || (opt == "") || (idfw == "") || (command == "")) { return false; }
-	clearTimeout(v_sTimerUpdateAjax);
-	var urlStr = "config.php?display=epm_config&quietmode=1&module_tab=" + idtab + "&command=" + command + "&command_sub=" + opt + "&idfw=" + idfw;
-	box = $('<div id="moduledialogwrapper" ></div>')
-	.dialog({
-		title: 'Status',
-		resizable: false,
-		dialogClass: 'epm_config_tab_manager_bt_dialog',
-		modal: true,
-		width: 410,
-		maxHeight: 410,
-		height: 'auto',
-		maxHeight: 350,
-		scroll: true,
-		position: { my: "top-175", at: "center", of: window },
-		open: function (e) {
-			$('#moduledialogwrapper').html(_('Loading..' ) + '<i class="fa fa-spinner fa-spin fa-2x">');
-			var xhr = new XMLHttpRequest(),
-			timer = null;
-			xhr.open('POST', urlStr, true);
-			xhr.send(null);
-			timer = window.setInterval(function() {
-				$('#moduledialogwrapper').animate({ scrollTop: $(this).scrollTop() + $(this).height() });
-				if (xhr.readyState == XMLHttpRequest.DONE) {
-					window.clearTimeout(timer);
-					epm_config_select_tab_ajax();
-				}
-				if (xhr.responseText.length > 0) {
-					if ($('#moduledialogwrapper').html().trim() != xhr.responseText.trim()) {
-						$('#moduledialogwrapper').html(xhr.responseText);
-						$('#moduleprogress').scrollTop(1E10);
-					}
-				}
-				if (xhr.readyState == XMLHttpRequest.DONE) {
-					$("#moduleprogress").css("overflow", "auto");
-					$('#moduleprogress').scrollTop(1E10);
-					$("#moduleBoxContents a").focus();
-				}
-			}, 500);
-		},
-		close: function(e) {
-			close_module_actions(false);
-			$(e.target).dialog("destroy").remove();
-		}
-	});
-}
-
 function epm_config_tab_manager_ajax_get_add_data(data, idtab)
 {
 	if ($('#button_check_for_updates').is(':disabled') ==  true) {
-		$("#button_check_for_updates").attr("disabled", false).on( "click", function(){ epm_config_tab_manager_bt_update_check_click(idtab); });
+		$("#button_check_for_updates").attr("disabled", false).on( "click", function(){ epm_config_tab_manager_bt_update_check_click(); });
 	}
 	if (data.status == true) {
 		var boxappendL0 = "#epm_config_manager_all_list_box";
@@ -492,6 +400,21 @@ function epm_config_tab_manager_ajax_get_add_data(data, idtab)
 		fpbxToast(data.message,'ERROR!','error');
 		return false;
 	}
+}
+
+function epm_config_tab_manager_bt_update_check_click() 
+{
+	var urlStr = "config.php?display=epm_config&quietmode=1&module_tab=manager&command=check_for_updates";
+	box = epm_config_dialog_action("bt_update_chkeck", urlStr);
+}
+
+function epm_config_tab_manager_bt(opt, idfw, command) 
+{
+	if ((opt == "") || (idfw == "") || (command == "")) { return false; }
+	clearTimeout(v_sTimerUpdateAjax);
+	
+	var urlStr = "config.php?display=epm_config&quietmode=1&module_tab=manager&command=" + command + "&command_sub=" + opt + "&idfw=" + idfw;
+	box = epm_config_dialog_action("manager_bt", urlStr, null, "Status", 'epm_config_tab_manager_bt_dialog');
 }
 
 function epm_config_tab_manager_bt_enable_disable_ajustar(iL0, itemData, level) 
@@ -612,21 +535,21 @@ function epm_config_tab_manager_html_L1(data, prefijoid, txt, idtab)
 					'class'	: 'btn btn-default',
 					'value'		: txt.install
 				})
-				.on( "click", function(){ epm_config_tab_manager_bt(idtab, 'brand_install', data.id, 'brand'); }),
+				.on( "click", function(){ epm_config_tab_manager_bt('brand_install', data.id, 'brand'); }),
 				$('<input/>', {
 					'type'	: 'button',
 					'id'	: prefijoid + '_bt_brand_uninstall',
 					'class'	: 'btn btn-default',
 					'value'		: txt.uninstall
 				})
-				.on( "click", function(){ epm_config_tab_manager_bt(idtab, 'brand_uninstall', data.id, 'brand'); }),
+				.on( "click", function(){ epm_config_tab_manager_bt('brand_uninstall', data.id, 'brand'); }),
 				$('<input/>', {
 					'type'	: 'button',
 					'id'	: prefijoid + '_bt_brand_update',
 					'class'	: 'btn btn-default',
 					'value'	: txt.update
 				})
-				.on( "click", function(){ epm_config_tab_manager_bt(idtab, 'brand_update', data.id, 'brand'); })
+				.on( "click", function(){ epm_config_tab_manager_bt('brand_update', data.id, 'brand'); })
 				
 			);
 			
@@ -668,28 +591,28 @@ function epm_config_tab_manager_html_L2(data, prefijoid, txt, idtab)
 					'class'	: 'btn btn-default',
 					'value'	: txt.update
 				})
-				.on( "click", function(){ epm_config_tab_manager_bt(idtab, 'pr_update', data.id, 'firmware'); }),
+				.on( "click", function(){ epm_config_tab_manager_bt('pr_update', data.id, 'firmware'); }),
 				$('<input/>', {
 					'type'	: 'button',
 					'id'	: prefijoid + '_bt_fw_install',
 					'class'	: 'btn btn-default',
 					'value'	: txt.fw_install
 				})
-				.on( "click", function(){ epm_config_tab_manager_bt(idtab, 'fw_install', data.id, 'firmware'); }),
+				.on( "click", function(){ epm_config_tab_manager_bt('fw_install', data.id, 'firmware'); }),
 				$('<input/>', {
 					'type'	: 'button',
 					'id'	: prefijoid + '_bt_fw_uninstall',
 					'class'	: 'btn btn-default',
 					'value'	: txt.fw_uninstall
 				})
-				.on( "click", function(){ epm_config_tab_manager_bt(idtab, 'fw_uninstall', data.id, 'firmware'); }),
+				.on( "click", function(){ epm_config_tab_manager_bt('fw_uninstall', data.id, 'firmware'); }),
 				$('<input/>', {
 					'type'	: 'button',
 					'id'	: prefijoid + '_bt_fw_update',
 					'class'	: 'btn btn-default',
 					'value'	: txt.fw_update
 				})
-				.on( "click", function(){ epm_config_tab_manager_bt(idtab, 'fw_update', data.id, 'firmware'); })
+				.on( "click", function(){ epm_config_tab_manager_bt('fw_update', data.id, 'firmware'); })
 			);
 		});
 	});
