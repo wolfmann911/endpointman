@@ -2,7 +2,7 @@
 /**
  * Endpoint Manager FreePBX File
  *
- * @author Andrew Nagy
+ * @author Javier Pastor
  * @license MPL / GPLv2 / LGPL
  * @package Endpoint Manager
  */
