@@ -117,7 +117,8 @@
         <div class="col-sm-3 bootnav">
 			<?php
 				//$sql = 'SELECT * FROM endpointman_product_list WHERE hidden = 0 AND id > 0 ORDER BY long_name ASC';
-				$sql = 'SELECT * FROM endpointman_product_list WHERE hidden = 0 AND id > 0 AND brand IN (SELECT id FROM asterisk.endpointman_brand_list where hidden = 0) ORDER BY long_name ASC';
+				//$sql = 'SELECT * FROM endpointman_product_list WHERE hidden = 0 AND id > 0 AND brand IN (SELECT id FROM asterisk.endpointman_brand_list where hidden = 0) ORDER BY long_name ASC';
+				$sql = 'SELECT * FROM endpointman_product_list WHERE hidden = 0 AND id IN (SELECT DISTINCT product_id FROM asterisk.endpointman_model_list where enabled = 1) AND brand IN (SELECT id FROM asterisk.endpointman_brand_list where hidden = 0) ORDER BY long_name ASC';
 				$product_list = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
 				echo load_view(__DIR__.'/epm_advanced/poce.views.bootnav.php', array('request' => $_REQUEST, 'product_list' => $product_list));
 				unset ($product_list);

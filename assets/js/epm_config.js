@@ -363,7 +363,7 @@ function epm_config_tab_manager_ajax_get_add_data(data, idtab)
 						{
 							CrearSubListItem(iL2);
 							$('#' + iL2.boxsubite).append(epm_config_tab_html_L0(iL3.prefijoid, data.txt.ayuda_model));
-							epm_config_tab_manager_html_L3(itemDataL3, iL3.prefijo, iL3.prefijoid, itemDataL3.model, "1", data.txt.disable + " ", "0", data.txt.enable + " ", idtab);
+							epm_config_tab_manager_html_L3(itemDataL3, iL3.prefijo, iL3.prefijoid, itemDataL3.model, "0", data.txt.disable + " ", "1", data.txt.enable + " ", idtab);
 						}
 						epm_config_tab_manager_bt_enable_disable_ajustar(iL3, itemDataL3, "L3");
 					});
@@ -459,8 +459,8 @@ function epm_config_tab_manager_bt_enable_disable_ajustar(iL0, itemData, level)
 				temp_input = "-1";
 			}
 			if (itemData.enabled != temp_input) {
-				$("#" + iL0.prefijoid + "_enable").attr("disabled", false).prop( "checked", ((itemData.enabled == 0) ? true : false));
-				$("#" + iL0.prefijoid + "_disable").attr("disabled", false).prop( "checked", ((itemData.enabled == 1) ? true : false));
+				$("#" + iL0.prefijoid + "_enable").attr("disabled", false).prop( "checked", ((itemData.enabled == 1) ? true : false));
+				$("#" + iL0.prefijoid + "_disable").attr("disabled", false).prop( "checked", ((itemData.enabled == 0) ? true : false));
 			}
 		}
 		return;

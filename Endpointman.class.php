@@ -21,6 +21,27 @@ function format_txt($texto = "", $css_class = "", $remplace_txt = array())
 	return '<p ' . ($css_class != '' ? 'class="' . $css_class . '"' : '') . '>'.$texto.'</p>';	
 }
 
+function generate_xml_from_array ($array, $node_name, &$tab = -1) 
+{
+	$tab++;
+	$xml ="";
+	if (is_array($array) || is_object($array)) {
+		foreach ($array as $key=>$value) {
+			if (is_numeric($key)) {
+				$key = $node_name;
+			}
+			
+			$xml .= str_repeat("	", $tab). '<' . $key . '>' . "\n";
+			$xml .= generate_xml_from_array($value, $node_name, $tab);
+			$xml .= str_repeat("	", $tab). '</' . $key . '>' . "\n";
+			
+		}
+	} else {
+		$xml = str_repeat("	", $tab) . htmlspecialchars($array, ENT_QUOTES) . "\n";
+	}
+	$tab--;
+	return $xml;
+}
 
 class Endpointman implements \BMO {
 	
@@ -827,11 +848,12 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 			$template_file_list[0]['value'] = "template_data_custom.xml";
 			$template_file_list[0]['text'] = "template_data_custom.xml";
 		
-			$sql = "SELECT model FROM `endpointman_model_list` WHERE `product_id` LIKE '1-2' AND `enabled` = 1 AND `hidden` = 0";
-			$data = sql($sql, 'getall', DB_FETCHMODE_ASSOC);
+			$sql = "SELECT id, model FROM endpointman_model_list WHERE product_id = '" . $dget['product_select'] . "' AND enabled = 1 AND hidden = 0";
+			$data = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
 			$i = 1;
 			foreach ($data as $list) {
-				$template_file_list[$i]['value'] = "template_data_" . $list['model'] . "_custom.xml";
+				//$template_file_list[$i]['value'] = "template_data_" . $list['model'] . "_custom.xml";
+				$template_file_list[$i]['value'] = $list['id'];
 				$template_file_list[$i]['text'] = "template_data_" . $list['model'] . "_custom.xml";
 			}
 			
@@ -924,16 +946,30 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 					$retarr = array("status" => false, "message" => _("File not readable, check the permission! ").$filename);
 				}
 			}
-			elseif ($dget['type_file'] == "tfile") {
-				//TODO: Esta sin hacer pendiente.....
+			elseif ($dget['type_file'] == "tfile") 
+			{
+				if ($dget['file_id'] == "template_data_custom.xml")
+				{
+					$sendidt = "";
+					$original_name = $dget['file_name'];
+					$config_data = "";
+				}
+				else {
+					
+					$sql = "SELECT * FROM endpointman_model_list WHERE id = '" . $dget['file_id'] . "'";
+					$data = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
+			
+					$sendidt = $data['id'];
+					$original_name = $dget['file_name'];
+					$config_data = unserialize($data['template_data']);
+					$config_data = generate_xml_from_array ($config_data, 'node');
+				}
+				
 				$type = $dget['type_file'];
-				$sendidt = "";
 				$product_select = $dget['product_select'];
 				$save_as_name_value = $dget['file_name'];
-				$original_name = $dget['file_name'];
 				$filename = $dget['file_name'];
 				$location = $dget['file_name'];
-				$config_data = "";
 			}
 			
 			$retarr = array("status" => true, 
@@ -950,6 +986,22 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 		}
 		return $retarr;
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	function epm_advanced_poce_sendid()
 	{

@@ -2,7 +2,7 @@ var box;
 var cmeditor = null;
 
 $(document).ready(function() {
-	var arrayJs = ['assets/endpointman/js/addon/simplescrollbars.js', 'assets/endpointman/js/mode/xml.js', 'assets/endpointman/js/addon/fullscreen.js'];
+	var arrayJs = ['assets/endpointman/js/addon/simplescrollbars.js', 'assets/endpointman/js/mode/xml.js', 'assets/endpointman/js/addon/fullscreen.js', 'assets/endpointman/js/mode/xml.js'];
 	arrayJs.forEach(function (item, index, array) {
 		var x = document.createElement('script');
 		x.src = item;
@@ -69,6 +69,7 @@ function epm_advanced_select_tab_ajax(idtab)
 		if (cmeditor == null) {
 			cmeditor = CodeMirror.fromTextArea(document.getElementById("config_textarea"), {
 				lineNumbers: true,
+		        mode: "application/xml",
 				matchBrackets: true,
 				readOnly: true,
 				viewportMargin: Infinity,
