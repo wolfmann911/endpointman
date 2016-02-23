@@ -1,4 +1,13 @@
 <?php
+/**
+ * Endpoint Manager Config
+ *
+
+ * @author Javier Pastor
+ * @license MPL / GPLv2 / LGPL
+ * @package Provisioner
+ */
+
 namespace FreePBX\modules\Endpointman;
 
 class Config {
