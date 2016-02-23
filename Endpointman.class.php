@@ -166,10 +166,24 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 	}
 	
 	public function ajaxRequest($req, &$setting) {
+		$setting['authenticate'] = true;
+		$setting['allowremote'] = true;
+		return true;
+		
 		switch ($_REQUEST['module_sec']) 
 		{
 			case "epm_devices": 	break;
-			case "epm_templates": 	break;
+			case "epm_templates": 	
+				switch ($req) 
+				{
+					case "list_current_template": 
+						$setting['authenticate'] = true;
+						$setting['allowremote'] = false;
+						return true;
+					break;
+				}
+				break;
+				
 			case "epm_config":
 				switch ($req) 
 				{
@@ -214,7 +228,23 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 		switch ($module_sec) 
 		{
 			case "epm_devices": 	break;
-			case "epm_templates": 	break;
+			case "epm_templates":
+				if ($module_tab == "main")
+				{
+					switch ($command)
+					{
+						case "list_current_template":
+							$retarr = $this->epm_template_list_current_templates();
+							return $retarr;
+							break;
+				
+						default:
+							$retarr = array("status" => false, "message" => _("Command not found!") . " [" .$command. "]");
+							break;
+					}
+				}
+				break;
+				
 			case "epm_config":
 				$txt['manager'] = array(
 					'ayuda_model' => _("If we can activate the model set terminals of the models.<br /> If this model is disabled will not appear in the list of models that can be configured for PBX."),
@@ -517,7 +547,15 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 		switch ($_REQUEST['display']) 
 		{
 			case "epm_devices": 	break;
-			case "epm_templates": 	break;
+			case "epm_templates":
+				if(empty($this->pagedata))
+				{
+					$this->pagedata['main'] = array(
+						"name" => _("Current Templates"),
+						"page" => 'views/epm_templates_main.page.php'
+					);
+				}
+				break;
 			case "epm_config":
 				if(empty($this->pagedata)) 
 				{
@@ -760,23 +798,71 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 	
 	
 	
+	/***************************************************
+	 **** FUNCIONES SEC MODULO "epm_template\main". ****
+	 **************************************************/
 	
+	public function epm_template_list_current_templates ()
+	{
 	
+		$sql = 'SELECT endpointman_template_list.*, endpointman_product_list.short_name as model_class, endpointman_model_list.model as model_clone, endpointman_model_list.enabled FROM endpointman_template_list, endpointman_model_list, endpointman_product_list WHERE endpointman_model_list.hidden = 0 AND endpointman_template_list.model_id = endpointman_model_list.id AND endpointman_template_list.product_id = endpointman_product_list.id';
+		$template_list = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
+		$i = 0;
+		$row_out = array();
+		foreach($template_list as $row) {
+			$row_out[$i] = $row;
+			$row_out[$i]['custom'] = 0;
+			if(!$row['enabled']) {
+				$row_out[$i]['model_clone'] = $row_out[$i]['model_clone'];
+			}
+			$i++;
+		}
+		
+		$sql = 'SELECT endpointman_mac_list.mac, endpointman_mac_list.id, endpointman_mac_list.model, endpointman_model_list.model as model_clone, endpointman_product_list.short_name as model_class FROM endpointman_mac_list, endpointman_model_list, endpointman_product_list WHERE  endpointman_product_list.id = endpointman_model_list.product_id AND endpointman_mac_list.global_custom_cfg_data IS NOT NULL AND endpointman_model_list.id = endpointman_mac_list.model AND endpointman_mac_list.template_id = 0';
+		$template_list = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
+		foreach($template_list as $row) {
+			$sql = 'SELECT  description , line FROM  endpointman_line_list WHERE  mac_id ='. $row['id'].' ORDER BY line ASC';
+			$line_list = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
+			$description = "";
+			$c = 0;
+			foreach($line_list as $line_row) {
+				if($c > 0) {
+					$description .= ", ";
+				}
+				$description .= $line_row['description'];
+				$c++;
+			}
+			$row_out[$i] = $row;
+			$row_out[$i]['custom'] = 1;
+			$row_out[$i]['name'] = $row['mac'];
+			$row_out[$i]['description'] = $description;
+			$i++;
+		}
+		
+	/*
+		//$sql = 'SELECT endpointman_oui_list.id, endpointman_oui_list.oui , endpointman_brand_list.name, endpointman_oui_list.custom FROM endpointman_oui_list , endpointman_brand_list WHERE endpointman_oui_list.brand = endpointman_brand_list.id ORDER BY endpointman_oui_list.oui ASC';
+		$sql = 'SELECT T1.id, T1.oui, T2.name, T1.custom FROM endpointman_oui_list as T1 , endpointman_brand_list as T2 WHERE T1.brand = T2.id ORDER BY T1.oui ASC';
+		$data = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
+		$ret = array();
+		foreach ($data as $item) {
+			$ret[] = array('id' => $item['id'], 'oui' => $item['oui'], 'brand' => $item['name'], 'custom' => $item['custom']);
+		}
+		*/
+		return $row_out;
+	}
 	
-	
-	
-	
-	
-	
+	/********************
+	 * END SEC FUNCTIONS *
+	 ********************/
 	
 	
 	
 	
 	
 
-	/************************************************************
+	/***************************************************
 	 **** FUNCIONES SEC MODULO "epm_advanced\poce". ****
-	 ***********************************************************/
+	 ***************************************************/
 	
 	public function epm_advanced_poce_select() 
 	{
@@ -1875,6 +1961,9 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 		$row_out = array();
 		$i = 0;
 		$brand_list = $this->epm_config_hardware_get_list_brand(true);
+		
+		//FIX: https://github.com/FreePBX-ContributedModules/endpointman/commit/2ad929d0b38f05c9da1b847426a4094c3314be3b
+		if($check_for_updates) 	$brand_up = $this->update_check();
 		foreach ($brand_list as $row) 
 		{
 			$row_out[$i] = $row;
@@ -1883,7 +1972,6 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 			
 			if($check_for_updates) 
 			{
-				$brand_up = $this->update_check();
 				$id = $this->system->arraysearchrecursive($row['name'], $brand_up,'name');
 				$id = $id[0];
 				if((isset($brand_up[$id]['update'])) AND ($row['installed'] == 1)) {
