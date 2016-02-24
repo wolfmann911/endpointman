@@ -2519,7 +2519,7 @@ if ($echotxt) {  echo format_txt(_("System Error in Sync Model [%_name_%] Functi
      * @param int $model Model ID
      * @return boolean True on sync completed. False on sync failed
      */
-    function sync_model($model) {
+    function sync_model($model, &$error = array()) {
         if ((!empty($model)) OR ($model > 0)) {
             $sql = "SELECT * FROM  endpointman_model_list WHERE id='" . $model . "'";
             $model_row = sql($sql, 'getrow', DB_FETCHMODE_ASSOC);
@@ -2531,26 +2531,30 @@ if ($echotxt) {  echo format_txt(_("System Error in Sync Model [%_name_%] Functi
             $brand_row = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
 
             if (!file_exists($this->PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'])) {
-                $this->error['sync_model'] = "Brand Directory '" . $brand_row['directory'] . "' Doesn't Exist! (" . $this->PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . ")";
+                $error['sync_model'] = "Brand Directory '" . $brand_row['directory'] . "' Doesn't Exist! (" . $this->PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . ")";
                 return(FALSE);
             }
-
+            
             if (!file_exists($this->PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'])) {
-                $this->error['sync_model'] = "Product Directory '" . $product_row['cfg_dir'] . "' Doesn't Exist! (" . $this->PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'] . ")";
+                $error['sync_model'] = "Product Directory '" . $product_row['cfg_dir'] . "' Doesn't Exist! (" . $this->PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'] . ")";
                 return(FALSE);
             }
-
+            
             if (!file_exists($this->PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'] . '/family_data.json')) {
-                $this->error['sync_model'] = "File 'family_data.json Doesn't exist in directory: " . $this->PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'];
+            	
+                $error['sync_model'] = "File 'family_data.json Doesn't exist in directory: " . $this->PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'];
                 return(FALSE);
             }
 
             $family_line_json = $this->file2json($this->PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'] . '/family_data.json');
 
+            
+            
+            
             //TODO: Add local file checks to avoid slow reloading on PHP < 5.3
 			$key = $this->system->arraysearchrecursive($model_row['model'], $family_line_json['data']['model_list'], 'model');
             if ($key === FALSE) {
-                $this->error['sync_model'] = "Can't locate model in family JSON file";
+                $error['sync_model'] = "Can't locate model in family JSON file";
                 return(FALSE);
             } else {
                 $template_list = implode(",", $family_line_json['data']['model_list'][$key[0]]['template_data']);
@@ -2896,11 +2900,11 @@ if ($this->configmod->get('debug')) echo format_txt(_("Processing %_PATH_%/brand
 
                 $b_data = sql("SELECT id FROM endpointman_brand_list WHERE id = '" . $brand_id . "'", 'getOne');
                 if ($b_data) {
-					echo format_txt(_("Updating %_BRANDNAME_% brand data.........."), "", array("%_BRANDNAME_%" => $brand_name));
+echo format_txt(_("Updating %_BRANDNAME_% brand data.........."), "", array("%_BRANDNAME_%" => $brand_name));
                     $sql = "UPDATE endpointman_brand_list SET local = '" . $local . "', name = '" . $brand_name . "', cfg_ver = '" . $brand_version . "', installed = 1, hidden = 0 WHERE id = " . $brand_id;
                     sql($sql);
                 } else {
-					echo format_txt(_("Inserting %_BRANDNAME_% brand data.........."), "", array("%_BRANDNAME_%" => $brand_name));
+echo format_txt(_("Inserting %_BRANDNAME_% brand data.........."), "", array("%_BRANDNAME_%" => $brand_name));
 					$sql = "INSERT INTO endpointman_brand_list (id, name, directory, cfg_ver, local, installed) VALUES ('" . $brand_id . "', '" . $brand_name . "', '" . $directory . "', '" . $brand_version . "', '" . $local . "', '1')";
                     sql($sql);
                 }
@@ -2933,121 +2937,128 @@ if ($this->configmod->get('debug')) echo format_txt(_("Processing %_PATH_%/brand
                     }
 					sql($sql);
 					
-echo format_txt(_("-- Updating Model Lines................"));
-                    foreach ($family_line_xml['data']['model_list'] as $model_list) {
-                        $template_list = implode(",", $model_list['template_data']);
 
-                        $model_final_id = $brand_id . $family_line_xml['data']['id'] . $model_list['id'];
-                        $sql = 'SELECT id, global_custom_cfg_data, global_user_cfg_data FROM endpointman_mac_list WHERE model = ' . $model_final_id;
-                        $old_data = NULL;
-                        $old_data = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
-                        foreach ($old_data as $data) {
-                            $global_custom_cfg_data = unserialize($data['global_custom_cfg_data']);
-                            if ((is_array($global_custom_cfg_data)) AND (!array_key_exists('data', $global_custom_cfg_data))) {
+					if (count($family_line_xml['data']['model_list']) > 0) {
+						echo format_txt(_("-- Updating Model Lines................"));						
+	                    foreach ($family_line_xml['data']['model_list'] as $model_list) {
+	                        $template_list = implode(",", $model_list['template_data']);
+	
+	                        $model_final_id = $brand_id . $family_line_xml['data']['id'] . $model_list['id'];
+	                        $sql = 'SELECT id, global_custom_cfg_data, global_user_cfg_data FROM endpointman_mac_list WHERE model = ' . $model_final_id;
+	                        $old_data = NULL;
+	                        $old_data = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
+	                        foreach ($old_data as $data) {
+	                            $global_custom_cfg_data = unserialize($data['global_custom_cfg_data']);
+	                            if ((is_array($global_custom_cfg_data)) AND (!array_key_exists('data', $global_custom_cfg_data))) {
 echo format_txt(_("----Old Data Detected! Migrating......"));
-                                $new_data = array();
-                                $new_ari = array();
-                                foreach ($global_custom_cfg_data as $key => $old_keys) {
-                                    if (array_key_exists('value', $old_keys)) {
-                                        $new_data[$key] = $old_keys['value'];
-                                    } else {
-                                        $breaks = explode("_", $key);
-                                        $new_data["loop|" . $key] = $old_keys[$breaks[2]];
-                                    }
-                                    if (array_key_exists('ari', $old_keys)) {
-                                        $new_ari[$key] = 1;
-                                    }
-                                }
-                                $final_data = array();
-                                $final_data['data'] = $new_data;
-                                $final_data['ari'] = $new_ari;
-                                $final_data = serialize($final_data);
-                                $sql = "UPDATE endpointman_mac_list SET  global_custom_cfg_data =  '" . $final_data . "' WHERE  id =" . $data['id'];
-                                sql($sql);
-								echo format_txt(_("Done!"), "done");
-                            }
-
-                            $global_user_cfg_data = unserialize($data['global_user_cfg_data']);
-                            $old_check = FALSE;
-                            if (is_array($global_user_cfg_data)) {
-                                foreach ($global_user_cfg_data as $stuff) {
-                                    if (is_array($stuff)) {
-                                        if (array_key_exists('value', $stuff)) {
-                                            $old_check = TRUE;
-                                            break;
-                                        } else {
-                                            break;
-                                        }
-                                    } else {
-                                        break;
-                                    }
-                                }
-                            }
-                            if ((is_array($global_user_cfg_data)) AND ($old_check)) {
+	                                $new_data = array();
+	                                $new_ari = array();
+	                                foreach ($global_custom_cfg_data as $key => $old_keys) {
+	                                    if (array_key_exists('value', $old_keys)) {
+	                                        $new_data[$key] = $old_keys['value'];
+	                                    } else {
+	                                        $breaks = explode("_", $key);
+	                                        $new_data["loop|" . $key] = $old_keys[$breaks[2]];
+	                                    }
+	                                    if (array_key_exists('ari', $old_keys)) {
+	                                        $new_ari[$key] = 1;
+	                                    }
+	                                }
+	                                $final_data = array();
+	                                $final_data['data'] = $new_data;
+	                                $final_data['ari'] = $new_ari;
+	                                $final_data = serialize($final_data);
+	                                $sql = "UPDATE endpointman_mac_list SET  global_custom_cfg_data =  '" . $final_data . "' WHERE  id =" . $data['id'];
+	                                sql($sql);
+									echo format_txt(_("Done!"), "done");
+	                            }
+	
+	                            $global_user_cfg_data = unserialize($data['global_user_cfg_data']);
+	                            $old_check = FALSE;
+	                            if (is_array($global_user_cfg_data)) {
+	                                foreach ($global_user_cfg_data as $stuff) {
+	                                    if (is_array($stuff)) {
+	                                        if (array_key_exists('value', $stuff)) {
+	                                            $old_check = TRUE;
+	                                            break;
+	                                        } else {
+	                                            break;
+	                                        }
+	                                    } else {
+	                                        break;
+	                                    }
+	                                }
+	                            }
+	                            if ((is_array($global_user_cfg_data)) AND ($old_check)) {
 echo format_txt(_("Old Data Detected! Migrating......"));
-                                $new_data = array();
-                                foreach ($global_user_cfg_data as $key => $old_keys) {
-                                    if (array_key_exists('value', $old_keys)) {
-                                        $exploded = explode("_", $key);
-                                        $counted = count($exploded);
-                                        $counted = $counted - 1;
-                                        if (is_numeric($exploded[$counted])) {
-                                            $key = "loop|" . $key;
-                                        }
-                                        $new_data[$key] = $old_keys['value'];
-                                    }
-                                }
-                                $final_data = serialize($new_data);
-                                $sql = "UPDATE endpointman_mac_list SET  global_user_cfg_data =  '" . $final_data . "' WHERE  id =" . $data['id'];
-                                sql($sql);
-								echo format_txt(_("Done!"), "done");
-                            }
-                        }
-                        $old_data = NULL;
-                        $sql = 'SELECT id, global_custom_cfg_data FROM endpointman_template_list WHERE model_id = ' . $model_final_id;
-                        $old_data = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
-                        foreach ($old_data as $data) {
-                            $global_custom_cfg_data = unserialize($data['global_custom_cfg_data']);
-                            if ((is_array($global_custom_cfg_data)) AND (!array_key_exists('data', $global_custom_cfg_data))) {
+	                                $new_data = array();
+	                                foreach ($global_user_cfg_data as $key => $old_keys) {
+	                                    if (array_key_exists('value', $old_keys)) {
+	                                        $exploded = explode("_", $key);
+	                                        $counted = count($exploded);
+	                                        $counted = $counted - 1;
+	                                        if (is_numeric($exploded[$counted])) {
+	                                            $key = "loop|" . $key;
+	                                        }
+	                                        $new_data[$key] = $old_keys['value'];
+	                                    }
+	                                }
+	                                $final_data = serialize($new_data);
+	                                $sql = "UPDATE endpointman_mac_list SET  global_user_cfg_data =  '" . $final_data . "' WHERE  id =" . $data['id'];
+	                                sql($sql);
+									echo format_txt(_("Done!"), "done");
+	                            }
+	                        }
+	                        $old_data = NULL;
+	                        $sql = 'SELECT id, global_custom_cfg_data FROM endpointman_template_list WHERE model_id = ' . $model_final_id;
+	                        $old_data = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
+	                        foreach ($old_data as $data) {
+	                            $global_custom_cfg_data = unserialize($data['global_custom_cfg_data']);
+	                            if ((is_array($global_custom_cfg_data)) AND (!array_key_exists('data', $global_custom_cfg_data))) {
 echo format_txt(_("Old Data Detected! Migrating......"));
-                                $new_data = array();
-                                $new_ari = array();
-                                foreach ($global_custom_cfg_data as $key => $old_keys) {
-                                    if (array_key_exists('value', $old_keys)) {
-                                        $new_data[$key] = $old_keys['value'];
-                                    } else {
-                                        $breaks = explode("_", $key);
-                                        $new_data["loop|" . $key] = $old_keys[$breaks[2]];
-                                    }
-                                    if (array_key_exists('ari', $old_keys)) {
-                                        $new_ari[$key] = 1;
-                                    }
-                                }
-                                $final_data = array();
-                                $final_data['data'] = $new_data;
-                                $final_data['ari'] = $new_ari;
-                                $final_data = serialize($final_data);
-                                $sql = "UPDATE endpointman_template_list SET  global_custom_cfg_data =  '" . $final_data . "' WHERE  id =" . $data['id'];
-                                sql($sql);
-								echo format_txt(_("Done!"), "done");
-                            }
-                        }
-
-                        $m_data = sql("SELECT id FROM endpointman_model_list WHERE id='" . $brand_id . $family_line_xml['data']['id'] . $model_list['id'] . "'", 'getOne');
-                        if ($m_data) {
+	                                $new_data = array();
+	                                $new_ari = array();
+	                                foreach ($global_custom_cfg_data as $key => $old_keys) {
+	                                    if (array_key_exists('value', $old_keys)) {
+	                                        $new_data[$key] = $old_keys['value'];
+	                                    } else {
+	                                        $breaks = explode("_", $key);
+	                                        $new_data["loop|" . $key] = $old_keys[$breaks[2]];
+	                                    }
+	                                    if (array_key_exists('ari', $old_keys)) {
+	                                        $new_ari[$key] = 1;
+	                                    }
+	                                }
+	                                $final_data = array();
+	                                $final_data['data'] = $new_data;
+	                                $final_data['ari'] = $new_ari;
+	                                $final_data = serialize($final_data);
+	                                $sql = "UPDATE endpointman_template_list SET  global_custom_cfg_data =  '" . $final_data . "' WHERE  id =" . $data['id'];
+	                                sql($sql);
+									echo format_txt(_("Done!"), "done");
+	                            }
+	                        }
+	
+	                        $m_data = sql("SELECT id FROM endpointman_model_list WHERE id='" . $brand_id . $family_line_xml['data']['id'] . $model_list['id'] . "'", 'getOne');
+	                        if ($m_data) {
 if ($this->configmod->get('debug')) echo format_txt(_("---Updating Model %_NAMEMOD_%"), "", array("%_NAMEMOD_%" => $model_list['model']));
-                            $sql = "UPDATE endpointman_model_list SET max_lines = '" . $model_list['lines'] . "', model = '" . $model_list['model'] . "', template_list = '" . $template_list . "' WHERE id = '" . $brand_id . $family_line_xml['data']['id'] . $model_list['id'] . "'";
-                        } 
-						else {
+	                            $sql = "UPDATE endpointman_model_list SET max_lines = '" . $model_list['lines'] . "', model = '" . $model_list['model'] . "', template_list = '" . $template_list . "' WHERE id = '" . $brand_id . $family_line_xml['data']['id'] . $model_list['id'] . "'";
+	                        } 
+							else {
 if ($this->configmod->get('debug')) echo format_txt(_("---Inserting Model %_NAMEMOD_%"), "", array("%_NAMEMOD_%" => $model_list['model']));
-                            $sql = "INSERT INTO endpointman_model_list (`id`, `brand`, `model`, `max_lines`, `product_id`, `template_list`, `enabled`, `hidden`) VALUES ('" . $brand_id . $family_line_xml['data']['id'] . $model_list['id'] . "', '" . $brand_id . "', '" . $model_list['model'] . "', '" . $model_list['lines'] . "', '" . $brand_id . $family_line_xml['data']['id'] . "', '" . $template_list . "', '0', '0')";
-                        }
-                        sql($sql);
-						
-                        if (!$this->sync_model($brand_id . $family_line_xml['data']['id'] . $model_list['id'])) {
-							echo format_txt(_("System Error in Sync Model Function, Load Failure!"), "error");
-                        }
-                    }
+	                            $sql = "INSERT INTO endpointman_model_list (`id`, `brand`, `model`, `max_lines`, `product_id`, `template_list`, `enabled`, `hidden`) VALUES ('" . $brand_id . $family_line_xml['data']['id'] . $model_list['id'] . "', '" . $brand_id . "', '" . $model_list['model'] . "', '" . $model_list['lines'] . "', '" . $brand_id . $family_line_xml['data']['id'] . "', '" . $template_list . "', '0', '0')";
+	                        }
+	                        sql($sql);
+							
+	                        if (!$this->sync_model($brand_id . $family_line_xml['data']['id'] . $model_list['id'], $errlog)) {
+	                        	echo format_txt(_("System Error in Sync Model Function, Load Failure!"), "error");
+								echo format_txt($errlog['sync_model'], "error");
+	                        }
+	                        unset ($errlog);
+	                    }
+					}
+                    
+                    
                     //Phone Models Move Here
                     $family_id = $brand_id . $family_line_xml['data']['id'];
                     $sql = "SELECT * FROM endpointman_model_list WHERE product_id = " . $family_id;
