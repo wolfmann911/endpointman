@@ -1,30 +1,27 @@
 var v_sTimerUpdateAjax = "";
 
-$(document).ready(function() {
+function epm_config_document_ready () {
+	
+}
 
+function epm_config_windows_load (nTab = "") {
+	epm_config_select_tab_ajax(nTab);
+	
+	$("#epm_config_" + nTab + "_all_list_box").children("div").hide("slow", function () {
+		$(this).remove();
+	});
+}
 
-});
-
-$(window).load(function() {
-	//La ventana ya ha cargado todo el contenido html
-	epm_config_tab_check_activa();
-});
-
+function epm_config_change_tab (nTab = "") {
+	epm_config_select_tab_ajax(nTab);
+	
+	$("#epm_config_" + nTab + "_all_list_box").children("div").hide("slow", function () {
+		$(this).remove();
+	});
+}
 
 
 /**** INI: FUNCTION GLOBAL SEC ****/
-function epm_config_tab_check_activa(oldtab = "")
-{
-	var actTab = epm_global_get_tab_actual();
-	if (oldtab != actTab) 
-	{
-		$("#epm_config_" + actTab + "_all_list_box").children("div").hide("slow", function () {
-			$(this).remove();
-		});
-		epm_config_select_tab_ajax(actTab);
-	}
-	setTimeout(function () { epm_config_tab_check_activa(actTab); }, 500);
-}
 
 function epm_config_select_tab_ajax(idtab)
 {	
@@ -34,6 +31,7 @@ function epm_config_select_tab_ajax(idtab)
 		return false;
 	}
 	
+	clearTimeout(v_sTimerUpdateAjax);
 	$("#epm_config_"+ idtab +"_load_init").each(function() {
 		if ($(this).css('display') == "none") 
 		{
@@ -405,7 +403,7 @@ function epm_config_tab_manager_ajax_get_add_data(data, idtab)
 function epm_config_tab_manager_bt_update_check_click() 
 {
 	var urlStr = "config.php?display=epm_config&quietmode=1&module_tab=manager&command=check_for_updates";
-	box = epm_config_dialog_action("bt_update_chkeck", urlStr);
+	box = epm_global_dialog_action("bt_update_chkeck", urlStr);
 }
 
 function epm_config_tab_manager_bt(opt, idfw, command) 
@@ -414,7 +412,7 @@ function epm_config_tab_manager_bt(opt, idfw, command)
 	clearTimeout(v_sTimerUpdateAjax);
 	
 	var urlStr = "config.php?display=epm_config&quietmode=1&module_tab=manager&command=" + command + "&command_sub=" + opt + "&idfw=" + idfw;
-	box = epm_config_dialog_action("manager_bt", urlStr, null, "Status", 'epm_config_tab_manager_bt_dialog');
+	box = epm_global_dialog_action("manager_bt", urlStr, null, "Status", 'epm_config_tab_manager_bt_dialog');
 }
 
 function epm_config_tab_manager_bt_enable_disable_ajustar(iL0, itemData, level) 

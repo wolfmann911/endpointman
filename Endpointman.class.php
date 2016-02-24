@@ -628,26 +628,43 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
     	$this->system->rmrf($this->PHONE_MODULES_PATH);
     	exec("rm -R ". $this->PHONE_MODULES_PATH);
     	
-    	
-    	out(_("Dropping all relevant tables"));
-    	$sql[] = "DROP TABLE `endpointman_brand_list`";
-    	$sql[] = "DROP TABLE `endpointman_global_vars`";
-    	$sql[] = "DROP TABLE `endpointman_mac_list`"; 
-    	$sql[] = "DROP TABLE `endpointman_line_list`";
-    	$sql[] = "DROP TABLE `endpointman_model_list`";
-    	$sql[] = "DROP TABLE `endpointman_oui_list`";
-    	$sql[] = "DROP TABLE `endpointman_product_list`";
-    	$sql[] = "DROP TABLE `endpointman_template_list`";
-    	$sql[] = "DROP TABLE `endpointman_time_zones`";
-    	$sql[] = "DROP TABLE `endpointman_custom_configs`";
-    	foreach($sql as $row_sql) {
-    		$this->db->query($row_sql);
-    	}
-    	
     	out(_('Removing symlink to web provisioner'));
     	$provisioning_path = $this->config->get('AMPWEBROOT')."/provisioning";
     	if(is_link($provisioning_path)) { unlink($provisioning_path); }
-    	 
+    	
+    	out(_("Dropping all relevant tables"));
+    	$sql = "DROP TABLE `endpointman_brand_list`";
+    	$sth = $this->db->prepare($sql);
+    	$sth->execute();
+    	$sql = "DROP TABLE `endpointman_global_vars`";
+    	$sth = $this->db->prepare($sql);
+    	$sth->execute();
+    	$sql = "DROP TABLE `endpointman_mac_list`";
+    	$sth = $this->db->prepare($sql);
+    	$sth->execute();
+    	$sql = "DROP TABLE `endpointman_line_list`";
+    	$sth = $this->db->prepare($sql);
+    	$sth->execute();
+    	$sql = "DROP TABLE `endpointman_model_list`";
+    	$sth = $this->db->prepare($sql);
+    	$sth->execute();
+    	$sql = "DROP TABLE `endpointman_oui_list`";
+    	$sth = $this->db->prepare($sql);
+    	$sth->execute();
+    	$sql = "DROP TABLE `endpointman_product_list`";
+    	$sth = $this->db->prepare($sql);
+    	$sth->execute();
+    	$sql = "DROP TABLE `endpointman_template_list`";
+    	$sth = $this->db->prepare($sql);
+    	$sth->execute();
+    	$sql = "DROP TABLE `endpointman_time_zones`";
+    	$sth = $this->db->prepare($sql);
+    	$sth->execute();
+    	$sql = "DROP TABLE `endpointman_custom_configs`";
+    	$sth = $this->db->prepare($sql);
+    	$sth->execute();
+    	return true;
+    	
     	//show exception!!!!!!
     	//if(!is_link($this->config->get('AMPWEBROOT').'/admin/assets/endpointman')) {
     	//	$this->system->rmrf($this->config->get('AMPWEBROOT').'/admin/assets/endpointman');
@@ -2789,7 +2806,7 @@ echo format_txt(_("- Copied %_FILE_% to %_FILETO_%."), "txt", array("%_FILE_%" =
 					if (file_exists($temp_directory . $package)) {
 						$md5_xml = $temp['data']['brands']['md5sum'];
 						$md5_pkg = md5_file($temp_directory . $package);
-
+						
 						echo format_txt(_("Checking MD5sum of Package...."));
 						if ($md5_xml == $md5_pkg) {
 							echo format_txt(_("Done!"), "done");
@@ -2803,6 +2820,8 @@ echo format_txt(_("- Copied %_FILE_% to %_FILETO_%."), "txt", array("%_FILE_%" =
 							$this->update_brand($row[0]['directory'], TRUE);
 						} else {
 							echo format_txt(_("MD5 Did not match!"), "error");
+							echo format_txt(_("MD5 XML: %_MD5_%"), "error", array("%_MD5_%" => $md5_xml));
+							echo format_txt(_("MD5 PKG: %_MD5_%"), "error", array("%_MD5_%" => $md5_pkg));
 						}
 					} else {
 						echo format_txt(_("Can't Find Downloaded File!"), "error");

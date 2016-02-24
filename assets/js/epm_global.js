@@ -1,5 +1,41 @@
 var box = null;
 
+$(document).ready(function() {
+	
+	$('ul[role=tablist] li a').on("click", function(){
+		var tabclick =  $(this).attr('aria-controls');
+		if (tabclick != "") {
+			var displayActual = $.getUrlVar('display');
+			if (displayActual != "") {
+				var func = displayActual + "_change_tab";
+				if (typeof window[func] == 'function') { 
+					setTimeout(function () { window[func](tabclick); }, 500);
+				}
+			}
+		}
+	});
+	
+	
+	var displayActual = $.getUrlVar('display');
+	if (displayActual != "") {
+		var func = displayActual + "_document_ready";
+		if (typeof window[func] == 'function') { 
+			window[func]();
+		}
+	}
+	
+});
+
+$(window).load(function() {
+	var displayActual = $.getUrlVar('display');
+	if (displayActual != "") {
+		var func = displayActual + "_windows_load";
+		if (typeof window[func] == 'function') { 
+			window[func](epm_global_get_tab_actual());
+		}
+	}
+});
+
 function epm_global_html_find_hide_and_remove(name, tDelay = 1, bSlow = false)
 {
 	if ($(name).length > 0) {
@@ -39,13 +75,8 @@ function epm_global_html_css_name(name, bStatus, classname)
 function epm_global_get_tab_actual()
 {
 	var sTab = "";
-	$("#list-tabs-epm_config a").parents("ul").find("a").each(function( index ) 
-	{
-		var tabActualN = $(this).attr('aria-controls');
-		if ($("#" + tabActualN).css('display') != "none") 
-		{
-			sTab = tabActualN;
-		}
+	$("ul[role=tablist] li.active a").each(function() {
+		sTab = $(this).attr('aria-controls');
 	});
 	return sTab;
 }
@@ -66,11 +97,11 @@ function epm_advanced_get_value_by_form(sform, snameopt, formtype = "name")
 	return rdata;
 }
 
-function epm_config_dialog_action(actionname, urlStr, formname = null, titleStr = "Status", ClassDlg = "")
+function epm_global_dialog_action(actionname, urlStr, formname = null, titleStr = "Status", ClassDlg = "")
 {
 	if ((actionname == "") || (urlStr == "")) { return null; }
 	
-	var obox = $('<div id="moduledialogwrapper" ></div>')
+	box = $('<div id="moduledialogwrapper" ></div>')
 	.dialog({
 		title: titleStr,
 		resizable: false,
@@ -126,12 +157,14 @@ function epm_config_dialog_action(actionname, urlStr, formname = null, titleStr 
 			$(e.target).dialog("destroy").remove();
 		}
 	});
-	
-	return obox;
 }
 
 function close_module_actions(goback, acctionname = "") 
 {
+	if (box != null) {
+		box.dialog("destroy").remove();
+	}
+	
 	var displayActual = $.getUrlVar('display');
 	if (displayActual != "") {
 		var func = 'close_module_actions_'+displayActual;
@@ -140,7 +173,6 @@ function close_module_actions(goback, acctionname = "")
 		}
 	}
 	
-	box.dialog("destroy").remove();
 	if (goback) {
 		location.reload();
 	}		
@@ -157,6 +189,14 @@ function end_module_actions(acctionname = "")
 	}
 }
 
+function epm_global_refresh_table(snametable, showmsg = true)
+{
+	if (snametable == "") { return; }
+	$(snametable).bootstrapTable('refresh');
+	if (showmsg == true) {
+		fpbxToast("Table Refrash Ok!", '', 'success');
+	}
+}
 
 
 

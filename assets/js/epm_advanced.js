@@ -1,8 +1,8 @@
-var box;
 var cmeditor = null;
 
-$(document).ready(function() {
-	var arrayJs = ['assets/endpointman/js/addon/simplescrollbars.js', 'assets/endpointman/js/mode/xml.js', 'assets/endpointman/js/addon/fullscreen.js', 'assets/endpointman/js/mode/xml.js'];
+function epm_advanced_document_ready () {
+
+	var arrayJs = ['assets/endpointman/js/addon/simplescrollbars.js', 'assets/endpointman/js/mode/xml.js', 'assets/endpointman/js/addon/fullscreen.js'];
 	arrayJs.forEach(function (item, index, array) {
 		var x = document.createElement('script');
 		x.src = item;
@@ -35,28 +35,18 @@ $(document).ready(function() {
 		$(this).blur();
 	});
 	
-});
+}
 
+function epm_advanced_windows_load (nTab = "") {
+	epm_advanced_select_tab_ajax(nTab);
+}
 
-$(window).load(function() {
-	epm_advanced_tab_check_activa();
-});
-
-
-
+function epm_advanced_change_tab (nTab = "") {
+	epm_advanced_select_tab_ajax(nTab);
+}
 
 
 /**** INI: FUNCTION GLOBAL SEC ****/
-function epm_advanced_tab_check_activa(oldtab = "")
-{
-	var actTab = epm_global_get_tab_actual();
-	if (oldtab != actTab) 
-	{
-		epm_advanced_select_tab_ajax(actTab);
-	}
-	setTimeout(function () { epm_advanced_tab_check_activa(actTab); }, 500);
-}
-
 function epm_advanced_select_tab_ajax(idtab)
 {	
 	if (idtab == "") {
@@ -69,7 +59,6 @@ function epm_advanced_select_tab_ajax(idtab)
 		if (cmeditor == null) {
 			cmeditor = CodeMirror.fromTextArea(document.getElementById("config_textarea"), {
 				lineNumbers: true,
-		        mode: "application/xml",
 				matchBrackets: true,
 				readOnly: true,
 				viewportMargin: Infinity,
@@ -112,17 +101,16 @@ function epm_config_tab_manual_upload_bt_explor_brand()
 		alert ("The id of the selected mark is invalid!");
 	}
 	else {
-		epm_config_tab_manual_upload_bt_upload("export_brands_availables&package="+packageid, iedl_form_import_cvs);
+		var urlStr = "config.php?display=epm_advanced&subpage=manual_upload&command=export_brands_availables&package="+packageid;
+		epm_global_dialog_action("manual_upload_bt_export_brand", urlStr);
 	}
 }
 
 function epm_config_tab_manual_upload_bt_upload(command, formname)
 {
-	if (command == "") { return; }
-	if (formname == "") { return; }
-	
+	if ((command == "") || (formname == "")) { return; }
 	var urlStr = "config.php?display=epm_advanced&subpage=manual_upload&command="+command;
-	box = epm_config_dialog_action("manual_upload_bt_upload", urlStr, formname);
+	epm_global_dialog_action("manual_upload_bt_upload", urlStr, formname);
 }
 /**** END: FUNCTION TAB UPLOAD_MANUAL ****/
 
@@ -138,7 +126,7 @@ function epm_config_tab_iedl_bt_import()
 {
 	var urlStr = "config.php?display=epm_advanced&subpage=iedl&command=import";
 	var formname = "iedl_form_import_cvs";
-	box = epm_config_dialog_action("iedlimport", urlStr, formname);
+	epm_global_dialog_action("iedlimport", urlStr, formname);
 }
 /**** END: FUNCTION TAB IEDL ****/
 
