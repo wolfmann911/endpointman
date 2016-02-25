@@ -57,7 +57,7 @@
 								<input id="bt_import_csv" type="file" class="form-control_off" name="files[]" multiple>
 							</span>
 							<span>
-								<a class='btn btn-default' id='button_import' name="button_import" href="javascript:epm_config_tab_iedl_bt_import();"><i class='fa fa-upload'></i> <?php echo _('Import')?></a>
+								<a class='btn btn-default' id='button_import' name="button_import" href="javascript:epm_advanced_tab_iedl_bt_import();"><i class='fa fa-upload'></i> <?php echo _('Import')?></a>
 							</span>
 						</div>
 					</div>

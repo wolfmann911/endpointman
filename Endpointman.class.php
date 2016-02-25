@@ -43,6 +43,7 @@ function generate_xml_from_array ($array, $node_name, &$tab = -1)
 	return $xml;
 }
 
+
 class Endpointman implements \BMO {
 	
 	//public $eda; //endpoint data abstraction layer
@@ -166,9 +167,12 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 	}
 	
 	public function ajaxRequest($req, &$setting) {
-		$setting['authenticate'] = true;
-		$setting['allowremote'] = true;
-		return true;
+		
+//AVISO!!!!!!!!!!!!!!!!!!!!!!!!!!
+//PERMITE TODO!!!!!!!!!!!!!!!!!!!
+//$setting['authenticate'] = true;
+//$setting['allowremote'] = true;
+//return true;
 		
 		switch ($_REQUEST['module_sec']) 
 		{
@@ -208,6 +212,7 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 					case "poce_save_as_file":
 					case "poce_sendid":
 					case "poce_delete_config_custom":
+					case "list_files_brands_export":
 					case "saveconfig": 
 						$setting['authenticate'] = true;
 						$setting['allowremote'] = false;
@@ -418,6 +423,18 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 							break;
 					}
 					//$retarr['txt'] = $txt['settings'];
+				}
+				elseif ($module_tab == "manual_upload") {
+					switch ($command)
+					{
+						case "list_files_brands_export":
+							$retarr = $this->epm_advanced_manual_upload_list_files_brans_export();
+							break;
+							
+						default:
+							$retarr = array("status" => false, "message" => _("Command not found!") . " [" .$command. "]");
+							break;
+					}
 				}
 				else {
 					$retarr = array("status" => false, "message" => _("Tab is not valid!") . " [" .$module_tab. "]");
@@ -632,6 +649,10 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
     	$provisioning_path = $this->config->get('AMPWEBROOT')."/provisioning";
     	if(is_link($provisioning_path)) { unlink($provisioning_path); }
     	
+    	if(!is_link($this->config->get('AMPWEBROOT').'/admin/assets/endpointman')) {
+    		$this->system->rmrf($this->config->get('AMPWEBROOT').'/admin/assets/endpointman');
+    	}
+    	
     	out(_("Dropping all relevant tables"));
     	$sql = "DROP TABLE `endpointman_brand_list`";
     	$sth = $this->db->prepare($sql);
@@ -664,11 +685,6 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
     	$sth = $this->db->prepare($sql);
     	$sth->execute();
     	return true;
-    	
-    	//show exception!!!!!!
-    	//if(!is_link($this->config->get('AMPWEBROOT').'/admin/assets/endpointman')) {
-    	//	$this->system->rmrf($this->config->get('AMPWEBROOT').'/admin/assets/endpointman');
-    	//}
 	}
 	
     public function backup() {
@@ -1019,7 +1035,7 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 				$row = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
 				
 				$config_files = explode(",", $row['config_files']);
-				//TODO: Añadir validacion para ver si $dget['file_name'] esta en el array $config_files
+				//TODO: AÃ±adir validacion para ver si $dget['file_name'] esta en el array $config_files
 				
 				$filename = $dget['file_name'];
 				$pathfile = $this->PHONE_MODULES_PATH . 'endpoint/' . $row['directory'] . "/" . $row['cfg_dir'] . "/" . $filename; 
@@ -1096,16 +1112,7 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 	
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	//TODO: PENDIENTE REVISAR
 	function epm_advanced_poce_sendid()
 	{
 		if (! isset($_REQUEST['product_select'])) {
@@ -1147,6 +1154,12 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 		}
 		return $retarr;
 	}
+	
+	
+	
+	
+	
+	
 	
 	function epm_advanced_poce_save_file()
 	{
@@ -1281,17 +1294,71 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 	
 	
 	
-	
-	
-	
-	
-	
-	
-
-
 	/************************************************************
 	 **** FUNCIONES SEC MODULO "epm_advanced\manual_upload". ****
 	 ***********************************************************/
+	
+	public function epm_advanced_manual_upload_list_files_brans_export()
+	{
+		$path_tmp_dir = $this->PHONE_MODULES_PATH."temp/export/";
+		$array_list_files = array();
+		$array_count_brand = array();
+		
+		
+		$array_list_exception= array(".", "..", ".htaccess");
+		if(file_exists($path_tmp_dir))
+		{
+			if(is_dir($path_tmp_dir))
+			{
+				$l_files = scandir($path_tmp_dir, 1);
+				$i = 0;
+				foreach ($l_files as $archivo) {
+					if (in_array($archivo, $array_list_exception)) { continue; }
+					
+					$pathandfile = $path_tmp_dir.$archivo;
+					$brand = substr(pathinfo($archivo, PATHINFO_FILENAME), 0, -11);
+					$ftime = substr(pathinfo($archivo, PATHINFO_FILENAME), -10);
+					
+					$array_count_brand[] = $brand;
+					$array_list_files[$i] = array("brand" => $brand,
+							"pathall" => $pathandfile,
+							"path" => $path_tmp_dir,
+							"file" => $archivo,
+							"filename" => pathinfo($archivo, PATHINFO_FILENAME),
+							"extension" => pathinfo($archivo, PATHINFO_EXTENSION),
+							"timer" => $ftime,
+							"timestamp" => strftime("[%Y-%m-%d %H:%M:%S]", $ftime),
+							"mime_type" => mime_content_type($pathandfile),
+							"is_dir" => is_dir($pathandfile),
+							"is_file" => is_file($pathandfile),
+							"is_link" => is_link($pathandfile),
+							"readlink" => (is_link($pathandfile) == true ? readlink ($pathandfile) : NULL));
+					
+					$i++;
+				}
+				unset ($l_files);
+				
+				$array_count_brand = array_count_values($array_count_brand);
+				ksort ($array_count_brand);
+				$array_count_brand_end = array();
+				
+				foreach($array_count_brand as $key => $value) {
+					$array_count_brand_end[] = array('name' => $key , 'num' => $value);
+				}
+				
+				$retarr = array("status" => true, "message" => _("List Done!"), "countlist" => count($array_list_files), "list_files" => $array_list_files, "list_brands" => $array_count_brand_end );
+				unset ($array_count_brand_end);
+				unset ($array_count_brand);
+				unset ($array_list_files);
+			}
+			else {
+				$retarr = array("status" => false, "message" => _("Not is directory: ") . $path_tmp_dir);
+			}
+		} else {
+			$retarr = array("status" => false, "message" => _("Directory no exists: ") . $path_tmp_dir);
+		}
+		return $retarr;
+	}
 	
 	public function epm_advanced_manual_upload_brand()
 	{
@@ -1628,7 +1695,7 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 	
 	private function epm_advanced_oui_remove()
 	{
-		//TODO: Añadir validacion de si es custom o no
+		//TODO: AÃ±adir validacion de si es custom o no
 		if ((! isset($_REQUEST['id_del'])) OR ($_REQUEST['id_del'] == "")) {
 			$retarr = array("status" => false, "message" => _("No ID set!"));
 		}
@@ -1650,7 +1717,7 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 	
 	private function epm_advanced_oui_add() 
 	{
-		//TODO: Pendiente añadir isExiste datos.
+		//TODO: Pendiente aÃ±adir isExiste datos.
 		if ((! isset($_REQUEST['number_new_oui'])) OR ($_REQUEST['number_new_oui'] == "")) {
 			$retarr = array("status" => false, "message" => _("No OUI set!"));
 		}
