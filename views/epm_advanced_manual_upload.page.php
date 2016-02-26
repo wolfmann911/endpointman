@@ -141,33 +141,6 @@
 								</li>
 							</ul>
 							<ul class="list-group" id="list-brands-export">
-								<?php 
-							
-							
-							/*
-							
-								foreach ($array_list_files as $k => $v) 
-								{
-									echo '<li class="list-group-item" id="list_export_files">';
-									
-									echo '	<a data-toggle="collapse" href="#brand_'.$k.'" aria-expanded="false" aria-controls="brand_'.$k.'" class="collapse-item list-group-item">';
-									echo '		<span class="label label-default label-pill pull-xs-right">'.count($v).'</span>';
-									echo '		<i class="fa fa-expand"></i>&nbsp; '. $k;
-									echo '</a>';
-									echo '<div class="list-group collapse" id="brand_'.$k.'">';
-									foreach ($v as $itemlist) {
-										echo '<a class="list-group-item" href="config.php?display=epm_advanced&subpage=manual_upload&command=export_brands_availables_file&file_package='.$itemlist['file'].'" target="_blank">';
-										echo '	<span class="label label-default label-pill pull-xs-right">'.strftime("[%Y-%m-%d %H:%M:%S]", $itemlist['timer']).'</span>';
-										echo '	<i class="fa fa-file-archive-o"></i>&nbsp; '.$itemlist['pathall'];
-										echo '</a>';
-									}
-									echo '</div>';
-									echo '</li>';
-								}
-						
-						*/
-							
-							?>
 							</ul>
 						</div>
 					</div>

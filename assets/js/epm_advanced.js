@@ -30,10 +30,7 @@ function epm_advanced_document_ready () {
 	
 	
 	//TAB MANUAL_UPLOAD
-	$('#manual_upload a.collapse-item').on("click", function(){
-		epm_global_html_css_name(this,"auto","active");
-		$(this).blur();
-	});
+	
 	
 }
 
@@ -126,134 +123,107 @@ function epm_advanced_tab_manual_upload_bt_upload(command, formname)
 
 function epm_advanced_tab_manual_upload_list_files_brand_expor()
 {
-	epm_global_html_find_show_hide("#list-brands-export-item-loading", true, 1, true);
-	epm_global_html_find_hide_and_remove("#list-brands-export > li.item-list-brand-export", 1, true);
-	
-	$.ajax({
-		type: 'POST',
-		url: "ajax.php",
-		data: {
-			module: "endpointman",
-			module_sec: "epm_advanced",
-			module_tab: "manual_upload",
-			command: "list_files_brands_export"
-		},
-		dataType: 'json',
-		timeout: 60000,
-		error: function(xhr, ajaxOptions, thrownError) {
-			fpbxToast('ERROR AJAX:' + thrownError,'ERROR (' + xhr.status + ')!','error');
-			return false;
-		},
-		success: function(data) 
-		{
-			if (data.status == true) 
-			{
-				if (data.countlist == 0) 
-				{
-					$("#list-brands-export").append(
-						$('<li/>', { 'class' : 'list-group-item item-list-brand-export'	})
-						.text("Empty list")
-						.append(
-							$('<span/>', { 'class' : 'label label-default label-pill pull-xs-right' })
-							.text("0")
-						)
-					);
-				}
-				else 
-				{
-					$(data.list_brands).each(function(index, itemData) 
-					{
-						$("#list-brands-export").append(
-							$('<li/>', { 'class' : 'list-group-item item-list-brand-export', 'id' : 'item-list-brans-export-' + itemData.name })
-							.append(
-								$('<a/>', { 
-									'data-toggle' 	: 'collapse',
-									'href'			: '#box_list_files_brand_' + itemData.name,
-									'aria-expanded'	: 'false',
-									'aria-controls' : 'box_list_files_brand_' + itemData.name,
-									'class'			: 'collapse-item list-group-item',
-									'onclick'		: 'epm_global_html_css_name(this,"auto","active"); $(this).blur();'
-								})
-								.append(
-									$('<span/>', { 'class' : 'label label-default label-pill pull-xs-right'	}).text(itemData.num),
-									$('<i/>',    { 'class' : 'fa fa-expand' })
-								)
-								.append(
-									$("<span/>", {}).text(" " + itemData.name)
-								)
-							)
-						);
-						if (itemData.num > 0) {
-							$('#item-list-brans-export-' + itemData.name).append(
-								$('<div/>', {
-									'class' : 'list-group collapse',
-									'id' : 'box_list_files_brand_'+ itemData.name
-								})
-							);
-						}
-					});
-					
-					$(data.list_files).each(function(index, itemData) 
-					{
-						//alert (moment.unix(itemData.timer).format("HH/mm/ss"));
-						
-						$('#box_list_files_brand_' + itemData.brand).append(
-							$('<a/>', { 
-								'href'	: 'config.php?display=epm_advanced&subpage=manual_upload&command=export_brands_availables_file&file_package=' + itemData.file,
-								'target': '_blank',
-								'class'	: 'list-group-item'
-							})
-							.append(
-								$('<span/>', {'class' : 'label label-default label-pill pull-xs-right'}).text(itemData.timestamp),
-								$('<i/>',    {'class' : 'fa fa-file-archive-o' })
-							)
-							.append(
-								$("<span/>", {}).text(" " + itemData.pathall)
-							)
-						);
-					});
-					
-					
-					
-
-					/*
-						foreach ($array_list_files as $k => $v) 
-						{
-							
-							echo '<li class="list-group-item" id="list_export_files">';
-							echo '	<a data-toggle="collapse" href="#brand_'.$k.'" aria-expanded="false" aria-controls="brand_'.$k.'" class="collapse-item list-group-item">';
-							echo '		<span class="label label-default label-pill pull-xs-right">'.count($v).'</span>';
-							echo '		<i class="fa fa-expand"></i>&nbsp; '. $k;
-							echo '</a>';
-							
-							foreach ($v as $itemlist) {
-								echo '<a class="list-group-item" href="config.php?display=epm_advanced&subpage=manual_upload&command=export_brands_availables_file&file_package='.$itemlist['file'].'" target="_blank">';
-								echo '	<span class="label label-default label-pill pull-xs-right">'.strftime("[%Y-%m-%d %H:%M:%S]", $itemlist['timer']).'</span>';
-								echo '	<i class="fa fa-file-archive-o"></i>&nbsp; '.$itemlist['pathall'];
-								echo '</a>';
-							}
-							echo '</div>';
-							echo '</li>';
-						}
-											
-					*/
-				}
-				
-				fpbxToast(data.message, '', 'success');
-				return true;
-			} 
-			else 
-			{
-				$("#list-brands-export").append(
-						$('<li/>', { 'class' : 'list-group-item item-list-brand-export text-center bg-warning' }).text(data.message)
-					);
-				fpbxToast(data.message, data.txt.error, 'error');
+	epm_global_html_find_show_hide("#list-brands-export-item-loading", true, 0, true);
+	if ($("#list-brands-export li.item-list-brand-export").length > 0) {
+		$("#list-brands-export li.item-list-brand-export").hide("slow" , function () {
+			$(this).remove();
+			epm_advanced_tab_manual_upload_list_files_brand_expor();
+		});
+	}
+	else {
+		$.ajax({
+			type: 'POST',
+			url: "ajax.php",
+			data: {
+				module: "endpointman",
+				module_sec: "epm_advanced",
+				module_tab: "manual_upload",
+				command: "list_files_brands_export"
+			},
+			dataType: 'json',
+			timeout: 60000,
+			error: function(xhr, ajaxOptions, thrownError) {
+				fpbxToast('ERROR AJAX:' + thrownError,'ERROR (' + xhr.status + ')!','error');
+				$("#list-brands-export").append($('<li/>', { 'class' : 'list-group-item item-list-brand-export text-center bg-warning' }).text('ERROR AJAX:' + thrownError));
 				return false;
-			}
-		},
-	});	
-	
-	epm_global_html_find_show_hide("#list-brands-export-item-loading", false, 1, true);
+			},
+			beforeSend: function(){
+				epm_global_html_find_show_hide("#list-brands-export-item-loading", true, 0, true);
+			},
+			complete: function(){
+				epm_global_html_find_show_hide("#list-brands-export-item-loading", false, 1000, true);
+			},
+			success: function(data) {
+				if (data.status == true) {
+					if (data.countlist == 0) {
+						$("#list-brands-export").append($('<li/>', { 'class' : 'list-group-item item-list-brand-export'	}).text("Empty list").append($('<span/>', { 'class' : 'label label-default label-pill pull-xs-right' }).text("0")));
+					}
+					else {
+						$(data.list_brands).each(function(index, itemData) 
+						{
+							$("#list-brands-export").append(
+								$('<li/>', { 'class' : 'list-group-item item-list-brand-export', 'id' : 'item-list-brans-export-' + itemData.name })
+								.append(
+									$('<a/>', { 
+										'data-toggle' 	: 'collapse',
+										'href'			: '#box_list_files_brand_' + itemData.name,
+										'aria-expanded'	: 'false',
+										'aria-controls' : 'box_list_files_brand_' + itemData.name,
+										'class'			: 'collapse-item list-group-item'
+									})
+									.append(
+										$('<span/>', { 'class' : 'label label-default label-pill pull-xs-right'	}).text(itemData.num),
+										$('<i/>',    { 'class' : 'fa fa-expand' })
+									)
+									.append(
+										$("<span/>", {}).text(" " + itemData.name)
+									)
+								)
+							);
+							if (itemData.num > 0) {
+								$('#item-list-brans-export-' + itemData.name).append(
+									$('<div/>', {
+										'class' : 'list-group collapse',
+										'id' : 'box_list_files_brand_'+ itemData.name
+									})
+								);
+							}
+						});
+						
+						$(data.list_files).each(function(index, itemData) 
+						{
+							$('#box_list_files_brand_' + itemData.brand).append(
+								$('<a/>', { 
+									'href'	: 'config.php?display=epm_advanced&subpage=manual_upload&command=export_brands_availables_file&file_package=' + itemData.file,
+									'target': '_blank',
+									'class'	: 'list-group-item'
+								})
+								.append(
+									$('<span/>', {'class' : 'label label-default label-pill pull-xs-right'}).text(itemData.timestamp),
+									$('<i/>',    {'class' : 'fa fa-file-archive-o' })
+								)
+								.append($("<span/>", {}).text(" " + itemData.pathall))
+							);
+						});
+					}
+					
+					//$('#manual_upload a.collapse-item').removeattr('onclick');
+					$('#manual_upload a.collapse-item').on("click", function(){
+						epm_global_html_css_name(this,"auto","active");
+						$(this).blur();
+					});
+					
+					fpbxToast(data.message, '', 'success');
+					return true;
+				} 
+				else {
+					$("#list-brands-export").append( $('<li/>', { 'class' : 'list-group-item item-list-brand-export text-center bg-warning' }).text(data.message));
+					fpbxToast(data.message, data.txt.error, 'error');
+					return false;
+				}
+			},
+		});
+	}
 }
 /**** END: FUNCTION TAB UPLOAD_MANUAL ****/
 

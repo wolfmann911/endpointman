@@ -1,5 +1,11 @@
 @CHARSET "ISO-8859-1";
 
+
+#epm_templates option[value=""], #epm_advanced option[value=""], #epm_config option[value=""] {
+	background-color: #E5FFCC;
+}
+
+
 .section-title {
 	margin: 10px 10px 0px 10px;
 }
