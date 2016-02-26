@@ -2045,7 +2045,6 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 		$row_out = array();
 		$i = 0;
 		$brand_list = $this->epm_config_hardware_get_list_brand(true);
-		
 		//FIX: https://github.com/FreePBX-ContributedModules/endpointman/commit/2ad929d0b38f05c9da1b847426a4094c3314be3b
 		if($check_for_updates) 	$brand_up = $this->update_check();
 		foreach ($brand_list as $row) 

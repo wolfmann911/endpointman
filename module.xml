@@ -20,7 +20,7 @@
 		The backend configurator is hosted at: https://github.com/provisioner/Provisioner
 		Pull Requests can be made to either of these and are encouraged.
     </description>
-	<changelog>
+		<changelog>
 		*13.0.6.4* Fix bug, generate file list export brands through AJAX, delete code not required, organize files.
 		*13.0.6.3* Fix bug, optimize code.
 		*13.0.6.2* Bring back in better check onlines
@@ -48,7 +48,7 @@
 	 	*2.11.5.0* Major cosmetic changes thanks to jnovack!
 		*2.11.4.11* Fixes #6426 (Fatal SQL error - Device cfg submit with apostrophe in extn text description)
 		*2.11.4.10* Fixes #6428
-		*2.11.4.9* Fix a stupid error on my part with requiring php 5.3 SORRY! :-(
+        *2.11.4.9* Fix a stupid error on my part with requiring php 5.3 SORRY! :-(
     </changelog>
 	<info></info>
 	<location>release/2.11/endpointman-2.11.4.11.tgz</location>
