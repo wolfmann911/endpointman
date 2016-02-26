@@ -1,8 +1,8 @@
-var box;
 var cmeditor = null;
 
-$(document).ready(function() {
-	var arrayJs = ['assets/endpointman/js/addon/simplescrollbars.js', 'assets/endpointman/js/mode/xml.js', 'assets/endpointman/js/addon/fullscreen.js', 'assets/endpointman/js/mode/xml.js'];
+function epm_advanced_document_ready () {
+
+	var arrayJs = ['assets/endpointman/js/addon/simplescrollbars.js', 'assets/endpointman/js/mode/xml.js', 'assets/endpointman/js/addon/fullscreen.js'];
 	arrayJs.forEach(function (item, index, array) {
 		var x = document.createElement('script');
 		x.src = item;
@@ -30,33 +30,20 @@ $(document).ready(function() {
 	
 	
 	//TAB MANUAL_UPLOAD
-	$('#manual_upload a.collapse-item').on("click", function(){
-		epm_global_html_css_name(this,"auto","active");
-		$(this).blur();
-	});
 	
-});
+	
+}
 
+function epm_advanced_windows_load (nTab = "") {
+	epm_advanced_select_tab_ajax(nTab);
+}
 
-$(window).load(function() {
-	epm_advanced_tab_check_activa();
-});
-
-
-
+function epm_advanced_change_tab (nTab = "") {
+	epm_advanced_select_tab_ajax(nTab);
+}
 
 
 /**** INI: FUNCTION GLOBAL SEC ****/
-function epm_advanced_tab_check_activa(oldtab = "")
-{
-	var actTab = epm_global_get_tab_actual();
-	if (oldtab != actTab) 
-	{
-		epm_advanced_select_tab_ajax(actTab);
-	}
-	setTimeout(function () { epm_advanced_tab_check_activa(actTab); }, 500);
-}
-
 function epm_advanced_select_tab_ajax(idtab)
 {	
 	if (idtab == "") {
@@ -69,7 +56,6 @@ function epm_advanced_select_tab_ajax(idtab)
 		if (cmeditor == null) {
 			cmeditor = CodeMirror.fromTextArea(document.getElementById("config_textarea"), {
 				lineNumbers: true,
-		        mode: "application/xml",
 				matchBrackets: true,
 				readOnly: true,
 				viewportMargin: Infinity,
@@ -85,12 +71,23 @@ function epm_advanced_select_tab_ajax(idtab)
 			});
 		}
 	}
+	else if (idtab == "manual_upload") {
+		epm_advanced_tab_manual_upload_list_files_brand_expor();
+	}
 	return true;
 }
+
 
 function close_module_actions_epm_advanced(goback, acctionname = "")
 {
 	
+}
+
+function end_module_actions_epm_advanced(acctionname = "")
+{
+	if (acctionname == "manual_upload_bt_export_brand") {
+		epm_advanced_tab_manual_upload_list_files_brand_expor();
+	}
 }
 /**** END: FUNCTION GLOBAL SEC ****/
 
@@ -102,7 +99,7 @@ function close_module_actions_epm_advanced(goback, acctionname = "")
 
 
 /**** INI: FUNCTION TAB UPLOAD_MANUAL ****/
-function epm_config_tab_manual_upload_bt_explor_brand() 
+function epm_advanced_tab_manual_upload_bt_explor_brand() 
 {
 	var packageid = $('#brand_export_pack_selected').val();
 	if (packageid == "") {
@@ -112,17 +109,121 @@ function epm_config_tab_manual_upload_bt_explor_brand()
 		alert ("The id of the selected mark is invalid!");
 	}
 	else {
-		epm_config_tab_manual_upload_bt_upload("export_brands_availables&package="+packageid, iedl_form_import_cvs);
+		var urlStr = "config.php?display=epm_advanced&subpage=manual_upload&command=export_brands_availables&package="+packageid;
+		epm_global_dialog_action("manual_upload_bt_export_brand", urlStr);
 	}
 }
 
-function epm_config_tab_manual_upload_bt_upload(command, formname)
+function epm_advanced_tab_manual_upload_bt_upload(command, formname)
 {
-	if (command == "") { return; }
-	if (formname == "") { return; }
-	
+	if ((command == "") || (formname == "")) { return; }
 	var urlStr = "config.php?display=epm_advanced&subpage=manual_upload&command="+command;
-	box = epm_config_dialog_action("manual_upload_bt_upload", urlStr, formname);
+	epm_global_dialog_action("manual_upload_bt_upload", urlStr, formname);
+}
+
+function epm_advanced_tab_manual_upload_list_files_brand_expor()
+{
+	epm_global_html_find_show_hide("#list-brands-export-item-loading", true, 0, true);
+	if ($("#list-brands-export li.item-list-brand-export").length > 0) {
+		$("#list-brands-export li.item-list-brand-export").hide("slow" , function () {
+			$(this).remove();
+			epm_advanced_tab_manual_upload_list_files_brand_expor();
+		});
+	}
+	else {
+		$.ajax({
+			type: 'POST',
+			url: "ajax.php",
+			data: {
+				module: "endpointman",
+				module_sec: "epm_advanced",
+				module_tab: "manual_upload",
+				command: "list_files_brands_export"
+			},
+			dataType: 'json',
+			timeout: 60000,
+			error: function(xhr, ajaxOptions, thrownError) {
+				fpbxToast('ERROR AJAX:' + thrownError,'ERROR (' + xhr.status + ')!','error');
+				$("#list-brands-export").append($('<li/>', { 'class' : 'list-group-item item-list-brand-export text-center bg-warning' }).text('ERROR AJAX:' + thrownError));
+				return false;
+			},
+			beforeSend: function(){
+				epm_global_html_find_show_hide("#list-brands-export-item-loading", true, 0, true);
+			},
+			complete: function(){
+				epm_global_html_find_show_hide("#list-brands-export-item-loading", false, 1000, true);
+			},
+			success: function(data) {
+				if (data.status == true) {
+					if (data.countlist == 0) {
+						$("#list-brands-export").append($('<li/>', { 'class' : 'list-group-item item-list-brand-export'	}).text("Empty list").append($('<span/>', { 'class' : 'label label-default label-pill pull-xs-right' }).text("0")));
+					}
+					else {
+						$(data.list_brands).each(function(index, itemData) 
+						{
+							$("#list-brands-export").append(
+								$('<li/>', { 'class' : 'list-group-item item-list-brand-export', 'id' : 'item-list-brans-export-' + itemData.name })
+								.append(
+									$('<a/>', { 
+										'data-toggle' 	: 'collapse',
+										'href'			: '#box_list_files_brand_' + itemData.name,
+										'aria-expanded'	: 'false',
+										'aria-controls' : 'box_list_files_brand_' + itemData.name,
+										'class'			: 'collapse-item list-group-item'
+									})
+									.append(
+										$('<span/>', { 'class' : 'label label-default label-pill pull-xs-right'	}).text(itemData.num),
+										$('<i/>',    { 'class' : 'fa fa-expand' })
+									)
+									.append(
+										$("<span/>", {}).text(" " + itemData.name)
+									)
+								)
+							);
+							if (itemData.num > 0) {
+								$('#item-list-brans-export-' + itemData.name).append(
+									$('<div/>', {
+										'class' : 'list-group collapse',
+										'id' : 'box_list_files_brand_'+ itemData.name
+									})
+								);
+							}
+						});
+						
+						$(data.list_files).each(function(index, itemData) 
+						{
+							$('#box_list_files_brand_' + itemData.brand).append(
+								$('<a/>', { 
+									'href'	: 'config.php?display=epm_advanced&subpage=manual_upload&command=export_brands_availables_file&file_package=' + itemData.file,
+									'target': '_blank',
+									'class'	: 'list-group-item'
+								})
+								.append(
+									$('<span/>', {'class' : 'label label-default label-pill pull-xs-right'}).text(itemData.timestamp),
+									$('<i/>',    {'class' : 'fa fa-file-archive-o' })
+								)
+								.append($("<span/>", {}).text(" " + itemData.pathall))
+							);
+						});
+					}
+					
+					//$('#manual_upload a.collapse-item').removeattr('onclick');
+					$('#manual_upload a.collapse-item').on("click", function(){
+						epm_global_html_css_name(this,"auto","active");
+						$(this).blur();
+					});
+					
+					fpbxToast(data.message, '', 'success');
+					return true;
+				} 
+				else {
+					$("#list-brands-export").append( $('<li/>', { 'class' : 'list-group-item item-list-brand-export text-center bg-warning' }).text(data.message));
+					fpbxToast(data.message, data.txt.error, 'error');
+					return false;
+				}
+			},
+		});
+	}
 }
 /**** END: FUNCTION TAB UPLOAD_MANUAL ****/
 
@@ -134,11 +235,11 @@ function epm_config_tab_manual_upload_bt_upload(command, formname)
 
 
 /**** INI: FUNCTION TAB IEDL ****/
-function epm_config_tab_iedl_bt_import() 
+function epm_advanced_tab_iedl_bt_import() 
 {
 	var urlStr = "config.php?display=epm_advanced&subpage=iedl&command=import";
 	var formname = "iedl_form_import_cvs";
-	box = epm_config_dialog_action("iedlimport", urlStr, formname);
+	epm_global_dialog_action("iedlimport", urlStr, formname);
 }
 /**** END: FUNCTION TAB IEDL ****/
 

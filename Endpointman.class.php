@@ -43,6 +43,7 @@ function generate_xml_from_array ($array, $node_name, &$tab = -1)
 	return $xml;
 }
 
+
 class Endpointman implements \BMO {
 	
 	//public $eda; //endpoint data abstraction layer
@@ -166,10 +167,27 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 	}
 	
 	public function ajaxRequest($req, &$setting) {
+		
+//AVISO!!!!!!!!!!!!!!!!!!!!!!!!!!
+//PERMITE TODO!!!!!!!!!!!!!!!!!!!
+//$setting['authenticate'] = true;
+//$setting['allowremote'] = true;
+//return true;
+		
 		switch ($_REQUEST['module_sec']) 
 		{
 			case "epm_devices": 	break;
-			case "epm_templates": 	break;
+			case "epm_templates": 	
+				switch ($req) 
+				{
+					case "list_current_template": 
+						$setting['authenticate'] = true;
+						$setting['allowremote'] = false;
+						return true;
+					break;
+				}
+				break;
+				
 			case "epm_config":
 				switch ($req) 
 				{
@@ -194,6 +212,7 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 					case "poce_save_as_file":
 					case "poce_sendid":
 					case "poce_delete_config_custom":
+					case "list_files_brands_export":
 					case "saveconfig": 
 						$setting['authenticate'] = true;
 						$setting['allowremote'] = false;
@@ -214,7 +233,23 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 		switch ($module_sec) 
 		{
 			case "epm_devices": 	break;
-			case "epm_templates": 	break;
+			case "epm_templates":
+				if ($module_tab == "main")
+				{
+					switch ($command)
+					{
+						case "list_current_template":
+							$retarr = $this->epm_template_list_current_templates();
+							return $retarr;
+							break;
+				
+						default:
+							$retarr = array("status" => false, "message" => _("Command not found!") . " [" .$command. "]");
+							break;
+					}
+				}
+				break;
+				
 			case "epm_config":
 				$txt['manager'] = array(
 					'ayuda_model' => _("If we can activate the model set terminals of the models.<br /> If this model is disabled will not appear in the list of models that can be configured for PBX."),
@@ -389,6 +424,18 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 					}
 					//$retarr['txt'] = $txt['settings'];
 				}
+				elseif ($module_tab == "manual_upload") {
+					switch ($command)
+					{
+						case "list_files_brands_export":
+							$retarr = $this->epm_advanced_manual_upload_list_files_brans_export();
+							break;
+							
+						default:
+							$retarr = array("status" => false, "message" => _("Command not found!") . " [" .$command. "]");
+							break;
+					}
+				}
 				else {
 					$retarr = array("status" => false, "message" => _("Tab is not valid!") . " [" .$module_tab. "]");
 				}
@@ -517,7 +564,15 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 		switch ($_REQUEST['display']) 
 		{
 			case "epm_devices": 	break;
-			case "epm_templates": 	break;
+			case "epm_templates":
+				if(empty($this->pagedata))
+				{
+					$this->pagedata['main'] = array(
+						"name" => _("Current Templates"),
+						"page" => 'views/epm_templates_main.page.php'
+					);
+				}
+				break;
 			case "epm_config":
 				if(empty($this->pagedata)) 
 				{
@@ -590,30 +645,46 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
     	$this->system->rmrf($this->PHONE_MODULES_PATH);
     	exec("rm -R ". $this->PHONE_MODULES_PATH);
     	
-    	
-    	out(_("Dropping all relevant tables"));
-    	$sql[] = "DROP TABLE `endpointman_brand_list`";
-    	$sql[] = "DROP TABLE `endpointman_global_vars`";
-    	$sql[] = "DROP TABLE `endpointman_mac_list`"; 
-    	$sql[] = "DROP TABLE `endpointman_line_list`";
-    	$sql[] = "DROP TABLE `endpointman_model_list`";
-    	$sql[] = "DROP TABLE `endpointman_oui_list`";
-    	$sql[] = "DROP TABLE `endpointman_product_list`";
-    	$sql[] = "DROP TABLE `endpointman_template_list`";
-    	$sql[] = "DROP TABLE `endpointman_time_zones`";
-    	$sql[] = "DROP TABLE `endpointman_custom_configs`";
-    	foreach($sql as $row_sql) {
-    		$this->db->query($row_sql);
-    	}
-    	
     	out(_('Removing symlink to web provisioner'));
     	$provisioning_path = $this->config->get('AMPWEBROOT')."/provisioning";
     	if(is_link($provisioning_path)) { unlink($provisioning_path); }
-    	 
-    	//show exception!!!!!!
-    	//if(!is_link($this->config->get('AMPWEBROOT').'/admin/assets/endpointman')) {
-    	//	$this->system->rmrf($this->config->get('AMPWEBROOT').'/admin/assets/endpointman');
-    	//}
+    	
+    	if(!is_link($this->config->get('AMPWEBROOT').'/admin/assets/endpointman')) {
+    		$this->system->rmrf($this->config->get('AMPWEBROOT').'/admin/assets/endpointman');
+    	}
+    	
+    	out(_("Dropping all relevant tables"));
+    	$sql = "DROP TABLE `endpointman_brand_list`";
+    	$sth = $this->db->prepare($sql);
+    	$sth->execute();
+    	$sql = "DROP TABLE `endpointman_global_vars`";
+    	$sth = $this->db->prepare($sql);
+    	$sth->execute();
+    	$sql = "DROP TABLE `endpointman_mac_list`";
+    	$sth = $this->db->prepare($sql);
+    	$sth->execute();
+    	$sql = "DROP TABLE `endpointman_line_list`";
+    	$sth = $this->db->prepare($sql);
+    	$sth->execute();
+    	$sql = "DROP TABLE `endpointman_model_list`";
+    	$sth = $this->db->prepare($sql);
+    	$sth->execute();
+    	$sql = "DROP TABLE `endpointman_oui_list`";
+    	$sth = $this->db->prepare($sql);
+    	$sth->execute();
+    	$sql = "DROP TABLE `endpointman_product_list`";
+    	$sth = $this->db->prepare($sql);
+    	$sth->execute();
+    	$sql = "DROP TABLE `endpointman_template_list`";
+    	$sth = $this->db->prepare($sql);
+    	$sth->execute();
+    	$sql = "DROP TABLE `endpointman_time_zones`";
+    	$sth = $this->db->prepare($sql);
+    	$sth->execute();
+    	$sql = "DROP TABLE `endpointman_custom_configs`";
+    	$sth = $this->db->prepare($sql);
+    	$sth->execute();
+    	return true;
 	}
 	
     public function backup() {
@@ -760,23 +831,71 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 	
 	
 	
+	/***************************************************
+	 **** FUNCIONES SEC MODULO "epm_template\main". ****
+	 **************************************************/
 	
+	public function epm_template_list_current_templates ()
+	{
 	
+		$sql = 'SELECT endpointman_template_list.*, endpointman_product_list.short_name as model_class, endpointman_model_list.model as model_clone, endpointman_model_list.enabled FROM endpointman_template_list, endpointman_model_list, endpointman_product_list WHERE endpointman_model_list.hidden = 0 AND endpointman_template_list.model_id = endpointman_model_list.id AND endpointman_template_list.product_id = endpointman_product_list.id';
+		$template_list = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
+		$i = 0;
+		$row_out = array();
+		foreach($template_list as $row) {
+			$row_out[$i] = $row;
+			$row_out[$i]['custom'] = 0;
+			if(!$row['enabled']) {
+				$row_out[$i]['model_clone'] = $row_out[$i]['model_clone'];
+			}
+			$i++;
+		}
+		
+		$sql = 'SELECT endpointman_mac_list.mac, endpointman_mac_list.id, endpointman_mac_list.model, endpointman_model_list.model as model_clone, endpointman_product_list.short_name as model_class FROM endpointman_mac_list, endpointman_model_list, endpointman_product_list WHERE  endpointman_product_list.id = endpointman_model_list.product_id AND endpointman_mac_list.global_custom_cfg_data IS NOT NULL AND endpointman_model_list.id = endpointman_mac_list.model AND endpointman_mac_list.template_id = 0';
+		$template_list = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
+		foreach($template_list as $row) {
+			$sql = 'SELECT  description , line FROM  endpointman_line_list WHERE  mac_id ='. $row['id'].' ORDER BY line ASC';
+			$line_list = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
+			$description = "";
+			$c = 0;
+			foreach($line_list as $line_row) {
+				if($c > 0) {
+					$description .= ", ";
+				}
+				$description .= $line_row['description'];
+				$c++;
+			}
+			$row_out[$i] = $row;
+			$row_out[$i]['custom'] = 1;
+			$row_out[$i]['name'] = $row['mac'];
+			$row_out[$i]['description'] = $description;
+			$i++;
+		}
+		
+	/*
+		//$sql = 'SELECT endpointman_oui_list.id, endpointman_oui_list.oui , endpointman_brand_list.name, endpointman_oui_list.custom FROM endpointman_oui_list , endpointman_brand_list WHERE endpointman_oui_list.brand = endpointman_brand_list.id ORDER BY endpointman_oui_list.oui ASC';
+		$sql = 'SELECT T1.id, T1.oui, T2.name, T1.custom FROM endpointman_oui_list as T1 , endpointman_brand_list as T2 WHERE T1.brand = T2.id ORDER BY T1.oui ASC';
+		$data = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
+		$ret = array();
+		foreach ($data as $item) {
+			$ret[] = array('id' => $item['id'], 'oui' => $item['oui'], 'brand' => $item['name'], 'custom' => $item['custom']);
+		}
+		*/
+		return $row_out;
+	}
 	
-	
-	
-	
-	
-	
+	/********************
+	 * END SEC FUNCTIONS *
+	 ********************/
 	
 	
 	
 	
 	
 
-	/************************************************************
+	/***************************************************
 	 **** FUNCIONES SEC MODULO "epm_advanced\poce". ****
-	 ***********************************************************/
+	 ***************************************************/
 	
 	public function epm_advanced_poce_select() 
 	{
@@ -916,7 +1035,7 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 				$row = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
 				
 				$config_files = explode(",", $row['config_files']);
-				//TODO: Añadir validacion para ver si $dget['file_name'] esta en el array $config_files
+				//TODO: AÃ±adir validacion para ver si $dget['file_name'] esta en el array $config_files
 				
 				$filename = $dget['file_name'];
 				$pathfile = $this->PHONE_MODULES_PATH . 'endpoint/' . $row['directory'] . "/" . $row['cfg_dir'] . "/" . $filename; 
@@ -993,16 +1112,7 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 	
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	//TODO: PENDIENTE REVISAR
 	function epm_advanced_poce_sendid()
 	{
 		if (! isset($_REQUEST['product_select'])) {
@@ -1044,6 +1154,12 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 		}
 		return $retarr;
 	}
+	
+	
+	
+	
+	
+	
 	
 	function epm_advanced_poce_save_file()
 	{
@@ -1178,17 +1294,71 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 	
 	
 	
-	
-	
-	
-	
-	
-	
-
-
 	/************************************************************
 	 **** FUNCIONES SEC MODULO "epm_advanced\manual_upload". ****
 	 ***********************************************************/
+	
+	public function epm_advanced_manual_upload_list_files_brans_export()
+	{
+		$path_tmp_dir = $this->PHONE_MODULES_PATH."temp/export/";
+		$array_list_files = array();
+		$array_count_brand = array();
+		
+		
+		$array_list_exception= array(".", "..", ".htaccess");
+		if(file_exists($path_tmp_dir))
+		{
+			if(is_dir($path_tmp_dir))
+			{
+				$l_files = scandir($path_tmp_dir, 1);
+				$i = 0;
+				foreach ($l_files as $archivo) {
+					if (in_array($archivo, $array_list_exception)) { continue; }
+					
+					$pathandfile = $path_tmp_dir.$archivo;
+					$brand = substr(pathinfo($archivo, PATHINFO_FILENAME), 0, -11);
+					$ftime = substr(pathinfo($archivo, PATHINFO_FILENAME), -10);
+					
+					$array_count_brand[] = $brand;
+					$array_list_files[$i] = array("brand" => $brand,
+							"pathall" => $pathandfile,
+							"path" => $path_tmp_dir,
+							"file" => $archivo,
+							"filename" => pathinfo($archivo, PATHINFO_FILENAME),
+							"extension" => pathinfo($archivo, PATHINFO_EXTENSION),
+							"timer" => $ftime,
+							"timestamp" => strftime("[%Y-%m-%d %H:%M:%S]", $ftime),
+							"mime_type" => mime_content_type($pathandfile),
+							"is_dir" => is_dir($pathandfile),
+							"is_file" => is_file($pathandfile),
+							"is_link" => is_link($pathandfile),
+							"readlink" => (is_link($pathandfile) == true ? readlink ($pathandfile) : NULL));
+					
+					$i++;
+				}
+				unset ($l_files);
+				
+				$array_count_brand = array_count_values($array_count_brand);
+				ksort ($array_count_brand);
+				$array_count_brand_end = array();
+				
+				foreach($array_count_brand as $key => $value) {
+					$array_count_brand_end[] = array('name' => $key , 'num' => $value);
+				}
+				
+				$retarr = array("status" => true, "message" => _("List Done!"), "countlist" => count($array_list_files), "list_files" => $array_list_files, "list_brands" => $array_count_brand_end );
+				unset ($array_count_brand_end);
+				unset ($array_count_brand);
+				unset ($array_list_files);
+			}
+			else {
+				$retarr = array("status" => false, "message" => _("Not is directory: ") . $path_tmp_dir);
+			}
+		} else {
+			$retarr = array("status" => false, "message" => _("Directory no exists: ") . $path_tmp_dir);
+		}
+		return $retarr;
+	}
 	
 	public function epm_advanced_manual_upload_brand()
 	{
@@ -1525,7 +1695,7 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 	
 	private function epm_advanced_oui_remove()
 	{
-		//TODO: Añadir validacion de si es custom o no
+		//TODO: AÃ±adir validacion de si es custom o no
 		if ((! isset($_REQUEST['id_del'])) OR ($_REQUEST['id_del'] == "")) {
 			$retarr = array("status" => false, "message" => _("No ID set!"));
 		}
@@ -1547,7 +1717,7 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 	
 	private function epm_advanced_oui_add() 
 	{
-		//TODO: Pendiente añadir isExiste datos.
+		//TODO: Pendiente aÃ±adir isExiste datos.
 		if ((! isset($_REQUEST['number_new_oui'])) OR ($_REQUEST['number_new_oui'] == "")) {
 			$retarr = array("status" => false, "message" => _("No OUI set!"));
 		}
@@ -1875,6 +2045,7 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 		$row_out = array();
 		$i = 0;
 		$brand_list = $this->epm_config_hardware_get_list_brand(true);
+		//FIX: https://github.com/FreePBX-ContributedModules/endpointman/commit/2ad929d0b38f05c9da1b847426a4094c3314be3b
 		if($check_for_updates) 	$brand_up = $this->update_check();
 		foreach ($brand_list as $row) 
 		{
@@ -2414,7 +2585,7 @@ if ($echotxt) {  echo format_txt(_("System Error in Sync Model [%_name_%] Functi
      * @param int $model Model ID
      * @return boolean True on sync completed. False on sync failed
      */
-    function sync_model($model) {
+    function sync_model($model, &$error = array()) {
         if ((!empty($model)) OR ($model > 0)) {
             $sql = "SELECT * FROM  endpointman_model_list WHERE id='" . $model . "'";
             $model_row = sql($sql, 'getrow', DB_FETCHMODE_ASSOC);
@@ -2426,26 +2597,30 @@ if ($echotxt) {  echo format_txt(_("System Error in Sync Model [%_name_%] Functi
             $brand_row = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
 
             if (!file_exists($this->PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'])) {
-                $this->error['sync_model'] = "Brand Directory '" . $brand_row['directory'] . "' Doesn't Exist! (" . $this->PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . ")";
+                $error['sync_model'] = "Brand Directory '" . $brand_row['directory'] . "' Doesn't Exist! (" . $this->PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . ")";
                 return(FALSE);
             }
-
+            
             if (!file_exists($this->PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'])) {
-                $this->error['sync_model'] = "Product Directory '" . $product_row['cfg_dir'] . "' Doesn't Exist! (" . $this->PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'] . ")";
+                $error['sync_model'] = "Product Directory '" . $product_row['cfg_dir'] . "' Doesn't Exist! (" . $this->PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'] . ")";
                 return(FALSE);
             }
-
+            
             if (!file_exists($this->PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'] . '/family_data.json')) {
-                $this->error['sync_model'] = "File 'family_data.json Doesn't exist in directory: " . $this->PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'];
+            	
+                $error['sync_model'] = "File 'family_data.json Doesn't exist in directory: " . $this->PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'];
                 return(FALSE);
             }
 
             $family_line_json = $this->file2json($this->PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'] . '/family_data.json');
 
+            
+            
+            
             //TODO: Add local file checks to avoid slow reloading on PHP < 5.3
 			$key = $this->system->arraysearchrecursive($model_row['model'], $family_line_json['data']['model_list'], 'model');
             if ($key === FALSE) {
-                $this->error['sync_model'] = "Can't locate model in family JSON file";
+                $error['sync_model'] = "Can't locate model in family JSON file";
                 return(FALSE);
             } else {
                 $template_list = implode(",", $family_line_json['data']['model_list'][$key[0]]['template_data']);
@@ -2701,7 +2876,7 @@ echo format_txt(_("- Copied %_FILE_% to %_FILETO_%."), "txt", array("%_FILE_%" =
 					if (file_exists($temp_directory . $package)) {
 						$md5_xml = $temp['data']['brands']['md5sum'];
 						$md5_pkg = md5_file($temp_directory . $package);
-
+						
 						echo format_txt(_("Checking MD5sum of Package...."));
 						if ($md5_xml == $md5_pkg) {
 							echo format_txt(_("Done!"), "done");
@@ -2715,6 +2890,8 @@ echo format_txt(_("- Copied %_FILE_% to %_FILETO_%."), "txt", array("%_FILE_%" =
 							$this->update_brand($row[0]['directory'], TRUE);
 						} else {
 							echo format_txt(_("MD5 Did not match!"), "error");
+							echo format_txt(_("MD5 XML: %_MD5_%"), "error", array("%_MD5_%" => $md5_xml));
+							echo format_txt(_("MD5 PKG: %_MD5_%"), "error", array("%_MD5_%" => $md5_pkg));
 						}
 					} else {
 						echo format_txt(_("Can't Find Downloaded File!"), "error");
@@ -2789,11 +2966,11 @@ if ($this->configmod->get('debug')) echo format_txt(_("Processing %_PATH_%/brand
 
                 $b_data = sql("SELECT id FROM endpointman_brand_list WHERE id = '" . $brand_id . "'", 'getOne');
                 if ($b_data) {
-					echo format_txt(_("Updating %_BRANDNAME_% brand data.........."), "", array("%_BRANDNAME_%" => $brand_name));
+echo format_txt(_("Updating %_BRANDNAME_% brand data.........."), "", array("%_BRANDNAME_%" => $brand_name));
                     $sql = "UPDATE endpointman_brand_list SET local = '" . $local . "', name = '" . $brand_name . "', cfg_ver = '" . $brand_version . "', installed = 1, hidden = 0 WHERE id = " . $brand_id;
                     sql($sql);
                 } else {
-					echo format_txt(_("Inserting %_BRANDNAME_% brand data.........."), "", array("%_BRANDNAME_%" => $brand_name));
+echo format_txt(_("Inserting %_BRANDNAME_% brand data.........."), "", array("%_BRANDNAME_%" => $brand_name));
 					$sql = "INSERT INTO endpointman_brand_list (id, name, directory, cfg_ver, local, installed) VALUES ('" . $brand_id . "', '" . $brand_name . "', '" . $directory . "', '" . $brand_version . "', '" . $local . "', '1')";
                     sql($sql);
                 }
@@ -2826,121 +3003,128 @@ if ($this->configmod->get('debug')) echo format_txt(_("Processing %_PATH_%/brand
                     }
 					sql($sql);
 					
-echo format_txt(_("-- Updating Model Lines................"));
-                    foreach ($family_line_xml['data']['model_list'] as $model_list) {
-                        $template_list = implode(",", $model_list['template_data']);
 
-                        $model_final_id = $brand_id . $family_line_xml['data']['id'] . $model_list['id'];
-                        $sql = 'SELECT id, global_custom_cfg_data, global_user_cfg_data FROM endpointman_mac_list WHERE model = ' . $model_final_id;
-                        $old_data = NULL;
-                        $old_data = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
-                        foreach ($old_data as $data) {
-                            $global_custom_cfg_data = unserialize($data['global_custom_cfg_data']);
-                            if ((is_array($global_custom_cfg_data)) AND (!array_key_exists('data', $global_custom_cfg_data))) {
+					if (count($family_line_xml['data']['model_list']) > 0) {
+						echo format_txt(_("-- Updating Model Lines................"));						
+	                    foreach ($family_line_xml['data']['model_list'] as $model_list) {
+	                        $template_list = implode(",", $model_list['template_data']);
+	
+	                        $model_final_id = $brand_id . $family_line_xml['data']['id'] . $model_list['id'];
+	                        $sql = 'SELECT id, global_custom_cfg_data, global_user_cfg_data FROM endpointman_mac_list WHERE model = ' . $model_final_id;
+	                        $old_data = NULL;
+	                        $old_data = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
+	                        foreach ($old_data as $data) {
+	                            $global_custom_cfg_data = unserialize($data['global_custom_cfg_data']);
+	                            if ((is_array($global_custom_cfg_data)) AND (!array_key_exists('data', $global_custom_cfg_data))) {
 echo format_txt(_("----Old Data Detected! Migrating......"));
-                                $new_data = array();
-                                $new_ari = array();
-                                foreach ($global_custom_cfg_data as $key => $old_keys) {
-                                    if (array_key_exists('value', $old_keys)) {
-                                        $new_data[$key] = $old_keys['value'];
-                                    } else {
-                                        $breaks = explode("_", $key);
-                                        $new_data["loop|" . $key] = $old_keys[$breaks[2]];
-                                    }
-                                    if (array_key_exists('ari', $old_keys)) {
-                                        $new_ari[$key] = 1;
-                                    }
-                                }
-                                $final_data = array();
-                                $final_data['data'] = $new_data;
-                                $final_data['ari'] = $new_ari;
-                                $final_data = serialize($final_data);
-                                $sql = "UPDATE endpointman_mac_list SET  global_custom_cfg_data =  '" . $final_data . "' WHERE  id =" . $data['id'];
-                                sql($sql);
-								echo format_txt(_("Done!"), "done");
-                            }
-
-                            $global_user_cfg_data = unserialize($data['global_user_cfg_data']);
-                            $old_check = FALSE;
-                            if (is_array($global_user_cfg_data)) {
-                                foreach ($global_user_cfg_data as $stuff) {
-                                    if (is_array($stuff)) {
-                                        if (array_key_exists('value', $stuff)) {
-                                            $old_check = TRUE;
-                                            break;
-                                        } else {
-                                            break;
-                                        }
-                                    } else {
-                                        break;
-                                    }
-                                }
-                            }
-                            if ((is_array($global_user_cfg_data)) AND ($old_check)) {
+	                                $new_data = array();
+	                                $new_ari = array();
+	                                foreach ($global_custom_cfg_data as $key => $old_keys) {
+	                                    if (array_key_exists('value', $old_keys)) {
+	                                        $new_data[$key] = $old_keys['value'];
+	                                    } else {
+	                                        $breaks = explode("_", $key);
+	                                        $new_data["loop|" . $key] = $old_keys[$breaks[2]];
+	                                    }
+	                                    if (array_key_exists('ari', $old_keys)) {
+	                                        $new_ari[$key] = 1;
+	                                    }
+	                                }
+	                                $final_data = array();
+	                                $final_data['data'] = $new_data;
+	                                $final_data['ari'] = $new_ari;
+	                                $final_data = serialize($final_data);
+	                                $sql = "UPDATE endpointman_mac_list SET  global_custom_cfg_data =  '" . $final_data . "' WHERE  id =" . $data['id'];
+	                                sql($sql);
+									echo format_txt(_("Done!"), "done");
+	                            }
+	
+	                            $global_user_cfg_data = unserialize($data['global_user_cfg_data']);
+	                            $old_check = FALSE;
+	                            if (is_array($global_user_cfg_data)) {
+	                                foreach ($global_user_cfg_data as $stuff) {
+	                                    if (is_array($stuff)) {
+	                                        if (array_key_exists('value', $stuff)) {
+	                                            $old_check = TRUE;
+	                                            break;
+	                                        } else {
+	                                            break;
+	                                        }
+	                                    } else {
+	                                        break;
+	                                    }
+	                                }
+	                            }
+	                            if ((is_array($global_user_cfg_data)) AND ($old_check)) {
 echo format_txt(_("Old Data Detected! Migrating......"));
-                                $new_data = array();
-                                foreach ($global_user_cfg_data as $key => $old_keys) {
-                                    if (array_key_exists('value', $old_keys)) {
-                                        $exploded = explode("_", $key);
-                                        $counted = count($exploded);
-                                        $counted = $counted - 1;
-                                        if (is_numeric($exploded[$counted])) {
-                                            $key = "loop|" . $key;
-                                        }
-                                        $new_data[$key] = $old_keys['value'];
-                                    }
-                                }
-                                $final_data = serialize($new_data);
-                                $sql = "UPDATE endpointman_mac_list SET  global_user_cfg_data =  '" . $final_data . "' WHERE  id =" . $data['id'];
-                                sql($sql);
-								echo format_txt(_("Done!"), "done");
-                            }
-                        }
-                        $old_data = NULL;
-                        $sql = 'SELECT id, global_custom_cfg_data FROM endpointman_template_list WHERE model_id = ' . $model_final_id;
-                        $old_data = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
-                        foreach ($old_data as $data) {
-                            $global_custom_cfg_data = unserialize($data['global_custom_cfg_data']);
-                            if ((is_array($global_custom_cfg_data)) AND (!array_key_exists('data', $global_custom_cfg_data))) {
+	                                $new_data = array();
+	                                foreach ($global_user_cfg_data as $key => $old_keys) {
+	                                    if (array_key_exists('value', $old_keys)) {
+	                                        $exploded = explode("_", $key);
+	                                        $counted = count($exploded);
+	                                        $counted = $counted - 1;
+	                                        if (is_numeric($exploded[$counted])) {
+	                                            $key = "loop|" . $key;
+	                                        }
+	                                        $new_data[$key] = $old_keys['value'];
+	                                    }
+	                                }
+	                                $final_data = serialize($new_data);
+	                                $sql = "UPDATE endpointman_mac_list SET  global_user_cfg_data =  '" . $final_data . "' WHERE  id =" . $data['id'];
+	                                sql($sql);
+									echo format_txt(_("Done!"), "done");
+	                            }
+	                        }
+	                        $old_data = NULL;
+	                        $sql = 'SELECT id, global_custom_cfg_data FROM endpointman_template_list WHERE model_id = ' . $model_final_id;
+	                        $old_data = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
+	                        foreach ($old_data as $data) {
+	                            $global_custom_cfg_data = unserialize($data['global_custom_cfg_data']);
+	                            if ((is_array($global_custom_cfg_data)) AND (!array_key_exists('data', $global_custom_cfg_data))) {
 echo format_txt(_("Old Data Detected! Migrating......"));
-                                $new_data = array();
-                                $new_ari = array();
-                                foreach ($global_custom_cfg_data as $key => $old_keys) {
-                                    if (array_key_exists('value', $old_keys)) {
-                                        $new_data[$key] = $old_keys['value'];
-                                    } else {
-                                        $breaks = explode("_", $key);
-                                        $new_data["loop|" . $key] = $old_keys[$breaks[2]];
-                                    }
-                                    if (array_key_exists('ari', $old_keys)) {
-                                        $new_ari[$key] = 1;
-                                    }
-                                }
-                                $final_data = array();
-                                $final_data['data'] = $new_data;
-                                $final_data['ari'] = $new_ari;
-                                $final_data = serialize($final_data);
-                                $sql = "UPDATE endpointman_template_list SET  global_custom_cfg_data =  '" . $final_data . "' WHERE  id =" . $data['id'];
-                                sql($sql);
-								echo format_txt(_("Done!"), "done");
-                            }
-                        }
-
-                        $m_data = sql("SELECT id FROM endpointman_model_list WHERE id='" . $brand_id . $family_line_xml['data']['id'] . $model_list['id'] . "'", 'getOne');
-                        if ($m_data) {
+	                                $new_data = array();
+	                                $new_ari = array();
+	                                foreach ($global_custom_cfg_data as $key => $old_keys) {
+	                                    if (array_key_exists('value', $old_keys)) {
+	                                        $new_data[$key] = $old_keys['value'];
+	                                    } else {
+	                                        $breaks = explode("_", $key);
+	                                        $new_data["loop|" . $key] = $old_keys[$breaks[2]];
+	                                    }
+	                                    if (array_key_exists('ari', $old_keys)) {
+	                                        $new_ari[$key] = 1;
+	                                    }
+	                                }
+	                                $final_data = array();
+	                                $final_data['data'] = $new_data;
+	                                $final_data['ari'] = $new_ari;
+	                                $final_data = serialize($final_data);
+	                                $sql = "UPDATE endpointman_template_list SET  global_custom_cfg_data =  '" . $final_data . "' WHERE  id =" . $data['id'];
+	                                sql($sql);
+									echo format_txt(_("Done!"), "done");
+	                            }
+	                        }
+	
+	                        $m_data = sql("SELECT id FROM endpointman_model_list WHERE id='" . $brand_id . $family_line_xml['data']['id'] . $model_list['id'] . "'", 'getOne');
+	                        if ($m_data) {
 if ($this->configmod->get('debug')) echo format_txt(_("---Updating Model %_NAMEMOD_%"), "", array("%_NAMEMOD_%" => $model_list['model']));
-                            $sql = "UPDATE endpointman_model_list SET max_lines = '" . $model_list['lines'] . "', model = '" . $model_list['model'] . "', template_list = '" . $template_list . "' WHERE id = '" . $brand_id . $family_line_xml['data']['id'] . $model_list['id'] . "'";
-                        } 
-						else {
+	                            $sql = "UPDATE endpointman_model_list SET max_lines = '" . $model_list['lines'] . "', model = '" . $model_list['model'] . "', template_list = '" . $template_list . "' WHERE id = '" . $brand_id . $family_line_xml['data']['id'] . $model_list['id'] . "'";
+	                        } 
+							else {
 if ($this->configmod->get('debug')) echo format_txt(_("---Inserting Model %_NAMEMOD_%"), "", array("%_NAMEMOD_%" => $model_list['model']));
-                            $sql = "INSERT INTO endpointman_model_list (`id`, `brand`, `model`, `max_lines`, `product_id`, `template_list`, `enabled`, `hidden`) VALUES ('" . $brand_id . $family_line_xml['data']['id'] . $model_list['id'] . "', '" . $brand_id . "', '" . $model_list['model'] . "', '" . $model_list['lines'] . "', '" . $brand_id . $family_line_xml['data']['id'] . "', '" . $template_list . "', '0', '0')";
-                        }
-                        sql($sql);
-						
-                        if (!$this->sync_model($brand_id . $family_line_xml['data']['id'] . $model_list['id'])) {
-							echo format_txt(_("System Error in Sync Model Function, Load Failure!"), "error");
-                        }
-                    }
+	                            $sql = "INSERT INTO endpointman_model_list (`id`, `brand`, `model`, `max_lines`, `product_id`, `template_list`, `enabled`, `hidden`) VALUES ('" . $brand_id . $family_line_xml['data']['id'] . $model_list['id'] . "', '" . $brand_id . "', '" . $model_list['model'] . "', '" . $model_list['lines'] . "', '" . $brand_id . $family_line_xml['data']['id'] . "', '" . $template_list . "', '0', '0')";
+	                        }
+	                        sql($sql);
+							
+	                        if (!$this->sync_model($brand_id . $family_line_xml['data']['id'] . $model_list['id'], $errlog)) {
+	                        	echo format_txt(_("System Error in Sync Model Function, Load Failure!"), "error");
+								echo format_txt($errlog['sync_model'], "error");
+	                        }
+	                        unset ($errlog);
+	                    }
+					}
+                    
+                    
                     //Phone Models Move Here
                     $family_id = $brand_id . $family_line_xml['data']['id'];
                     $sql = "SELECT * FROM endpointman_model_list WHERE product_id = " . $family_id;

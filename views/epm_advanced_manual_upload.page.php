@@ -29,7 +29,7 @@
 								<input id="fileField" type="file" class="form-control_off" name="files[]" multiple>
 							</span>
 							<span>
-								<a class='btn btn-default' id='upload_provisioner' name="upload_provisioner" href="javascript:epm_config_tab_manual_upload_bt_upload('upload_provisioner', 'manual_upload_form_import_provisioner');"><i class='fa fa-upload'></i> <?php echo _('Import')?></a>
+								<a class='btn btn-default' id='upload_provisioner' name="upload_provisioner" href="javascript:epm_advanced_tab_manual_upload_bt_upload('upload_provisioner', 'manual_upload_form_import_provisioner');"><i class='fa fa-upload'></i> <?php echo _('Import')?></a>
 							</span>
 						</div>
 					</div>
@@ -59,7 +59,7 @@
 								<input id="fileField" type="file" class="form-control_off" name="files[]" multiple>
 							</span>
 							<span>
-								<a class='btn btn-default' id='upload_brand' name="upload_brand" href="javascript:epm_config_tab_manual_upload_bt_upload('upload_brand', 'manual_upload_form_import_brand');"><i class='fa fa-upload'></i> <?php echo _('Import')?></a>
+								<a class='btn btn-default' id='upload_brand' name="upload_brand" href="javascript:epm_advanced_tab_manual_upload_bt_upload('upload_brand', 'manual_upload_form_import_brand');"><i class='fa fa-upload'></i> <?php echo _('Import')?></a>
 							</span>
 						</div>
 					</div>
@@ -75,41 +75,6 @@
 	</form>
 </div>
 
-<?php
-	$brand_ava = FreePBX::Endpointman()->brands_available("",false);
-	$path_tmp_dir = FreePBX::Endpointman()->PHONE_MODULES_PATH."temp/export/";
-	
-	$array_list_files = array();
-	$array_list_exception= array(".", "..", ".htaccess");
-	if(file_exists($path_tmp_dir)) 
-	{
-		if(is_dir($path_tmp_dir)) 
-		{
-			$l_files = scandir($path_tmp_dir, 1);
-			foreach ($l_files as $archivo) {
-				if (in_array($archivo, $array_list_exception)) { continue; }
-				$pathandfile = $path_tmp_dir.$archivo;
-				$brand = substr(pathinfo($archivo, PATHINFO_FILENAME), 0, -11);
-				$ftime = substr(pathinfo($archivo, PATHINFO_FILENAME), -10);
-				
-				$array_list_files[$brand][] = array("brand" => $brand,
-											"pathall" => $pathandfile, 
-											"path" => $path_tmp_dir, 
-											"file" => $archivo, 
-											"filename" => pathinfo($archivo, PATHINFO_FILENAME), 
-											"extension" => pathinfo($archivo, PATHINFO_EXTENSION),
-											"timer" => $ftime,
-											"mime_type" => mime_content_type($pathandfile),
-											"is_dir" => is_dir($pathandfile),
-											"is_file" => is_file($pathandfile),
-											"is_link" => is_link($pathandfile),
-											"readlink" => (is_link($pathandfile) == true ? readlink ($pathandfile) : NULL));
-			}
-			unset ($l_files);
-		}
-	}
-	natsort($array_list_files);
-?>
 <div class="section-title" data-for="ma_up_ex_brand_package">
 	<h3><?php echo _("Export Brand Packages") ?></h3>
 </div>
@@ -120,33 +85,33 @@
 		<div class="row">
 			<div class="col-md-12">
 				<div class="row">
-					<div class="form-group custom_box_import">
+					<div class="form-group">
 						<div class="col-md-3">
 							<label class="control-label" for="brand_export_pack"><?php echo _("Brand's Available")?></label>
 							<i class="fa fa-question-circle fpbx-help-icon" data-for="brand_export_pack"></i>
 						</div>
-						<div class="col-md-9 text-right">
-						
-							<?php if ($brand_ava == "") : ?>
+						<div class="col-md-9">
+							<?php
+							$brand_ava = FreePBX::Endpointman()->brands_available("",false);
+							if ($brand_ava == "") : ?>
 								<div class="alert alert-info text-left" role="alert"> <strong><?php echo _("Heads up!"); ?></strong> <?php echo _("List Bran's Availables empty."); ?> <i class='icon-globe'></i></div>
 							<?php else: ?>
-							<span>
-								<div class="styled-select">
-									<select name="brand_export_pack_selected" id="brand_export_pack_selected">
-										<?php
-											echo '<option value="">'._('Select Brand:').'</option>';
+								<div class="input-group">
+	      							<select class="form-control" name="brand_export_pack_selected" id="brand_export_pack_selected">
+										<option value=""><?php echo _('Select Brand:')?></option>
+											<?php 
 											foreach ($brand_ava as $row) {
 												echo '<option value="'.$row['value'].'">'.$row['text'].'</option>';
 											}
-										?>
+											?>
 									</select>
-								</div>
-							</span>
-							<span>
-								<a class='btn btn-default' id='brand_export_pack' name="brand_export_pack" href="javascript:epm_config_tab_manual_upload_bt_explor_brand();"><i class='fa fa-download'></i> <?php echo _('Export')?></a>
-							</span>
-							<?php endif ?>
-							
+	      							<span class="input-group-btn">
+	        							<button class="btn btn-default" type="button" name='brand_export_pack' id='brand_export_pack' onclick="epm_advanced_tab_manual_upload_bt_explor_brand()"><i class="fa fa-download"></i> <?php echo _("Export")?></button>
+	      							</span>
+    						</div>
+							<?php endif;
+							unset ($brand_ava);
+							?>
 						</div>
 					</div>
 				</div>
@@ -169,35 +134,13 @@
 							<i class="fa fa-question-circle fpbx-help-icon" data-for="brand_export_pack_list"></i>
 						</div>
 						<div class="col-md-9">
-							<ul class="list-group">
-							<?php 
-							if (count($array_list_files) == 0) {
-								echo '<li class="list-group-item">';
-								echo '<span class="label label-default label-pill pull-xs-right">0</span>';
-								echo '<i class="fa fa-file-archive-o"></i>&nbsp; '._("Empty list.");
-								echo '</li>';
-							}
-							else {
-								foreach ($array_list_files as $k => $v) 
-								{
-									echo '<li class="list-group-item" id="list_export_files">';
-									
-									echo '	<a data-toggle="collapse" href="#brand_'.$k.'" aria-expanded="false" aria-controls="brand_'.$k.'" class="collapse-item list-group-item">';
-									echo '		<span class="label label-default label-pill pull-xs-right">'.count($v).'</span>';
-									echo '		<i class="fa fa-expand"></i>&nbsp; '. $k;
-									echo '</a>';
-									echo '<div class="list-group collapse" id="brand_'.$k.'">';
-									foreach ($v as $itemlist) {
-										echo '<a class="list-group-item" href="config.php?display=epm_advanced&subpage=manual_upload&command=export_brands_availables_file&file_package='.$itemlist['file'].'" target="_blank">';
-										echo '	<span class="label label-default label-pill pull-xs-right">'.strftime("[%Y-%m-%d %H:%M:%S]", $itemlist['timer']).'</span>';
-										echo '	<i class="fa fa-file-archive-o"></i>&nbsp; '.$itemlist['pathall'];
-										echo '</a>';
-									}
-									echo '</div>';
-									echo '</li>';
-								}
-							}
-							?>
+							
+							<ul class="list-group" id="list-brands-export-item-loading">
+								<li class="list-group-item text-center bg-info">
+									<i class="fa fa-spinner fa-pulse"></i>&nbsp; <?php echo _("Loading...")?>
+								</li>
+							</ul>
+							<ul class="list-group" id="list-brands-export">
 							</ul>
 						</div>
 					</div>
@@ -212,8 +155,3 @@
 	</div>
 	
 </div>
-<?php
-	unset ($brand_ava);
-	unset ($path_tmp_dir);
-	unset ($array_list_files);
-?>

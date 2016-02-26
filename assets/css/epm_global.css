@@ -1,5 +1,11 @@
 @CHARSET "ISO-8859-1";
 
+
+#epm_templates option[value=""], #epm_advanced option[value=""], #epm_config option[value=""] {
+	background-color: #E5FFCC;
+}
+
+
 .section-title {
 	margin: 10px 10px 0px 10px;
 }
@@ -8,32 +14,6 @@
 	margin-left: 10px;
 	margin-right: 10px;
 	margin-bottom: 10px;
-}
-
-/* -------------------- Select Box Styles: bavotasan.com Method (with special adaptations by ericrasch.com) */
-/* -------------------- Source: http://bavotasan.com/2011/style-select-box-using-only-css/ */
-.styled-select 
-{
-   background: url(../images/15xvbd5.png) no-repeat 96% 0;
-   background-color: #3b8ec2;
-   height: 35px;
-   overflow: hidden;
-   width: 240px;
-   
-   -webkit-border-radius: 5px;
-   -moz-border-radius: 5px;
-   border-radius: 5px;
-}
-
-.styled-select select 
-{
-   background: transparent;
-   border: none;
-   color: #fff;
-   font-size: 14px;
-   height: 35px;
-   padding: 5px; /* If you add too much padding here, the options won't show in IE */
-   width: 268px;   
 }
 
 .pull-xs-right

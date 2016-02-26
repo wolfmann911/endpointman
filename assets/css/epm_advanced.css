@@ -1,11 +1,6 @@
-@import "epm_global.css";
+@CHARSET "ISO-8859-1";
 
-@import "codemirror.css";
-@import "codemirror_simplescrollbars.css";
-@import "codemirror_fullscreen.css";
-
-
-.linedwrap {
+#epm_advanced .linedwrap {
 	border-top-width: 1px;
 	border-right-width: 1px;
 	border-bottom-width: 1px;
@@ -33,29 +28,11 @@
    -moz-box-shadow: 4px 4px 2px #00dddd;
 }
 
-
-
-#AddDlgModal .styled-select { width: 240px; }
-#AddDlgModal .styled-select select { width: 268px; }
-
-#manual_upload .styled-select 
-{
-   height: 29px;
-   width: 400px;
-}
-
-#manual_upload .styled-select select 
-{
-   height: 29px;
-   width: 428px;
-}
-
-
-.custom_box_import div.col-md-9 {
+#epm_advanced .custom_box_import div.col-md-9 {
 	display: table;
 }
 
-.custom_box_import div.col-md-9 span {
+#epm_advanced .custom_box_import div.col-md-9 span {
 	display: table-cell;
 	margin: 0px;
 	padding: 0px 0px 0px 10px;
@@ -138,8 +115,7 @@
 }
 
 
-
-div.CodeMirror
+#epm_advanced div.CodeMirror
 {
 	/*
   transition-property: border, box-shadow;
@@ -181,7 +157,7 @@ div.CodeMirror
   font-family: Courier, "dejavu sans mono","monaco","lucida console","courier new",monospace;
 }
 
-div.CodeMirror:hover
+#epm_advanced div.CodeMirror:hover
 {
 	border-top-color: rgba(171, 213, 242, 0.9);
 	border-right-color: rgba(171, 213, 242, 0.9);
@@ -191,7 +167,7 @@ div.CodeMirror:hover
 }
 
 /*
-div.CodeMirror:hover
+#epm_advanced div.CodeMirror:hover
 {
   border-top-color: rgba(82, 168, 236, 0.8);
   border-right-color: rgba(82, 168, 236, 0.8);

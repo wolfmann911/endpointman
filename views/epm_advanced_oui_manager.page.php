@@ -3,9 +3,11 @@
 	
 	$sql = 'SELECT * from endpointman_brand_list WHERE id > 0 ORDER BY name ASC';
 	$brands = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
+	unset ($sql);
 	
-	$request = $_REQUEST;
-	$content = load_view(__DIR__.'/epm_advanced/oui_manager.views.grid.php', array('request' => $request, 'brands' => $brands));
-	echo $content;
+	echo load_view(__DIR__.'/epm_advanced/oui_manager.views.grid.php', array('request' => $_REQUEST));
+	echo load_view(__DIR__.'/epm_advanced/oui_manager.views.new.modal.php', array('request' => $_REQUEST, 'brands' => $brands));
+	
+	unset ($brands);
 	return;
 ?>
