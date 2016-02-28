@@ -70,8 +70,8 @@ class Endpointman implements \BMO {
 		require_once('lib/epm_data_abstraction.class.php');
 		
 		
-		$this->freepbx = $freepbx;
-		$this->db = $freepbx->Database;
+		$this->freepbx =& $freepbx;
+		$this->db =& $freepbx->Database;
 		$this->config = $freepbx->Config;
 		$this->configmod = new Endpointman\Config();
 		$this->system = new epm_system();
@@ -170,9 +170,9 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 		
 //AVISO!!!!!!!!!!!!!!!!!!!!!!!!!!
 //PERMITE TODO!!!!!!!!!!!!!!!!!!!
-//$setting['authenticate'] = true;
-//$setting['allowremote'] = true;
-//return true;
+$setting['authenticate'] = true;
+$setting['allowremote'] = true;
+return true;
 		
 		switch ($_REQUEST['module_sec']) 
 		{
@@ -180,7 +180,10 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 			case "epm_templates": 	
 				switch ($req) 
 				{
-					case "list_current_template": 
+					case "model_clone":
+					case "list_current_template":
+					case "add_template":
+					case "del_template":
 						$setting['authenticate'] = true;
 						$setting['allowremote'] = false;
 						return true;
@@ -234,15 +237,30 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 		{
 			case "epm_devices": 	break;
 			case "epm_templates":
-				if ($module_tab == "main")
+				if ($module_tab == "manager")
 				{
 					switch ($command)
 					{
 						case "list_current_template":
-							$retarr = $this->epm_template_list_current_templates();
+							$retarr = $this->epm_templates_list_current_templates();
 							return $retarr;
 							break;
-				
+							
+						case "model_clone":
+							$retarr = $this->epm_templates_model_clone();
+							return $retarr;
+							break;
+							
+						case "add_template":
+							$retarr = $this->epm_templates_add_template();
+							return $retarr;
+							break;
+							
+						case "del_template":
+							$retarr = $this->epm_templates_del_template();
+							return $retarr;
+							break;
+							
 						default:
 							$retarr = array("status" => false, "message" => _("Command not found!") . " [" .$command. "]");
 							break;
@@ -302,7 +320,7 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 							break;
 						
 						case "list_all_brand": 
-							$retarr = array("status" => true, "message" => "OK", "datlist" => $this->epm_config_manager_hardware_get_list_all(true));
+							$retarr = array("status" => true, "message" => "OK", "datlist" => $this->epm_config_manager_hardware_get_list_all(false));
 							break;
 						
 						default:
@@ -563,16 +581,30 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 		
 		switch ($_REQUEST['display']) 
 		{
-			case "epm_devices": 	break;
-			case "epm_templates":
+			case "epm_devices":
 				if(empty($this->pagedata))
 				{
 					$this->pagedata['main'] = array(
-						"name" => _("Current Templates"),
-						"page" => 'views/epm_templates_main.page.php'
+							"name" => _("Devices"),
+							"page" => 'views/epm_devices_main.page.php'
 					);
 				}
 				break;
+				
+			case "epm_templates":
+				if(empty($this->pagedata))
+				{
+					$this->pagedata['manager'] = array(
+						"name" => _("Current Templates"),
+						"page" => 'views/epm_templates_manager.page.php'
+					);
+					$this->pagedata['editor'] = array(
+							"name" => _("Template Editor"),
+							"page" => 'views/epm_templates_editor.page.php'
+					);
+				}
+				break;
+				
 			case "epm_config":
 				if(empty($this->pagedata)) 
 				{
@@ -831,11 +863,111 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 	
 	
 	
-	/***************************************************
-	 **** FUNCIONES SEC MODULO "epm_template\main". ****
-	 **************************************************/
+	/******************************************************
+	 **** FUNCIONES SEC MODULO "epm_template\manager". ****
+	 *****************************************************/
 	
-	public function epm_template_list_current_templates ()
+	public function epm_templates_del_template() 
+	{
+		if (! isset($_REQUEST['idsel'])) {
+			$retarr = array("status" => false, "message" => _("No send ID!"));
+		}
+		elseif (! is_numeric($_REQUEST['idsel'])) {
+			$retarr = array("status" => false, "message" => _("ID is not number!"));
+		}
+		elseif ($_REQUEST['idsel'] <= 0) {
+			$retarr = array("status" => false, "message" => _("ID send is negative!"));
+		}
+		else {
+			$dget['idsel'] = $_REQUEST['idsel'];
+			
+			$sql = "DELETE FROM endpointman_template_list WHERE id = ". $dget['idsel'];
+			sql($sql);
+			$sql = "UPDATE endpointman_mac_list SET template_id = 0 WHERE template_id = ".$dget['idsel'];
+			sql($sql);
+			
+			$retarr = array("status" => true, "message" => _("Delete Template OK!"));
+			unset($dget);
+		}
+		return $retarr;
+	}
+	
+	public function epm_templates_add_template ()
+	{
+		if (! isset($_REQUEST['newnametemplate'])) {
+			$retarr = array("status" => false, "message" => _("No send Name!"));
+		}
+		elseif (empty($_REQUEST['newnametemplate'])) {
+			$retarr = array("status" => false, "message" => _("Name is null!"));
+		}
+		elseif (! isset($_REQUEST['newproductselec'])) {
+			$retarr = array("status" => false, "message" => _("No send Product!"));
+		}
+		elseif (! is_numeric($_REQUEST['newproductselec'])) {
+			$retarr = array("status" => false, "message" => _("Product is not number!"));
+		}
+		elseif ($_REQUEST['newproductselec'] <= 0) {
+			$retarr = array("status" => false, "message" => _("Product send is negative!"));
+		}
+		elseif (! isset($_REQUEST['newclonemodel'])) {
+			$retarr = array("status" => false, "message" => _("No send Clone Model!"));
+		}
+		elseif (! is_numeric($_REQUEST['newclonemodel'])) {
+			$retarr = array("status" => false, "message" => _("Clone Model is not number!"));
+		}
+		elseif ($_REQUEST['newclonemodel'] <= 0) {
+			$retarr = array("status" => false, "message" => _("Clone Model send is negative!"));
+		}
+		else {
+			$dget['newnametemplate'] = $_REQUEST['newnametemplate'];
+			$dget['newproductselec'] = $_REQUEST['newproductselec'];
+			$dget['newclonemodel'] = $_REQUEST['newclonemodel'];
+
+			$db = $this->db;
+			$sql = "INSERT INTO endpointman_template_list (product_id, name, model_id) VALUES (?,?,?)";
+			$q = $db->prepare($sql);
+			$ob = $q->execute(array($dget['newproductselec'], addslashes($dget['newnametemplate']), $dget['newclonemodel']));
+			$newid = $db->lastInsertId();
+			//$endpoint->edit_template_display($id,0);
+			
+			$retarr = array("status" => true, "message" => _("Add New Template OK!"), "newid" => $newid);
+			unset($dget);
+		}
+		return $retarr;
+	}
+	
+	public function epm_templates_model_clone () 
+	{
+		if (! isset($_REQUEST['id'])) {
+			$retarr = array("status" => false, "message" => _("No send ID!"));
+		}
+		elseif (! is_numeric($_REQUEST['id'])) {
+			$retarr = array("status" => false, "message" => _("ID send is not number!"));
+		}
+		elseif ($_REQUEST['id'] <= 0) {
+			$retarr = array("status" => false, "message" => _("ID send is number not valid!"));
+		}
+		else
+		{
+			$dget['id'] = $_REQUEST['id'];
+			
+			$i=0;
+			$out = array();
+			$sql = "SELECT endpointman_model_list.id, endpointman_model_list.model as model FROM endpointman_model_list, endpointman_product_list WHERE endpointman_product_list.id = endpointman_model_list.product_id AND endpointman_model_list.enabled = 1 AND endpointman_model_list.hidden = 0 AND product_id = '". $dget['id']."'";
+			$result = sql($sql,'getAll', DB_FETCHMODE_ASSOC);
+			foreach($result as $row) {
+				$out[$i]['optionValue'] = $row['id'];
+				$out[$i]['optionDisplay'] = $row['model'];
+				$i++;
+			}
+			$retarr = array("status" => true, "message" => _("Generate list Ok!"), "listopt" => $out);
+			
+			unset($dget);
+		}
+		return $retarr;
+	}
+	
+	public function epm_templates_list_current_templates ()
 	{
 	
 		$sql = 'SELECT endpointman_template_list.*, endpointman_product_list.short_name as model_class, endpointman_model_list.model as model_clone, endpointman_model_list.enabled FROM endpointman_template_list, endpointman_model_list, endpointman_product_list WHERE endpointman_model_list.hidden = 0 AND endpointman_template_list.model_id = endpointman_model_list.id AND endpointman_template_list.product_id = endpointman_product_list.id';
@@ -1035,7 +1167,7 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 				$row = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
 				
 				$config_files = explode(",", $row['config_files']);
-				//TODO: AÃ±adir validacion para ver si $dget['file_name'] esta en el array $config_files
+				//TODO: Añadir validacion para ver si $dget['file_name'] esta en el array $config_files
 				
 				$filename = $dget['file_name'];
 				$pathfile = $this->PHONE_MODULES_PATH . 'endpoint/' . $row['directory'] . "/" . $row['cfg_dir'] . "/" . $filename; 
@@ -1695,7 +1827,7 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 	
 	private function epm_advanced_oui_remove()
 	{
-		//TODO: AÃ±adir validacion de si es custom o no
+		//TODO: Añadir validacion de si es custom o no
 		if ((! isset($_REQUEST['id_del'])) OR ($_REQUEST['id_del'] == "")) {
 			$retarr = array("status" => false, "message" => _("No ID set!"));
 		}
@@ -1717,7 +1849,7 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 	
 	private function epm_advanced_oui_add() 
 	{
-		//TODO: Pendiente aÃ±adir isExiste datos.
+		//TODO: Pendiente añadir isExiste datos.
 		if ((! isset($_REQUEST['number_new_oui'])) OR ($_REQUEST['number_new_oui'] == "")) {
 			$retarr = array("status" => false, "message" => _("No OUI set!"));
 		}
@@ -2429,6 +2561,7 @@ if ($echotxt) {  echo format_txt(_("Not able to connect to repository. Using loc
 							if (!($this->system->arraysearchrecursive($brand_name, $row, 'directory'))) {
                                 //insert row
                                 $sql = "INSERT INTO endpointman_brand_list (id, name, directory, cfg_ver) VALUES ('" . $temp['brand_id'] . "', '" . $temp['name'] . "', '" . $temp['directory'] . "', '" . $version[$brand_name] . "')";
+                                $_SESSION["sqlerr"] = $sql;
                                 sql($sql);
                             } else {
                                 //in database already!
@@ -4193,6 +4326,59 @@ $this->error['parse_configs'] = "File not written to hard drive!";
 	
 	
 	
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 	
 	
 	

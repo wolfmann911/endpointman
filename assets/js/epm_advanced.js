@@ -43,7 +43,8 @@ function epm_advanced_change_tab (nTab = "") {
 }
 
 
-/**** INI: FUNCTION GLOBAL SEC ****/
+// INI: FUNCTION GLOBAL SEC
+
 function epm_advanced_select_tab_ajax(idtab)
 {	
 	if (idtab == "") {
@@ -89,7 +90,8 @@ function end_module_actions_epm_advanced(acctionname = "")
 		epm_advanced_tab_manual_upload_list_files_brand_expor();
 	}
 }
-/**** END: FUNCTION GLOBAL SEC ****/
+
+// END: FUNCTION GLOBAL SEC 
 
 
 
@@ -98,7 +100,8 @@ function end_module_actions_epm_advanced(acctionname = "")
 
 
 
-/**** INI: FUNCTION TAB UPLOAD_MANUAL ****/
+// INI: FUNCTION TAB UPLOAD_MANUAL
+
 function epm_advanced_tab_manual_upload_bt_explor_brand() 
 {
 	var packageid = $('#brand_export_pack_selected').val();
@@ -225,7 +228,8 @@ function epm_advanced_tab_manual_upload_list_files_brand_expor()
 		});
 	}
 }
-/**** END: FUNCTION TAB UPLOAD_MANUAL ****/
+
+// END: FUNCTION TAB UPLOAD_MANUAL 
 
 
 
@@ -234,14 +238,14 @@ function epm_advanced_tab_manual_upload_list_files_brand_expor()
 
 
 
-/**** INI: FUNCTION TAB IEDL ****/
+// INI: FUNCTION TAB IEDL
 function epm_advanced_tab_iedl_bt_import() 
 {
 	var urlStr = "config.php?display=epm_advanced&subpage=iedl&command=import";
 	var formname = "iedl_form_import_cvs";
 	epm_global_dialog_action("iedlimport", urlStr, formname);
 }
-/**** END: FUNCTION TAB IEDL ****/
+// END: FUNCTION TAB IEDL
 
 
 
@@ -250,7 +254,7 @@ function epm_advanced_tab_iedl_bt_import()
 
 
 
-/**** INI: FUNCTION TAB POCE ****/
+// INI: FUNCTION TAB POCE
 function epm_advanced_tab_poce_select_product(idsel, bclear = true)
 {
 	if ($.isNumeric(idsel) == false) { return; }
@@ -591,7 +595,7 @@ function epm_advanced_tab_poce_bt_acction (command)
 	});	
 	
 }
-/**** END: FUNCTION TAB POCE ****/
+// END: FUNCTION TAB POCE
 
 
 
@@ -600,7 +604,7 @@ function epm_advanced_tab_poce_bt_acction (command)
 
 
 
-/**** INI: FUNCTION TAB OUI MANAGER ****/
+// INI: FUNCTION TAB OUI MANAGER
 function epm_advanced_tab_oui_manager_grid_actionFormatter(value, row, index){
 	var html = '';
     if (row.custom == 1) {
@@ -698,12 +702,12 @@ function epm_advanced_tab_oui_manager_ajax (data_ajax = ""){
 	}
 	return response;
 }
-/**** END: FUNCTION TAB OUI MANAGER ****/
+// END: FUNCTION TAB OUI MANAGER
 
 
 
 
-/**** INI: FUNCTION TAB SETTING ****/
+// INI: FUNCTION TAB SETTING
 function epm_advanced_tab_setting_input_value_change_bt(sNameID, sValue = "", bSaveChange = true, bSetFocus = false)
 {
 	$(sNameID).val(sValue);
@@ -768,4 +772,4 @@ function epm_advanced_tab_setting_input_change(obt)
 		},
 	});	
 }
-/**** END: FUNCTION TAB SETTING ****/
+// END: FUNCTION TAB SETTING
