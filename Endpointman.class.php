@@ -70,8 +70,8 @@ class Endpointman implements \BMO {
 		require_once('lib/epm_data_abstraction.class.php');
 		
 		
-		$this->freepbx =& $freepbx;
-		$this->db =& $freepbx->Database;
+		$this->freepbx = $freepbx;
+		$this->db = $freepbx->Database;
 		$this->config = $freepbx->Config;
 		$this->configmod = new Endpointman\Config();
 		$this->system = new epm_system();
