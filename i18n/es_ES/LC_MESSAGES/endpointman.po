@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-03 10:44-0800\n"
+"POT-Creation-Date: 2016-03-03 11:01-0800\n"
 "PO-Revision-Date: 2016-02-17 22:48+0100\n"
 "Last-Translator: Javier Pastor <jpastor@cerebelum.net>\n"
 "Language-Team: \n"
@@ -459,7 +459,7 @@ msgstr ""
 msgid "Failed to install "
 msgstr "Fallo de installacion"
 
-#: Endpointman.class.php:3781
+#: Endpointman.class.php:3782
 msgid "Failed to write file to disk"
 msgstr ""
 
@@ -483,7 +483,7 @@ msgstr "¡Archivo no encontrado!"
 msgid "File not readable, check the permission! "
 msgstr ""
 
-#: Endpointman.class.php:3783
+#: Endpointman.class.php:3784
 msgid "File upload stopped by extension"
 msgstr ""
 
@@ -683,7 +683,7 @@ msgstr ""
 msgid "Invalid JSON Structure in %_PATH_%/brand_data.json"
 msgstr "Inválida estructura JSON en %_PATCH _%/brand_data.json"
 
-#: Endpointman.class.php:3567
+#: Endpointman.class.php:3568
 msgid "Invalid MAC Address"
 msgstr "Direccion MAC no valida"
 
@@ -691,7 +691,7 @@ msgstr "Direccion MAC no valida"
 msgid "Invalid Mac on line %_LINE_%!"
 msgstr ""
 
-#: Endpointman.class.php:3562
+#: Endpointman.class.php:3563
 msgid "Invalid Model Selected, Can't Sync System"
 msgstr "Seleccionada Modelo no válido, no puede Sistema de sincronización"
 
@@ -804,7 +804,7 @@ msgstr "Correcto!"
 msgid "Maximum stack depth exceeded"
 msgstr "Superó capacidad de la pila máximo"
 
-#: Endpointman.class.php:3779
+#: Endpointman.class.php:3780
 msgid "Missing a temporary folder"
 msgstr ""
 
@@ -877,7 +877,7 @@ msgstr ""
 msgid "No Configuration Location Defined!"
 msgstr ""
 
-#: Endpointman.class.php:3600 Endpointman.class.php:3618
+#: Endpointman.class.php:3601 Endpointman.class.php:3619
 msgid "No Devices/Extensions Left to Add"
 msgstr "No hay dispositivos / Extensiones a la izquierdo para Añadir"
 
@@ -889,7 +889,7 @@ msgstr ""
 msgid "No ID set!"
 msgstr "No se ha enviado ID!"
 
-#: Endpointman.class.php:3604 Endpointman.class.php:3622
+#: Endpointman.class.php:3605 Endpointman.class.php:3623
 msgid "No Lines Left to Add"
 msgstr "No hay líneas de a la izquierdo para Añadir"
 
@@ -902,7 +902,7 @@ msgstr ""
 msgid "No Selected"
 msgstr "No Seleccionado"
 
-#: Endpointman.class.php:3777
+#: Endpointman.class.php:3778
 msgid "No file was uploaded"
 msgstr "No se ha cargado el fichero"
 
@@ -1278,17 +1278,17 @@ msgstr ""
 "<br /> El boton \"Actualizar\" aparece cuando se detecta una nueva version "
 "de Paquete de este modelo."
 
-#: Endpointman.class.php:3773
+#: Endpointman.class.php:3774
 msgid ""
 "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in "
 "the HTML form"
 msgstr ""
 
-#: Endpointman.class.php:3771
+#: Endpointman.class.php:3772
 msgid "The uploaded file exceeds the upload_max_filesize directive in php.ini"
 msgstr ""
 
-#: Endpointman.class.php:3775
+#: Endpointman.class.php:3776
 msgid "The uploaded file was only partially uploaded"
 msgstr ""
 
@@ -1346,7 +1346,7 @@ msgstr "Desisntalando Marca..."
 msgid "Uninstalla frimware..."
 msgstr "Desisntalando Frimware..."
 
-#: Endpointman.class.php:3917
+#: Endpointman.class.php:3918
 msgid "Unknown"
 msgstr "Desconocido"
 
@@ -1354,7 +1354,7 @@ msgstr "Desconocido"
 msgid "Unknown error"
 msgstr "Error desconocido."
 
-#: Endpointman.class.php:3785
+#: Endpointman.class.php:3786
 msgid "Unknown upload error"
 msgstr "Error al subir Desconocido"
 
@@ -1450,15 +1450,15 @@ msgstr ""
 "También puede actualizar manualmente el repositorio mediante la descarga de "
 "archivos aquí: %_URL_INI_% de lanzamiento Repo %_URL_END_%"
 
-#: Endpointman.class.php:3499
+#: Endpointman.class.php:3500
 msgid "You Must Select A Model From the Drop Down"
 msgstr "Usted debe seleccionar un modelo de la gota de Down"
 
-#: Endpointman.class.php:3502
+#: Endpointman.class.php:3503
 msgid "You Must Select an Extension/Device From the Drop Down"
 msgstr "Tu deves seleeciona una Extension/Disposito de listado de abajo"
 
-#: Endpointman.class.php:4945
+#: Endpointman.class.php:4946
 msgid "You can't remove the only line left"
 msgstr "No se puede quitar la única línea de la izquierda"
 

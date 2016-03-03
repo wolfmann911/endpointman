@@ -20,7 +20,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2.10\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-03 10:44-0800\n"
+"POT-Creation-Date: 2016-03-03 11:01-0800\n"
 "PO-Revision-Date: 2012-11-01 22:35+0400\n"
 "Last-Translator: PostMet <ceo@postmet.com>\n"
 "Language-Team: Russian\n"
@@ -456,7 +456,7 @@ msgstr ""
 msgid "Failed to install "
 msgstr ""
 
-#: Endpointman.class.php:3781
+#: Endpointman.class.php:3782
 msgid "Failed to write file to disk"
 msgstr ""
 
@@ -480,7 +480,7 @@ msgstr ""
 msgid "File not readable, check the permission! "
 msgstr ""
 
-#: Endpointman.class.php:3783
+#: Endpointman.class.php:3784
 msgid "File upload stopped by extension"
 msgstr ""
 
@@ -671,7 +671,7 @@ msgstr ""
 msgid "Invalid JSON Structure in %_PATH_%/brand_data.json"
 msgstr ""
 
-#: Endpointman.class.php:3567
+#: Endpointman.class.php:3568
 msgid "Invalid MAC Address"
 msgstr ""
 
@@ -679,7 +679,7 @@ msgstr ""
 msgid "Invalid Mac on line %_LINE_%!"
 msgstr ""
 
-#: Endpointman.class.php:3562
+#: Endpointman.class.php:3563
 msgid "Invalid Model Selected, Can't Sync System"
 msgstr ""
 
@@ -792,7 +792,7 @@ msgstr ""
 msgid "Maximum stack depth exceeded"
 msgstr ""
 
-#: Endpointman.class.php:3779
+#: Endpointman.class.php:3780
 msgid "Missing a temporary folder"
 msgstr ""
 
@@ -859,7 +859,7 @@ msgstr ""
 msgid "No Configuration Location Defined!"
 msgstr ""
 
-#: Endpointman.class.php:3600 Endpointman.class.php:3618
+#: Endpointman.class.php:3601 Endpointman.class.php:3619
 msgid "No Devices/Extensions Left to Add"
 msgstr ""
 
@@ -871,7 +871,7 @@ msgstr ""
 msgid "No ID set!"
 msgstr ""
 
-#: Endpointman.class.php:3604 Endpointman.class.php:3622
+#: Endpointman.class.php:3605 Endpointman.class.php:3623
 msgid "No Lines Left to Add"
 msgstr ""
 
@@ -884,7 +884,7 @@ msgstr ""
 msgid "No Selected"
 msgstr ""
 
-#: Endpointman.class.php:3777
+#: Endpointman.class.php:3778
 msgid "No file was uploaded"
 msgstr ""
 
@@ -1245,17 +1245,17 @@ msgid ""
 "of this model pack is detected."
 msgstr ""
 
-#: Endpointman.class.php:3773
+#: Endpointman.class.php:3774
 msgid ""
 "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in "
 "the HTML form"
 msgstr ""
 
-#: Endpointman.class.php:3771
+#: Endpointman.class.php:3772
 msgid "The uploaded file exceeds the upload_max_filesize directive in php.ini"
 msgstr ""
 
-#: Endpointman.class.php:3775
+#: Endpointman.class.php:3776
 msgid "The uploaded file was only partially uploaded"
 msgstr ""
 
@@ -1313,7 +1313,7 @@ msgstr ""
 msgid "Uninstalla frimware..."
 msgstr ""
 
-#: Endpointman.class.php:3917
+#: Endpointman.class.php:3918
 msgid "Unknown"
 msgstr ""
 
@@ -1321,7 +1321,7 @@ msgstr ""
 msgid "Unknown error"
 msgstr ""
 
-#: Endpointman.class.php:3785
+#: Endpointman.class.php:3786
 msgid "Unknown upload error"
 msgstr ""
 
@@ -1413,15 +1413,15 @@ msgid ""
 "_URL_INI_% Release Repo %_URL_END_%"
 msgstr ""
 
-#: Endpointman.class.php:3499
+#: Endpointman.class.php:3500
 msgid "You Must Select A Model From the Drop Down"
 msgstr ""
 
-#: Endpointman.class.php:3502
+#: Endpointman.class.php:3503
 msgid "You Must Select an Extension/Device From the Drop Down"
 msgstr ""
 
-#: Endpointman.class.php:4945
+#: Endpointman.class.php:4946
 msgid "You can't remove the only line left"
 msgstr ""
 
