@@ -21,8 +21,7 @@ function epm_config_change_tab (nTab = "") {
 }
 
 
-/**** INI: FUNCTION GLOBAL SEC ****/
-
+//**** INI: FUNCTION GLOBAL SEC ****
 function epm_config_select_tab_ajax(idtab)
 {	
 	clearTimeout(v_sTimerUpdateAjax);
@@ -284,7 +283,7 @@ function CrearSubListItem(iL0)
 		$('#' + iL0.boxappend).append( $('<div/>', { 'class' : 'sortable', 'id' : iL0.boxsubite }) )
 	}
 }
-/**** END: FUNCTION GLOBAL SEC ****/
+//**** END: FUNCTION GLOBAL SEC ****
 
 
 
@@ -294,7 +293,7 @@ function CrearSubListItem(iL0)
 
 
 
-/**** INI: TAB/MANAGER ****/
+//**** INI: TAB/MANAGER ****
 function epm_config_tab_manager_ajax_get_add_data(data, idtab)
 {
 	if ($('#button_check_for_updates').is(':disabled') ==  true) {
@@ -673,7 +672,7 @@ function epm_config_tab_manager_html_L3(data, prefijo, prefijoid, name, value_di
 		});
 	});
 }
-/**** END: TAB/MANAGER ****/
+//**** END: TAB/MANAGER ****
 
 
 
@@ -690,7 +689,7 @@ function epm_config_tab_manager_html_L3(data, prefijo, prefijoid, name, value_di
 
 
 
-/**** INI: TAB/EDITOR ****/
+//**** INI: TAB/EDITOR ****
 function epm_config_tab_editor_ajax_get_add_data (data, idtab)
 {
 	if (data.status == true) 
@@ -957,4 +956,4 @@ function epm_config_tab_editor_html_L2(data, iL0, name, value_yes, txt_bt_yes, v
 		
 	});
 }
-/**** END: TAB/EDITOR ****/
+//**** END: TAB/EDITOR ****

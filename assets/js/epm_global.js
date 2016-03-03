@@ -207,7 +207,7 @@ function epm_global_refresh_table(snametable, showmsg = true)
 
 
 
-// **** INI: CODIGO DE FREEPBX ****
+// INI: CODIGO DE FREEPBX
 function epm_global_update_jquery_msg_help()
 {
 	if($(".fpbx-container").length>0){
@@ -232,4 +232,4 @@ function epm_global_update_jquery_msg_help()
 		});
 	}
 }
-// **** END: CODIGO DE FREEPBX ****
+// END: CODIGO DE FREEPBX
