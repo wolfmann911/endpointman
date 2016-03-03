@@ -12,16 +12,16 @@ namespace FreePBX\modules;
 
 function format_txt($texto = "", $css_class = "", $remplace_txt = array())
 {
-	if (count($remplace_txt) > 0) 
+	if (count($remplace_txt) > 0)
 	{
 		foreach ($remplace_txt as $clave => $valor) {
 			$texto = str_replace($clave, $valor, $texto);
 		}
 	}
-	return '<p ' . ($css_class != '' ? 'class="' . $css_class . '"' : '') . '>'.$texto.'</p>';	
+	return '<p ' . ($css_class != '' ? 'class="' . $css_class . '"' : '') . '>'.$texto.'</p>';
 }
 
-function generate_xml_from_array ($array, $node_name, &$tab = -1) 
+function generate_xml_from_array ($array, $node_name, &$tab = -1)
 {
 	$tab++;
 	$xml ="";
@@ -30,11 +30,11 @@ function generate_xml_from_array ($array, $node_name, &$tab = -1)
 			if (is_numeric($key)) {
 				$key = $node_name;
 			}
-			
+
 			$xml .= str_repeat("	", $tab). '<' . $key . '>' . "\n";
 			$xml .= generate_xml_from_array($value, $node_name, $tab);
 			$xml .= str_repeat("	", $tab). '</' . $key . '>' . "\n";
-			
+
 		}
 	} else {
 		$xml = str_repeat("	", $tab) . htmlspecialchars($array, ENT_QUOTES) . "\n";
@@ -45,20 +45,20 @@ function generate_xml_from_array ($array, $node_name, &$tab = -1)
 
 
 class Endpointman implements \BMO {
-	
+
 	//public $eda; //endpoint data abstraction layer
 	//public $system;
-	
+
     public $error; //error construct
     public $message; //message construct
-	
+
 	public $UPDATE_PATH;
     public $MODULES_PATH;
 	public $LOCAL_PATH;
 	public $PHONE_MODULES_PATH;
 	public $PROVISIONER_BASE;
-	
-	
+
+
 	public function __construct($freepbx = null) {
 		if ($freepbx == null) {
 			throw new \Exception("Not given a FreePBX Object");
@@ -68,34 +68,34 @@ class Endpointman implements \BMO {
 		require_once('lib/epm_system.class.php');
 		require_once('lib/datetimezone.class.php');
 		require_once('lib/epm_data_abstraction.class.php');
-		
-		
+
+
 		$this->freepbx = $freepbx;
 		$this->db = $freepbx->Database;
 		$this->config = $freepbx->Config;
 		$this->configmod = new Endpointman\Config();
 		$this->system = new epm_system();
 		$this->eda = new epm_data_abstraction($this->config, $this->configmod);
-		
-		
+
+
 		$this->configmod->set('disable_epm', FALSE);
 		$this->eda->global_cfg = $this->configmod->getall();
-		
+
         //Generate empty array
         $this->error = array();
         $this->message = array();
-		
-		
+
+
 		$this->configmod->set('tz', $this->config->get('PHPTIMEZONE'));
 		date_default_timezone_set($this->configmod->get('tz'));
-		
+
 		$this->UPDATE_PATH = $this->configmod->get('update_server');
         $this->MODULES_PATH = $this->config->get('AMPWEBROOT') . '/admin/modules/';
-        
+
 define("UPDATE_PATH", $this->UPDATE_PATH);
 define("MODULES_PATH", $this->MODULES_PATH);
-        
-		
+
+
         //Determine if local path is correct!
         if (file_exists($this->MODULES_PATH . "endpointman/")) {
             $this->LOCAL_PATH = $this->MODULES_PATH . "endpointman/";
@@ -103,7 +103,7 @@ define("LOCAL_PATH", $this->LOCAL_PATH);
         } else {
             die("Can't Load Local Endpoint Manager Directory!");
         }
-		
+
         //Define the location of phone modules, keeping it outside of the module directory so that when the user updates endpointmanager they don't lose all of their phones
         if (file_exists($this->MODULES_PATH . "_ep_phone_modules/")) {
             $this->PHONE_MODULES_PATH = $this->MODULES_PATH . "_ep_phone_modules/";
@@ -120,7 +120,7 @@ define("LOCAL_PATH", $this->LOCAL_PATH);
             }
         }
 define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
-		
+
         //Define error reporting
         if (($this->configmod->get('debug')) AND (!isset($_REQUEST['quietmode']))) {
             error_reporting(E_ALL);
@@ -128,7 +128,7 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
         } else {
             ini_set('display_errors', 0);
         }
-		
+
         //Check if config location is writable and/or exists!
         if ($this->configmod->isExiste('config_location')) {
 			$config_location = $this->configmod->get('config_location');
@@ -149,7 +149,7 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
             }
         }
 	}
-	
+
 	public function chownFreepbx() {
 		$webroot = $this->config->get('AMPWEBROOT');
 		$modulesdir = $webroot . '/admin/modules/';
@@ -165,20 +165,20 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 						'perms' => 0755);
 		return $files;
 	}
-	
+
 	public function ajaxRequest($req, &$setting) {
-		
+
 //AVISO!!!!!!!!!!!!!!!!!!!!!!!!!!
 //PERMITE TODO!!!!!!!!!!!!!!!!!!!
 $setting['authenticate'] = true;
 $setting['allowremote'] = true;
 return true;
-		
-		switch ($_REQUEST['module_sec']) 
+
+		switch ($_REQUEST['module_sec'])
 		{
 			case "epm_devices": 	break;
-			case "epm_templates": 	
-				switch ($req) 
+			case "epm_templates":
+				switch ($req)
 				{
 					case "model_clone":
 					case "list_current_template":
@@ -190,11 +190,11 @@ return true;
 					break;
 				}
 				break;
-				
+
 			case "epm_config":
-				switch ($req) 
+				switch ($req)
 				{
-					case "saveconfig": 
+					case "saveconfig":
 					case "list_all_brand":
 						$setting['authenticate'] = true;
 						$setting['allowremote'] = false;
@@ -202,9 +202,9 @@ return true;
 					break;
 				}
 				break;
-				
-			case "epm_advanced": 
-				switch ($req) 
+
+			case "epm_advanced":
+				switch ($req)
 				{
 					case "oui":
 					case "oui_add":
@@ -216,7 +216,7 @@ return true;
 					case "poce_sendid":
 					case "poce_delete_config_custom":
 					case "list_files_brands_export":
-					case "saveconfig": 
+					case "saveconfig":
 						$setting['authenticate'] = true;
 						$setting['allowremote'] = false;
 						return true;
@@ -226,14 +226,14 @@ return true;
 		}
         return false;
     }
-	
+
     public function ajaxHandler() {
 		$module_sec = isset($_REQUEST['module_sec'])? trim($_REQUEST['module_sec']) : '';
 		$module_tab = isset($_REQUEST['module_tab'])? trim($_REQUEST['module_tab']) : '';
 		$command = isset($_REQUEST['command'])? trim($_REQUEST['command']) : '';
-		
+
 		$txt = "";
-		switch ($module_sec) 
+		switch ($module_sec)
 		{
 			case "epm_devices": 	break;
 			case "epm_templates":
@@ -245,29 +245,29 @@ return true;
 							$retarr = $this->epm_templates_list_current_templates();
 							return $retarr;
 							break;
-							
+
 						case "model_clone":
 							$retarr = $this->epm_templates_model_clone();
 							return $retarr;
 							break;
-							
+
 						case "add_template":
 							$retarr = $this->epm_templates_add_template();
 							return $retarr;
 							break;
-							
+
 						case "del_template":
 							$retarr = $this->epm_templates_del_template();
 							return $retarr;
 							break;
-							
+
 						default:
 							$retarr = array("status" => false, "message" => _("Command not found!") . " [" .$command. "]");
 							break;
 					}
 				}
 				break;
-				
+
 			case "epm_config":
 				$txt['manager'] = array(
 					'ayuda_model' => _("If we can activate the model set terminals of the models.<br /> If this model is disabled will not appear in the list of models that can be configured for PBX."),
@@ -280,7 +280,7 @@ return true;
 					'install' => _("Install"),
 					'uninstall' => _("Uninstall"),
 					'update' => _("Update"),
-					'fw_install' => _('Install Firmware'), 
+					'fw_install' => _('Install Firmware'),
 					'fw_uninstall' =>  _('Remove Firmware'),
 					'fw_update' => _('Update Firmware'),
 					'enable' => _('Enable'),
@@ -310,37 +310,37 @@ return true;
 					'err_upload_content' => _("Upload Content!"),
 					'opt_invalid' => _("Invalid Option!")
 				);
-				
-				if ($module_tab == "manager") 
+
+				if ($module_tab == "manager")
 				{
 					switch ($command)
 					{
-						case "saveconfig": 
+						case "saveconfig":
 							$retarr = $this->epm_config_manager_saveconfig();
 							break;
-						
-						case "list_all_brand": 
+
+						case "list_all_brand":
 							$retarr = array("status" => true, "message" => "OK", "datlist" => $this->epm_config_manager_hardware_get_list_all(false));
 							break;
-						
+
 						default:
 							$retarr = array("status" => false, "message" => _("Command not found!") . " [" .$command. "]");
 							break;
 					}
 					$retarr['txt'] = $txt['manager'];
 				}
-				elseif ($module_tab == "editor") 
+				elseif ($module_tab == "editor")
 				{
-					switch ($command) 
+					switch ($command)
 					{
-						case "saveconfig": 
+						case "saveconfig":
 							$retarr = $this->epm_config_editor_saveconfig();
 							break;
-							
+
 						case "list_all_brand":
 							$retarr = array("status" => true, "message" => "OK", "datlist" => $this->epm_config_editor_hardware_get_list_all());
 							break;
-							
+
 						default:
 							$retarr = array("status" => false, "message" => _("Command not found!") . " [" .$command. "]");
 							break;
@@ -352,7 +352,7 @@ return true;
 				}
 				return $retarr;
 				break;
-				
+
 			case "epm_advanced":
 				$txt['settings'] = array(
 					'error' => _("Error!"),
@@ -360,7 +360,7 @@ return true;
 					'save_changes_ok' => _("Saving Changes... Ok!"),
 					'opt_invalid' => _("Invalid Option!")
 				);
-			
+
 				if ($module_tab == "settings")
 				{
 					switch ($command)
@@ -368,7 +368,7 @@ return true;
 						case "saveconfig":
 							$retarr = $this->epm_advanced_settings_saveconfig();
 							break;
-							
+
 						default:
 							$retarr = array("status" => false, "message" => _("Command not found!") . " [" .$command. "]");
 							break;
@@ -388,15 +388,15 @@ return true;
 							}
 							return $ret;
 							break;
-						
+
 						case "oui_add":
 							$retarr = $this->epm_advanced_oui_add();
 							break;
-							
+
 						case "oui_del":
 							$retarr = $this->epm_advanced_oui_remove();
 							break;
-							
+
 						default:
 							$retarr = array("status" => false, "message" => _("Command not found!") . " [" .$command. "]");
 							break;
@@ -418,24 +418,24 @@ return true;
 						case "poce_select":
 							$retarr = $this->epm_advanced_poce_select();
 							break;
-							
+
 						case "poce_select_file":
 							$retarr = $this->epm_advanced_poce_select_file();
 							break;
-							
+
 						case "poce_save_file":
 						case "poce_save_as_file":
 							$retarr = $this->epm_advanced_poce_save_file();
 							break;
-						
+
 						case "poce_sendid":
 							$retarr = $this->epm_advanced_poce_sendid();
 							break;
-							
+
 						case "poce_delete_config_custom":
 							$retarr = $this->epm_advanced_poce_delete_config_custom();
 							break;
-								
+
 						default:
 							$retarr = array("status" => false, "message" => _("Command not found!") . " [" .$command. "]");
 							break;
@@ -448,7 +448,7 @@ return true;
 						case "list_files_brands_export":
 							$retarr = $this->epm_advanced_manual_upload_list_files_brans_export();
 							break;
-							
+
 						default:
 							$retarr = array("status" => false, "message" => _("Command not found!") . " [" .$command. "]");
 							break;
@@ -462,25 +462,25 @@ return true;
 		}
 		return false;
     }
-	
+
 	public static function myDialplanHooks() {
 		return true;
 	}
-	
+
 	public function doConfigPageInit($page) {
 		//TODO: Pendiente revisar y eliminar moule_tab.
 		$module_tab = isset($_REQUEST['module_tab'])? trim($_REQUEST['module_tab']) : '';
 		if ($module_tab == "") {
 			$module_tab = isset($_REQUEST['subpage'])? trim($_REQUEST['subpage']) : '';
 		}
-		
+
 		$command = isset($_REQUEST['command'])? trim($_REQUEST['command']) : '';
-		switch ($page) 
+		switch ($page)
 		{
 			case "epm_devices": 	break;
 			case "epm_templates": 	break;
 			case "epm_config":
-				switch ($module_tab) 
+				switch ($module_tab)
 				{
 					case "manager":
 						switch ($command) {
@@ -491,19 +491,19 @@ return true;
 								echo "<br /><hr><br />";
 								exit;
 								break;
-								
+
 							case "manual_install":
 								$this->epm_config_manual_install();
 								echo "<br /><hr><br />";
 								exit;
 								break;
-								
+
 							case "firmware":
 								$this->epm_config_manager_firmware();
 								echo "<br /><hr><br />";
 								exit;
 								break;
-								
+
 							case "brand":
 								$this->epm_config_manager_brand();
 								echo "<br /><hr><br />";
@@ -511,18 +511,18 @@ return true;
 								break;
 						}
 						break;
-					
+
 					case "editor":
 						break;
 				}
 				break;
-				
+
 			case "epm_advanced":
 				switch ($module_tab)
 				{
 					case "oui_manager":
 						break;
-							
+
 					case "iedl":
 						switch ($command) {
 							case "export":
@@ -535,7 +535,7 @@ return true;
 								break;
 						}
 						break;
-						
+
 					case "manual_upload":
 						switch ($command) {
 							case "export_brands_availables":
@@ -543,18 +543,18 @@ return true;
 								echo "<br /><hr><br />";
 								exit;
 								break;
-								
+
 							case "export_brands_availables_file":
 								$this->epm_advanced_manual_upload_export_brans_available_file();
 								exit;
 								break;
-								
+
 							case "upload_brand":
 								$this->epm_advanced_manual_upload_brand();
 								echo "<br /><hr><br />";
 								exit;
 								break;
-								
+
 							case "upload_provisioner":
 								$this->epm_advanced_manual_upload_provisioner();
 								echo "<br /><hr><br />";
@@ -567,19 +567,19 @@ return true;
 				break;
 		}
 	}
-	
+
 	public function doGeneralPost() {
 		if (!isset($_REQUEST['Submit'])) 	{ return; }
 		if (!isset($_REQUEST['display'])) 	{ return; }
-		
+
 		needreload();
 	}
-	
+
 	public function myShowPage() {
 		if (! isset($_REQUEST['display']))
 			return $this->pagedata;
-		
-		switch ($_REQUEST['display']) 
+
+		switch ($_REQUEST['display'])
 		{
 			case "epm_devices":
 				if(empty($this->pagedata))
@@ -590,7 +590,7 @@ return true;
 					);
 				}
 				break;
-				
+
 			case "epm_templates":
 				if(empty($this->pagedata))
 				{
@@ -604,9 +604,9 @@ return true;
 					);
 				}
 				break;
-				
+
 			case "epm_config":
-				if(empty($this->pagedata)) 
+				if(empty($this->pagedata))
 				{
 					$this->pagedata['manager'] = array(
 						"name" => _("Install/Unistall"),
@@ -618,9 +618,9 @@ return true;
 					);
 				}
 				break;
-				
-			case "epm_advanced": 
-				if(empty($this->pagedata)) 
+
+			case "epm_advanced":
+				if(empty($this->pagedata))
 				{
 					$this->pagedata['settings'] = array(
 						"name" => _("Settings"),
@@ -645,7 +645,7 @@ return true;
 				}
 				break;
 		}
-		
+
 		if(! empty($this->pagedata)) {
 			foreach($this->pagedata as &$page) {
 				ob_start();
@@ -656,35 +656,35 @@ return true;
 			return $this->pagedata;
 		}
 	}
-	
+
 	public function getActiveModules() {
 	}
-	
+
 	//http://wiki.freepbx.org/display/FOP/Adding+Floating+Right+Nav+to+Your+Module
 	public function getRightNav($request) {
 	}
-	
+
 	//http://wiki.freepbx.org/pages/viewpage.action?pageId=29753755
 	public function getActionBar($request) {
 	}
-	
+
 	public function install() {
-		
+
 	}
-	
+
     public function uninstall() {
     	out(_("Removing Phone Modules Directory"));
     	$this->system->rmrf($this->PHONE_MODULES_PATH);
     	exec("rm -R ". $this->PHONE_MODULES_PATH);
-    	
+
     	out(_('Removing symlink to web provisioner'));
     	$provisioning_path = $this->config->get('AMPWEBROOT')."/provisioning";
     	if(is_link($provisioning_path)) { unlink($provisioning_path); }
-    	
+
     	if(!is_link($this->config->get('AMPWEBROOT').'/admin/assets/endpointman')) {
     		$this->system->rmrf($this->config->get('AMPWEBROOT').'/admin/assets/endpointman');
     	}
-    	
+
     	out(_("Dropping all relevant tables"));
     	$sql = "DROP TABLE `endpointman_brand_list`";
     	$sth = $this->db->prepare($sql);
@@ -718,32 +718,32 @@ return true;
     	$sth->execute();
     	return true;
 	}
-	
+
     public function backup() {
 	}
-	
+
     public function restore($backup) {
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
 	/**
      * Get info models by product id selected.
      * @param int $id_product product ID
 	 * @param bool $show_all True return all, False return hidden = 0
      * @return array
      */
-	public function epm_config_hardware_get_list_models($id_product=NULL, $show_all = true) 
+	public function epm_config_hardware_get_list_models($id_product=NULL, $show_all = true)
 	{
 		if(! is_numeric($id_product)) { throw new \Exception( _("ID Producto not is number")." (".$id_product.")"); }
 		if($show_all == true) 	{ $sql = 'SELECT * FROM endpointman_model_list WHERE product_id = '.$id_product; }
@@ -751,14 +751,14 @@ return true;
 		$result = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
 		return $result;
 	}
-	
+
 	/**
      * Get info product by brand id selected.
      * @param int $id_brand brand ID
 	 * @param bool $show_all True return all, FAlse return hidde = 0
      * @return array
      */
-	public function epm_config_hardware_get_list_product($id_brand=NULL, $show_all = true) 
+	public function epm_config_hardware_get_list_product($id_brand=NULL, $show_all = true)
 	{
 		if(! is_numeric($id_brand)) { throw new \Exception(_("ID Brand not is numbre")." (".$id_brand.")"); }
 		if ($show_all == true) 	{ $sql = 'SELECT * FROM endpointman_product_list WHERE brand = '.$id_brand.' ORDER BY long_name ASC'; }
@@ -766,7 +766,7 @@ return true;
 		$result = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
 		return $result;
 	}
-	
+
 	/**
      * Get info all brands.
 	 * @param bool $show_all True return all, False return hidde = 0
@@ -778,48 +778,48 @@ return true;
 		$result = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
 		return $result;
 	}
-	
-	
-	
-	
-	
 
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	private function epm_config_manual_install($install_type = "", $package ="")
 	{
 		if ($install_type == "") {
 			throw new \Exception("Not send install_type!");
 		}
-	
+
 		switch($install_type) {
 			case "export_brand":
 
 				break;
-	
+
 			case "upload_master_xml":
 				if (file_exists($this->PHONE_MODULES_PATH."temp/master.xml")) {
 					$handle = fopen($this->PHONE_MODULES_PATH."temp/master.xml", "rb");
@@ -838,36 +838,36 @@ return true;
 				} else {
 				}
 				break;
-	
+
 			case "upload_provisioner":
-				
+
 				break;
-	
+
 			case "upload_brand":
-			
+
 				break;
 		}
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	/******************************************************
 	 **** FUNCIONES SEC MODULO "epm_template\manager". ****
 	 *****************************************************/
-	
-	public function epm_templates_del_template() 
+
+	public function epm_templates_del_template()
 	{
 		if (! isset($_REQUEST['idsel'])) {
 			$retarr = array("status" => false, "message" => _("No send ID!"));
@@ -880,18 +880,18 @@ return true;
 		}
 		else {
 			$dget['idsel'] = $_REQUEST['idsel'];
-			
+
 			$sql = "DELETE FROM endpointman_template_list WHERE id = ". $dget['idsel'];
 			sql($sql);
 			$sql = "UPDATE endpointman_mac_list SET template_id = 0 WHERE template_id = ".$dget['idsel'];
 			sql($sql);
-			
+
 			$retarr = array("status" => true, "message" => _("Delete Template OK!"));
 			unset($dget);
 		}
 		return $retarr;
 	}
-	
+
 	public function epm_templates_add_template ()
 	{
 		if (! isset($_REQUEST['newnametemplate'])) {
@@ -929,14 +929,14 @@ return true;
 			$ob = $q->execute(array($dget['newproductselec'], addslashes($dget['newnametemplate']), $dget['newclonemodel']));
 			$newid = $db->lastInsertId();
 			//$endpoint->edit_template_display($id,0);
-			
+
 			$retarr = array("status" => true, "message" => _("Add New Template OK!"), "newid" => $newid);
 			unset($dget);
 		}
 		return $retarr;
 	}
-	
-	public function epm_templates_model_clone () 
+
+	public function epm_templates_model_clone ()
 	{
 		if (! isset($_REQUEST['id'])) {
 			$retarr = array("status" => false, "message" => _("No send ID!"));
@@ -950,7 +950,7 @@ return true;
 		else
 		{
 			$dget['id'] = $_REQUEST['id'];
-			
+
 			$i=0;
 			$out = array();
 			$sql = "SELECT endpointman_model_list.id, endpointman_model_list.model as model FROM endpointman_model_list, endpointman_product_list WHERE endpointman_product_list.id = endpointman_model_list.product_id AND endpointman_model_list.enabled = 1 AND endpointman_model_list.hidden = 0 AND product_id = '". $dget['id']."'";
@@ -961,15 +961,15 @@ return true;
 				$i++;
 			}
 			$retarr = array("status" => true, "message" => _("Generate list Ok!"), "listopt" => $out);
-			
+
 			unset($dget);
 		}
 		return $retarr;
 	}
-	
+
 	public function epm_templates_list_current_templates ()
 	{
-	
+
 		$sql = 'SELECT endpointman_template_list.*, endpointman_product_list.short_name as model_class, endpointman_model_list.model as model_clone, endpointman_model_list.enabled FROM endpointman_template_list, endpointman_model_list, endpointman_product_list WHERE endpointman_model_list.hidden = 0 AND endpointman_template_list.model_id = endpointman_model_list.id AND endpointman_template_list.product_id = endpointman_product_list.id';
 		$template_list = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
 		$i = 0;
@@ -982,7 +982,7 @@ return true;
 			}
 			$i++;
 		}
-		
+
 		$sql = 'SELECT endpointman_mac_list.mac, endpointman_mac_list.id, endpointman_mac_list.model, endpointman_model_list.model as model_clone, endpointman_product_list.short_name as model_class FROM endpointman_mac_list, endpointman_model_list, endpointman_product_list WHERE  endpointman_product_list.id = endpointman_model_list.product_id AND endpointman_mac_list.global_custom_cfg_data IS NOT NULL AND endpointman_model_list.id = endpointman_mac_list.model AND endpointman_mac_list.template_id = 0';
 		$template_list = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
 		foreach($template_list as $row) {
@@ -1003,7 +1003,7 @@ return true;
 			$row_out[$i]['description'] = $description;
 			$i++;
 		}
-		
+
 	/*
 		//$sql = 'SELECT endpointman_oui_list.id, endpointman_oui_list.oui , endpointman_brand_list.name, endpointman_oui_list.custom FROM endpointman_oui_list , endpointman_brand_list WHERE endpointman_oui_list.brand = endpointman_brand_list.id ORDER BY endpointman_oui_list.oui ASC';
 		$sql = 'SELECT T1.id, T1.oui, T2.name, T1.custom FROM endpointman_oui_list as T1 , endpointman_brand_list as T2 WHERE T1.brand = T2.id ORDER BY T1.oui ASC';
@@ -1015,21 +1015,21 @@ return true;
 		*/
 		return $row_out;
 	}
-	
+
 	/********************
 	 * END SEC FUNCTIONS *
 	 ********************/
-	
-	
-	
-	
-	
+
+
+
+
+
 
 	/***************************************************
 	 **** FUNCIONES SEC MODULO "epm_advanced\poce". ****
 	 ***************************************************/
-	
-	public function epm_advanced_poce_select() 
+
+	public function epm_advanced_poce_select()
 	{
 		if (! isset($_REQUEST['product_select'])) {
 			$retarr = array("status" => false, "message" => _("No send Product Select!"));
@@ -1043,10 +1043,10 @@ return true;
 		else
 		{
 			$dget['product_select'] = $_REQUEST['product_select'];
-			
+
 			$sql = 'SELECT * FROM `endpointman_product_list` WHERE `hidden` = 0 AND `id` = '.$dget['product_select'];
 			$product_select_info = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
-			
+
 			$sql = "SELECT cfg_dir,directory,config_files FROM endpointman_product_list,endpointman_brand_list WHERE endpointman_product_list.brand = endpointman_brand_list.id AND endpointman_product_list.id ='" . $dget['product_select'] . "'";
 			$row =  sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
 			$config_files = explode(",", $row['config_files']);
@@ -1059,7 +1059,7 @@ return true;
 					$i++;
 				}
 			} else { $file_list = NULL; }
-			
+
 			$sql = "SELECT * FROM endpointman_custom_configs WHERE product_id = '" . $dget['product_select'] . "'";
 			$data = sql($sql,'getAll', DB_FETCHMODE_ASSOC);
 			$i = 0;
@@ -1072,13 +1072,13 @@ return true;
 					$i++;
 				}
 			} else { $sql_file_list = NULL; }
-			
-			
+
+
 			require_once($this->PHONE_MODULES_PATH . 'setup.php');
 			$class = "endpoint_" . $row['directory'] . "_" . $row['cfg_dir'] . '_phone';
 			$base_class = "endpoint_" . $row['directory'] . '_base';
 			$master_class = "endpoint_base";
-			
+
 			/*********************************************************************************
 			 *** Quick Fix for FreePBX Distro
 			 *** I seriously want to figure out why ONLY the FreePBX Distro can't do autoloads.
@@ -1094,11 +1094,11 @@ return true;
 			}
 			//end quick fix
 			$phone_config = new $class();
-		
+
 			//TODO: remove
 			$template_file_list[0]['value'] = "template_data_custom.xml";
 			$template_file_list[0]['text'] = "template_data_custom.xml";
-		
+
 			$sql = "SELECT id, model FROM endpointman_model_list WHERE product_id = '" . $dget['product_select'] . "' AND enabled = 1 AND hidden = 0";
 			$data = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
 			$i = 1;
@@ -1107,19 +1107,19 @@ return true;
 				$template_file_list[$i]['value'] = $list['id'];
 				$template_file_list[$i]['text'] = "template_data_" . $list['model'] . "_custom.xml";
 			}
-			
-			$retarr = array("status" => true, 
-							"message" => "OK", 
-							"product_select" => $dget['product_select'], 
-							"product_select_info" => $product_select_info, 
-							"file_list" => $file_list, 
-							"template_file_list" => $template_file_list, 
+
+			$retarr = array("status" => true,
+							"message" => "OK",
+							"product_select" => $dget['product_select'],
+							"product_select_info" => $product_select_info,
+							"file_list" => $file_list,
+							"template_file_list" => $template_file_list,
 							"sql_file_list" => $sql_file_list);
 			unset($dget);
 		}
 		return $retarr;
 	}
-	
+
 	public function epm_advanced_poce_select_file()
 	{
 		if (! isset($_REQUEST['product_select'])) {
@@ -1146,12 +1146,12 @@ return true;
 			$dget['file_name'] = $_REQUEST['file_name'];
 			$dget['file_id'] = $_REQUEST['file_id'];
 			$dget['type_file'] = $_REQUEST['type_file'];
-			
-			
+
+
 			if ($dget['type_file'] == "sql") {
 				$sql = 'SELECT * FROM endpointman_custom_configs WHERE id =' . $dget['file_id'];
 				$row = sql($sql, 'getrow', DB_FETCHMODE_ASSOC);
-				
+
 				$type = $dget['type_file'];
 				$sendidt = $row['id'];
 				$product_select = $row['product_id'];
@@ -1160,19 +1160,19 @@ return true;
 				$filename =  $row['name'];
 				$location = "SQL: ". $row['name'];
 				$config_data = $this->display_htmlspecialchars($row['data']);
-				
+
 			}
 			elseif ($dget['type_file'] == "file") {
 				$sql = "SELECT cfg_dir,directory,config_files FROM endpointman_product_list,endpointman_brand_list WHERE endpointman_product_list.brand = endpointman_brand_list.id AND endpointman_product_list.id = '" . $dget['product_select'] . "'";
 				$row = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
-				
+
 				$config_files = explode(",", $row['config_files']);
-				//TODO: Añadir validacion para ver si $dget['file_name'] esta en el array $config_files
-				
+				//TODO: Aï¿½adir validacion para ver si $dget['file_name'] esta en el array $config_files
+
 				$filename = $dget['file_name'];
-				$pathfile = $this->PHONE_MODULES_PATH . 'endpoint/' . $row['directory'] . "/" . $row['cfg_dir'] . "/" . $filename; 
-				
-				
+				$pathfile = $this->PHONE_MODULES_PATH . 'endpoint/' . $row['directory'] . "/" . $row['cfg_dir'] . "/" . $filename;
+
+
 				if (is_readable($pathfile)) {
 					if(filesize($pathfile)>0) {
 						$handle = fopen($pathfile, "rb");
@@ -1183,7 +1183,7 @@ return true;
 					else {
 						$contents = "";
 					}
-					
+
 					$type = $dget['type_file'];
 					$sendidt = $dget['file_id'];
 					$product_select = $dget['product_select'];
@@ -1197,7 +1197,7 @@ return true;
 					$retarr = array("status" => false, "message" => _("File not readable, check the permission! ").$filename);
 				}
 			}
-			elseif ($dget['type_file'] == "tfile") 
+			elseif ($dget['type_file'] == "tfile")
 			{
 				if ($dget['file_id'] == "template_data_custom.xml")
 				{
@@ -1206,24 +1206,24 @@ return true;
 					$config_data = "";
 				}
 				else {
-					
+
 					$sql = "SELECT * FROM endpointman_model_list WHERE id = '" . $dget['file_id'] . "'";
 					$data = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
-			
+
 					$sendidt = $data['id'];
 					$original_name = $dget['file_name'];
 					$config_data = unserialize($data['template_data']);
 					$config_data = generate_xml_from_array ($config_data, 'node');
 				}
-				
+
 				$type = $dget['type_file'];
 				$product_select = $dget['product_select'];
 				$save_as_name_value = $dget['file_name'];
 				$filename = $dget['file_name'];
 				$location = $dget['file_name'];
 			}
-			
-			$retarr = array("status" => true, 
+
+			$retarr = array("status" => true,
 							"message" => "OK",
 							"type" => $type,
 							"sendidt" => $sendidt,
@@ -1237,13 +1237,13 @@ return true;
 		}
 		return $retarr;
 	}
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
 	//TODO: PENDIENTE REVISAR
 	function epm_advanced_poce_sendid()
 	{
@@ -1262,9 +1262,9 @@ return true;
 			$dget['sendid'] = $_REQUEST['sendid'];
 			$dget['original_name'] = $_REQUEST['original_name'];
 			$dget['config_text'] = $_REQUEST['config_text'];
-			
-			
-			
+
+
+
 			//DEBUGGGGGGGGGGGGG
 			return;
 			if ($dget['type_file'] == "sql") {
@@ -1286,13 +1286,13 @@ return true;
 		}
 		return $retarr;
 	}
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
 	function epm_advanced_poce_save_file()
 	{
 		if (! isset($_REQUEST['product_select'])) {
@@ -1325,14 +1325,14 @@ return true;
 			$dget['original_name'] = $_REQUEST['original_name'];
 			$dget['file_name'] = $_REQUEST['file_name'];
 			$dget['config_text'] = $_REQUEST['config_text'];
-			
-			
-			if ($dget['type_file'] == "file")  
+
+
+			if ($dget['type_file'] == "file")
 			{
 				$sql = "SELECT cfg_dir,directory,config_files FROM endpointman_product_list,endpointman_brand_list WHERE endpointman_product_list.brand = endpointman_brand_list.id AND endpointman_product_list.id = '" . $dget['product_select'] . "'";
 				$row = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
 				$config_files = explode(",", $row['config_files']);
-				
+
 				if ((is_array($config_files)) AND (in_array($dget['file_name'], $config_files)))
 				{
 					$pathdir = $this->PHONE_MODULES_PATH . 'endpoint/' . $row['directory'] . "/" . $row['cfg_dir'] . "/";
@@ -1343,7 +1343,7 @@ return true;
 					elseif (! is_writable($pathfile)) {
 						$retarr = array("status" => false, "message" => "File is not Writable (".$pathfile.")!");
 					}
-					else 
+					else
 					{
 						$wfh = fopen($pathfile, 'w');
 						fwrite($wfh, $dget['config_text']);
@@ -1355,7 +1355,7 @@ return true;
 					$retarr = array("status" => false, "message" => "The File no existe in the DataBase!");
 				}
 			}
-			elseif ($dget['type_file'] == "sql") 
+			elseif ($dget['type_file'] == "sql")
 			{
 				$sql = "UPDATE endpointman_custom_configs SET data = '" . addslashes($dget['config_text']) . "' WHERE id = " . $dget['sendid'];
 				sql($sql);
@@ -1369,7 +1369,7 @@ return true;
 				$ob = $q->execute(array(addslashes($dget['save_as_name']), addslashes($dget['original_name']), $dget['product_select'], addslashes($dget['config_text'])));
 				$newidinsert = $db->lastInsertId();
 				$retarr = array("status" => true, "message" => "Saved to Database!");
-				
+
 				$retarr['type_file'] = "sql";
 				$retarr['location'] = "SQL: ". $dget['save_as_name'];
 				$retarr['sendidt'] = $newidinsert;
@@ -1377,8 +1377,8 @@ return true;
 			else {
 				$retarr = array("status" => false, "message" => "Type not valid!");
 			}
-			
-			
+
+
 			$retarr['original_name'] = $dget['original_name'];
 			$retarr['file_name'] = $dget['file_name'];
 			$retarr['save_as_name'] = $dget['save_as_name'];
@@ -1386,7 +1386,7 @@ return true;
 		}
 		return $retarr;
 	}
-	
+
 	function epm_advanced_poce_delete_config_custom()
 	{
 		if (! isset($_REQUEST['product_select'])) {
@@ -1402,7 +1402,7 @@ return true;
 			$dget['type_file'] = $_REQUEST['type_file'];
 			$dget['product_select'] = $_REQUEST['product_select'];
 			$dget['sql_select'] = $_REQUEST['sql_select'];
-			
+
 			if ($dget['type_file'] == "sql") {
 				$sql = "DELETE FROM endpointman_custom_configs WHERE id =" . $dget['sql_select'];
 				sql($sql);
@@ -1410,7 +1410,7 @@ return true;
 				$retarr = array("status" => true, "message" => "File delete ok!");
 			}
 			else { $retarr = array("status" => false, "message" => _("Type File not valid!")); }
-			
+
 			unset($dget);
 		}
 		return $retarr;
@@ -1418,25 +1418,25 @@ return true;
 	/********************
 	 * END SEC FUNCTIONS *
 	 ********************/
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
 	/************************************************************
 	 **** FUNCIONES SEC MODULO "epm_advanced\manual_upload". ****
 	 ***********************************************************/
-	
+
 	public function epm_advanced_manual_upload_list_files_brans_export()
 	{
 		$path_tmp_dir = $this->PHONE_MODULES_PATH."temp/export/";
 		$array_list_files = array();
 		$array_count_brand = array();
-		
-		
+
+
 		$array_list_exception= array(".", "..", ".htaccess");
 		if(file_exists($path_tmp_dir))
 		{
@@ -1446,11 +1446,11 @@ return true;
 				$i = 0;
 				foreach ($l_files as $archivo) {
 					if (in_array($archivo, $array_list_exception)) { continue; }
-					
+
 					$pathandfile = $path_tmp_dir.$archivo;
 					$brand = substr(pathinfo($archivo, PATHINFO_FILENAME), 0, -11);
 					$ftime = substr(pathinfo($archivo, PATHINFO_FILENAME), -10);
-					
+
 					$array_count_brand[] = $brand;
 					$array_list_files[$i] = array("brand" => $brand,
 							"pathall" => $pathandfile,
@@ -1465,19 +1465,19 @@ return true;
 							"is_file" => is_file($pathandfile),
 							"is_link" => is_link($pathandfile),
 							"readlink" => (is_link($pathandfile) == true ? readlink ($pathandfile) : NULL));
-					
+
 					$i++;
 				}
 				unset ($l_files);
-				
+
 				$array_count_brand = array_count_values($array_count_brand);
 				ksort ($array_count_brand);
 				$array_count_brand_end = array();
-				
+
 				foreach($array_count_brand as $key => $value) {
 					$array_count_brand_end[] = array('name' => $key , 'num' => $value);
 				}
-				
+
 				$retarr = array("status" => true, "message" => _("List Done!"), "countlist" => count($array_list_files), "list_files" => $array_list_files, "list_brands" => $array_count_brand_end );
 				unset ($array_count_brand_end);
 				unset ($array_count_brand);
@@ -1491,7 +1491,7 @@ return true;
 		}
 		return $retarr;
 	}
-	
+
 	public function epm_advanced_manual_upload_brand()
 	{
 		if (count($_FILES["files"]["error"]) == 0) {
@@ -1501,23 +1501,23 @@ return true;
 		{
 			foreach ($_FILES["files"]["error"] as $key => $error) {
 				echo format_txt(_("Importing brand file %_FILE_%..."), "", array("%_FILE_%" => $_FILES["files"]["name"][$key]));
-			
+
 				if ($error != UPLOAD_ERR_OK) {
 					echo format_txt($this->file_upload_error_message($error), "error");
 				}
-				else 
+				else
 				{
-		 			
+
 					$uploads_dir = $this->PHONE_MODULES_PATH . "temp";
 					$name = $_FILES["files"]["name"][$key];
 					$extension = pathinfo($name, PATHINFO_EXTENSION);
 					if ($extension == "tgz") {
-						
+
 						$tmp_name = $_FILES["files"]["tmp_name"][$key];
 						$uploads_dir_file = $uploads_dir."/".$name;
 						move_uploaded_file($tmp_name, $uploads_dir_file);
-						
-						if (file_exists($uploads_dir_file)) 
+
+						if (file_exists($uploads_dir_file))
 						{
 							$temp_directory = sys_get_temp_dir() . "/epm_temp/";
 							if (!file_exists($temp_directory)) {
@@ -1529,7 +1529,7 @@ return true;
 									echo format_txt(_("Error!"), "error");
 								}
 							}
-							if (file_exists($temp_directory)) 
+							if (file_exists($temp_directory))
 							{
 								if ($this->configmod->get('debug')) {
 									echo format_txt(_("Extracting Tarball %_FILEPACKAGE_% to %_TEMPDIR_%........"),"",array("%_FILEPACKAGE_%" => $uploads_dir_file, "%_TEMPDIR_%" => $temp_directory));
@@ -1538,16 +1538,16 @@ return true;
 								}
 								exec("tar -xvf ".$uploads_dir_file." -C ".$temp_directory);
 								echo format_txt(_("Done!"), "done");
-								
+
 								$package = basename($name, ".tgz");
 								$package = explode("-",$package);
-								
+
 								if ($this->configmod->get('debug')) {
 									echo format_txt(_("Looking for file %_FILEPACKAGE_% to pass on to update_brand()..."),"",array("%_FILEPACKAGE_%" => $temp_directory.$package[0]));
 								} else {
 									echo format_txt(_("Looking file and update brand's...."));
 								}
-								
+
 								if(file_exists($temp_directory.$package[0])) {
 									$this->update_brand($package[0],FALSE);
 									//                  Note: no need to delete/unlink/rmdir as this is handled in update_brand()
@@ -1555,12 +1555,12 @@ return true;
 									echo format_txt(_("Please name the Package the same name as your brand!"));
 								}
 							}
-						} 
+						}
 						else {
 							echo format_txt(_("No File Provided!"), "error");
 							//echo "File ".$this->PHONE_MODULES_PATH."temp/".$_REQUEST['package']." not found. <br />";
 						}
-					} 
+					}
 					else {
 						echo format_txt(_("Invalid File Extension!"), "error");
 					}
@@ -1568,7 +1568,7 @@ return true;
 			}
 		}
 	}
-	
+
 	public function epm_advanced_manual_upload_provisioner ()
 	{
 		if (count($_FILES["files"]["error"]) == 0) {
@@ -1578,26 +1578,26 @@ return true;
 		{
 			foreach ($_FILES["files"]["error"] as $key => $error) {
 				echo format_txt(_("Importing Provisioner file %_FILE_%..."), "", array("%_FILE_%" => $_FILES["files"]["name"][$key]));
-			
+
 				if ($error != UPLOAD_ERR_OK) {
 					echo format_txt($this->file_upload_error_message($error), "error");
 				}
-				else 
+				else
 				{
 					$uploads_dir = $this->PHONE_MODULES_PATH . "temp";
 					$name = $_FILES["files"]["name"][$key];
 					$extension = pathinfo($name, PATHINFO_EXTENSION);
-					if ($extension == "tgz") 
+					if ($extension == "tgz")
 					{
 						$tmp_name = $_FILES["files"]["tmp_name"][$key];
 						$uploads_dir_file = $uploads_dir."/".$name;
 						move_uploaded_file($tmp_name, $uploads_dir_file);
-						
+
 						if (file_exists($uploads_dir_file)) {
 							echo format_txt(_("Extracting Provisioner Package..."));
 							exec("tar -xvf ".$uploads_dir_file." -C ".$uploads_dir."/");
 							echo format_txt(_("Done!"), "done");
-							
+
 							if(!file_exists($this->PHONE_MODULES_PATH."endpoint")) {
 								echo format_txt(_("Creating Provisioner Directory..."));
 								if (mkdir($this->PHONE_MODULES_PATH."endpoint") == true) {
@@ -1607,19 +1607,19 @@ return true;
 									echo format_txt(_("Error!"), "error");
 								}
 							}
-							
-							if(file_exists($this->PHONE_MODULES_PATH."endpoint")) 
+
+							if(file_exists($this->PHONE_MODULES_PATH."endpoint"))
 							{
 								$endpoint_last_mod = filemtime($this->PHONE_MODULES_PATH."temp/endpoint/base.php");
 								rename($this->PHONE_MODULES_PATH."temp/endpoint/base.php", $this->PHONE_MODULES_PATH."endpoint/base.php");
-								
+
 								echo format_txt(_("Updating Last Modified..."));
 								$sql = "UPDATE endpointman_global_vars SET value = '".$endpoint_last_mod."' WHERE var_name = 'endpoint_vers'";
 								sql($sql);
 								echo format_txt(_("Done!"),"done");
 							}
-							
-						} else { 
+
+						} else {
 							echo format_txt(_("File Temp no Exists!"), "error");
 						}
 					} else {
@@ -1629,7 +1629,7 @@ return true;
 			}
 		}
 	}
-	
+
 	public function epm_advanced_manual_upload_export_brans_available_file()
 	{
 		if ((! isset($_REQUEST['file_package'])) OR ($_REQUEST['file_package'] == "")) {
@@ -1641,7 +1641,7 @@ return true;
 		else {
 			$dget['file_package'] = $_REQUEST['file_package'];
 			$path_tmp_file = $this->PHONE_MODULES_PATH."/temp/export/".$_REQUEST['file_package'];
-			
+
 			if (! file_exists($path_tmp_file)) {
 				header('HTTP/1.0 404 Not Found', true, 404);
 				echo "<h1>Error 404 Not Found</h1>";
@@ -1664,7 +1664,7 @@ return true;
 		}
 		exit;
 	}
-	
+
 	public function epm_advanced_manual_upload_export_brans_available()
 	{
 		if ((! isset($_REQUEST['package'])) OR ($_REQUEST['package'] == "")) {
@@ -1675,23 +1675,23 @@ return true;
 		}
 		else {
 			$dget['package'] = $_REQUEST['package'];
-			
+
 			$sql = 'SELECT `name`, `directory` FROM `endpointman_brand_list` WHERE `id` = '.$dget['package'].'';
 			$row = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
-			
+
 			if ($row == "") {
 				echo format_txt(_("ID Package send not valid, brand not exist!"), "error");
 			}
 			else {
 				echo format_txt(_("Exporting %_NAME_%"), "", array("%_NAME_%" => $row['name']));
-				
+
 				if(!file_exists($this->PHONE_MODULES_PATH."/temp/export/")) {
 					mkdir($this->PHONE_MODULES_PATH."/temp/export/");
 				}
 				$time = time();
 				exec("tar zcf ".$this->PHONE_MODULES_PATH."temp/export/".$row['directory']."-".$time.".tgz --exclude .svn --exclude firmware -C ".$this->PHONE_MODULES_PATH."/endpoint ".$row['directory']);
-				
-				
+
+
 				echo format_txt(_("Done!"), "done");
 				echo format_txt(_("Click this link to download:"));
 				echo "<a href='config.php?display=epm_advanced&subpage=manual_upload&command=export_brands_availables_file&file_package=".$row['directory']."-".$time.".tgz' target='_blank'>";
@@ -1702,17 +1702,17 @@ return true;
 			unset ($dget);
 		}
 	}
-	
+
 	/********************
 	 * END SEC FUNCTIONS *
 	 ********************/
-	
-	
-	
+
+
+
 	/***************************************************
 	 **** FUNCIONES SEC MODULO "epm_advanced\iedl". ****
 	 **************************************************/
-	
+
 	public function epm_advanced_iedl_export($sFileName = "devices_list.csv")
 	{
 		header("Content-type: text/csv");
@@ -1726,20 +1726,20 @@ return true;
 		fclose($outstream);
 		exit;
 	}
-	
+
 	//Dave B's Q&D file upload security code (http://us2.php.net/manual/en/features.file-upload.php)
 	public function epm_advanced_iedl_import()
 	{
 		if (count($_FILES["files"]["error"]) == 0) {
 			echo format_txt(_("Can Not Find Uploaded Files!"), "error");
 		}
-		else 
+		else
 		{
 			$allowedExtensions = array("application/csv", "text/plain");
-			
+
 			foreach ($_FILES["files"]["error"] as $key => $error) {
 				echo format_txt(_("Importing CVS file %_FILE_%..."), "", array("%_FILE_%" => $_FILES["files"]["name"][$key]));
-				
+
 				if ($error != UPLOAD_ERR_OK) {
 					echo format_txt($this->file_upload_error_message($error), "error");
 				}
@@ -1754,7 +1754,7 @@ return true;
 					else {
 						$uploadfile = $this->LOCAL_PATH . basename($_FILES["files"]["name"][$key]);
 						$uploadtemp = $_FILES["files"]["tmp_name"][$key];
-						
+
 						if (move_uploaded_file($uploadtemp, $uploadfile)) {
 							//Parse the uploaded file
 							$handle = fopen($uploadfile, "r");
@@ -1764,29 +1764,29 @@ return true;
 									if ($mac = $this->mac_check_clean($device[0])) {
 										$sql = "SELECT id FROM endpointman_brand_list WHERE name LIKE '%" . $device[1] . "%' LIMIT 1";
 										$res = sql($sql);
-										
+
 										if ($res->numRows() > 0) {
 											$brand_id = sql($sql, 'getOne');
 											$brand_id = $brand_id[0];
-											
+
 											$sql_model = "SELECT id FROM endpointman_model_list WHERE brand = " . $brand_id . " AND model LIKE '%" . $device[2] . "%' LIMIT 1";
 											$sql_ext = "SELECT extension, name FROM users WHERE extension LIKE '%" . $device[3] . "%' LIMIT 1";
-											
+
 											$line_id = isset($device[4]) ? $device[4] : 1;
-											
+
 											$res_model = sql($sql_model);
 											if ($res_model->numRows()) {
 												$model_id = sql($sql_model, 'getRow', DB_FETCHMODE_ASSOC);
 												$model_id = $model_id['id'];
-												
+
 												$res_ext = sql($sql_ext);
 												if ($res_ext->numRows()) {
 													$ext = sql($sql_ext, 'getRow', DB_FETCHMODE_ASSOC);
 													$description = $ext['name'];
 													$ext = $ext['extension'];
-													
+
 													$this->add_device($mac, $model_id, $ext, 0, $line_id, $description);
-													
+
 													echo format_txt(_("Done!"), "done");
 												} else {
 													echo format_txt(_("Invalid Extension Specified on line %_LINE_%!"), "error", array("%_LINE_%" => $i));
@@ -1814,20 +1814,20 @@ return true;
 			}
 		}
 	}
-	
+
 	/********************
 	 * END SEC FUNCTIONS *
 	 ********************/
-	
-	
-	
+
+
+
 	/**********************************************************
 	 **** FUNCIONES SEC MODULO "epm_advanced\oui_manager". ****
 	 *********************************************************/
-	
+
 	private function epm_advanced_oui_remove()
 	{
-		//TODO: Añadir validacion de si es custom o no
+		//TODO: Aï¿½adir validacion de si es custom o no
 		if ((! isset($_REQUEST['id_del'])) OR ($_REQUEST['id_del'] == "")) {
 			$retarr = array("status" => false, "message" => _("No ID set!"));
 		}
@@ -1837,19 +1837,19 @@ return true;
 		else
 		{
 			$dget['id'] = $_REQUEST['id_del'];
-			
+
 			$sql = "DELETE FROM endpointman_oui_list WHERE id = " . $dget['id'];
 			sql($sql);
-			
+
 			$retarr = array("status" => true, "message" => "OK", "id" => $dget['id']);
 			unset($dget);
 		}
 		return $retarr;
-	} 
-	
-	private function epm_advanced_oui_add() 
+	}
+
+	private function epm_advanced_oui_add()
 	{
-		//TODO: Pendiente añadir isExiste datos.
+		//TODO: Pendiente aï¿½adir isExiste datos.
 		if ((! isset($_REQUEST['number_new_oui'])) OR ($_REQUEST['number_new_oui'] == "")) {
 			$retarr = array("status" => false, "message" => _("No OUI set!"));
 		}
@@ -1859,26 +1859,26 @@ return true;
 		else {
 			$dget['oui'] = $_REQUEST['number_new_oui'];
 			$dget['brand'] = $_REQUEST['brand_new_oui'];
-			
+
 			$sql = "INSERT INTO  endpointman_oui_list (oui, brand, custom) VALUES ('" . $dget['oui'] . "',  '" . $dget['brand'] . "',  '1')";
 			sql($sql);
-			
+
 			$retarr = array("status" => true, "message" => "OK", "oui" => $dget['oui'], "brand" => $dget['brand']);
 			unset($dget);
 		}
 		return $retarr;
 	}
-	
+
 	/********************
 	 * END SEC FUNCTIONS *
 	 ********************/
-	
-	
-	
+
+
+
 	/******************************************************
 	**** FUNCIONES SEC MODULO "epm_advanced\settings". ****
 	******************************************************/
-	
+
 	public function epm_advanced_config_loc_is_writable()
 	{
 		$config_loc = $this->configmod->get("config_loc");
@@ -1887,12 +1887,12 @@ return true;
 			if ((file_exists($config_loc)) AND (is_dir($config_loc))) {
 				if (is_writable($config_loc)) {
 					$tftp_writable = TRUE;
-				} 
+				}
 			}
-		} 
+		}
 		return $tftp_writable;
 	}
-	
+
 	private function epm_advanced_settings_saveconfig ()
 	{
 		if (! isset($_REQUEST['name'])) {
@@ -1901,7 +1901,7 @@ return true;
 		elseif (! isset($_REQUEST['value'])) {
 			$retarr = array("status" => false, "message" => _("No send value!"));
 		}
-		else 
+		else
 		{
 			$dget['name'] = strtolower($_REQUEST['name']);
 			$dget['value'] = $_REQUEST['value'];
@@ -1910,47 +1910,47 @@ return true;
 					$dget['value'] = strtolower($dget['value']);
 					$sql = "UPDATE endpointman_global_vars SET value='" . ($dget['value'] == "yes" ? "1": "0") . "' WHERE var_name='enable_ari'";
 					break;
-					
+
 				case "enable_debug":
 					$dget['value'] = strtolower($dget['value']);
 					$sql = "UPDATE endpointman_global_vars SET value='" . ($dget['value'] == "yes" ? "1": "0") . "' WHERE var_name='debug'";
 					break;
-					
+
 				case "disable_help":
 					$dget['value'] = strtolower($dget['value']);
 					$sql = "UPDATE endpointman_global_vars SET value='" . ($dget['value'] == "yes" ? "1": "0") . "' WHERE var_name='disable_help'";
 					break;
-					
+
 				case "allow_dupext":
 					$dget['value'] = strtolower($dget['value']);
 					$sql = "UPDATE endpointman_global_vars SET value='" . ($dget['value'] == "yes" ? "1": "0") . "' WHERE var_name='show_all_registrations'";
 					break;
-					
+
 				case "allow_hdfiles":
 					$dget['value'] = strtolower($dget['value']);
 					$sql = "UPDATE endpointman_global_vars SET value='" . ($dget['value'] == "yes" ? "1": "0") . "' WHERE var_name='allow_hdfiles'";
 					break;
-					
+
 				case "tftp_check":
 					$dget['value'] = strtolower($dget['value']);
 					$sql = "UPDATE endpointman_global_vars SET value='" . ($dget['value'] == "yes" ? "1": "0") . "' WHERE var_name='tftp_check'";
 					break;
-				
+
 				case "backup_check":
 					$dget['value'] = strtolower($dget['value']);
 					$sql = "UPDATE endpointman_global_vars SET value='" . ($dget['value'] == "yes" ? "1": "0") . "' WHERE var_name='backup_check'";
 					break;
-				
+
 				case "use_repo":
 					$dget['value'] = strtolower($dget['value']);
 					if (($dget['value'] == "yes") and (! $this->has_git())) {
-						$retarr = array("status" => false, "message" => _("Git not installed!")); 
+						$retarr = array("status" => false, "message" => _("Git not installed!"));
 					}
 					else {
 						$sql = "UPDATE endpointman_global_vars SET value='" . ($dget['value'] == "yes" ? "1": "0") . "' WHERE var_name='use_repo'";
 					}
 					break;
-					
+
 				case "config_loc":
 					$dget['value'] = trim($dget['value']);
 					//No trailing slash. Help the user out and add one :-)
@@ -1962,53 +1962,53 @@ return true;
 							if (is_writable($dget['value'] = $dget['value'])) {
 								$sql = "UPDATE endpointman_global_vars SET value='" . $dget['value'] . "' WHERE var_name='config_location'";
 							} else {
-								$retarr = array("status" => false, "message" => _("Directory Not Writable!")); 
+								$retarr = array("status" => false, "message" => _("Directory Not Writable!"));
 							}
 						} else {
-							$retarr = array("status" => false, "message" => _("Not a Vaild Directory.<br /> Try to run 'mkdir " . $_POST['config_loc'] . "' as root.")); 
+							$retarr = array("status" => false, "message" => _("Not a Vaild Directory.<br /> Try to run 'mkdir " . $_POST['config_loc'] . "' as root."));
 						}
 					} else {
-						$retarr = array("status" => false, "message" => _("No Configuration Location Defined!")); 
+						$retarr = array("status" => false, "message" => _("No Configuration Location Defined!"));
 					}
 					break;
-					
+
 				case "srvip":
 					$dget['value'] = trim($dget['value']);
 					$sql = "UPDATE endpointman_global_vars SET value='" . $dget['value'] . "' WHERE var_name='srvip'";
 					break;
-					
+
 				case "tz":
 					$sql = "UPDATE endpointman_global_vars SET value='" . $dget['value'] . "' WHERE var_name='tz'";
 					break;
-					
+
 				case "ntp_server":
 					$dget['value'] = trim($dget['value']);
 					$sql = "UPDATE endpointman_global_vars SET value='" . $dget['value'] . "' WHERE var_name='ntp'";
 					break;
-					
+
 				case "nmap_loc":
 					$sql = "UPDATE endpointman_global_vars SET value='" . $dget['value'] . "' WHERE var_name='nmap_location'";
 					break;
-					
+
 				case "arp_loc":
 					$sql = "UPDATE endpointman_global_vars SET value='" . $dget['value'] . "' WHERE var_name='arp_location'";
 					break;
-					
+
 				case "asterisk_loc":
 					$sql = "UPDATE endpointman_global_vars SET value='" . $dget['value'] . "' WHERE var_name='asterisk_location'";
 					break;
-					
+
 				case "package_server":
 					$sql = "UPDATE endpointman_global_vars SET value='" . $dget['value'] . "' WHERE var_name='update_server'";
 					break;
-				
+
 				case "cfg_type":
 					if ($dget['value'] == 'http') {
 						$symlink = $this->config->get('AMPWEBROOT') . "/provisioning";
 						$reallink = $this->LOCAL_PATH . "provisioning";
 						if ((!is_link($symlink)) OR (!readlink($symlink) == $reallink)) {
 							if (!symlink($reallink, $symlink)) {
-								$retarr = array("status" => false, "message" => _("Your permissions are wrong on " . $this->config->get('AMPWEBROOT') . ", web provisioning link not created!")); 
+								$retarr = array("status" => false, "message" => _("Your permissions are wrong on " . $this->config->get('AMPWEBROOT') . ", web provisioning link not created!"));
 								//$dget['value'] = 'file';
 								break;
 							} else {
@@ -2022,9 +2022,9 @@ return true;
 					}
 					$sql = "UPDATE endpointman_global_vars SET value='" . $dget['value'] . "' WHERE var_name='server_type'";
 					break;
-					
+
 				default:
-					$retarr = array("status" => false, "message" => _("Name invalid: ") . $dget['name'] ); 
+					$retarr = array("status" => false, "message" => _("Name invalid: ") . $dget['name'] );
 			}
 			if (isset($sql)) {
 				sql($sql);
@@ -2035,53 +2035,53 @@ return true;
 		}
 		return $retarr;
 	}
-	
+
 	/********************
 	* END SEC FUNCTIONS *
 	********************/
-	
-	
-	
+
+
+
 	/***************************************************
 	**** FUNCIONES SEC MODULO "epm_config\manager". ****
 	***************************************************/
-	
+
 	private function epm_config_manager_check_for_updates ()
 	{
 		$this->update_check();
 		$retarr = array("status" => true, "message" => "OK");
 		return $retarr;
 	}
-	
+
 	private function epm_config_manager_brand()
 	{
-		if (! isset($_REQUEST['command_sub'])) { 
+		if (! isset($_REQUEST['command_sub'])) {
 			throw new \Exception("Not send command_sub!");
 		}
-		elseif (! isset($_REQUEST['idfw'])) { 
+		elseif (! isset($_REQUEST['idfw'])) {
 			throw new \Exception("Not send ID!");
 		}
-		else if (! is_numeric($_REQUEST['idfw'])) { 
+		else if (! is_numeric($_REQUEST['idfw'])) {
 			throw new \Exception("ID not is numbre!");
 		}
 		else
 		{
 			$dget['command'] =  strtolower($_REQUEST['command_sub']);
 			$dget['id'] = $_REQUEST['idfw'];
-			
+
 			switch($dget['command']) {
 				case "brand_install":
 					$this->download_brand($dget['id']);
 					break;
-					
+
 				case "brand_update":
 					$this->download_brand($dget['id']);
 					break;
-					
+
 				case "brand_uninstall":
 					$this->remove_brand($dget['id']);
 					break;
-					
+
 				default:
 					echo "<br />" . _("Error: Command not found!"). " [" . $dget['command'] . "]" . "<br />";
 			}
@@ -2089,43 +2089,43 @@ return true;
 			unset ($dget);
 		}
 	}
-	
+
 	private function epm_config_manager_firmware()
 	{
-		if (! isset($_REQUEST['command_sub'])) { 
+		if (! isset($_REQUEST['command_sub'])) {
 			throw new \Exception("Not send command_sub!");
 		}
-		elseif (! isset($_REQUEST['idfw'])) { 
+		elseif (! isset($_REQUEST['idfw'])) {
 			throw new \Exception("Not send ID!");
 		}
-		else if (! is_numeric($_REQUEST['idfw'])) { 
+		else if (! is_numeric($_REQUEST['idfw'])) {
 			throw new \Exception("ID not is numbre!");
 		}
 		else
 		{
 			$dget['command'] =  strtolower($_REQUEST['command_sub']);
 			$dget['id'] = $_REQUEST['idfw'];
-			
+
 			switch($dget['command']) {
 				case "fw_install":
 					$this->install_firmware($dget['id']);
 					break;
-					
+
 				case "fw_update":
 					$this->install_firmware($dget['id']);
 					break;
-					
+
 				case "fw_uninstall":
 					$this->remove_firmware($dget['id']);
 					break;
-					
+
 				default:
 					echo "<br />" . _("Error: Command not found!"). " [" . $dget['command'] . "]" . "<br />";
 			}
 			unset ($dget);
 		}
 	}
-	
+
 	private function epm_config_manager_saveconfig()
 	{
 		if (! isset($_REQUEST['name'])) {
@@ -2143,24 +2143,24 @@ return true;
 		elseif (! is_numeric($_REQUEST['idbt'])) {
 			$retarr = array("status" => false, "message" => _("ID send is not number!"));
 		}
-		else 
+		else
 		{
 			$dget['name'] = strtolower($_REQUEST['name']);
 			$dget['value'] = strtolower($_REQUEST['value']);
 			$dget['idtype'] = strtolower($_REQUEST['idtype']);
 			$dget['id'] = $_REQUEST['idbt'];
-			
+
 			switch($dget['idtype']) {
 				case "marca":
 					$sql = "UPDATE endpointman_brand_list SET enabled = '" .$dget['value']. "' WHERE id = '".$dget['id']."'";
 					break;
-					
+
 				case "modelo":
 					$sql = "UPDATE endpointman_model_list SET enabled = " .$dget['value']. " WHERE id = '".$dget['id']."'";
 					break;
-					
+
 				default:
-					$retarr = array("status" => false, "message" => _("IDType invalid: ") . $dget['idtype'] ); 
+					$retarr = array("status" => false, "message" => _("IDType invalid: ") . $dget['idtype'] );
 			}
 			if (isset($sql)) {
 				sql($sql);
@@ -2171,7 +2171,7 @@ return true;
 		}
 		return $retarr;
 	}
-	
+
 	public function epm_config_manager_hardware_get_list_all($check_for_updates = true)
 	{
 		$row_out = array();
@@ -2179,13 +2179,13 @@ return true;
 		$brand_list = $this->epm_config_hardware_get_list_brand(true);
 		//FIX: https://github.com/FreePBX-ContributedModules/endpointman/commit/2ad929d0b38f05c9da1b847426a4094c3314be3b
 		if($check_for_updates) 	$brand_up = $this->update_check();
-		foreach ($brand_list as $row) 
+		foreach ($brand_list as $row)
 		{
 			$row_out[$i] = $row;
 			$row_out[$i]['count'] = $i;
 			$row_out[$i]['cfg_ver_datetime'] = date("c",$row['cfg_ver']);
-			
-			if($check_for_updates) 
+
+			if($check_for_updates)
 			{
 				$id = $this->system->arraysearchrecursive($row['name'], $brand_up,'name');
 				$id = $id[0];
@@ -2201,19 +2201,19 @@ return true;
 					$row_out[$i]['update_vers'] = "";
 				}
 			}
-			else 
+			else
 			{
 				if (! isset($row_out[$i]['update'])) 		{ $row_out[$i]['update'] = ""; }
 				if (! isset($row_out[$i]['update_vers'])) 	{ $row_out[$i]['update_vers'] = ""; }
 			}
 			if ($row['hidden'] == 1) { continue; }
-			
-			
+
+
 			$j = 0;
 			$product_list = $this->epm_config_hardware_get_list_product($row['id'], true);
 			foreach($product_list as $row2) {
 				$row_out[$i]['products'][$j] = $row2;
-				
+
 				if($check_for_updates) {
 					if((array_key_exists('firmware_vers', $row2)) AND ($row2['firmware_vers'] > 0)) {
 						$temp = $this->firmware_update_check($row2['id']);
@@ -2224,17 +2224,17 @@ return true;
 						$row_out[$i]['products'][$j]['update_vers_fw'] = "";
 					}
 				}
-				else 
+				else
 				{
 					if (! isset($row_out[$i]['products'][$j]['update_fw'])) 		{ $row_out[$i]['products'][$j]['update_fw'] = 0; }
 					if (! isset($row_out[$i]['products'][$j]['update_vers_fw'])) 	{ $row_out[$i]['products'][$j]['update_vers_fw'] = ""; }
 				}
 				$row_out[$i]['products'][$j]['fw_type'] = $this->firmware_local_check($row2['id']);
 				if ($row2['hidden'] == 1) { continue; }
-				
+
 				$k = 0;
 				$model_list = $this->epm_config_hardware_get_list_models($row2['id'], true);
-				foreach($model_list as $row3) 
+				foreach($model_list as $row3)
 				{
 					$row_out[$i]['products'][$j]['models'][$k] = $row3;
 					if($row_out[$i]['products'][$j]['models'][$k]['enabled']){
@@ -2251,9 +2251,9 @@ return true;
 	/********************
 	* END SEC FUNCTIONS *
 	********************/
-	
-	
-	
+
+
+
 	/**************************************************
 	**** FUNCIONES SEC MODULO "epm_config\editor". ****
 	**************************************************/
@@ -2278,28 +2278,28 @@ return true;
 		elseif (! is_numeric($_REQUEST['idbt'])) {
 			$retarr = array("status" => false, "message" => _("ID send is not number!"));
 		}
-		else 
+		else
 		{
 			$dget['name'] = strtolower($_REQUEST['name']);
 			$dget['value'] = strtolower($_REQUEST['value']);
 			$dget['idtype'] = strtolower($_REQUEST['idtype']);
 			$dget['id'] = $_REQUEST['idbt'];
-			
+
 			switch($dget['idtype']) {
 				case "marca":
 					$sql = "UPDATE endpointman_brand_list SET hidden = '".$dget['value'] ."' WHERE id = '".$dget['id']."'";
 					break;
-				
+
 				case "producto":
 					$sql = "UPDATE endpointman_product_list SET hidden = '". $dget['value'] ."' WHERE id = '".$dget['id']."'";
 					break;
-						
+
 				case "modelo":
 					$sql = "UPDATE endpointman_model_list SET hidden = '". $dget['value'] ."' WHERE id = '".$dget['id']."'";
 					break;
-					
+
 				default:
-					$retarr = array("status" => false, "message" => _("IDType invalid: ") . $dget['idtype'] ); 
+					$retarr = array("status" => false, "message" => _("IDType invalid: ") . $dget['idtype'] );
 			}
 			if (isset($sql)) {
 				sql($sql);
@@ -2310,23 +2310,23 @@ return true;
 		}
 		return $retarr;
 	}
-	
+
 	/**
      * Get info all brdans, prodics, models.
      * @return array
      */
-	public function epm_config_editor_hardware_get_list_all () 
+	public function epm_config_editor_hardware_get_list_all ()
 	{
 		$row_out = array();
 		$i = 0;
-		foreach ($this->epm_config_hardware_get_list_brand(true) as $row) 
+		foreach ($this->epm_config_hardware_get_list_brand(true) as $row)
 		{
 			$row_out[$i] = $row;
 			$row_out[$i]['count'] = $i;
-			if ($row['installed']) 
+			if ($row['installed'])
 			{
 				$j = 0;
-				foreach ($this->epm_config_hardware_get_list_product($row['id'], true) as $row2) 
+				foreach ($this->epm_config_hardware_get_list_product($row['id'], true) as $row2)
 				{
 					$row_out[$i]['products'][$j] = $row2;
 					$k = 0;
@@ -2344,33 +2344,33 @@ return true;
 	/********************
 	* END SEC FUNCTIONS *
 	********************/
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	/*****************************************
 	****** CODIGO ANTIGUO -- REVISADO ********
 	*****************************************/
-	
-	
+
+
 	/**
      * Check for new firmware on the servers
      * @param int $id Product ID
@@ -2399,7 +2399,7 @@ return true;
             }
         }
     }
-	
+
 	/**
      * Check to see the status of the firmware locally (installed or not)
      * @param int $id
@@ -2408,10 +2408,10 @@ return true;
     function firmware_local_check($id=NULL) {
         $sql = "SELECT * FROM  endpointman_product_list WHERE hidden = 0 AND id ='" . $id . "'";
         $res = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
-		
+
         if (count($res) > 0) {
             $row = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
-			
+
             $sql = "SELECT directory FROM  endpointman_brand_list WHERE hidden = 0 AND id ='" . $row['brand'] . "'";
             $brand_directory = sql($sql, 'getOne');
 
@@ -2434,7 +2434,7 @@ return true;
             return("nothing");
         }
     }
-	
+
 	/**
      * Reads a file. Json decodes it and will report any errors back
      * @param string $file location of file
@@ -2479,7 +2479,7 @@ return true;
             return(false);
         }
     }
-	
+
 	/**
      * Check for new packges for brands. These packages will include phone models and such which the user can remove if they want
      * This function will alos auto-update the provisioner.net library incase anything has changed
@@ -2524,7 +2524,7 @@ if ($echotxt) {  echo format_txt(_("Not able to connect to repository. Using loc
                         sql($sql);
                     }
                 }
-				
+
                 $out = $temp['data']['brands'];
                 //Assume that if we can't connect and find the master.xml file then why should we try to find every other file.
                 if ($master_result) {
@@ -2569,9 +2569,9 @@ if ($echotxt) {  echo format_txt(_("Not able to connect to repository. Using loc
                         } else {
                             $this->error['brand_update_check_local_file'] = "<br/>Error: No Local File for " . $data['name'] . "!<br /><br />Learn how to manually upload packages here (it's easy!): <a href='http://wiki.provisioner.net/index.php/Endpoint_manager_manual_upload' target='_blank'>Click Here!</a>";
 if ($echotxt) {
-	echo format_txt(_("Error: No Local File for %_name_% !"), "error", array("%_name_%" => $data['name'])); 
-	echo format_txt(_("Learn how to manually upload packages here (it's easy!):"), "error"); 
-	echo format_txt(_("<a href='http://wiki.provisioner.net/index.php/Endpoint_manager_manual_upload' target='_blank'>Click Here!</a>"), "error"); 
+	echo format_txt(_("Error: No Local File for %_name_% !"), "error", array("%_name_%" => $data['name']));
+	echo format_txt(_("Learn how to manually upload packages here (it's easy!):"), "error");
+	echo format_txt(_("<a href='http://wiki.provisioner.net/index.php/Endpoint_manager_manual_upload' target='_blank'>Click Here!</a>"), "error");
 }
                         }
                     }
@@ -2594,10 +2594,10 @@ if ($echotxt) {
                     }
                 } else {
                     $this->error['brand_update_check_master_file'] = "<br/>Aborting Brand Downloads. Can't Get Master File, Assuming Timeout Issues!<br /><br />Learn how to manually upload packages here (it's easy!): <a href='http://wiki.provisioner.net/index.php/Endpoint_manager_manual_upload' target='_blank'>Click Here!</a>";
-if ($echotxt) {  
-	echo format_txt(_("Aborting Brand Downloads. Can't Get Master File, Assuming Timeout Issues!"), "error"); 
-	echo format_txt(_("Aborting Brand Downloads. Can't Get Master File, Assuming Timeout Issues!"), "error"); 
-	echo format_txt(_("<a href='http://wiki.provisioner.net/index.php/Endpoint_manager_manual_upload' target='_blank'>Click Here!</a>"), "error"); 
+if ($echotxt) {
+	echo format_txt(_("Aborting Brand Downloads. Can't Get Master File, Assuming Timeout Issues!"), "error");
+	echo format_txt(_("Aborting Brand Downloads. Can't Get Master File, Assuming Timeout Issues!"), "error");
+	echo format_txt(_("<a href='http://wiki.provisioner.net/index.php/Endpoint_manager_manual_upload' target='_blank'>Click Here!</a>"), "error");
 }
                 }
 
@@ -2712,7 +2712,7 @@ if ($echotxt) {  echo format_txt(_("System Error in Sync Model [%_name_%] Functi
             }
         }
     }
-	
+
 	 /**
      * Sync the XML files (incuding all template files) from the hard drive with the database
      * @param int $model Model ID
@@ -2733,23 +2733,23 @@ if ($echotxt) {  echo format_txt(_("System Error in Sync Model [%_name_%] Functi
                 $error['sync_model'] = "Brand Directory '" . $brand_row['directory'] . "' Doesn't Exist! (" . $this->PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . ")";
                 return(FALSE);
             }
-            
+
             if (!file_exists($this->PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'])) {
                 $error['sync_model'] = "Product Directory '" . $product_row['cfg_dir'] . "' Doesn't Exist! (" . $this->PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'] . ")";
                 return(FALSE);
             }
-            
+
             if (!file_exists($this->PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'] . '/family_data.json')) {
-            	
+
                 $error['sync_model'] = "File 'family_data.json Doesn't exist in directory: " . $this->PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'];
                 return(FALSE);
             }
 
             $family_line_json = $this->file2json($this->PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'] . '/' . $product_row['cfg_dir'] . '/family_data.json');
 
-            
-            
-            
+
+
+
             //TODO: Add local file checks to avoid slow reloading on PHP < 5.3
 			$key = $this->system->arraysearchrecursive($model_row['model'], $family_line_json['data']['model_list'], 'model');
             if ($key === FALSE) {
@@ -2782,7 +2782,7 @@ if ($echotxt) {  echo format_txt(_("System Error in Sync Model [%_name_%] Functi
             return(FALSE);
         }
     }
-	
+
 	function sys_get_temp_dir() {
         if (!empty($_ENV['TMP'])) {
             return realpath($_ENV['TMP']);
@@ -2809,21 +2809,21 @@ if ($echotxt) {  echo format_txt(_("System Error in Sync Model [%_name_%] Functi
         $sql = 'SELECT endpointman_product_list.*, endpointman_brand_list.directory FROM endpointman_product_list, endpointman_brand_list WHERE endpointman_product_list.brand = endpointman_brand_list.id AND endpointman_product_list.id = ' . $product_id;
         $row = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
         $json_data = $this->file2json($this->PHONE_MODULES_PATH . "endpoint/" . $row['directory'] . "/" . $row['cfg_dir'] . "/family_data.json");
-		
+
         if ($json_data['data']['firmware_ver'] > $row['firmware_vers']) {
             if (!file_exists($temp_directory)) {
                 mkdir($temp_directory);
             }
             $md5_xml = $json_data['data']['firmware_md5sum'];
             $firmware_pkg = $json_data['data']['firmware_pkg'];
-			
+
             if (file_exists($temp_directory . $firmware_pkg)) {
                 $md5_pkg = md5_file($temp_directory . $firmware_pkg);
-				
+
                 if ($md5_xml == $md5_pkg) {
 					echo format_txt(_("Skipping download..."));
-                } 
-				else 
+                }
+				else
 				{
 					echo format_txt(_("Downloading firmware..."));
                     if (! $this->system->download_file_with_progress_bar($this->UPDATE_PATH . $row['directory'] . "/" . $firmware_pkg, $temp_directory . $firmware_pkg))
@@ -2834,8 +2834,8 @@ if ($echotxt) {  echo format_txt(_("System Error in Sync Model [%_name_%] Functi
 					echo format_txt(_("Done!"), "done");
                     $md5_pkg = md5_file($temp_directory . $firmware_pkg);
                 }
-            } 
-			else 
+            }
+			else
 			{
 				echo format_txt(_("Downloading firmware..."));
                 if (! $this->system->download_file_with_progress_bar($this->UPDATE_PATH . $row['directory'] . "/" . $firmware_pkg, $temp_directory . $firmware_pkg))
@@ -2846,16 +2846,16 @@ if ($echotxt) {  echo format_txt(_("System Error in Sync Model [%_name_%] Functi
 				echo format_txt(_("Done!"), "done");
                 $md5_pkg = md5_file($temp_directory . $firmware_pkg);
             }
-			
+
 			echo format_txt(_("Checking MD5sum of Package..."));
             if ($md5_xml == $md5_pkg) {
 				echo format_txt(_("Matches!"), "done");
-				
+
                 if (file_exists($temp_directory . $row['directory'] . "/" . $row['cfg_dir'] . "/firmware")) {
                     $this->system->rmrf($temp_directory . $row['directory'] . "/" . $row['cfg_dir'] . "/firmware");
                 }
                 mkdir($temp_directory . $row['directory'] . "/" . $row['cfg_dir'] . "/firmware", 0777, TRUE);
-				
+
 				echo format_txt(_("Installing Firmware..."));
                 exec("tar -xvf " . $temp_directory . $firmware_pkg . " -C " . $temp_directory . $row['directory'] . "/" . $row['cfg_dir']);
                 $i = 0;
@@ -2876,26 +2876,26 @@ echo format_txt(_("- Copied %_FILE_% to %_FILETO_%."), "txt", array("%_FILE_%" =
                 $list = implode(",", $list);
                 $sql = "UPDATE endpointman_product_list SET firmware_vers = '" . $json_data['data']['firmware_ver'] . "', firmware_files = '" . $list . "' WHERE id = " . $row['id'];
                 sql($sql);
-				
-				
+
+
                 if (isset($copy_error)) {
 					echo format_txt(_("Copy Error Detected! Aborting Install!"), "error");
                     $this->remove_firmware($product_id);
 					echo format_txt(_("Please Check Directory/Permissions!"), "error");
-                } 
+                }
 				else {
 					echo format_txt(_("Done!"), "done");
                 }
-            } 
+            }
 			else {
 				echo format_txt(_("Firmware MD5 didn't match!"), "error");
             }
-        } 
+        }
 		else {
 			echo format_txt(_("Your Firmware is already up to date"), "done");
         }
     }
-	
+
 	/**
      * Remove firmware from the Hard Drive
      * @param int $id Product ID
@@ -2915,10 +2915,10 @@ echo format_txt(_("- Copied %_FILE_% to %_FILETO_%."), "txt", array("%_FILE_%" =
         }
         $sql = "UPDATE endpointman_product_list SET firmware_files = '', firmware_vers = '' WHERE id = '" . $id . "'";
         sql($sql);
-		
+
 		echo format_txt(_("Done!"), "done");
     }
-	
+
 	/**
      * Remove the brand
      * @param int $id Brand ID
@@ -2928,13 +2928,13 @@ echo format_txt(_("- Copied %_FILE_% to %_FILETO_%."), "txt", array("%_FILE_%" =
         if (!$this->configmod->get('use_repo')) {
             $sql = "SELECT id, firmware_vers FROM endpointman_product_list WHERE brand = '" . $id . "'";
             $products = sql($sql, 'getall', DB_FETCHMODE_ASSOC);
-			
+
             foreach ($products as $data) {
                 if ($data['firmware_vers'] != "") {
                     $this->remove_firmware($data['id']);
                 }
             }
-			
+
 			$sql = "SELECT directory FROM endpointman_brand_list WHERE id = '" . $id . "'";
             $brand_dir = sql($sql, 'getOne');
             $this->system->rmrf($this->PHONE_MODULES_PATH . "endpoint/" . $brand_dir);
@@ -2951,9 +2951,9 @@ echo format_txt(_("- Copied %_FILE_% to %_FILETO_%."), "txt", array("%_FILE_%" =
             $this->system->rmrf($this->PHONE_MODULES_PATH . $brand_dir);
             $sql = "DELETE FROM endpointman_brand_list WHERE id = '" . $id . "'";
             sql($sql);
-			
+
 			echo format_txt(_("All Done!"), "done");
-        } 
+        }
 		elseif ($force) {
 			$sql = "SELECT directory FROM endpointman_brand_list WHERE id = '" . $id . "'";
             $brand_dir = sql($sql, 'getOne');
@@ -2969,14 +2969,14 @@ echo format_txt(_("- Copied %_FILE_% to %_FILETO_%."), "txt", array("%_FILE_%" =
 
             $sql = "DELETE FROM endpointman_brand_list WHERE id = '" . $id . "'";
             sql($sql);
-			
+
 			echo format_txt(_("Done!"), "done");
-        } 
+        }
 		else {
 			echo format_txt(_("Not allowed in repo mode!!"), "error");
         }
     }
-	
+
 	 /**
      * This will download the xml & brand package remotely
      * @param integer $id Brand ID
@@ -2984,7 +2984,7 @@ echo format_txt(_("- Copied %_FILE_% to %_FILETO_%."), "txt", array("%_FILE_%" =
     function download_brand($id) {
         if (!$this->configmod->get('use_repo')) {
             $temp_directory = $this->sys_get_temp_dir() . "/epm_temp/";
-			
+
 			if (!file_exists($temp_directory)) {
 				echo format_txt(_("Creating EPM temp directory"));
 				if (! mkdir($temp_directory)) {
@@ -2993,7 +2993,7 @@ echo format_txt(_("- Copied %_FILE_% to %_FILETO_%."), "txt", array("%_FILE_%" =
 					return false;
 				}
 			}
-			
+
 			echo format_txt(_("Downloading Brand JSON....."));
             $row = sql('SELECT * FROM  endpointman_brand_list WHERE id =' . $id, 'getAll', DB_FETCHMODE_ASSOC);
             $result = $this->system->download_file($this->UPDATE_PATH . $row[0]['directory'] . "/" . $row[0]['directory'] . ".json", $this->PHONE_MODULES_PATH . "endpoint/" . $row[0]['directory'] . "/brand_data.json");
@@ -3009,15 +3009,15 @@ echo format_txt(_("- Copied %_FILE_% to %_FILETO_%."), "txt", array("%_FILE_%" =
 					if (file_exists($temp_directory . $package)) {
 						$md5_xml = $temp['data']['brands']['md5sum'];
 						$md5_pkg = md5_file($temp_directory . $package);
-						
+
 						echo format_txt(_("Checking MD5sum of Package...."));
 						if ($md5_xml == $md5_pkg) {
 							echo format_txt(_("Done!"), "done");
-							
+
 							echo format_txt(_("Extracting Tarball........"));
 							exec("tar -xvf " . $temp_directory . $package . " -C " . $temp_directory);
 							echo format_txt(_("Done!"), "done");
-							
+
 							//Update File in the temp directory
 							copy($this->PHONE_MODULES_PATH . 'endpoint/' . $row[0]['directory'] . '/brand_data.json', $temp_directory . $row[0]['directory'] . '/brand_data.json');
 							$this->update_brand($row[0]['directory'], TRUE);
@@ -3048,10 +3048,10 @@ echo format_txt(_("- Copied %_FILE_% to %_FILETO_%."), "txt", array("%_FILE_%" =
      */
     function update_brand($package, $remote=TRUE) {
 if ($this->configmod->get('debug')) echo format_txt(_("update_brand(): Debug is set to %_DEBUG_MODE_%"), "",array("%_DEBUG_MODE_%" => $this->configmod->get('debug')));
-		
+
 		$temp_directory = $this->sys_get_temp_dir() . "/epm_temp/";
 if ($this->configmod->get('debug')) echo format_txt(_("Processing %_PATH_%/brand_data.json..."), "",array("%_PATH_%" => $temp_directory.$package));
-		
+
         if (file_exists($temp_directory . $package . '/brand_data.json')) {
             $temp = $this->file2json($temp_directory . $package . '/brand_data.json');
             if (key_exists('directory', $temp['data']['brands'])) {
@@ -3125,23 +3125,23 @@ echo format_txt(_("Inserting %_BRANDNAME_% brand data.........."), "", array("%_
 
                     $data = sql("SELECT id FROM endpointman_product_list WHERE id='" . $brand_id . $family_line_xml['data']['id'] . "'", 'getOne');
                     $short_name = preg_replace("/\[(.*?)\]/si", "", $family_line_xml['data']['name']);
-					
+
 					if ($data) {
 						if ($this->configmod->get('debug')) echo "-Updating Family ".$short_name."<br/>";
                         $sql = "UPDATE endpointman_product_list SET short_name = '" . str_replace("'", "''", $short_name) . "', long_name = '" . str_replace("'", "''", $family_line_xml['data']['name']) . "', cfg_ver = '" . $family_line_xml['data']['version'] . "', config_files='" . $family_line_xml['data']['configuration_files'] . "' WHERE id = '" . $brand_id . $family_line_xml['data']['id'] . "'";
-                    } 
+                    }
 					else {
 						if ($this->configmod->get('debug')) echo "-Inserting Family ".$short_name."<br/>";
                         $sql = "INSERT INTO endpointman_product_list (`id`, `brand`, `short_name`, `long_name`, `cfg_dir`, `cfg_ver`, `config_files`, `hidden`) VALUES ('" . $brand_id . $family_line_xml['data']['id'] . "', '" . $brand_id . "', '" . str_replace("'", "''", $short_name) . "', '" . str_replace("'", "''", $family_line_xml['data']['name']) . "', '" . $family_line_xml['data']['directory'] . "', '" . $family_line_xml['data']['last_modified'] . "','" . $family_line_xml['data']['configuration_files'] . "', '0')";
                     }
 					sql($sql);
-					
+
 
 					if (count($family_line_xml['data']['model_list']) > 0) {
-						echo format_txt(_("-- Updating Model Lines................"));						
+						echo format_txt(_("-- Updating Model Lines................"));
 	                    foreach ($family_line_xml['data']['model_list'] as $model_list) {
 	                        $template_list = implode(",", $model_list['template_data']);
-	
+
 	                        $model_final_id = $brand_id . $family_line_xml['data']['id'] . $model_list['id'];
 	                        $sql = 'SELECT id, global_custom_cfg_data, global_user_cfg_data FROM endpointman_mac_list WHERE model = ' . $model_final_id;
 	                        $old_data = NULL;
@@ -3171,7 +3171,7 @@ echo format_txt(_("----Old Data Detected! Migrating......"));
 	                                sql($sql);
 									echo format_txt(_("Done!"), "done");
 	                            }
-	
+
 	                            $global_user_cfg_data = unserialize($data['global_user_cfg_data']);
 	                            $old_check = FALSE;
 	                            if (is_array($global_user_cfg_data)) {
@@ -3237,18 +3237,18 @@ echo format_txt(_("Old Data Detected! Migrating......"));
 									echo format_txt(_("Done!"), "done");
 	                            }
 	                        }
-	
+
 	                        $m_data = sql("SELECT id FROM endpointman_model_list WHERE id='" . $brand_id . $family_line_xml['data']['id'] . $model_list['id'] . "'", 'getOne');
 	                        if ($m_data) {
 if ($this->configmod->get('debug')) echo format_txt(_("---Updating Model %_NAMEMOD_%"), "", array("%_NAMEMOD_%" => $model_list['model']));
 	                            $sql = "UPDATE endpointman_model_list SET max_lines = '" . $model_list['lines'] . "', model = '" . $model_list['model'] . "', template_list = '" . $template_list . "' WHERE id = '" . $brand_id . $family_line_xml['data']['id'] . $model_list['id'] . "'";
-	                        } 
+	                        }
 							else {
 if ($this->configmod->get('debug')) echo format_txt(_("---Inserting Model %_NAMEMOD_%"), "", array("%_NAMEMOD_%" => $model_list['model']));
 	                            $sql = "INSERT INTO endpointman_model_list (`id`, `brand`, `model`, `max_lines`, `product_id`, `template_list`, `enabled`, `hidden`) VALUES ('" . $brand_id . $family_line_xml['data']['id'] . $model_list['id'] . "', '" . $brand_id . "', '" . $model_list['model'] . "', '" . $model_list['lines'] . "', '" . $brand_id . $family_line_xml['data']['id'] . "', '" . $template_list . "', '0', '0')";
 	                        }
 	                        sql($sql);
-							
+
 	                        if (!$this->sync_model($brand_id . $family_line_xml['data']['id'] . $model_list['id'], $errlog)) {
 	                        	echo format_txt(_("System Error in Sync Model Function, Load Failure!"), "error");
 								echo format_txt($errlog['sync_model'], "error");
@@ -3256,8 +3256,8 @@ if ($this->configmod->get('debug')) echo format_txt(_("---Inserting Model %_NAME
 	                        unset ($errlog);
 	                    }
 					}
-                    
-                    
+
+
                     //Phone Models Move Here
                     $family_id = $brand_id . $family_line_xml['data']['id'];
                     $sql = "SELECT * FROM endpointman_model_list WHERE product_id = " . $family_id;
@@ -3291,7 +3291,7 @@ if ($this->configmod->get('debug')) echo format_txt(_("---Inserting Model %_NAME
 	                    sql($sql);
 	                }
 				}
-				
+
 				echo format_txt(_("Done!"), "done");
             } else {
 				echo format_txt(_("Invalid JSON Structure in %_PATH_%/brand_data.json"), "", array("%_PATH_%" => $temp_directory.$package), "error");
@@ -3304,37 +3304,37 @@ if ($this->configmod->get('debug')) echo format_txt(_("---Inserting Model %_NAME
         $this->system->rmrf($temp_directory . $package);
         echo format_txt(_("Done!"), "done");
     }
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	/**
      * Returns list of Brands that are installed and not hidden and that have at least one model enabled under them
      * @param integer $selected ID Number of the brand that is supposed to be selected in a drop-down list box
@@ -3342,6 +3342,7 @@ if ($this->configmod->get('debug')) echo format_txt(_("---Inserting Model %_NAME
      */
     function brands_available($selected = NULL, $show_blank=TRUE) {
         $data = $this->eda->all_active_brands();
+				$temp = array();
         if ($show_blank) {
             $temp[0]['value'] = "";
             $temp[0]['text'] = "";
@@ -3361,7 +3362,7 @@ if ($this->configmod->get('debug')) echo format_txt(_("---Inserting Model %_NAME
         }
         return($temp);
     }
-	
+
 	function listTZ($selected) {
         require_once('lib/datetimezone.class.php');
         $data = \DateTimeZone::listIdentifiers();
@@ -3379,7 +3380,7 @@ if ($this->configmod->get('debug')) echo format_txt(_("---Inserting Model %_NAME
 
         return($temp);
     }
-	
+
 	function has_git() {
         exec('which git', $output);
 
@@ -3394,7 +3395,7 @@ if ($this->configmod->get('debug')) echo format_txt(_("---Inserting Model %_NAME
         return!empty($matches[0]) ? $git : false;
         echo!empty($matches[0]) ? 'installed' : 'nope';
     }
-	
+
 	function tftp_check() {
         //create a simple block here incase people have strange issues going on as we will kill http
         //by running this if the server isn't really running!
@@ -3437,8 +3438,8 @@ echo 'TFTP Server is not running. <br />See here for instructions on how to inst
 echo 'TFTP Server check failed on last past. Skipping';
         }
     }
-	
-	
+
+
     /**
      * Used to send sample configurations to provisioner.net
      * NOTE: The user has to explicitly click a link that states they are sending the configuration to the project
@@ -3450,14 +3451,14 @@ echo 'TFTP Server check failed on last past. Skipping';
      */
     function submit_config($brand, $product, $orig_name, $data) {
     	$posturl = 'http://www.provisioner.net/submit_config.php';
-    
+
     	$fp = fopen($this->LOCAL_PATH . 'data.txt', 'w');
     	fwrite($fp, $data);
     	fclose($fp);
     	$file_name_with_full_path = $this->LOCAL_PATH . "data.txt";
-    
+
     	$postvars = array('brand' => $brand, 'product' => $product, 'origname' => htmlentities(addslashes($orig_name)), 'file_contents' => '@' . $file_name_with_full_path);
-    
+
     	$ch = curl_init($posturl);
     	curl_setopt($ch, CURLOPT_POST, 1);
     	curl_setopt($ch, CURLOPT_POSTFIELDS, $postvars);
@@ -3465,17 +3466,17 @@ echo 'TFTP Server check failed on last past. Skipping';
     	curl_setopt($ch, CURLOPT_HEADER, 0);  // DO NOT RETURN HTTP HEADERS
     	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);  // RETURN THE CONTENTS OF THE CALL, probably not needed
     	$Rec_Data = curl_exec($ch);
-    
+
     	ob_start();
     	header("Content-Type: text/html");
     	$Final_Out = ob_get_clean();
     	curl_close($ch);
     	unlink($file_name_with_full_path);
-    
+
     	return($Final_Out);
     }
-	
-    
+
+
     /**
      * Fixes the display are special strings so we can visible see them instead of them being transformed
      * @param string $contents a string of course
@@ -3489,9 +3490,9 @@ echo 'TFTP Server check failed on last past. Skipping';
     	$contents = str_replace("&#039;", "&amp;#039;", $contents);
     	return($contents);
     }
-    
-    
-    
+
+
+
     function add_device($mac, $model, $ext, $template=NULL, $line=NULL, $displayname=NULL) {
     	$mac = $this->mac_check_clean($mac);
     	if ($mac) {
@@ -3505,12 +3506,12 @@ $this->error['add_device'] = _("You Must Select an Extension/Device From the Dro
     			if ($this->sync_model($model)) {
     				$sql = "SELECT id,template_id FROM endpointman_mac_list WHERE mac = '" . $mac . "'";
     				$dup = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
-    
+
     				if ($dup) {
     					if (!isset($template)) {
     						$template = $dup['template_id'];
     					}
-    
+
     					$sql = "UPDATE endpointman_mac_list SET model = " . $model . ", template_id =  " . $template . " WHERE id = " . $dup['id'];
     					sql($sql);
 						$return = $this->add_line($dup['id'], $line, $ext);
@@ -3523,38 +3524,38 @@ $this->error['add_device'] = _("You Must Select an Extension/Device From the Dro
     					if (!isset($template)) {
     						$template = 0;
     					}
-    
+
     					$sql = "SELECT mac_id FROM endpointman_line_list WHERE ext = " . $ext;
     					$used = sql($sql, 'getOne');
-    
+
 						if (($used) AND (! $this->configmod->get('show_all_registrations'))) {
 $this->error['add_device'] = "You can't assign the same user to multiple devices!";
     						return(FALSE);
     					}
-    
+
     					if (!isset($displayname)) {
     						$sql = 'SELECT description FROM devices WHERE id = ' . $ext;
     						$name = & sql($sql, 'getOne');
     					} else {
     						$name = $displayname;
     					}
-    
+
     					$sql = 'SELECT endpointman_product_list. * , endpointman_model_list.template_data, endpointman_brand_list.directory FROM endpointman_model_list, endpointman_brand_list, endpointman_product_list WHERE endpointman_model_list.id =  \'' . $model . '\' AND endpointman_model_list.brand = endpointman_brand_list.id AND endpointman_model_list.product_id = endpointman_product_list.id';
     					$row = & sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
-    
+
     					$sql = "INSERT INTO `endpointman_mac_list` (`mac`, `model`, `template_id`) VALUES ('" . $mac . "', '" . $model . "', '" . $template . "')";
     					sql($sql);
-    
+
     					$sql = 'SELECT last_insert_id()';
     					$ext_id = & sql($sql, 'getOne');
-    
+
     					if (empty($line)) {
     						$line = 1;
     					}
-    
+
     					$sql = "INSERT INTO `endpointman_line_list` (`mac_id`, `ext`, `line`, `description`) VALUES ('" . $ext_id . "', '" . $ext . "', '" . $line . "', '" . addslashes($name) . "')";
     					sql($sql);
-    
+
 $this->message['add_device'][] = "Added " . $name . " to line " . $line;
     					return($ext_id);
     				}
@@ -3568,32 +3569,32 @@ $this->error['add_device'] = _("Invalid MAC Address") . "!";
     		return(FALSE);
     	}
     }
-    
-    
+
+
     function add_line($mac_id, $line=NULL, $ext=NULL, $displayname=NULL) {
     	if ((!isset($line)) AND (!isset($ext))) {
     		if ($this->linesAvailable(NULL, $mac_id)) {
     			if ($this->eda->all_unused_registrations()) {
     				$sql = 'SELECT * FROM endpointman_line_list WHERE mac_id = ' . $mac_id;
     				$lines_list = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
-    
+
     				foreach ($lines_list as $row) {
     					$sql = "SELECT description FROM devices WHERE id = " . $row['ext'];
     					$name = sql($sql, 'getOne');
-    
+
     					$sql = "UPDATE endpointman_line_list SET line = '" . $row['line'] . "', ext = '" . $row['ext'] . "', description = '" . $this->eda->escapeSimple($name) . "' WHERE luid =  " . $row['luid'];
     					sql($sql);
     				}
-    
+
     				$reg = array_values($this->display_registration_list());
     				$lines = array_values($this->linesAvailable(NULL, $mac_id));
-    
+
     				$sql = "SELECT description FROM devices WHERE id = " . $reg[0]['value'];
     				$name = $this->eda->sql($sql, 'getOne');
-    
+
     				$sql = "INSERT INTO `endpointman_line_list` (`mac_id`, `ext`, `line`, `description`) VALUES ('" . $mac_id . "', '" . $reg[0]['value'] . "', '" . $lines[0]['value'] . "', '" . addslashes($name) . "')";
     				$this->eda->sql($sql);
-    
+
 $this->message['add_line'] = "Added '<i>" . $name . "</i>' to line '<i>" . $lines[0]['value'] . "</i>' on device '<i>" . $reg[0]['value'] . "</i>' <br/> Configuration Files will not be Generated until you click Save!";
     				return($mac_id);
     			} else {
@@ -3608,10 +3609,10 @@ $this->error['add_line'] = _("No Lines Left to Add") . "!";
     		if ($this->linesAvailable(NULL, $mac_id)) {
     			if ($this->eda->all_unused_registrations()) {
     				$lines = array_values($this->linesAvailable(NULL, $mac_id));
-    
+
     				$sql = "INSERT INTO `endpointman_line_list` (`mac_id`, `ext`, `line`, `description`) VALUES ('" . $mac_id . "', '" . $ext . "', '" . $lines[0]['value'] . "', '" . addslashes($displayname) . "')";
     				sql($sql);
-    
+
 $this->message['add_line'] = "Added '<i>" . $name . "</i>' to line '<i>" . $lines[0]['value'] . "</i>' on device '<i>" . $reg[0]['value'] . "</i>' <br/> Configuration Files will not be Generated until you click Save!";
     				return($mac_id);
     			} else {
@@ -3635,7 +3636,7 @@ $this->error['add_line'] = "This line has already been assigned!";
     			} else {
     				$name = $displayname;
     			}
-    
+
     			$sql = "INSERT INTO `endpointman_line_list` (`mac_id`, `ext`, `line`, `description`) VALUES ('" . $mac_id . "', '" . $ext . "', '" . $line . "', '" . addslashes($name) . "')";
     			sql($sql);
 $this->message['add_line'] .= "Added " . $name . " to line " . $line . "<br/>";
@@ -3644,25 +3645,25 @@ $this->message['add_line'] .= "Added " . $name . " to line " . $line . "<br/>";
     	}
     }
 
-    
+
     function linesAvailable($lineid=NULL, $macid=NULL) {
     	if (isset($lineid)) {
     		$sql = "SELECT max_lines FROM endpointman_model_list WHERE id = (SELECT endpointman_mac_list.model FROM endpointman_mac_list, endpointman_line_list WHERE endpointman_line_list.luid = " . $lineid . " AND endpointman_line_list.mac_id = endpointman_mac_list.id)";
-    
+
     		$sql_l = "SELECT line, mac_id FROM `endpointman_line_list` WHERE luid = " . $lineid;
     		$line = sql($sql_l, 'getRow', DB_FETCHMODE_ASSOC);
-    
+
     		$sql_lu = "SELECT line FROM endpointman_line_list WHERE mac_id = " . $line['mac_id'];
     	} elseif (isset($macid)) {
     		$sql = "SELECT max_lines FROM endpointman_model_list WHERE id = (SELECT model FROM endpointman_mac_list WHERE id =" . $macid . ")";
     		$sql_lu = "SELECT line FROM endpointman_line_list WHERE mac_id = " . $macid;
-    
+
     		$line['line'] = 0;
     	}
-    
+
     	$max_lines = sql($sql, 'getOne');
     	$lines_used = sql($sql_lu, 'getAll');
-    
+
     	for ($i = 1; $i <= $max_lines; $i++) {
     		if ($i == $line['line']) {
     			$temp[$i]['value'] = $i;
@@ -3681,8 +3682,8 @@ $this->message['add_line'] .= "Added " . $name . " to line " . $line . "<br/>";
     		return FALSE;
     	}
     }
-    
-    
+
+
     /**
      * This function takes a string and tries to determine if it's a valid mac addess, return FALSE if invalid
      * @param string $mac The full mac address
@@ -3727,13 +3728,13 @@ $this->message['add_line'] .= "Added " . $name . " to line " . $line . "<br/>";
     		return(FALSE);
     	}
     }
-	
+
     /**
      * Display all unused registrations from whatever manager we are using!
      * @return <type>
      */
     function display_registration_list($line_id=NULL) {
-    
+
     	if (isset($line_id)) {
     		$result = $this->eda->all_unused_registrations();
     		$line_data = $this->eda->get_line_information($line_id);
@@ -3741,7 +3742,7 @@ $this->message['add_line'] .= "Added " . $name . " to line " . $line . "<br/>";
     		$result = $this->eda->all_unused_registrations();
     		$line_data = NULL;
     	}
-    
+
     	$i = 1;
     	$temp = array();
     	foreach ($result as $row) {
@@ -3749,17 +3750,17 @@ $this->message['add_line'] .= "Added " . $name . " to line " . $line . "<br/>";
     		$temp[$i]['text'] = $row['id'] . " --- " . $row['description'];
     		$i++;
     	}
-    
+
     	if (isset($line_data)) {
     		$temp[$i]['value'] = $line_data['ext'];
     		$temp[$i]['text'] = $line_data['ext'] . " --- " . $line_data['description'];
     		$temp[$i]['selected'] = "selected";
     	}
-    
+
     	return($temp);
     }
-	
-    
+
+
     /**
      * Taken from PHP.net. A list of errors returned when uploading files.
      * @param <type> $error_code
@@ -3785,7 +3786,7 @@ $this->message['add_line'] .= "Added " . $name . " to line " . $line . "<br/>";
     			return _('Unknown upload error');
     	}
     }
-    
+
     /**
      * Send this function an ID from the mac devices list table and you'll get all the information we have on that particular phone
      * @param integer $mac_id ID number reference from the MySQL database referencing the table endpointman_mac_list
@@ -3839,23 +3840,23 @@ $this->error['get_phone_info'] = "Mac ID is not set";
     		return(FALSE);
     	}
     	$sql = "SELECT id FROM endpointman_mac_list WHERE model > 0 AND id =" . $mac_id;
-    
+
     	$res = sql($sql);
     	if ($res->numRows()) {
     		//Returns Brand Name, Brand Directory, Model Name, Mac Address, Extension (FreePBX), Custom Configuration Template, Custom Configuration Data, Product Name, Product ID, Product Configuration Directory, Product Configuration Version, Product XML name,
     		$sql = "SELECT endpointman_mac_list.specific_settings, endpointman_mac_list.config_files_override, endpointman_mac_list.global_user_cfg_data, endpointman_model_list.id as model_id, endpointman_brand_list.id as brand_id, endpointman_brand_list.name, endpointman_brand_list.directory, endpointman_model_list.model, endpointman_mac_list.mac, endpointman_mac_list.template_id, endpointman_mac_list.global_custom_cfg_data, endpointman_product_list.long_name, endpointman_product_list.id as product_id, endpointman_product_list.cfg_dir, endpointman_product_list.cfg_ver, endpointman_model_list.template_data, endpointman_model_list.enabled, endpointman_mac_list.global_settings_override FROM endpointman_line_list, endpointman_mac_list, endpointman_model_list, endpointman_brand_list, endpointman_product_list WHERE endpointman_mac_list.model = endpointman_model_list.id AND endpointman_brand_list.id = endpointman_model_list.brand AND endpointman_product_list.id = endpointman_model_list.product_id AND endpointman_mac_list.id = endpointman_line_list.mac_id AND endpointman_mac_list.id = " . $mac_id;
     		$phone_info = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
-    
+
     		if (!$phone_info) {
 $this->error['get_phone_info'] = "Error with SQL Statement";
     		}
-    
+
     		//If there is a template associated with this phone then pull that information and put it into the array
     		if ($phone_info['template_id'] > 0) {
     			$sql = "SELECT name, global_custom_cfg_data, config_files_override, global_settings_override FROM endpointman_template_list WHERE id = " . $phone_info['template_id'];
     			$phone_info['template_data_info'] = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
     		}
-    
+
     		$sql = "SELECT endpointman_line_list.*, sip.data as secret, devices.*, endpointman_line_list.description AS epm_description FROM endpointman_line_list, sip, devices WHERE endpointman_line_list.ext = devices.id AND endpointman_line_list.ext = sip.id AND sip.keyword = 'secret' AND mac_id = " . $mac_id . " ORDER BY endpointman_line_list.line ASC";
     		$lines_info = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
     		foreach ($lines_info as $line) {
@@ -3867,7 +3868,7 @@ $this->error['get_phone_info'] = "Error with SQL Statement";
     		$sql = "SELECT id, mac FROM endpointman_mac_list WHERE id =" . $mac_id;
     		//Phone is unknown, we need to display this to the end user so that they can make corrections
     		$row = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
-    
+
 			$brand = $this->get_brand_from_mac($row['mac']);
     		if ($brand) {
     			$phone_info['brand_id'] = $brand['id'];
@@ -3876,7 +3877,7 @@ $this->error['get_phone_info'] = "Error with SQL Statement";
     			$phone_info['brand_id'] = 0;
     			$phone_info['name'] = 'Unknown';
     		}
-    
+
     		$phone_info['id'] = $mac_id;
     		$phone_info['model_id'] = 0;
     		$phone_info['product_id'] = 0;
@@ -3890,7 +3891,7 @@ $this->error['get_phone_info'] = "Error with SQL Statement";
     	}
     	return $phone_info;
     }
-	
+
     /**
      * Get the brand from any mac sent to this function
      * @param string $mac
@@ -3901,16 +3902,16 @@ $this->error['get_phone_info'] = "Error with SQL Statement";
 		if (!$this->mac_check_clean($mac)) {
     		return(FALSE);
     	}
-    
+
     	//Get the OUI only
     	$oui = substr($this->mac_check_clean($mac), 0, 6);
     	//Find the matching brand model to the oui
     	$oui_sql = "SELECT endpointman_brand_list.name, endpointman_brand_list.id FROM endpointman_oui_list, endpointman_brand_list WHERE oui LIKE '%" . $oui . "%' AND endpointman_brand_list.id = endpointman_oui_list.brand AND endpointman_brand_list.installed = 1 LIMIT 1";
     	$brand = sql($oui_sql, 'getRow', DB_FETCHMODE_ASSOC);
-    
+
     	$res = sql($oui_sql);
     	$brand_count = $res->numRows();
-    
+
     	if (!$brand_count) {
     		//oui doesn't have a matching mysql reference, probably a PC/router/wap/printer of some sort.
     		$phone_info['id'] = 0;
@@ -3919,19 +3920,19 @@ $this->error['get_phone_info'] = "Error with SQL Statement";
     		$phone_info['id'] = $brand['id'];
     		$phone_info['name'] = $brand['name'];
     	}
-    
+
     	return($phone_info);
     }
-	
-	
-	
+
+
+
     /**
      * Prepare and then send the data that Provisioner expects, then take what provisioner gives us and do what it says
      * @param array $phone_info Everything from get_phone_info
      * @param bool  $reboot Reboot the Phone after write
      * @param bool  $write  Write out Directory structure.
      */
-    function prepare_configs($phone_info, $reboot=TRUE, $write=TRUE) 
+    function prepare_configs($phone_info, $reboot=TRUE, $write=TRUE)
     {
     	$this->PROVISIONER_BASE = $this->PHONE_MODULES_PATH;
 //define('PROVISIONER_BASE', $this->PROVISIONER_BASE);
@@ -3939,7 +3940,7 @@ $this->error['get_phone_info'] = "Error with SQL Statement";
     		if (!class_exists('ProvisionerConfig')) {
     			require($this->PHONE_MODULES_PATH . 'autoload.php');
     		}
-    
+
     		//Load Provisioner
     		$class = "endpoint_" . $phone_info['directory'] . "_" . $phone_info['cfg_dir'] . '_phone';
     		$base_class = "endpoint_" . $phone_info['directory'] . '_base';
@@ -3953,10 +3954,10 @@ $this->error['get_phone_info'] = "Error with SQL Statement";
     		if (!class_exists($class)) {
     			ProvisionerConfig::endpointsAutoload($class);
     		}
-    
+
     		if (class_exists($class)) {
 				$provisioner_lib = new $class();
-    
+
     			//Determine if global settings have been overridden
     			if ($phone_info['template_id'] > 0) {
     				if (isset($phone_info['template_data_info']['global_settings_override'])) {
@@ -3977,25 +3978,25 @@ $this->error['get_phone_info'] = "Error with SQL Statement";
     					$settings['tz'] = $this->configmod->get('tz');
     				}
     			}
-    
-    
-    
+
+
+
     			//Tell the system who we are and were to find the data.
     			$provisioner_lib->root_dir = $this->PHONE_MODULES_PATH;
     			$provisioner_lib->engine = 'asterisk';
     			$provisioner_lib->engine_location = $this->configmod->get('asterisk_location','asterisk');
     			$provisioner_lib->system = 'unix';
-    
+
     			//have to because of versions less than php5.3
     			$provisioner_lib->brand_name = $phone_info['directory'];
     			$provisioner_lib->family_line = $phone_info['cfg_dir'];
-    
-    
-    
+
+
+
     			//Phone Model (Please reference family_data.xml in the family directory for a list of recognized models)
     			//This has to match word for word. I really need to fix this....
     			$provisioner_lib->model = $phone_info['model'];
-    
+
     			//Timezone
     			try {
     				$provisioner_lib->DateTimeZone = new DateTimeZone($settings['tz']);
@@ -4003,7 +4004,7 @@ $this->error['get_phone_info'] = "Error with SQL Statement";
 $this->error['parse_configs'] = 'Error Returned From Timezone Library: ' . $e->getMessage();
     				return(FALSE);
     			}
-    
+
     			$temp = "";
     			$template_data = unserialize($phone_info['template_data']);
     			$global_user_cfg_data = unserialize($phone_info['global_user_cfg_data']);
@@ -4036,7 +4037,7 @@ $this->error['parse_configs'] = 'Error Returned From Timezone Library: ' . $e->g
     					}
     				}
     			}
-    
+
     			if (!empty($global_custom_cfg_data)) {
     				if (array_key_exists('data', $global_custom_cfg_data)) {
     					$global_custom_cfg_ari = $global_custom_cfg_data['ari'];
@@ -4046,7 +4047,7 @@ $this->error['parse_configs'] = 'Error Returned From Timezone Library: ' . $e->g
     					$global_custom_cfg_ari = array();
     				}
     			}
-    
+
     			$new_template_data = array();
     			$line_ops = array();
     			if (is_array($global_custom_cfg_data)) {
@@ -4081,7 +4082,7 @@ $this->error['parse_configs'] = 'Error Returned From Timezone Library: ' . $e->g
     					}
     				}
     			}
-    
+
     			if (!$write) {
     				$new_template_data['provision']['type'] = 'dynamic';
     				$new_template_data['provision']['protocol'] = 'http';
@@ -4093,9 +4094,9 @@ $this->error['parse_configs'] = 'Error Returned From Timezone Library: ' . $e->g
     				$new_template_data['provision']['path'] = $settings['srvip'];
     				$new_template_data['provision']['encryption'] = FALSE;
     			}
-    
+
     			$new_template_data['ntp'] = $settings['ntp'];
-    
+
     			//Overwrite all specific settings variables now
     			if (!empty($phone_info['specific_settings'])) {
     				$specific_settings = unserialize($phone_info['specific_settings']);
@@ -4103,24 +4104,24 @@ $this->error['parse_configs'] = 'Error Returned From Timezone Library: ' . $e->g
     			} else {
     				$specific_settings = array();
     			}
-    
+
     			//Set Variables according to the template_data files included. We can include different template.xml files within family_data.xml also one can create
     			//template_data_custom.xml which will get included or template_data_<model_name>_custom.xml which will also get included
     			//line 'global' will set variables that aren't line dependant
-    
-    
+
+
     			$provisioner_lib->settings = $new_template_data;
-    
+
     			//Loop through Lines!
     			$li = 0;
     			foreach ($phone_info['line'] as $line) {
     				$line_options = is_array($line_ops[$line['line']]) ? $line_ops[$line['line']] : array();
     				$line_statics = array('line' => $line['line'], 'username' => $line['ext'], 'authname' => $line['ext'], 'secret' => $line['secret'], 'displayname' => $line['description'], 'server_host' => $this->global_cfg['srvip'], 'server_port' => '5060', 'user_extension' => $line['user_extension']);
-    
+
     				$provisioner_lib->settings['line'][$li] = array_merge($line_options, $line_statics);
     				$li++;
     			}
-    
+
     			if (array_key_exists('data', $specific_settings)) {
     				foreach ($specific_settings['data'] as $key => $data) {
     					$default_exp = preg_split("/\|/i", $key);
@@ -4168,20 +4169,20 @@ $this->error['parse_configs'] = 'Error Returned From Timezone Library: ' . $e->g
     					}
     				}
     			}
-    
+
     			$provisioner_lib->settings['mac'] = $phone_info['mac'];
     			$provisioner_lib->mac = $phone_info['mac'];
-    
+
     			//Setting a line variable here...these aren't defined in the template_data.xml file yet. however they will still be parsed
     			//and if they have defaults assigned in a future template_data.xml or in the config file using pipes (|) those will be used, pipes take precedence
     			$provisioner_lib->processor_info = "EndPoint Manager Version " . $this->global_cfg['version'];
-    
+
     			// Because every brand is an extension (eventually) of endpoint, you know this function will exist regardless of who it is
     			//Start timer
     			$time_start = microtime(true);
-    
+
     			$provisioner_lib->debug = TRUE;
-    
+
     			try {
     				$returned_data = $provisioner_lib->generate_all_files();
     			} catch (Exception $e) {
@@ -4210,7 +4211,7 @@ $this->error['parse_configs'] = "Can't Load the Autoloader!";
     		return(FALSE);
     	}
     }
-	
+
     function write_configs($provisioner_lib, $reboot, $write_path, $phone_info, $returned_data) {
     	//Create Directory Structure (If needed)
     	if (isset($provisioner_lib->directory_structure)) {
@@ -4239,7 +4240,7 @@ $this->error['parse_configs'] = "Could Not Create Directory: " . $data;
     			}
     		}
     	}
-    
+
     	//Copy Files (If needed)
     	if (isset($provisioner_lib->copy_files)) {
     		foreach ($provisioner_lib->copy_files as $data) {
@@ -4263,7 +4264,7 @@ $this->error['parse_configs'] = "Could Not Create File: " . $data;
     			}
     		}
     	}
-    
+
     	foreach ($returned_data as $file => $data) {
     		if (((file_exists($write_path . $file)) AND (is_writable($write_path . $file)) AND (!in_array($file, $provisioner_lib->protected_files))) OR (!file_exists($write_path . $file))) {
     			//Move old file to backup
@@ -4289,116 +4290,116 @@ $this->error['parse_configs'] = "File not written to hard drive!";
     			return(FALSE);
     		}
     	}
-    
+
     	if ($reboot) {
     		$provisioner_lib->reboot();
     	}
     }
-	
-	
-	
-	
-	
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	/*********************************************
 	****** CODIGO ANTIGUO -- SIN REVISADO ********
 	*********************************************/
-	
-	
-	
-	
-	
-	
-	
-	
 
-    
+
+
+
+
+
+
+
+
+
 
     function download_json($location, $directory=NULL) {
         $temp_directory = $this->sys_get_temp_dir() . "/epm_temp/";
@@ -4434,11 +4435,11 @@ $this->error['parse_configs'] = "File not written to hard drive!";
         }
     }
 
-    
 
-   
 
-    
+
+
+
 
     function merge_data($path, $template_list, $maxlines = 12) {
         //TODO: fix
@@ -4529,9 +4530,9 @@ $this->error['parse_configs'] = "File not written to hard drive!";
         return($data);
     }
 
-   
 
-	
+
+
 
     /**
     * Send process to run in background
@@ -4557,7 +4558,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
         return(count($ProcessState) >= 2);
     }
 
-    
+
 
     /**
     * Uses which to find executables that asterisk can run/use
@@ -4595,9 +4596,9 @@ $this->error['parse_configs'] = "File not written to hard drive!";
         return FALSE;
     }
 
-    
 
-    
+
+
 
     /**
      * Check for valid netmast to avoid security issues
@@ -4778,10 +4779,10 @@ $this->error['parse_configs'] = "File not written to hard drive!";
         return FALSE;
     }
 
-    
-    
 
-    
+
+
+
 
     function display_templates($product_id, $temp_select = NULL) {
         $i = 0;
@@ -4815,14 +4816,14 @@ $this->error['parse_configs'] = "File not written to hard drive!";
         return(TRUE);
     }
 
-	
-	
-	
-	
-	
-    
 
-    
+
+
+
+
+
+
+
 
     function prepare_message_box() {
         $error_message = NULL;
@@ -4861,14 +4862,14 @@ $this->error['parse_configs'] = "File not written to hard drive!";
         }
     }
 
-   
-
-    
-   
 
 
 
-    
+
+
+
+
+
 
     function update_device($macid, $model, $template, $luid=NULL, $name=NULL, $line=NULL, $update_lines=TRUE) {
         $sql = "UPDATE endpointman_mac_list SET model = " . $model . ", template_id =  " . $template . " WHERE id = " . $macid;
@@ -5523,13 +5524,13 @@ $this->error['parse_configs'] = "File not written to hard drive!";
         }
     }
 
-    
+
 
     function display_configs() {
 
     }
 
-   
+
 
 }
 ?>

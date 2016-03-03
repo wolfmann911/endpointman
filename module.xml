@@ -2,7 +2,7 @@
 	<rawname>endpointman</rawname>
 	<repo>unsupported</repo>
 	<name>OSS PBX End Point Manager</name>
-	<version>13.0.6.4</version>
+	<version>13.0.6.6</version>
 	<type>setup</type>
 	<category>Connectivity</category>
 	<license>GPLv2+</license>
@@ -21,6 +21,8 @@
 		Pull Requests can be made to either of these and are encouraged.
     </description>
 		<changelog>
+		*13.0.6.6* Fix missing files issues
+		*13.0.6.5* Remove array by reference
 		*13.0.6.4* Fix bug, generate file list export brands through AJAX, delete code not required, organize files.
 		*13.0.6.3* Fix bug, optimize code.
 		*13.0.6.2* Bring back in better check onlines

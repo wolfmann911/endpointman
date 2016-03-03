@@ -40,7 +40,7 @@ class endpointmanager {
         $this->global_cfg['disable_epm'] = FALSE;
 
         $this->global_cfg['tz'] = !empty($this->global_cfg['tz']) ? $this->global_cfg['tz'] : 'America/Los_Angeles';
-        date_default_timezone_set($this->global_cfg['tz']);
+        //date_default_timezone_set($this->global_cfg['tz']);
 
         //Generate empty array
         $this->error = array();
@@ -54,21 +54,21 @@ class endpointmanager {
             $this->global_cfg['disable_epm'] = TRUE;
         }
 
-        define("UPDATE_PATH", $this->global_cfg['update_server']);
-        define("MODULES_PATH", dirname(dirname(dirname(__FILE__))) . '/');
+        //define("UPDATE_PATH", $this->global_cfg['update_server']);
+        //define("MODULES_PATH", dirname(dirname(dirname(__FILE__))) . '/');
 
         //Determine if local path is correct!
         if (file_exists(MODULES_PATH . "endpointman/")) {
-            define("LOCAL_PATH", MODULES_PATH . "endpointman/");
+            //define("LOCAL_PATH", MODULES_PATH . "endpointman/");
         } else {
             die("Can't Load Local Endpoint Manager Directory!");
         }
 
         //Define the location of phone modules, keeping it outside of the module directory so that when the user updates endpointmanager they don't lose all of their phones
         if (file_exists(MODULES_PATH . "_ep_phone_modules/")) {
-            define("PHONE_MODULES_PATH", MODULES_PATH . "_ep_phone_modules/");
+            //define("PHONE_MODULES_PATH", MODULES_PATH . "_ep_phone_modules/");
         } else {
-            define("PHONE_MODULES_PATH", MODULES_PATH . "_ep_phone_modules/");
+            //define("PHONE_MODULES_PATH", MODULES_PATH . "_ep_phone_modules/");
             if (!file_exists(PHONE_MODULES_PATH)) {
                 mkdir(PHONE_MODULES_PATH, 0775);
             }
