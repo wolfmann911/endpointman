@@ -34,7 +34,7 @@
 <div class="section-title" data-for="iedl_import_csv">
 	<h3><?php echo _("Import CSV") ?></h3>
 </div>
-<div class="section custom_box_import_csv" data-id="iedl_import_csv">
+<div class="section" data-id="iedl_import_csv">
 
 	<form name="iedl_form_import_cvs" enctype="multipart/form-data" method="post">
 	<input type="hidden" name="MAX_FILE_SIZE" value="30000" />
@@ -43,7 +43,7 @@
 		<div class="row">
 			<div class="col-md-12">
 				<div class="row">
-					<div class="form-group">
+					<div class="form-group custom_box_import">
 						<div class="col-md-3">
 							<label class="control-label" for="bt_import_csv"><?php echo _("Import CSV file of devices")?></label>
 							<i class="fa fa-question-circle fpbx-help-icon" data-for="bt_import_csv"></i>
@@ -57,7 +57,7 @@
 								<input id="bt_import_csv" type="file" class="form-control_off" name="files[]" multiple>
 							</span>
 							<span>
-								<a class='btn btn-default' id='button_import' name="button_import" href="javascript:epm_config_tab_iedl_bt_import();"><i class='fa fa-upload'></i> <?php echo _('Import')?></a>
+								<a class='btn btn-default' id='button_import' name="button_import" href="javascript:epm_advanced_tab_iedl_bt_import();"><i class='fa fa-upload'></i> <?php echo _('Import')?></a>
 							</span>
 						</div>
 					</div>

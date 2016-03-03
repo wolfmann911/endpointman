@@ -1,6 +1,6 @@
-@import "epm_global.css";
+@CHARSET "ISO-8859-1";
 
-div.sortable
+#epm_config div.sortable
 {
 	background: transparent;
 	

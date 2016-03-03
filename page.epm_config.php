@@ -2,7 +2,7 @@
 /**
  * Endpoint Manager FreePBX File
  *
- * @author Andrew Nagy
+ * @author Javier Pastor
  * @license MPL / GPLv2 / LGPL
  * @package Endpoint Manager
  */
@@ -14,7 +14,7 @@ if ((! isset($_REQUEST['subpage'])) || ($_REQUEST['subpage'] == "")) {
 
 ?>
 
-<div class="container-fluid">
+<div class="container-fluid" id="epm_config">
 	<h1><?php echo _("End Point Configuraction Manager")?></h1>
 	<h2><?php echo _("Package Manager")?></h2>
 	<div class="row">

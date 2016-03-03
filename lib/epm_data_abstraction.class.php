@@ -10,8 +10,8 @@ namespace FreePBX\modules;
 class epm_data_abstraction {
     function __construct($config, $configmod) {
     	
-    	$this->config = $config;
-    	$this->configmod = $configmod;
+    	$this->config =& $config;
+    	$this->configmod =& $configmod;
     }
 	
     function all_products() {
@@ -80,7 +80,7 @@ class epm_data_abstraction {
      */
     function all_active_brands() {
         $sql="SELECT DISTINCT endpointman_brand_list.name, endpointman_brand_list.id FROM  endpointman_brand_list,endpointman_model_list WHERE endpointman_model_list.brand = endpointman_brand_list.id AND endpointman_model_list.enabled = 1 AND endpointman_model_list.hidden = 0 AND endpointman_brand_list.installed = 1 AND endpointman_brand_list.hidden = 0";
-        $data = sql($sql,'getAll', DB_FETCHMODE_ASSOC);
+        $data =& sql($sql,'getAll', DB_FETCHMODE_ASSOC);
         return($data);
     }
 
@@ -98,7 +98,7 @@ class epm_data_abstraction {
 
     function all_unknown_devices() {
         $sql = 'SELECT * FROM  endpointman_mac_list WHERE model = 0';
-        $unknown_list =& $this->sql($sql,'getAll',DB_FETCHMODE_ASSOC);
+        $unknown_list =& sql($sql,'getAll',DB_FETCHMODE_ASSOC);
         return($unknown_list);
     }
 
@@ -108,7 +108,7 @@ class epm_data_abstraction {
         } else {
             $not_added="SELECT devices.id, devices.description FROM devices WHERE tech in('sip','pjsip') AND devices.id not in (SELECT devices.id FROM devices, endpointman_line_list WHERE tech in ('sip','pjsip') AND devices.id = endpointman_line_list.ext ) ORDER BY devices.id";
         }
-        $result = sql($not_added,'getAll', DB_FETCHMODE_ASSOC);
+        $result =& sql($not_added,'getAll', DB_FETCHMODE_ASSOC);
         return($result);
     }
 
@@ -120,7 +120,7 @@ class epm_data_abstraction {
 
     function get_lines_from_device($device_id) {
         $sql = 'SELECT * FROM endpointman_line_list WHERE mac_id = '.$device_id. ' ORDER BY  endpointman_line_list.line ASC';
-        $line_list =& $this->sql($sql,'getAll',DB_FETCHMODE_ASSOC);
+        $line_list =& sql($sql,'getAll',DB_FETCHMODE_ASSOC);
         return($line_list);
     }
 
