@@ -20,7 +20,7 @@ class epm_system {
      * @author http://www.php.net/manual/en/function.socket-create.php#43057
      * @param string $host
      * @param string $filename
-     * @return mixed file contents 
+     * @return mixed file contents
      */
     function tftp_fetch($host, $filename) {
         //first off let's check if this is installed or disabled
@@ -55,7 +55,7 @@ class epm_system {
         } while (strlen($buffer) == 516);  // the first non-full packet is the last.
         return $ret;
     }
-    
+
     /**
      * The RecursiveIteratorIterator must be told to provide children (files and subdirectories) before parents with its CHILD_FIRST constant.
      * Using RecursiveIteratorIterator is the only way PHP is able to see hidden files.
@@ -77,7 +77,7 @@ class epm_system {
             @rmdir($dir);
         }
     }
-    
+
     /**
     * Uses which to find executables that asterisk can run/use
     * @version 2.11
@@ -96,7 +96,7 @@ class epm_system {
             return('');
         }
     }
-    
+
     /**
     * Downloads a file and places it in the destination defined
     * @version 2.11
@@ -138,7 +138,7 @@ class epm_system {
             return false;
         }
     }
-    
+
     /**
     * Downloads a file and places it in the destination defined with progress
     * @version 2.11
@@ -156,24 +156,26 @@ class epm_system {
 
             while ($this->is_process_running($pid)) {
 
-                $out = 100 * round(filesize($destination_file) / $size, 2);
-                echo '<script type="text/javascript">document.getElementById(\'DivExample\').innerHTML="%' . $out . '";</script>';
+								if(file_exists($destination_file)) {
+									$out = 100 * round(filesize($destination_file) / $size, 2);
+									echo '<script type="text/javascript">document.getElementById(\'DivExample\').innerHTML="%' . $out . '";</script>';
+								}
 
                 usleep('500');
                 ob_end_flush();
                 //ob_flush();
                 flush();
                 ob_start();
-                
 
-                clearstatcache(); // make sure PHP actually checks dest. file size 
+
+                clearstatcache(); // make sure PHP actually checks dest. file size
             }
             return true;
         } else {
             return false;
         }
     }
-    
+
     /**
      * Taken from http://www.php.net/manual/en/function.array-search.php#69232
      * search haystack for needle and return an array of the key path, FALSE otherwise.
