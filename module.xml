@@ -21,7 +21,7 @@
 		Pull Requests can be made to either of these and are encouraged.
     </description>
 		<changelog>
-		*13.0.6.7* Fix missing files issues
+		*13.0.6.7* More code updated and Fix Bug
 		*13.0.6.6* Fix missing files issues
 		*13.0.6.5* Remove array by reference
 		*13.0.6.4* Fix bug, generate file list export brands through AJAX, delete code not required, organize files.
