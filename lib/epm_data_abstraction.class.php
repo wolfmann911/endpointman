@@ -60,7 +60,7 @@ class epm_data_abstraction {
      */
     function all_models() {
         $sql="SELECT endpointman_model_list.* FROM endpointman_model_list, endpointman_product_list WHERE endpointman_model_list.product_id = endpointman_product_list.id AND endpointman_model_list.enabled = 1 AND endpointman_product_list.hidden = 0";
-        $result1 =& $this->sql($sql, 'getAll',DB_FETCHMODE_ASSOC);
+        $result1 =& sql($sql, 'getAll',DB_FETCHMODE_ASSOC);
         return($result1);
     }
 
@@ -86,13 +86,13 @@ class epm_data_abstraction {
 
     function all_models_by_product($product_id) {
         $sql="SELECT * FROM endpointman_model_list WHERE product_id = ".$product_id;
-        $result1 =& $this->sql($sql, 'getAll',DB_FETCHMODE_ASSOC);
+        $result1 =& sql($sql, 'getAll',DB_FETCHMODE_ASSOC);
         return($result1);
     }
 
     function all_models_by_brand($brand_id) {
         $sql="SELECT endpointman_model_list.* FROM endpointman_model_list, endpointman_product_list WHERE endpointman_model_list.product_id = endpointman_product_list.id AND endpointman_model_list.enabled = 1 AND endpointman_product_list.hidden = 0 AND endpointman_model_list.brand = " . $brand_id;
-        $result1 =& $this->sql($sql, 'getAll',DB_FETCHMODE_ASSOC);
+        $result1 =& sql($sql, 'getAll',DB_FETCHMODE_ASSOC);
         return($result1);
     }
 
@@ -114,7 +114,7 @@ class epm_data_abstraction {
 
     function all_used_registrations() {
         $not_added="SELECT devices.id, devices.description FROM devices WHERE tech in ('sip','pjsip') AND devices.id in (SELECT devices.id FROM devices, endpointman_line_list WHERE tech in ('sip','pjsip') AND devices.id = endpointman_line_list.ext ) ORDER BY devices.id";
-        $result =& $this->sql($not_added,'getAll', DB_FETCHMODE_ASSOC);
+        $result =& sql($not_added,'getAll', DB_FETCHMODE_ASSOC);
         return($result);
     }
 

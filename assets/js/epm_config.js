@@ -21,12 +21,17 @@ function epm_config_change_tab (nTab = "") {
 }
 
 
+
+
+
+
+
 //**** INI: FUNCTION GLOBAL SEC ****
 function epm_config_select_tab_ajax(idtab)
 {	
 	clearTimeout(v_sTimerUpdateAjax);
 	if (idtab == "") {
-		fpbxToast('epm_config_select_tab_ajax -> id invalid (' + idtab + ')!','JS!','warning');
+		fpbxToast('epm_config_select_tab_ajax -> id no send!','JS!','warning');
 		return false;
 	}
 	
@@ -401,7 +406,7 @@ function epm_config_tab_manager_ajax_get_add_data(data, idtab)
 
 function epm_config_tab_manager_bt_update_check_click() 
 {
-	var urlStr = "config.php?display=epm_config&quietmode=1&module_tab=manager&command=check_for_updates";
+	var urlStr = "config.php?display=epm_config&module_tab=manager&command=check_for_updates";
 	box = epm_global_dialog_action("bt_update_chkeck", urlStr);
 }
 
@@ -410,7 +415,7 @@ function epm_config_tab_manager_bt(opt, idfw, command)
 	if ((opt == "") || (idfw == "") || (command == "")) { return false; }
 	clearTimeout(v_sTimerUpdateAjax);
 	
-	var urlStr = "config.php?display=epm_config&quietmode=1&module_tab=manager&command=" + command + "&command_sub=" + opt + "&idfw=" + idfw;
+	var urlStr = "config.php?display=epm_config&module_tab=manager&command=" + command + "&command_sub=" + opt + "&idfw=" + idfw;
 	box = epm_global_dialog_action("manager_bt", urlStr, null, "Status", 'epm_config_tab_manager_bt_dialog');
 }
 
