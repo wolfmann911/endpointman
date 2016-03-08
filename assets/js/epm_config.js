@@ -21,12 +21,17 @@ function epm_config_change_tab (nTab = "") {
 }
 
 
+
+
+
+
+
 //**** INI: FUNCTION GLOBAL SEC ****
 function epm_config_select_tab_ajax(idtab)
 {	
 	clearTimeout(v_sTimerUpdateAjax);
 	if (idtab == "") {
-		fpbxToast('epm_config_select_tab_ajax -> id invalid (' + idtab + ')!','JS!','warning');
+		fpbxToast('epm_config_select_tab_ajax -> id no send!','JS!','warning');
 		return false;
 	}
 	
@@ -401,7 +406,7 @@ function epm_config_tab_manager_ajax_get_add_data(data, idtab)
 
 function epm_config_tab_manager_bt_update_check_click() 
 {
-	var urlStr = "config.php?display=epm_config&quietmode=1&module_tab=manager&command=check_for_updates";
+	var urlStr = "config.php?display=epm_config&module_tab=manager&command=check_for_updates";
 	box = epm_global_dialog_action("bt_update_chkeck", urlStr);
 }
 
@@ -410,7 +415,7 @@ function epm_config_tab_manager_bt(opt, idfw, command)
 	if ((opt == "") || (idfw == "") || (command == "")) { return false; }
 	clearTimeout(v_sTimerUpdateAjax);
 	
-	var urlStr = "config.php?display=epm_config&quietmode=1&module_tab=manager&command=" + command + "&command_sub=" + opt + "&idfw=" + idfw;
+	var urlStr = "config.php?display=epm_config&module_tab=manager&command=" + command + "&command_sub=" + opt + "&idfw=" + idfw;
 	box = epm_global_dialog_action("manager_bt", urlStr, null, "Status", 'epm_config_tab_manager_bt_dialog');
 }
 
@@ -426,19 +431,16 @@ function epm_config_tab_manager_bt_enable_disable_ajustar(iL0, itemData, level)
 	}
 	else if (level == "L2") 
 	{
-		if ((itemData.fw_type == "install") || (itemData.fw_type == "uninstall")) 
+		if ((itemData.fw_type == "install") || (itemData.fw_type == "remove")) 
 		{
 			epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt_fw_install", 		((itemData.fw_type == "install") ? true : false));
 			epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt_fw_uninstall" , 	((itemData.fw_type == "install") ? false : true));
 			epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt_fw_update" , 		((itemData.update_fw == 0) ? false : true));
-			//epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt-pr-update" , 		((itemData.update == 0) ? false : true));
-			epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt-pr-update", false);
 		}
 		else if (itemData.fw_type == "nothing") {
 			epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt_fw_install", false);
 			epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt_fw_uninstall", false);
 			epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt_fw_update", false);
-			epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt-pr-update", false);
 		}
 		return;
 	}
@@ -582,13 +584,6 @@ function epm_config_tab_manager_html_L2(data, prefijoid, txt, idtab)
 			$(this)
 			.children('.col-md-9')
 			.append(
-				$('<input/>', {
-					'type'	: 'button',
-					'id'	: prefijoid + '_bt-pr-update',
-					'class'	: 'btn btn-default',
-					'value'	: txt.update
-				})
-				.on( "click", function(){ epm_config_tab_manager_bt('pr_update', data.id, 'firmware'); }),
 				$('<input/>', {
 					'type'	: 'button',
 					'id'	: prefijoid + '_bt_fw_install',

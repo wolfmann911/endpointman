@@ -2,7 +2,6 @@
 /**
  * Endpoint Manager Config
  *
-
  * @author Javier Pastor
  * @license MPL / GPLv2 / LGPL
  * @package Provisioner

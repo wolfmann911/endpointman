@@ -114,7 +114,7 @@ function epm_global_dialog_action(actionname, urlStr, formname = null, titleStr 
 		scroll: true,
 		position: { my: "top-175", at: "center", of: window },
 		open: function (e) {
-			$('#moduledialogwrapper').html(_('Loading..' ) + '<i class="fa fa-spinner fa-spin fa-2x">');
+			$('#moduledialogwrapper').html(_('Loading...' ) + '<i class="fa fa-spinner fa-spin fa-2x">');
 			
 			if (formname == null) {
 				var oData = null;

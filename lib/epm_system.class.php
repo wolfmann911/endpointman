@@ -20,7 +20,7 @@ class epm_system {
      * @author http://www.php.net/manual/en/function.socket-create.php#43057
      * @param string $host
      * @param string $filename
-     * @return mixed file contents
+     * @return mixed file contents 
      */
     function tftp_fetch($host, $filename) {
         //first off let's check if this is installed or disabled
@@ -55,7 +55,7 @@ class epm_system {
         } while (strlen($buffer) == 516);  // the first non-full packet is the last.
         return $ret;
     }
-
+    
     /**
      * The RecursiveIteratorIterator must be told to provide children (files and subdirectories) before parents with its CHILD_FIRST constant.
      * Using RecursiveIteratorIterator is the only way PHP is able to see hidden files.
@@ -77,7 +77,7 @@ class epm_system {
             @rmdir($dir);
         }
     }
-
+    
     /**
     * Uses which to find executables that asterisk can run/use
     * @version 2.11
@@ -96,7 +96,7 @@ class epm_system {
             return('');
         }
     }
-
+    
     /**
     * Downloads a file and places it in the destination defined
     * @version 2.11
@@ -104,7 +104,7 @@ class epm_system {
     * @param string $destination_file Destination of file
     * @package epm_system
     */
-    function download_file($url_file, $destination_file) {
+    function download_file($url_file, $destination_file, &$error = array()) {
         //Determine if file_get_contents_url exists which is the default FreePBX Standard for downloading straight files
         if(function_exists('file_get_contents_url')) {
             $contents = file_get_contents_url($url_file);
@@ -112,7 +112,7 @@ class epm_system {
             //I really hope we NEVER get here.
             $contents = file_get_contents($url_file);
             if (!preg_match('/200/', $http_response_header[0])) {
-                $this->error['download_file'] = "Unknown Error in Download_file";
+                $error['download_file'] = "Unknown Error in Download_file";
                 return false;
             }
         }
@@ -123,22 +123,22 @@ class epm_system {
                 mkdir($dirname);
             }
             if (!is_writable($dirname)) {
-                $this->error['download_file'] = "Directory '" . $dirname . "' is not writable! Unable to download files";
+                $error['download_file'] = "Directory '" . $dirname . "' is not writable! Unable to download files";
                 return false;
             }
             file_put_contents($destination_file, $contents);
             //check file placement
             if (!file_exists($destination_file)) {
-                $this->error['download_file'] = "File Doesn't Exist in '" . $dirname . "'. Unable to download files";
+                $error['download_file'] = "File Doesn't Exist in '" . $dirname . "'. Unable to download files";
                 return false;
             }
             return true;
         } else {
-            $this->error['download_file'] = "Contents of Remote file are blank! URL:".$url_file;
+            $error['download_file'] = "Contents of Remote file are blank! URL:".$url_file;
             return false;
         }
     }
-
+    
     /**
     * Downloads a file and places it in the destination defined with progress
     * @version 2.11
@@ -146,36 +146,54 @@ class epm_system {
     * @param string $destination_file Destination of file
     * @package epm_system
     */
-    function download_file_with_progress_bar($url_file, $destination_file) {
+    function download_file_with_progress_bar($url_file, $destination_file, &$error = array()) {
         set_time_limit(0);
         $headers = get_headers($url_file, 1);
         $size = $headers['Content-Length'];
-
+        $randnumid = trim(mt_rand(1000000000,100000000000000).$pid);
+        
         if (preg_match('/200/', $headers[0])) {
-            $pid = $this->run_in_background("wget " . $url_file . " -O " . $destination_file);
-
+            $pid = $this->run_in_background("wget --no-cache " . $url_file . " -O " . $destination_file);
+            
+            echo sprintf("<div>"._("Downloading %s ...")."</div>", basename($destination_file));
+			echo sprintf("<div id='DivProgressBar_%d' class='progress' style='width:100%%'>", $randnumid);
+			echo "<div class='progress-bar progress-bar-striped' role='progressbar' aria-valuenow='0' aria-valuemin='0' aria-valuemax='100' style='width:0%'>0% ("._("Complete").")</div>";
+			echo "</div>";
+			usleep('300');
             while ($this->is_process_running($pid)) {
-
-								if(file_exists($destination_file)) {
-									$out = 100 * round(filesize($destination_file) / $size, 2);
-									echo '<script type="text/javascript">document.getElementById(\'DivExample\').innerHTML="%' . $out . '";</script>';
-								}
-
+                $out = 100 * round(filesize($destination_file) / $size, 2);
+                ?>
+                <script type="text/javascript">
+                	$('#DivProgressBar_<?php echo $randnumid; ?> .progress-bar')
+                	.css('width', <?php echo $out ?>+'%')
+                	.attr('aria-valuenow', <?php echo $out ?>)
+                	.text("<?php echo $out ?>% (<?php echo _("Complete") ?>)");
+                </script>
+                <?php 
                 usleep('500');
                 ob_end_flush();
                 //ob_flush();
                 flush();
                 ob_start();
-
-
-                clearstatcache(); // make sure PHP actually checks dest. file size
+				clearstatcache(); // make sure PHP actually checks dest. file size 
             }
+            ?>
+			<script type="text/javascript">
+				$('#DivProgressBar_<?php echo $randnumid; ?> .progress-bar').css('width', '100%').attr('aria-valuenow', '100').text("100% (<?php echo _("Success") ?>)");
+			</script>
+			<?php 
             return true;
         } else {
+        	
+        	echo sprintf("<div>"._("Downloading %s ...")."</div>", basename($destination_file));
+        	echo "<div class='progress' style='width:100%'>";
+        	echo "<div class='progress-bar progress-bar-danger progress-bar-striped' role='progressbar' aria-valuenow='100' aria-valuemin='0' aria-valuemax='100' style='width:100%'>0% ("._("Error: ").$headers[0]."!)</div>";
+        	echo "</div>";
+        	
             return false;
         }
     }
-
+    
     /**
      * Taken from http://www.php.net/manual/en/function.array-search.php#69232
      * search haystack for needle and return an array of the key path, FALSE otherwise.
