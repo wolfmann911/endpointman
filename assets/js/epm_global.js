@@ -1,60 +1,64 @@
 var box = null;
 
 $(document).ready(function() {
-	
+
 	$('ul[role=tablist] li a').on("click", function(){
 		var tabclick =  $(this).attr('aria-controls');
-		if (tabclick != "") {
+		if (tabclick !== "") {
 			var displayActual = $.getUrlVar('display');
-			if (displayActual != "") {
+			if (displayActual !== "") {
 				var func = displayActual + "_change_tab";
-				if (typeof window[func] == 'function') { 
+				if (typeof window[func] == 'function') {
 					setTimeout(function () { window[func](tabclick); }, 500);
 				}
 			}
 		}
 	});
-	
-	
+
+
 	var displayActual = $.getUrlVar('display');
-	if (displayActual != "") {
+	if (displayActual !== "") {
 		var func = displayActual + "_document_ready";
-		if (typeof window[func] == 'function') { 
+		if (typeof window[func] == 'function') {
 			window[func]();
 		}
 	}
-	
+
 });
 
 $(window).load(function() {
 	var displayActual = $.getUrlVar('display');
-	if (displayActual != "") {
+	if (displayActual !== "") {
 		var func = displayActual + "_windows_load";
-		if (typeof window[func] == 'function') { 
+		if (typeof window[func] == 'function') {
 			window[func](epm_global_get_tab_actual());
 		}
 	}
 });
 
-function epm_global_html_find_hide_and_remove(name, tDelay = 1, bSlow = false)
+function epm_global_html_find_hide_and_remove(name, tDelay, bSlow)
 {
+	tDelay = typeof tDelay !== "undefined" ? tDelay : 1;
+	bSlow = typeof bSlow !== "undefined" ? bSlow : false;
 	if ($(name).length > 0) {
-		$(name).delay(tDelay).hide(((bSlow == true)  ? "slow" : ""), function () {
+		$(name).delay(tDelay).hide(((bSlow === true)  ? "slow" : ""), function () {
 			$(this).remove();
 		});
 	}
 }
 
-function epm_global_html_find_show_hide(name, bShow, tDelay = 1, slow = false)
+function epm_global_html_find_show_hide(name, bShow, tDelay, slow)
 {
+	tDelay = typeof tDelay !== "undefined" ? tDelay : 1;
+	bSlow = typeof bSlow !== "undefined" ? bSlow : false;
 	if ($(name).length > 0) {
-		if (bShow == true) 			{ $(name).delay(tDelay).show(((slow == true)  ? "slow" : "")); }
-		else if (bShow == false)	{ $(name).delay(tDelay).hide(((slow == true)  ? "slow" : "")); }
+		if (bShow === true) 			{ $(name).delay(tDelay).show(((slow === true)  ? "slow" : "")); }
+		else if (bShow === false)	{ $(name).delay(tDelay).hide(((slow === true)  ? "slow" : "")); }
 		else if (bShow == "auto")	{
 			if( $(name).is(":visible") ){
-				$(name).delay(tDelay).hide(((slow == true)  ? "slow" : "")); 
+				$(name).delay(tDelay).hide(((slow === true)  ? "slow" : ""));
 			}else{
-				$(name).delay(tDelay).show(((slow == true)  ? "slow" : ""));
+				$(name).delay(tDelay).show(((slow === true)  ? "slow" : ""));
 			}
 		}
 	}
@@ -63,8 +67,8 @@ function epm_global_html_find_show_hide(name, bShow, tDelay = 1, slow = false)
 function epm_global_html_css_name(name, bStatus, classname)
 {
 	if ($(name).length > 0) {
-		if (bStatus == true) 		{ $(name).addClass(classname); }
-		else if (bStatus == false)	{ $(name).removeClass(classname); }
+		if (bStatus === true) 		{ $(name).addClass(classname); }
+		else if (bStatus === false)	{ $(name).removeClass(classname); }
 		else if (bStatus == "auto")	{
 			if($(name).hasClass(classname)) { $(name).removeClass(classname); }
 			else							{ $(name).addClass(classname); }
@@ -81,12 +85,13 @@ function epm_global_get_tab_actual()
 	return sTab;
 }
 
-function epm_advanced_get_value_by_form(sform, snameopt, formtype = "name")
+function epm_advanced_get_value_by_form(sform, snameopt, formtype)
 {
+	formtype = typeof formtype !== "undefined" ? formtype : "name";
 	var rdata = null;
 	$('form['+formtype+'='+sform+']')
 	.find("input, textarea, select")
-	.each(function(index){  
+	.each(function(index){
 		var input = $(this);
 		if (snameopt == input.attr('name'))
 		{
@@ -97,10 +102,14 @@ function epm_advanced_get_value_by_form(sform, snameopt, formtype = "name")
 	return rdata;
 }
 
-function epm_global_dialog_action(actionname, urlStr, formname = null, titleStr = "Status", ClassDlg = "")
+function epm_global_dialog_action(actionname, urlStr, formname, titleStr, ClassDlg)
 {
-	if ((actionname == "") || (urlStr == "")) { return null; }
-	
+	formname = typeof formname !== "undefined" ? formname : null;
+	titleStr = typeof titleStr !== "undefined" ? titleStr : "Status";
+	ClassDlg = typeof ClassDlg !== "undefined" ? ClassDlg : "";
+
+	if ((actionname === "") || (urlStr === "")) { return null; }
+
 	box = $('<div id="moduledialogwrapper" ></div>')
 	.dialog({
 		title: titleStr,
@@ -108,22 +117,22 @@ function epm_global_dialog_action(actionname, urlStr, formname = null, titleStr 
 		dialogClass: ClassDlg,
 		modal: true,
 		width: 410,
-		maxHeight: 410,
 		height: 'auto',
 		maxHeight: 350,
 		scroll: true,
 		position: { my: "top-175", at: "center", of: window },
 		open: function (e) {
 			$('#moduledialogwrapper').html(_('Loading..' ) + '<i class="fa fa-spinner fa-spin fa-2x">');
-			
-			if (formname == null) {
-				var oData = null;
+
+			var oData;
+			if (formname === null) {
+				oData = null;
 			}
 			else {
 				var form = document.forms.namedItem(formname);
-				var oData = new FormData(form);	
+				oData = new FormData(form);
 			}
-			
+
 			var xhr = new XMLHttpRequest(),
 			timer = null;
 			xhr.open('POST', urlStr, true);
@@ -132,8 +141,8 @@ function epm_global_dialog_action(actionname, urlStr, formname = null, titleStr 
 				$('#moduledialogwrapper').animate({ scrollTop: $(this).scrollTop() + $(this).height() });
 				if (xhr.readyState == XMLHttpRequest.DONE) {
 					window.clearTimeout(timer);
-					if (typeof end_module_actions == 'function') { 
-						end_module_actions(actionname); 
+					if (typeof end_module_actions == 'function') {
+						end_module_actions(actionname);
 					}
 				}
 				if (xhr.responseText.length > 0) {
@@ -148,52 +157,55 @@ function epm_global_dialog_action(actionname, urlStr, formname = null, titleStr 
 					$("#moduleBoxContents a").focus();
 				}
 			}, 500);
-			
+
 		},
 		close: function(e) {
-			if (typeof close_module_actions == 'function') { 
-				close_module_actions(false, actionname); 
+			if (typeof close_module_actions == 'function') {
+				close_module_actions(false, actionname);
 			}
 			$(e.target).dialog("destroy").remove();
 		}
 	});
 }
 
-function close_module_actions(goback, acctionname = "") 
+function close_module_actions(goback, acctionname)
 {
-	if (box != null) {
+	acctionname = typeof acctionname !== "undefined" ? acctionname : "";
+	if (box !== null) {
 		box.dialog("destroy").remove();
 	}
-	
+
 	var displayActual = $.getUrlVar('display');
-	if (displayActual != "") {
+	if (displayActual !== "") {
 		var func = 'close_module_actions_'+displayActual;
-		if (typeof window[func] == 'function') { 
-			window[func](goback, acctionname); 
+		if (typeof window[func] == 'function') {
+			window[func](goback, acctionname);
 		}
 	}
-	
+
 	if (goback) {
 		location.reload();
-	}		
+	}
 }
 
-function end_module_actions(acctionname = "") 
+function end_module_actions(acctionname)
 {
+	acctionname = typeof acctionname !== "undefined" ? acctionname : "";
 	var displayActual = $.getUrlVar('display');
-	if (displayActual != "") {
+	if (displayActual !== "") {
 		var func = 'end_module_actions_'+displayActual;
-		if (typeof window[func] == 'function') { 
-			window[func](acctionname); 
+		if (typeof window[func] == 'function') {
+			window[func](acctionname);
 		}
 	}
 }
 
-function epm_global_refresh_table(snametable, showmsg = true)
+function epm_global_refresh_table(snametable, showmsg)
 {
-	if (snametable == "") { return; }
+	showmsg = typeof showmsg !== "undefined" ? showmsg : true;
+	if (snametable === "") { return; }
 	$(snametable).bootstrapTable('refresh');
-	if (showmsg == true) {
+	if (showmsg === true) {
 		fpbxToast("Table Refrash Ok!", '', 'success');
 	}
 }

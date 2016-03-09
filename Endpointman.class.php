@@ -87,19 +87,19 @@ class Endpointman implements \BMO {
 
 
 		$this->configmod->set('tz', $this->config->get('PHPTIMEZONE'));
-		date_default_timezone_set($this->configmod->get('tz'));
+		//date_default_timezone_set($this->configmod->get('tz'));
 
 		$this->UPDATE_PATH = $this->configmod->get('update_server');
         $this->MODULES_PATH = $this->config->get('AMPWEBROOT') . '/admin/modules/';
 
-define("UPDATE_PATH", $this->UPDATE_PATH);
-define("MODULES_PATH", $this->MODULES_PATH);
+				define("UPDATE_PATH", $this->UPDATE_PATH);
+				define("MODULES_PATH", $this->MODULES_PATH);
 
 
         //Determine if local path is correct!
         if (file_exists($this->MODULES_PATH . "endpointman/")) {
             $this->LOCAL_PATH = $this->MODULES_PATH . "endpointman/";
-define("LOCAL_PATH", $this->LOCAL_PATH);
+						define("LOCAL_PATH", $this->LOCAL_PATH);
         } else {
             die("Can't Load Local Endpoint Manager Directory!");
         }
