@@ -7,5 +7,5 @@ function epm_devices_windows_load (nTab = "") {
 }
 
 function epm_devices_change_tab (nTab = "") {
-	
+
 }

@@ -45,10 +45,10 @@ function epm_advanced_change_tab (nTab = "") {
 
 // INI: FUNCTION GLOBAL SEC
 
-function epm_advanced_select_tab_ajax(idtab)
-{	
+function epm_advanced_select_tab_ajax(idtab = "")
+{
 	if (idtab == "") {
-		fpbxToast('epm_advanced_select_tab_ajax -> id invalid (' + idtab + ')!','JS!','warning');
+		fpbxToast('epm_advanced_select_tab_ajax -> id invalid!','JS!','warning');
 		return false;
 	}
 	
@@ -255,7 +255,7 @@ function epm_advanced_tab_iedl_bt_import()
 
 
 // INI: FUNCTION TAB POCE
-function epm_advanced_tab_poce_select_product(idsel, bclear = true)
+function epm_advanced_tab_poce_select_product(idsel = null, bclear = true)
 {
 	if ($.isNumeric(idsel) == false) { return; }
 	$("div.list-group>a.active").removeClass("active");
@@ -318,7 +318,7 @@ function epm_advanced_tab_poce_select_product(idsel, bclear = true)
 	});	
 }
 
-function epm_advanced_tab_poce_create_file_list(idname, data = "", product_select = "", typefile="") 
+function epm_advanced_tab_poce_create_file_list(idname, data = "", product_select = "", typefile = "") 
 {
 	$(idname + " div.dropdown-menu").empty();
 	if (Array.isArray(data) == false)
@@ -675,7 +675,8 @@ function epm_advanced_tab_oui_manager_bt_del(id_del)
 	}
 }
 
-function epm_advanced_tab_oui_manager_ajax (data_ajax = ""){
+function epm_advanced_tab_oui_manager_ajax (data_ajax = "")
+{
 	var response = false;
 	if (data_ajax != "") { 
 		$.ajax({
@@ -708,13 +709,14 @@ function epm_advanced_tab_oui_manager_ajax (data_ajax = ""){
 
 
 // INI: FUNCTION TAB SETTING
-function epm_advanced_tab_setting_input_value_change_bt(sNameID, sValue = "", bSaveChange = true, bSetFocus = false)
+function epm_advanced_tab_setting_input_value_change_bt(sNameID = "", sValue = "", bSaveChange = true, bSetFocus = false)
 {
+	if (sNameID = "" ) { return false; }
+	
 	$(sNameID).val(sValue);
 	if (bSetFocus == true) { $(sNameID).focus(); }
 	if (bSaveChange == true) {
 		epm_advanced_tab_setting_input_change(sNameID);
-		
 	}
 }
 

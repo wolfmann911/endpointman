@@ -6,7 +6,6 @@ function epm_config_document_ready () {
 
 function epm_config_windows_load (nTab = "") {
 	epm_config_select_tab_ajax(nTab);
-	
 	$("#epm_config_" + nTab + "_all_list_box").children("div").hide("slow", function () {
 		$(this).remove();
 	});
@@ -14,7 +13,6 @@ function epm_config_windows_load (nTab = "") {
 
 function epm_config_change_tab (nTab = "") {
 	epm_config_select_tab_ajax(nTab);
-	
 	$("#epm_config_" + nTab + "_all_list_box").children("div").hide("slow", function () {
 		$(this).remove();
 	});
@@ -27,14 +25,12 @@ function epm_config_change_tab (nTab = "") {
 
 
 //**** INI: FUNCTION GLOBAL SEC ****
-function epm_config_select_tab_ajax(idtab)
-{	
-	clearTimeout(v_sTimerUpdateAjax);
+function epm_config_select_tab_ajax(idtab = "")
+{
 	if (idtab == "") {
 		fpbxToast('epm_config_select_tab_ajax -> id no send!','JS!','warning');
 		return false;
 	}
-	
 	clearTimeout(v_sTimerUpdateAjax);
 	$("#epm_config_"+ idtab +"_load_init").each(function() {
 		if ($(this).css('display') == "none") 
@@ -182,6 +178,9 @@ function epm_config_tab_html_L0(prefijoid, txt_ayuda)
 					.append(
 						$('<div/>', { 'class' : 'form-group' })
 						.append(
+							$('<div/>', { 
+								'class' : 'col-md-12'
+							}),
 							$('<div/>', { 
 								'class' : 'col-md-3'
 							}),
@@ -516,8 +515,9 @@ function epm_config_tab_manager_html_L1(data, prefijoid, txt, idtab)
 	$('#' + prefijoid + '_box' )
 	.each( function() {
 		$(this).find('.form-group').each( function() {
+			
 			$(this)
-			.children('.col-md-3')
+			.children('.col-md-12')
 			.append(
 				$('<label/>', {
 					'class' : 'control-label',
@@ -526,8 +526,17 @@ function epm_config_tab_manager_html_L1(data, prefijoid, txt, idtab)
 				$('<i/>', {
 					'class'  	: 'fa fa-question-circle fpbx-help-icon',
 					'data-for'	: prefijoid + '_label'
-				}),
-				$('<br/>'),
+				})
+			);
+			
+			
+			
+			$(this)
+			.children('.col-md-3')
+			.addClass("text-center")
+			.append(
+				$('<p/>', { 'id' : prefijoid + '_txt_last_update' }),
+				$('<p/>', {	'id' : prefijoid + '_txt_update' }),
 				$('<input/>', {
 					'type'	: 'button',
 					'id'	: prefijoid + '_bt_brand_install',
@@ -552,12 +561,15 @@ function epm_config_tab_manager_html_L1(data, prefijoid, txt, idtab)
 				
 			);
 			
+			/*
 			$(this)
 			.children('.col-md-9')
 			.append(
-				$('<p/>', { 'id' : prefijoid + '_txt_last_update' }),
+				$('<p/>', { 'id' : prefijoid + '_txt_last_update' })
 				$('<p/>', {	'id' : prefijoid + '_txt_update' })
 			);
+			*/
+			
 		});
 	});
 }
@@ -569,12 +581,12 @@ function epm_config_tab_manager_html_L2(data, prefijoid, txt, idtab)
 	.each( function() {
 		$(this).find('.form-group').each( function() {
 			$(this)
-			.children('.col-md-3')
+			.children('.col-md-12')
 			.append(
 				$('<label/>', {
 					'class' : 'control-label',
 					'for'   : prefijoid
-				}).text(data.short_name),
+				}).text(data.long_name + " "),
 				$('<i/>', {
 					'class'  	: 'fa fa-question-circle fpbx-help-icon',
 					'data-for'	: prefijoid
@@ -582,30 +594,60 @@ function epm_config_tab_manager_html_L2(data, prefijoid, txt, idtab)
 			);
 			
 			$(this)
-			.children('.col-md-9')
+			.children('.col-md-3')
+			.addClass("text-center")
 			.append(
-				$('<input/>', {
-					'type'	: 'button',
+				$('<a/>', {
 					'id'	: prefijoid + '_bt_fw_install',
 					'class'	: 'btn btn-default',
-					'value'	: txt.fw_install
+					'href'	: '#'
 				})
-				.on( "click", function(){ epm_config_tab_manager_bt('fw_install', data.id, 'firmware'); }),
-				$('<input/>', {
-					'type'	: 'button',
+				.on( "click", function(){ epm_config_tab_manager_bt('fw_install', data.id, 'firmware'); })
+				.append( 
+					$('<i/>', { 'class' : 'fa fa-plus-square-o' }),
+					$('<span/>', {}).text(" " + txt.fw_install)
+				),
+//TODO: EL BOTON ROJO PIERDE EL COLOR AL OCULTARSE Y MOTRASEA
+				$('<a/>', {
 					'id'	: prefijoid + '_bt_fw_uninstall',
-					'class'	: 'btn btn-default',
-					'value'	: txt.fw_uninstall
+					'class'	: 'btn btn-danger',
+					'href'	: '#'
 				})
-				.on( "click", function(){ epm_config_tab_manager_bt('fw_uninstall', data.id, 'firmware'); }),
-				$('<input/>', {
-					'type'	: 'button',
+				.on( "click", function(){ epm_config_tab_manager_bt('fw_uninstall', data.id, 'firmware'); })
+				.append( 
+					$('<i/>', { 'class' : 'fa fa-minus-square-o' }),
+					$('<span/>', {}).text(" " + txt.fw_uninstall)
+				),
+				$('<a/>', {
 					'id'	: prefijoid + '_bt_fw_update',
 					'class'	: 'btn btn-default',
-					'value'	: txt.fw_update
+					'href'	: '#'
 				})
 				.on( "click", function(){ epm_config_tab_manager_bt('fw_update', data.id, 'firmware'); })
+				.append( 
+					$('<i/>', { 'class' : 'fa fa-refresh' }),
+					$('<span/>', {}).text(" " + txt.fw_update)
+				)
 			);
+			
+			
+			$(this)
+			.children('.col-md-9')
+			.append(
+				$('<ul/>', { 'class' : 'list-group' })
+				.append(
+					$('<li/>', { 'class' : 'list-group-item active' })
+					.append(
+						$('<span/>', { 'class' : 'label label-default label-pill pull-xs-right'	}).text("?/?"),
+						$('<i/>',    { 'class' : 'fa fa-list-alt fa-lg' })
+					)
+					.append(
+						$("<span/>", {}).text(" Lista de productos...")
+					)
+				)
+			);
+			
+			
 		});
 	});
 }
@@ -622,7 +664,7 @@ function epm_config_tab_manager_html_L3(data, prefijo, prefijoid, name, value_di
 				$('<label/>', {
 					'class' : 'control-label',
 					'for'   : prefijoid
-				}).text(name),
+				}).text(name + " "),
 				$('<i/>', {
 					'class'  	: 'fa fa-question-circle fpbx-help-icon',
 					'data-for'	: prefijoid
@@ -644,7 +686,7 @@ function epm_config_tab_manager_html_L3(data, prefijo, prefijoid, name, value_di
 					'for'  		: prefijoid +'_disable',
 					'data-for'	: prefijoid
 				})
-				.text(txt_bt_disable)
+				.text(txt_bt_disable + " ")
 				.append(
 					$('<i/>', { 'class' : 'fa fa-toggle-off' })
 				),
@@ -659,7 +701,7 @@ function epm_config_tab_manager_html_L3(data, prefijo, prefijoid, name, value_di
 					'for'  	: prefijoid + '_enable',
 					'data-for'	: prefijoid
 				})
-				.text(txt_bt_enable)
+				.text(txt_bt_enable + " ")
 				.append(
 					$('<i/>', { 'class' : 'fa fa-toggle-on' })
 				)
@@ -877,7 +919,7 @@ function epm_config_tab_editor_html_L1(data, iL0, name, value_yes, txt_bt_yes, v
 					'for'  		: iL0.prefijoid +'_yes',
 					'data-for'	: iL0.prefijoid
 				})
-				.text(txt_bt_yes)
+				.text(txt_bt_yes + " ")
 				.append(
 					$('<i/>', { 'class' : 'fa fa-toggle-off' })
 				),
@@ -891,7 +933,7 @@ function epm_config_tab_editor_html_L1(data, iL0, name, value_yes, txt_bt_yes, v
 					'for'  	: iL0.prefijoid + '_no',
 					'data-for'	: iL0.prefijoid
 				})
-				.text(txt_bt_no)
+				.text(txt_bt_no + " ")
 				.append(
 					$('<i/>', { 'class' : 'fa fa-toggle-on' })
 				)
@@ -929,7 +971,7 @@ function epm_config_tab_editor_html_L2(data, iL0, name, value_yes, txt_bt_yes, v
 				'for'  		: iL0.prefijoid +'_yes',
 				'data-for'	: iL0.prefijoid
 			})
-			.text(txt_bt_yes)
+			.text(txt_bt_yes + " ")
 			.append(
 				$('<i/>', { 'class' : 'fa fa-toggle-off' })
 			),
@@ -943,7 +985,7 @@ function epm_config_tab_editor_html_L2(data, iL0, name, value_yes, txt_bt_yes, v
 				'for'  	: iL0.prefijoid + '_no',
 				'data-for'	: iL0.prefijoid
 			})
-			.text(txt_bt_no)
+			.text(txt_bt_no + " ")
 			.append(
 				$('<i/>', { 'class' : 'fa fa-toggle-on' })
 			)

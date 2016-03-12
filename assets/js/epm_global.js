@@ -1,11 +1,11 @@
 var box = null;
 
 $(document).ready(function() {
+	var displayActual = epm_global_getDisplayActual();
 	
 	$('ul[role=tablist] li a').on("click", function(){
 		var tabclick =  $(this).attr('aria-controls');
 		if (tabclick != "") {
-			var displayActual = $.getUrlVar('display');
 			if (displayActual != "") {
 				var func = displayActual + "_change_tab";
 				if (typeof window[func] == 'function') { 
@@ -15,8 +15,6 @@ $(document).ready(function() {
 		}
 	});
 	
-	
-	var displayActual = $.getUrlVar('display');
 	if (displayActual != "") {
 		var func = displayActual + "_document_ready";
 		if (typeof window[func] == 'function') { 
@@ -27,7 +25,7 @@ $(document).ready(function() {
 });
 
 $(window).load(function() {
-	var displayActual = $.getUrlVar('display');
+	var displayActual = epm_global_getDisplayActual();
 	if (displayActual != "") {
 		var func = displayActual + "_windows_load";
 		if (typeof window[func] == 'function') { 
@@ -36,8 +34,16 @@ $(window).load(function() {
 	}
 });
 
-function epm_global_html_find_hide_and_remove(name, tDelay = 1, bSlow = false)
+
+function epm_global_getDisplayActual ()
 {
+	var displayActual = $.getUrlVar('display');
+	displayActual = displayActual.replace("#", ""); 
+	return displayActual;
+}
+
+
+function epm_global_html_find_hide_and_remove(name = "", tDelay = 1, bSlow = false) {
 	if ($(name).length > 0) {
 		$(name).delay(tDelay).hide(((bSlow == true)  ? "slow" : ""), function () {
 			$(this).remove();
@@ -45,8 +51,7 @@ function epm_global_html_find_hide_and_remove(name, tDelay = 1, bSlow = false)
 	}
 }
 
-function epm_global_html_find_show_hide(name, bShow, tDelay = 1, slow = false)
-{
+function epm_global_html_find_show_hide(name = "", bShow = "auto", tDelay = 1, slow = false) {
 	if ($(name).length > 0) {
 		if (bShow == true) 			{ $(name).delay(tDelay).show(((slow == true)  ? "slow" : "")); }
 		else if (bShow == false)	{ $(name).delay(tDelay).hide(((slow == true)  ? "slow" : "")); }
@@ -97,10 +102,9 @@ function epm_advanced_get_value_by_form(sform, snameopt, formtype = "name")
 	return rdata;
 }
 
-function epm_global_dialog_action(actionname, urlStr, formname = null, titleStr = "Status", ClassDlg = "")
+function epm_global_dialog_action(actionname = "", urlStr = "", formname = null, titleStr = "Status", ClassDlg = "")
 {
 	if ((actionname == "") || (urlStr == "")) { return null; }
-	
 	box = $('<div id="moduledialogwrapper" ></div>')
 	.dialog({
 		title: titleStr,
@@ -165,7 +169,7 @@ function close_module_actions(goback, acctionname = "")
 		box.dialog("destroy").remove();
 	}
 	
-	var displayActual = $.getUrlVar('display');
+	var displayActual = epm_global_getDisplayActual();
 	if (displayActual != "") {
 		var func = 'close_module_actions_'+displayActual;
 		if (typeof window[func] == 'function') { 
@@ -180,7 +184,7 @@ function close_module_actions(goback, acctionname = "")
 
 function end_module_actions(acctionname = "") 
 {
-	var displayActual = $.getUrlVar('display');
+	var displayActual = epm_global_getDisplayActual();
 	if (displayActual != "") {
 		var func = 'end_module_actions_'+displayActual;
 		if (typeof window[func] == 'function') { 
@@ -189,7 +193,7 @@ function end_module_actions(acctionname = "")
 	}
 }
 
-function epm_global_refresh_table(snametable, showmsg = true)
+function epm_global_refresh_table(snametable = "", showmsg = false)
 {
 	if (snametable == "") { return; }
 	$(snametable).bootstrapTable('refresh');
