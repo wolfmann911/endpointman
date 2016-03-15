@@ -150,8 +150,8 @@ function epm_config_html_ordenar_lista(box_root, orden)
 	{
 		var elemLista =  lista.children("div.element-container").get();
 		elemLista.sort(function(a, b) {
-			var compA = $(a).find('.form-group').find('div.col-md-3 > label').first().text().toUpperCase().trim();
-			var compB = $(b).find('.form-group').find('div.col-md-3 > label').first().text().toUpperCase().trim();
+			var compA = $(a).find('.form-group').find('div.col-md-2 > label').first().text().toUpperCase().trim();
+			var compB = $(b).find('.form-group').find('div.col-md-2 > label').first().text().toUpperCase().trim();
 			return (compA < compB) ? -1 : (compA > compB) ? 1 : 0;
 		})
 	}
@@ -182,10 +182,10 @@ function epm_config_tab_html_L0(prefijoid, txt_ayuda)
 								'class' : 'col-md-12'
 							}),
 							$('<div/>', { 
-								'class' : 'col-md-3'
+								'class' : 'col-md-2'
 							}),
 							$('<div/>', { 
-								'class' : 'col-md-9',
+								'class' : 'col-md-10',
 								'id'	: prefijoid + '_box_select'
 							})
 						)
@@ -370,6 +370,7 @@ function epm_config_tab_manager_ajax_get_add_data(data, idtab)
 					});
 					//L3: end loop modelos
 					epm_config_html_ordenar_lista(iL2.boxappend, true);
+					epm_config_tab_manager_countlist(iL2.prefijoid, itemDataL2.models);
 					
 				});
 				//L2: end loop productos
@@ -401,6 +402,14 @@ function epm_config_tab_manager_ajax_get_add_data(data, idtab)
 		fpbxToast(data.message,'ERROR!','error');
 		return false;
 	}
+}
+
+function epm_config_tab_manager_countlist(prefijoid = "", datosxml = "")
+{
+	$('#' + prefijoid + '_box' )
+	.each( function() {
+		$(this).find('.count-products-brand').text(datosxml.length);
+	});
 }
 
 function epm_config_tab_manager_bt_update_check_click() 
@@ -529,41 +538,53 @@ function epm_config_tab_manager_html_L1(data, prefijoid, txt, idtab)
 				})
 			);
 			
-			
-			
 			$(this)
-			.children('.col-md-3')
+			.children('.col-md-2')
 			.addClass("text-center")
 			.append(
-				$('<p/>', { 'id' : prefijoid + '_txt_last_update' }),
-				$('<p/>', {	'id' : prefijoid + '_txt_update' }),
-				$('<input/>', {
+				$('<br/>', {}),
+				$('<button/>', {
 					'type'	: 'button',
 					'id'	: prefijoid + '_bt_brand_install',
-					'class'	: 'btn btn-default',
-					'value'		: txt.install
+					'class'	: 'btn btn-success',
+					'value'	: txt.install
 				})
-				.on( "click", function(){ epm_config_tab_manager_bt('brand_install', data.id, 'brand'); }),
-				$('<input/>', {
+				.on( "click", function(){ epm_config_tab_manager_bt('brand_install', data.id, 'brand'); })
+				.append( 
+					$('<i/>', { 'class' : 'fa fa-plus-square-o fa-lg' }),
+					$('<span/>', {}).text(" " + txt.install)
+				),
+				$('<button/>', {
 					'type'	: 'button',
 					'id'	: prefijoid + '_bt_brand_uninstall',
-					'class'	: 'btn btn-default',
-					'value'		: txt.uninstall
+					'class'	: 'btn btn-danger',
+					'value'	: txt.uninstall
 				})
-				.on( "click", function(){ epm_config_tab_manager_bt('brand_uninstall', data.id, 'brand'); }),
-				$('<input/>', {
+				.on( "click", function(){ epm_config_tab_manager_bt('brand_uninstall', data.id, 'brand'); })
+				.append( 
+					$('<i/>', { 'class' : 'fa fa-trash-o fa-lg' }),
+					$('<span/>', {}).text(" " + txt.uninstall)
+				),
+				$('<button/>', {
 					'type'	: 'button',
 					'id'	: prefijoid + '_bt_brand_update',
 					'class'	: 'btn btn-default',
 					'value'	: txt.update
 				})
 				.on( "click", function(){ epm_config_tab_manager_bt('brand_update', data.id, 'brand'); })
-				
+				.append( 
+					$('<i/>', { 'class' : 'fa fa-refresh fa-spin fa-lg' }),
+					$('<span/>', {}).text(" " + txt.update)
+				),
+				$('<br/>', {}),
+				$('<br/>', {}),
+				$('<p/>', { 'id' : prefijoid + '_txt_last_update' }),
+				$('<p/>', {	'id' : prefijoid + '_txt_update' })
 			);
 			
 			/*
 			$(this)
-			.children('.col-md-9')
+			.children('.col-md-10')
 			.append(
 				$('<p/>', { 'id' : prefijoid + '_txt_last_update' })
 				$('<p/>', {	'id' : prefijoid + '_txt_update' })
@@ -594,55 +615,53 @@ function epm_config_tab_manager_html_L2(data, prefijoid, txt, idtab)
 			);
 			
 			$(this)
-			.children('.col-md-3')
+			.children('.col-md-2')
 			.addClass("text-center")
 			.append(
-				$('<a/>', {
+				$('<button/>', {
+					'type'	: 'button',
 					'id'	: prefijoid + '_bt_fw_install',
-					'class'	: 'btn btn-default',
-					'href'	: '#'
+					'class'	: 'btn btn-default'
 				})
 				.on( "click", function(){ epm_config_tab_manager_bt('fw_install', data.id, 'firmware'); })
 				.append( 
-					$('<i/>', { 'class' : 'fa fa-plus-square-o' }),
+					$('<i/>', { 'class' : 'fa fa-plus-square-o fa-lg' }),
 					$('<span/>', {}).text(" " + txt.fw_install)
 				),
-//TODO: EL BOTON ROJO PIERDE EL COLOR AL OCULTARSE Y MOTRASEA
-				$('<a/>', {
+				$('<button/>', {
+					'type'	: 'button',
 					'id'	: prefijoid + '_bt_fw_uninstall',
-					'class'	: 'btn btn-danger',
-					'href'	: '#'
+					'class'	: 'btn btn-danger'
 				})
 				.on( "click", function(){ epm_config_tab_manager_bt('fw_uninstall', data.id, 'firmware'); })
 				.append( 
-					$('<i/>', { 'class' : 'fa fa-minus-square-o' }),
+					$('<i/>', { 'class' : 'fa fa-trash-o fa-lg' }),
 					$('<span/>', {}).text(" " + txt.fw_uninstall)
 				),
-				$('<a/>', {
+				$('<button/>', {
+					'type'	: 'button',
 					'id'	: prefijoid + '_bt_fw_update',
-					'class'	: 'btn btn-default',
-					'href'	: '#'
+					'class'	: 'btn btn-default'
 				})
 				.on( "click", function(){ epm_config_tab_manager_bt('fw_update', data.id, 'firmware'); })
 				.append( 
-					$('<i/>', { 'class' : 'fa fa-refresh' }),
+					$('<i/>', { 'class' : 'fa fa-refresh fa-spin fa-lg' }),
 					$('<span/>', {}).text(" " + txt.fw_update)
 				)
 			);
 			
-			
 			$(this)
-			.children('.col-md-9')
+			.children('.col-md-10')
 			.append(
 				$('<ul/>', { 'class' : 'list-group' })
 				.append(
 					$('<li/>', { 'class' : 'list-group-item active' })
 					.append(
-						$('<span/>', { 'class' : 'label label-default label-pill pull-xs-right'	}).text("?/?"),
+						$('<span/>', { 'class' : 'label label-default label-pill pull-xs-right count-products-brand' }).text("?"),
 						$('<i/>',    { 'class' : 'fa fa-list-alt fa-lg' })
 					)
 					.append(
-						$("<span/>", {}).text(" Lista de productos...")
+						$("<b/>", {}).text(" " + "Lista de productos...")
 					)
 				)
 			);
@@ -659,7 +678,7 @@ function epm_config_tab_manager_html_L3(data, prefijo, prefijoid, name, value_di
 	.each( function() {
 		$(this).find('.form-group').each( function() {
 			$(this)
-			.children('.col-md-3')
+			.children('.col-md-2')
 			.append(
 				$('<label/>', {
 					'class' : 'control-label',
@@ -672,8 +691,8 @@ function epm_config_tab_manager_html_L3(data, prefijo, prefijoid, name, value_di
 			);
 			
 			$(this)
-			.children('.col-md-9')
-			.addClass("radioset")
+			.children('.col-md-10')
+			.addClass("radioset text-center")
 			.append(
 				$('<input/>', {
 					'type'		: 'radio',
@@ -891,8 +910,9 @@ function epm_config_tab_editor_html_L1(data, iL0, name, value_yes, txt_bt_yes, v
 {
 	$('#' + iL0.prefijoid + '_box' ).each( function() {
 		$(this).find('.form-group').each( function() {
+			
 			$(this)
-			.children('.col-md-3')
+			.children('.col-md-12')
 			.append(
 				$('<label/>', {
 					'class' : 'control-label',
@@ -904,8 +924,16 @@ function epm_config_tab_editor_html_L1(data, iL0, name, value_yes, txt_bt_yes, v
 				})
 			);
 			
+			
+			
 			$(this)
-			.children('.col-md-9')
+			.children('.col-md-2')
+			.append(
+			
+			);
+			
+			$(this)
+			.children('.col-md-10')
 			.addClass("radioset")
 			.append(
 				$('<input/>', {

@@ -179,7 +179,7 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 		$arrVal['epm_devices']= array();
 		$arrVal['epm_templates']= array("model_clone","list_current_template","add_template","del_template");
 		$arrVal['epm_config']= array("saveconfig","list_all_brand");
-		$arrVal['epm_advanced']= array("oui", "oui_add", "oui_del", "poce_select", "poce_select_file", "poce_save_file", "poce_save_as_file", "poce_sendid", "poce_delete_config_custom", "list_files_brands_export", "saveconfig");
+		$arrVal['epm_advanced']= array("oui", "oui_add", "oui_del", "poce_list_brands","poce_select", "poce_select_file", "poce_save_file", "poce_save_as_file", "poce_sendid", "poce_delete_config_custom", "list_files_brands_export", "saveconfig");
 		if (!isset($arrVal[$module_sec])) { return false; }
 		
 		if (in_array($req, $arrVal[$module_sec])) {
@@ -393,6 +393,10 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 				elseif ($module_tab == "poce") {
 					switch ($command)
 					{
+						case "poce_list_brands":
+							$retarr = $this->epm_advanced_poce_list_brands();	
+							break;
+							
 						case "poce_select":
 							$retarr = $this->epm_advanced_poce_select();
 							break;
@@ -1017,6 +1021,24 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 	 **** FUNCIONES SEC MODULO "epm_advanced\poce". ****
 	 ***************************************************/
 	
+	public function epm_advanced_poce_list_brands()
+	{
+		//$sql = 'SELECT * FROM endpointman_product_list WHERE hidden = 0 AND id > 0 ORDER BY long_name ASC';
+		//$sql = 'SELECT * FROM endpointman_product_list WHERE hidden = 0 AND id > 0 AND brand IN (SELECT id FROM asterisk.endpointman_brand_list where hidden = 0) ORDER BY long_name ASC';
+		$sql = 'SELECT * FROM endpointman_product_list WHERE hidden = 0 AND id IN (SELECT DISTINCT product_id FROM asterisk.endpointman_model_list where enabled = 1) AND brand IN (SELECT id FROM asterisk.endpointman_brand_list where hidden = 0) ORDER BY long_name ASC';
+		$product_list = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
+		$i = 0;
+		$temp = array();
+		foreach ($product_list as $srow) 
+		{
+			$temp[$i]['id'] = $srow['id'];
+			$temp[$i]['name'] = $srow['long_name'];
+			$temp[$i]['name_mini'] = substr($srow['long_name'], 0, 40).(strlen($srow['long_name']) > 40 ? "..." : "");
+			$i++;
+		}
+		return array("status" => true, "message" => _("Ok!"), "ldatos" => $temp);
+	}
+	
 	public function epm_advanced_poce_select() 
 	{
 		if (! isset($_REQUEST['product_select'])) {
@@ -1306,6 +1328,7 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 		}
 		else
 		{
+			$dget['command'] = $_REQUEST['command'];
 			$dget['type_file'] = $_REQUEST['type_file'];
 			$dget['sendid'] = $_REQUEST['sendid'];
 			$dget['product_select'] = $_REQUEST['product_select'];
@@ -1317,40 +1340,79 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 			
 			if ($dget['type_file'] == "file")  
 			{
-				$sql = "SELECT cfg_dir,directory,config_files FROM endpointman_product_list,endpointman_brand_list WHERE endpointman_product_list.brand = endpointman_brand_list.id AND endpointman_product_list.id = '" . $dget['product_select'] . "'";
-				$row = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
-				$config_files = explode(",", $row['config_files']);
-				
-				if ((is_array($config_files)) AND (in_array($dget['file_name'], $config_files)))
+				if ($dget['command'] == "poce_save_file") 
 				{
-					$pathdir = $this->PHONE_MODULES_PATH . 'endpoint/' . $row['directory'] . "/" . $row['cfg_dir'] . "/";
-					$pathfile = $pathdir . $dget['file_name'];
-					if ((! file_exists($pathfile)) AND (! is_writable($pathdir))) {
-						$retarr = array("status" => false, "message" => "Directory is not Writable (".$pathdir.")!");
-					}
-					elseif (! is_writable($pathfile)) {
-						$retarr = array("status" => false, "message" => "File is not Writable (".$pathfile.")!");
-					}
-					else 
+					$sql = "SELECT cfg_dir,directory,config_files FROM endpointman_product_list,endpointman_brand_list WHERE endpointman_product_list.brand = endpointman_brand_list.id AND endpointman_product_list.id = '" . $dget['product_select'] . "'";
+					$row = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
+					$config_files = explode(",", $row['config_files']);
+					
+					if ((is_array($config_files)) AND (in_array($dget['file_name'], $config_files)))
 					{
-						$wfh = fopen($pathfile, 'w');
-						fwrite($wfh, $dget['config_text']);
-						fclose($wfh);
-						$retarr = array("status" => true, "message" => "Saved to Hard Drive!");
+						$pathdir = $this->PHONE_MODULES_PATH . 'endpoint/' . $row['directory'] . "/" . $row['cfg_dir'] . "/";
+						$pathfile = $pathdir . $dget['file_name'];
+						if ((! file_exists($pathfile)) AND (! is_writable($pathdir))) {
+							$retarr = array("status" => false, "message" => "Directory is not Writable (".$pathdir.")!");
+						}
+						elseif (! is_writable($pathfile)) {
+							$retarr = array("status" => false, "message" => "File is not Writable (".$pathfile.")!");
+						}
+						else 
+						{
+							$wfh = fopen($pathfile, 'w');
+							fwrite($wfh, $dget['config_text']);
+							fclose($wfh);
+							$retarr = array("status" => true, "message" => "Saved to Hard Drive!");
+						}
+					}
+					else {
+						$retarr = array("status" => false, "message" => "The File no existe in the DataBase!");
 					}
 				}
+				elseif ($dget['command'] == "poce_save_as_file") 
+				{
+					$db = $this->db;
+					$sql = 'INSERT INTO endpointman_custom_configs (name, original_name, product_id, data) VALUES (?,?,?,?)';
+					$q = $db->prepare($sql);
+					$ob = $q->execute(array(addslashes($dget['save_as_name']), addslashes($dget['original_name']), $dget['product_select'], addslashes($dget['config_text'])));
+					$newidinsert = $db->lastInsertId();
+					$retarr = array("status" => true, "message" => "Saved to Database!");
+					
+					$retarr['type_file'] = "sql";
+					$retarr['location'] = "SQL: ". $dget['save_as_name'];
+					$retarr['sendidt'] = $newidinsert;
+				}
 				else {
-					$retarr = array("status" => false, "message" => "The File no existe in the DataBase!");
+					$retarr = array("status" => false, "message" => "Command not valid!");
 				}
 			}
 			elseif ($dget['type_file'] == "sql") 
 			{
-				$sql = "UPDATE endpointman_custom_configs SET data = '" . addslashes($dget['config_text']) . "' WHERE id = " . $dget['sendid'];
-				sql($sql);
-				$retarr = array("status" => true, "message" => "Saved to Database!");
+				if ($dget['command'] == "poce_save_file") 
+				{
+					$sql = "UPDATE endpointman_custom_configs SET data = '" . addslashes($dget['config_text']) . "' WHERE id = " . $dget['sendid'];
+					sql($sql);
+					$retarr = array("status" => true, "message" => "Saved to Database!");
+				}
+				elseif ($dget['command'] == "poce_save_as_file") 
+				{
+					$db = $this->db;
+					$sql = 'INSERT INTO endpointman_custom_configs (name, original_name, product_id, data) VALUES (?,?,?,?)';
+					$q = $db->prepare($sql);
+					$ob = $q->execute(array(addslashes($dget['save_as_name']), addslashes($dget['original_name']), $dget['product_select'], addslashes($dget['config_text'])));
+					$newidinsert = $db->lastInsertId();
+					$retarr = array("status" => true, "message" => "Saved to Database!");
+					
+					$retarr['type_file'] = "sql";
+					$retarr['location'] = "SQL: ". $dget['save_as_name'];
+					$retarr['sendidt'] = $newidinsert;
+				}
+				else {
+					$retarr = array("status" => false, "message" => "Command not valid!");
+				}
 			}
 			elseif ($dget['type_file'] == "tfile")
 			{
+				/*
 				$db = $this->db;
 				$sql = 'INSERT INTO endpointman_custom_configs (name, original_name, product_id, data) VALUES (?,?,?,?)';
 				$q = $db->prepare($sql);
@@ -1361,6 +1423,7 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 				$retarr['type_file'] = "sql";
 				$retarr['location'] = "SQL: ". $dget['save_as_name'];
 				$retarr['sendidt'] = $newidinsert;
+				*/
 			}
 			else {
 				$retarr = array("status" => false, "message" => "Type not valid!");
