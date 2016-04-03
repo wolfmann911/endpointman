@@ -1,3 +1,4 @@
+"use strict";
 var cmeditor = null;
 
 function epm_advanced_document_ready () {
@@ -11,9 +12,9 @@ function epm_advanced_document_ready () {
 	
 	
 	//TAB SETTING
-	$('#settings input[type=text]').change(function(){ epm_advanced_tab_setting_input_change(this) });
-	$('#settings input[type=radio]').change(function(){ epm_advanced_tab_setting_input_change(this) });
-	$('#settings select').change(function(){ epm_advanced_tab_setting_input_change(this) });
+	$('#settings input[type=text]').change(function(){ epm_advanced_tab_setting_input_change(this); });
+	$('#settings input[type=radio]').change(function(){ epm_advanced_tab_setting_input_change(this); });
+	$('#settings select').change(function(){ epm_advanced_tab_setting_input_change(this); });
 	
 	
 	//TAB OUT_MANAGER
@@ -21,17 +22,6 @@ function epm_advanced_document_ready () {
 		$(this).find('input, select').val("");
 	});
 	$('#AddDlgModal_bt_new').on("click", function(){ epm_advanced_tab_oui_manager_bt_new(); });
-	
-	
-	//TAB POCE
-	
-	
-	//TAB IEDL
-	
-	
-	//TAB MANUAL_UPLOAD
-	
-	
 }
 
 function epm_advanced_windows_load (nTab = "") {
@@ -47,15 +37,15 @@ function epm_advanced_change_tab (nTab = "") {
 
 function epm_advanced_select_tab_ajax(idtab = "")
 {
-	if (idtab == "") {
+	if (idtab === "") {
 		fpbxToast('epm_advanced_select_tab_ajax -> id invalid!','JS!','warning');
 		return false;
 	}
 	
-	if (idtab == "poce")
+	if (idtab === "poce")
 	{
 		epm_advanced_tab_poce_update_list_brand_bootnav();
-		if (cmeditor == null) {
+		if (cmeditor === null) {
 			cmeditor = CodeMirror.fromTextArea(document.getElementById("config_textarea"), {
 				lineNumbers: true,
 				matchBrackets: true,
@@ -73,7 +63,7 @@ function epm_advanced_select_tab_ajax(idtab = "")
 			});
 		}
 	}
-	else if (idtab == "manual_upload") {
+	else if (idtab === "manual_upload") {
 		epm_advanced_tab_manual_upload_list_files_brand_expor();
 	}
 	return true;
@@ -87,7 +77,7 @@ function close_module_actions_epm_advanced(goback, acctionname = "")
 
 function end_module_actions_epm_advanced(acctionname = "")
 {
-	if (acctionname == "manual_upload_bt_export_brand") {
+	if (acctionname === "manual_upload_bt_export_brand") {
 		epm_advanced_tab_manual_upload_list_files_brand_expor();
 	}
 }
@@ -106,7 +96,7 @@ function end_module_actions_epm_advanced(acctionname = "")
 function epm_advanced_tab_manual_upload_bt_explor_brand() 
 {
 	var packageid = $('#brand_export_pack_selected').val();
-	if (packageid == "") {
+	if (packageid === "") {
 		alert ("You have not selected a brand from the list!");
 	}
 	else if (packageid < 0) {
@@ -120,7 +110,7 @@ function epm_advanced_tab_manual_upload_bt_explor_brand()
 
 function epm_advanced_tab_manual_upload_bt_upload(command, formname)
 {
-	if ((command == "") || (formname == "")) { return; }
+	if ((command === "") || (formname === "")) { return; }
 	var urlStr = "config.php?display=epm_advanced&subpage=manual_upload&command="+command;
 	epm_global_dialog_action("manual_upload_bt_upload", urlStr, formname);
 }
@@ -265,10 +255,10 @@ function epm_advanced_tab_poce_update_list_brand_bootnav(forzar=false)
 	
 
 	if (nListT > 0) {
-		if (frozar != true) { return; }
+		if (frozar !== true) { return; }
 	}
 	
-	if ((nListL == 0) && (nListO > 0)) {
+	if ((nListL === 0) && (nListO > 0)) {
 		$("#lista_brand_bootnav")
 		.empty()
 		.append(
@@ -347,7 +337,7 @@ function epm_advanced_tab_poce_clear_select()
 	$("#poce_NameProductSelect").text("No Selected");
 	$("#poce_file_name_path").text("No Selected");
 	$('#config_textarea').prop('disabled', true);
-	if (cmeditor != null) {
+	if (cmeditor !== null) {
 		cmeditor.setValue("Select file to config...");
 		cmeditor.setOption("readOnly",true);
 	}
@@ -365,7 +355,7 @@ function epm_advanced_tab_poce_clear_select()
 
 function epm_advanced_tab_poce_select_product(idsel = null, bclear = true)
 {
-	if ($.isNumeric(idsel) == false) { return; }
+	if ($.isNumeric(idsel) === false) { return; }
 	$("div.list-group>a.active").removeClass("active");
 	$("#list_product_"+idsel).addClass("active").blur();
     
@@ -418,14 +408,14 @@ function epm_advanced_tab_poce_select_product(idsel = null, bclear = true)
 function epm_advanced_tab_poce_create_file_list(idname, data = "", product_select = "", typefile = "") 
 {
 	$(idname + " div.dropdown-menu").empty();
-	if (Array.isArray(data) == false)
+	if (Array.isArray(data) === false)
 	{
 		$(idname + " span.label").text(0);
-		if (data == null) { data = "Emtry"; }
+		if (data === null) { data = "Emtry"; }
 		$(idname + " div.dropdown-menu")
 		.append(
 			$('<a/>', { 'href' : '#', 'class' : 'dropdown-item disable' }).text(data)
-		)
+		);
 		return;
 	}
 	$(idname + " span.label").text(data.length);
@@ -439,7 +429,7 @@ function epm_advanced_tab_poce_create_file_list(idname, data = "", product_selec
 				'id'	: typefile + '_' +  product_select + '_' + itemData.text +'_'+ itemData.value 
 			})
 			.text(itemData.text)
-		)
+		);
 	});
 	return;
 }
@@ -466,7 +456,7 @@ function epm_advanced_tab_poce_select_file_edit (idpro_select, txtnamefile, idna
 			$("#poce_file_name_path").text("Error ajax!");
 			
 			$('#config_textarea').prop('disabled', true);
-			if (cmeditor != null) {
+			if (cmeditor !== null) {
 				cmeditor.setValue("");
 				cmeditor.setOption("readOnly",true);
 			}
@@ -482,13 +472,13 @@ function epm_advanced_tab_poce_select_file_edit (idpro_select, txtnamefile, idna
 			if (data.status == true) {
 				$("#poce_file_name_path").text(data.location);
 				$('#config_textarea').prop('disabled', false);
-				if (cmeditor != null) {
+				if (cmeditor !== null) {
 					$("#box_sec_source button").prop('disabled', false);
 					cmeditor.setValue(data.config_data);
 					cmeditor.setOption("readOnly",false);
 				}
 				
-				if (data.type == "file") {
+				if (data.type === "file") {
 					$("#box_bt_save button[name=button_save]").prop('disabled', false);
 					$("#box_bt_save button[name=button_delete]").prop('disabled', true);
 					
@@ -497,14 +487,14 @@ function epm_advanced_tab_poce_select_file_edit (idpro_select, txtnamefile, idna
 					
 					$("#box_bt_share button").prop('disabled', true);
 				}
-				else if (data.type == "tfile") {
+				else if (data.type === "tfile") {
 					$("#box_bt_save button").prop('disabled', true);
 					$("#box_bt_share button").prop('disabled', true);
 				
 					$("#box_bt_save_as button").prop('disabled', true);
 					$("#box_bt_save_as input").prop('disabled', true).val(data.save_as_name_value);
 				}
-				else if (data.type == "sql") {
+				else if (data.type === "sql") {
 					$("#box_bt_save button[name=button_save]").prop('disabled', false);
 					$("#box_bt_save button[name=button_delete]").prop('disabled', false);
 					
@@ -529,7 +519,7 @@ function epm_advanced_tab_poce_select_file_edit (idpro_select, txtnamefile, idna
 			else {
 				$("#poce_file_name_path").text("Error obteniendo datos!");
 				$('#config_textarea').prop('disabled', true);
-				if (cmeditor != null) {
+				if (cmeditor !== null) {
 					cmeditor.setValue("");
 					cmeditor.setOption("readOnly",true);
 				}
@@ -549,28 +539,27 @@ function epm_advanced_tab_poce_select_file_edit (idpro_select, txtnamefile, idna
 
 function epm_advanced_tab_poce_bt_acction (command)
 {
-	if (command == "") { return; }
+	if (command === "") { return; }
 	var obj_name = $(command).attr("name").toLowerCase();
 	
-	if (obj_name == "bt_source_full_screen")
+	if (obj_name === "bt_source_full_screen")
 	{
 		cmeditor.setOption('fullScreen', !cmeditor.getOption('fullScreen'));
 		return true;
 	}
 	
-	if (epm_advanced_get_value_by_form("form_config_text_sec_button","datosok") == false)
+	if (epm_advanced_get_value_by_form("form_config_text_sec_button","datosok") === false)
 	{
 		fpbxToast("The form is not ready!", "Error!", 'error');
 		return false;
 	}
 	
+	var cfg_data = "";
 	switch(obj_name) {
     	case "button_save":
-    		if (confirm("Are you sure to save your changes will be overwritten irreversibly?") == false) {
-    		    return;
-    		}
+    		if (confirm("Are you sure to save your changes will be overwritten irreversibly?") === false) { return; }
     		
-    		var cfg_data = {
+    		cfg_data = {
     			module: "endpointman",
     			module_sec: "epm_advanced",
     			module_tab: "poce",
@@ -586,7 +575,7 @@ function epm_advanced_tab_poce_bt_acction (command)
     		break;
     	
     	case "button_save_as":
-    		var cfg_data = {
+    		cfg_data = {
     			module: "endpointman",
     			module_sec: "epm_advanced",
     			module_tab: "poce",
@@ -602,11 +591,9 @@ function epm_advanced_tab_poce_bt_acction (command)
     		break;
     		
     	case "button_delete":
-    		if (confirm("Are you sure you want to delete this file from the database?") == false) {
-    		    return;
-    		}
+    		if (confirm("Are you sure you want to delete this file from the database?") === false) { return; }
     		
-    		var cfg_data = {
+    		cfg_data = {
     			module: "endpointman",
     			module_sec: "epm_advanced",
     			module_tab: "poce",
@@ -618,7 +605,7 @@ function epm_advanced_tab_poce_bt_acction (command)
     		break;
     	
     	case "button_share":
-    		var cfg_data = {
+    		cfg_data = {
     			module: "endpointman",
     			module_sec: "epm_advanced",
     			module_tab: "poce",
@@ -731,7 +718,7 @@ function epm_advanced_tab_oui_manager_grid_customFormatter(value, row, index){
 function epm_advanced_tab_oui_manager_refresh_table(showmsg = true)
 {
 	$("#mygrid").bootstrapTable('refresh');
-	if (showmsg == true) {
+	if (showmsg === true) {
 		fpbxToast("Table Refrash Ok!", '', 'success');
 	}
 }
@@ -744,12 +731,12 @@ function epm_advanced_tab_oui_manager_bt_new()
 	if (new_oui.length < "6") {
 		fpbxToast('New: Input OUI not valid!','Warning!','warning');
 	}
-	else if (new_brand == "") {
+	else if (new_brand === "") {
 		fpbxToast('New: No select Brand!','Warning!','warning');
 	}
 	else {
 		var data_ajax = { module: "endpointman", module_sec: "epm_advanced", module_tab: "oui_manager", command: "oui_add", number_new_oui: new_oui, brand_new_oui: new_brand };
-		if (epm_advanced_tab_oui_manager_ajax(data_ajax) == true) {
+		if (epm_advanced_tab_oui_manager_ajax(data_ajax) === true) {
 			fpbxToast("New OUI add Ok!", '', 'success');
 			$("#mygrid").bootstrapTable('refresh');
 			$("#AddDlgModal").modal('hide');
@@ -761,12 +748,12 @@ function epm_advanced_tab_oui_manager_bt_new()
 
 function epm_advanced_tab_oui_manager_bt_del(id_del)
 {
-	if (id_del == "") {
+	if (id_del === "") {
 		fpbxToast('Delete: No ID set!','Warning!','warning');
 	}
 	else {
 		var data_ajax = { module: "endpointman", module_sec: "epm_advanced", module_tab: "oui_manager", command: "oui_del", id_del: id_del };
-		if (epm_advanced_tab_oui_manager_ajax(data_ajax) == true) {
+		if (epm_advanced_tab_oui_manager_ajax(data_ajax) === true) {
 			fpbxToast("OUI delete Ok!", '', 'success');	
 			$("#mygrid").bootstrapTable('refresh');
 		}
@@ -778,7 +765,7 @@ function epm_advanced_tab_oui_manager_bt_del(id_del)
 function epm_advanced_tab_oui_manager_ajax (data_ajax = "")
 {
 	var response = false;
-	if (data_ajax != "") { 
+	if (data_ajax !== "") { 
 		$.ajax({
 	        async: false,
 			type: 'POST',
@@ -791,7 +778,7 @@ function epm_advanced_tab_oui_manager_ajax (data_ajax = "")
 				return false;
 			},
 			success: function(data) {
-				if (data.status == true) {
+				if (data.status === true) {
 					response  = true;
 				} 
 				else {
@@ -811,19 +798,19 @@ function epm_advanced_tab_oui_manager_ajax (data_ajax = "")
 // INI: FUNCTION TAB SETTING
 function epm_advanced_tab_setting_input_value_change_bt(sNameID = "", sValue = "", bSaveChange = true, bSetFocus = false)
 {
-	if (sNameID = "" ) { return false; }
+	if (sNameID === "" ) { return false; }
 	
 	$(sNameID).val(sValue);
-	if (bSetFocus == true) { $(sNameID).focus(); }
-	if (bSaveChange == true) {
+	if (bSetFocus === true) { $(sNameID).focus(); }
+	if (bSaveChange === true) {
 		epm_advanced_tab_setting_input_change(sNameID);
 	}
 }
 
 function epm_advanced_tab_setting_input_change(obt)
 {
-	idtab = epm_global_get_tab_actual();
-	if (idtab == "") { return; }
+	var idtab = epm_global_get_tab_actual();
+	if (idtab === "") { return; }
 	
 	var obt_name = $(obt).attr("name").toLowerCase();
 	var obt_val = $(obt).val().toLowerCase();
@@ -874,4 +861,3 @@ function epm_advanced_tab_setting_input_change(obt)
 		},
 	});	
 }
-// END: FUNCTION TAB SETTING

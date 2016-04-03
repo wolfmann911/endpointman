@@ -1,3 +1,4 @@
+"use strict";
 var box = null;
 
 $(document).ready(function() {
@@ -5,19 +6,19 @@ $(document).ready(function() {
 	
 	$('ul[role=tablist] li a').on("click", function(){
 		var tabclick =  $(this).attr('aria-controls');
-		if (tabclick != "") {
-			if (displayActual != "") {
+		if (tabclick !== "") {
+			if (displayActual !== "") {
 				var func = displayActual + "_change_tab";
-				if (typeof window[func] == 'function') { 
+				if (typeof window[func] === 'function') { 
 					setTimeout(function () { window[func](tabclick); }, 500);
 				}
 			}
 		}
 	});
 	
-	if (displayActual != "") {
+	if (displayActual !== "") {
 		var func = displayActual + "_document_ready";
-		if (typeof window[func] == 'function') { 
+		if (typeof window[func] === 'function') { 
 			window[func]();
 		}
 	}
@@ -26,9 +27,9 @@ $(document).ready(function() {
 
 $(window).load(function() {
 	var displayActual = epm_global_getDisplayActual();
-	if (displayActual != "") {
+	if (displayActual !== "") {
 		var func = displayActual + "_windows_load";
-		if (typeof window[func] == 'function') { 
+		if (typeof window[func] === 'function') { 
 			window[func](epm_global_get_tab_actual());
 		}
 	}
@@ -45,7 +46,7 @@ function epm_global_getDisplayActual ()
 
 function epm_global_html_find_hide_and_remove(name = "", tDelay = 1, bSlow = false) {
 	if ($(name).length > 0) {
-		$(name).delay(tDelay).hide(((bSlow == true)  ? "slow" : ""), function () {
+		$(name).delay(tDelay).hide(((bSlow === true)  ? "slow" : ""), function () {
 			$(this).remove();
 		});
 	}
@@ -53,13 +54,13 @@ function epm_global_html_find_hide_and_remove(name = "", tDelay = 1, bSlow = fal
 
 function epm_global_html_find_show_hide(name = "", bShow = "auto", tDelay = 1, slow = false) {
 	if ($(name).length > 0) {
-		if (bShow == true) 			{ $(name).delay(tDelay).show(((slow == true)  ? "slow" : "")); }
-		else if (bShow == false)	{ $(name).delay(tDelay).hide(((slow == true)  ? "slow" : "")); }
-		else if (bShow == "auto")	{
-			if( $(name).is(":visible") ){
-				$(name).delay(tDelay).hide(((slow == true)  ? "slow" : "")); 
-			}else{
-				$(name).delay(tDelay).show(((slow == true)  ? "slow" : ""));
+		if (bShow === true) 		{ $(name).delay(tDelay).show(((slow === true)  ? "slow" : "")); }
+		else if (bShow === false)	{ $(name).delay(tDelay).hide(((slow === true)  ? "slow" : "")); }
+		else if (bShow === "auto")	{
+			if( $(name).is(":visible") ) {
+				$(name).delay(tDelay).hide(((slow === true)  ? "slow" : "")); 
+			} else{
+				$(name).delay(tDelay).show(((slow === true)  ? "slow" : ""));
 			}
 		}
 	}
@@ -68,9 +69,9 @@ function epm_global_html_find_show_hide(name = "", bShow = "auto", tDelay = 1, s
 function epm_global_html_css_name(name, bStatus, classname)
 {
 	if ($(name).length > 0) {
-		if (bStatus == true) 		{ $(name).addClass(classname); }
-		else if (bStatus == false)	{ $(name).removeClass(classname); }
-		else if (bStatus == "auto")	{
+		if (bStatus === true) 			{ $(name).addClass(classname); }
+		else if (bStatus === false)		{ $(name).removeClass(classname); }
+		else if (bStatus === "auto")	{
 			if($(name).hasClass(classname)) { $(name).removeClass(classname); }
 			else							{ $(name).addClass(classname); }
 		}
@@ -91,20 +92,21 @@ function epm_advanced_get_value_by_form(sform, snameopt, formtype = "name")
 	var rdata = null;
 	$('form['+formtype+'='+sform+']')
 	.find("input, textarea, select")
-	.each(function(index){  
+	.each( function(index) {
 		var input = $(this);
-		if (snameopt == input.attr('name'))
+		if (snameopt === input.attr('name'))
 		{
 			rdata = input.val();
 		}
-		//alert('Type: ' + input.attr('type') + ' - Name: ' + input.attr('name') + ' - Value: ' + input.val());
 	});
 	return rdata;
 }
 
 function epm_global_dialog_action(actionname = "", urlStr = "", formname = null, titleStr = "Status", ClassDlg = "")
 {
-	if ((actionname == "") || (urlStr == "")) { return null; }
+	var oData = null;
+	
+	if ((actionname === "") || (urlStr === "")) { return null; }
 	box = $('<div id="moduledialogwrapper" ></div>')
 	.dialog({
 		title: titleStr,
@@ -112,20 +114,16 @@ function epm_global_dialog_action(actionname = "", urlStr = "", formname = null,
 		dialogClass: ClassDlg,
 		modal: true,
 		width: 410,
-		maxHeight: 410,
 		height: 'auto',
 		maxHeight: 350,
 		scroll: true,
 		position: { my: "top-175", at: "center", of: window },
 		open: function (e) {
-			$('#moduledialogwrapper').html(_('Loading...' ) + '<i class="fa fa-spinner fa-spin fa-2x">');
+			$('#moduledialogwrapper').html('Loading... ' + '<i class="fa fa-spinner fa-spin fa-2x">');
 			
-			if (formname == null) {
-				var oData = null;
-			}
-			else {
+			if (formname !== null) {
 				var form = document.forms.namedItem(formname);
-				var oData = new FormData(form);	
+				oData = new FormData(form);	
 			}
 			
 			var xhr = new XMLHttpRequest(),
@@ -133,29 +131,31 @@ function epm_global_dialog_action(actionname = "", urlStr = "", formname = null,
 			xhr.open('POST', urlStr, true);
 			xhr.send(oData);
 			timer = window.setInterval(function() {
-				$('#moduledialogwrapper').animate({ scrollTop: $(this).scrollTop() + $(this).height() });
-				if (xhr.readyState == XMLHttpRequest.DONE) {
+				//$('#moduledialogwrapper').animate({ scrollTop: $(this).scrollTop() + $(document).height() });
+				if (xhr.readyState === XMLHttpRequest.DONE) {
 					window.clearTimeout(timer);
-					if (typeof end_module_actions == 'function') { 
+					if (typeof end_module_actions === 'function') { 
 						end_module_actions(actionname); 
 					}
 				}
 				if (xhr.responseText.length > 0) {
-					if ($('#moduledialogwrapper').html().trim() != xhr.responseText.trim()) {
+					if ($('#moduledialogwrapper').html().trim() !== xhr.responseText.trim()) {
 						$('#moduledialogwrapper').html(xhr.responseText);
-						$('#moduleprogress').scrollTop(1E10);
+						//$('#moduleprogress').scrollTop(1E10);
+						$('#moduledialogwrapper').animate({ scrollTop: $(this).scrollTop() + $(document).height() });
 					}
 				}
-				if (xhr.readyState == XMLHttpRequest.DONE) {
-					$("#moduleprogress").css("overflow", "auto");
-					$('#moduleprogress').scrollTop(1E10);
+				if (xhr.readyState === XMLHttpRequest.DONE) {
+					//$("#moduleprogress").css("overflow", "auto");
+					//$('#moduleprogress').scrollTop(1E10);
+					$('#moduledialogwrapper').animate({ scrollTop: $(this).scrollTop() + $(document).height() });
 					$("#moduleBoxContents a").focus();
 				}
 			}, 500);
 			
 		},
 		close: function(e) {
-			if (typeof close_module_actions == 'function') { 
+			if (typeof close_module_actions === 'function') { 
 				close_module_actions(false, actionname); 
 			}
 			$(e.target).dialog("destroy").remove();
@@ -165,14 +165,14 @@ function epm_global_dialog_action(actionname = "", urlStr = "", formname = null,
 
 function close_module_actions(goback, acctionname = "") 
 {
-	if (box != null) {
+	if (box !== null) {
 		box.dialog("destroy").remove();
 	}
 	
 	var displayActual = epm_global_getDisplayActual();
-	if (displayActual != "") {
+	if (displayActual !== "") {
 		var func = 'close_module_actions_'+displayActual;
-		if (typeof window[func] == 'function') { 
+		if (typeof window[func] === 'function') { 
 			window[func](goback, acctionname); 
 		}
 	}
@@ -185,9 +185,9 @@ function close_module_actions(goback, acctionname = "")
 function end_module_actions(acctionname = "") 
 {
 	var displayActual = epm_global_getDisplayActual();
-	if (displayActual != "") {
+	if (displayActual !== "") {
 		var func = 'end_module_actions_'+displayActual;
-		if (typeof window[func] == 'function') { 
+		if (typeof window[func] === 'function') { 
 			window[func](acctionname); 
 		}
 	}
@@ -195,9 +195,9 @@ function end_module_actions(acctionname = "")
 
 function epm_global_refresh_table(snametable = "", showmsg = false)
 {
-	if (snametable == "") { return; }
+	if (snametable === "") { return; }
 	$(snametable).bootstrapTable('refresh');
-	if (showmsg == true) {
+	if (showmsg === true) {
 		fpbxToast("Table Refrash Ok!", '', 'success');
 	}
 }

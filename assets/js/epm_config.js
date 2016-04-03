@@ -1,3 +1,4 @@
+"use strict";
 var v_sTimerUpdateAjax = "";
 
 function epm_config_document_ready () {
@@ -27,13 +28,13 @@ function epm_config_change_tab (nTab = "") {
 //**** INI: FUNCTION GLOBAL SEC ****
 function epm_config_select_tab_ajax(idtab = "")
 {
-	if (idtab == "") {
+	if (idtab === "") {
 		fpbxToast('epm_config_select_tab_ajax -> id no send!','JS!','warning');
 		return false;
 	}
 	clearTimeout(v_sTimerUpdateAjax);
 	$("#epm_config_"+ idtab +"_load_init").each(function() {
-		if ($(this).css('display') == "none") 
+		if ($(this).css('display') === "none") 
 		{
 			$(this).show("slow", function() {
 				var $tmp = epm_config_LoadContenidoAjax(idtab, "list_all_brand");
@@ -65,10 +66,11 @@ function epm_config_LoadContenidoAjax(idtab, opt)
 	clearTimeout(v_sTimerUpdateAjax);
 	opt = opt.trim();
 	idtab = idtab.trim();
-	statustab = $("#" + idtab).css('display').trim();
 	
-	if ((idtab == "") || (statustab == "") || (opt == "")) { return false; }
-	if (statustab == "none") { return false; }
+	var statustab = $("#" + idtab).css('display').trim();
+	
+	if ((idtab === "") || (statustab === "") || (opt === "")) { return false; }
+	if (statustab === "none") { return false; }
 	
 	$.ajax({
 		type: 'POST',
@@ -87,7 +89,7 @@ function epm_config_LoadContenidoAjax(idtab, opt)
 		},
 		success: function(data) {
 			var tTimer = 20000;
-			if (idtab == "editor") {
+			if (idtab === "editor") {
 				switch(opt) {
 					case "list_all_brand":
 						epm_config_tab_editor_ajax_get_add_data(data, idtab);
@@ -99,10 +101,10 @@ function epm_config_LoadContenidoAjax(idtab, opt)
 						break;
 				}
 			} 
-			else if (idtab == "manager") {
+			else if (idtab === "manager") {
 				switch(opt) {
 					case "check_for_updates":
-						if (data.status == true) 
+						if (data.status === true) 
 						{
 							fpbxToast(data.txt.update_content, data.txt.title_update, 'info');
 							epm_config_tab_manager_ajax_get_add_data(data, idtab);
@@ -130,45 +132,44 @@ function epm_config_LoadContenidoAjax(idtab, opt)
 
 function epm_config_html_ordenar_lista(box_root, orden)
 {
+	var elemLista = null;
 	var lista = $(box_root);
 	
-	var vL0 = lista.children("div.element-container").get().length
-	var vL1 = lista.children("div.element-container").children("div.section-title").get().length
-	var vLT = vL0 - vL1
+	var vL0 = lista.children("div.element-container").get().length;
+	var vL1 = lista.children("div.element-container").children("div.section-title").get().length;
+	var vLT = vL0 - vL1;
 	
-	if (vL0 == 0 ) { return; }
-	if (vLT == 0) 
+	if (vL0 === 0 ) { return; }
+	if (vLT === 0) 
 	{
-		var elemLista =  lista.children("div.element-container").get();
+		elemLista =  lista.children("div.element-container").get();
 		elemLista.sort(function(a, b) {
 			var compA = $(a).children("div.section-title").find('h3').text().toUpperCase().trim();
 			var compB = $(b).children("div.section-title").find('h3').text().toUpperCase().trim();
 			return (compA < compB) ? -1 : (compA > compB) ? 1 : 0;
-		})
+		});
 	}
 	else if (vLT > 0) 
 	{
-		var elemLista =  lista.children("div.element-container").get();
+		elemLista = lista.children("div.element-container").get();
 		elemLista.sort(function(a, b) {
 			var compA = $(a).find('.form-group').find('div.col-md-2 > label').first().text().toUpperCase().trim();
 			var compB = $(b).find('.form-group').find('div.col-md-2 > label').first().text().toUpperCase().trim();
 			return (compA < compB) ? -1 : (compA > compB) ? 1 : 0;
-		})
+		});
 	}
 	else { return; }
-	if(orden){
+	
+	if(orden) {
 		$(elemLista).each( function(ind, elem) { $(lista).append(elem); });
-	}else{
+	} else{
 		$(elemLista).each( function(ind, elem) { $(lista).prepend(elem); });
 	}
 }
 
 function epm_config_tab_html_L0(prefijoid, txt_ayuda) 
 {
-	var htmlReturn = $('<div/>', {
-			'class' : 'element-container',
-			'id'    : prefijoid + '_box'
-		})
+	var htmlReturn = $('<div/>', { 'class' : 'element-container', 'id' : prefijoid + '_box' })
 		.append(
 			$('<div/>', { 'class' : 'row' })
 			.append(
@@ -178,16 +179,9 @@ function epm_config_tab_html_L0(prefijoid, txt_ayuda)
 					.append(
 						$('<div/>', { 'class' : 'form-group' })
 						.append(
-							$('<div/>', { 
-								'class' : 'col-md-12'
-							}),
-							$('<div/>', { 
-								'class' : 'col-md-2'
-							}),
-							$('<div/>', { 
-								'class' : 'col-md-10',
-								'id'	: prefijoid + '_box_select'
-							})
+							$('<div/>', { 'class' : 'col-md-12' }),
+							$('<div/>', { 'class' : 'col-md-2' }),
+							$('<div/>', { 'class' : 'col-md-10', 'id' : prefijoid + '_box_select' })
 						)
 					)
 				)
@@ -196,10 +190,7 @@ function epm_config_tab_html_L0(prefijoid, txt_ayuda)
 			.append(
 				$('<div/>', { 'class' : 'col-md-12' })
 				.append(
-					$('<span/>', { 
-						'class' : 'help-block fpbx-help-block', 
-						'id' 	: prefijoid + '-help' 
-					}).text(txt_ayuda)
+					$('<span/>', { 'class' : 'help-block fpbx-help-block', 'id' : prefijoid + '-help' }).text(txt_ayuda)
 				)
 			)
 		);
@@ -231,7 +222,6 @@ function epm_config_tab_html_L1(boxpadre, prefijoid, titulo, txt_ayuda)
 			})
 			.append(
 			
-			
 				$('<div/>', { 'class' : 'row' })
 				.append(
 					$('<div/>', { 'class' : 'col-md-12' })
@@ -240,10 +230,7 @@ function epm_config_tab_html_L1(boxpadre, prefijoid, titulo, txt_ayuda)
 						.append(
 							$('<div/>', { 'class' : 'form-group' })
 							.append(
-								$('<div/>', { 
-									'class' : 'col-md-12',
-									'id'	: prefijoid + '_box_select'
-								})
+								$('<div/>', { 'class' : 'col-md-12', 'id' : prefijoid + '_box_select' })
 							)
 						)
 					)
@@ -252,13 +239,9 @@ function epm_config_tab_html_L1(boxpadre, prefijoid, titulo, txt_ayuda)
 				.append(
 					$('<div/>', { 'class' : 'col-md-12' })
 					.append(
-						$('<span/>', { 
-							'class' : 'help-block fpbx-help-block', 
-							'id' 	: prefijoid + '-help' 
-						}).text(txt_ayuda)
+						$('<span/>', { 'class' : 'help-block fpbx-help-block',  'id' : prefijoid + '-help' }).text(txt_ayuda)
 					)
 				)
-				
 				
 			)
 		)
@@ -283,8 +266,8 @@ function ItemsLevel(idtab = "", prefijo = "", id = 0)
 
 function CrearSubListItem(iL0)
 {
-	if ( $('#' + iL0.boxsubite).length == 0 ) {
-		$('#' + iL0.boxappend).append( $('<div/>', { 'class' : 'sortable', 'id' : iL0.boxsubite }) )
+	if ( $('#' + iL0.boxsubite).length === 0 ) {
+		$('#' + iL0.boxappend).append( $('<div/>', { 'class' : 'sortable', 'id' : iL0.boxsubite }) );
 	}
 }
 //**** END: FUNCTION GLOBAL SEC ****
@@ -300,14 +283,14 @@ function CrearSubListItem(iL0)
 //**** INI: TAB/MANAGER ****
 function epm_config_tab_manager_ajax_get_add_data(data, idtab)
 {
-	if ($('#button_check_for_updates').is(':disabled') ==  true) {
+	if ($('#button_check_for_updates').is(':disabled') === true) {
 		$("#button_check_for_updates").attr("disabled", false).on( "click", function(){ epm_config_tab_manager_bt_update_check_click(); });
 	}
-	if (data.status == true) {
+	if (data.status === true) {
 		var boxappendL0 = "#epm_config_manager_all_list_box";
-		if ((data.datlist == null) || (data.datlist == ""))
+		if ((data.datlist === null) || (data.datlist === ""))
 		{
-			if ( $('#manager_alert_list_emtry').length == 0 ) 
+			if ( $('#manager_alert_list_emtry').length === 0 ) 
 			{
 				$(boxappendL0).children("div").hide("slow", function () { $(this).remove(); });
 				$(boxappendL0).append(
@@ -329,8 +312,11 @@ function epm_config_tab_manager_ajax_get_add_data(data, idtab)
 			$(data.datlist).each(function(index, itemData) 
 			{
 				var iL1 = new ItemsLevel(idtab, "marca", itemData.id);
-				if (itemData.hidden == 1) { epm_global_html_find_hide_and_remove('#' + iL1.boxelemen); return; }
-				if ( $('#' + iL1.boxelemen).length == 0 ) 
+				if (itemData.hidden === 1) { 
+					epm_global_html_find_hide_and_remove('#' + iL1.boxelemen); 
+					return; 
+				}
+				if ( $('#' + iL1.boxelemen).length === 0 ) 
 				{
 					$(boxappendL0).append(epm_config_tab_html_L0(iL1.prefijoid, data.txt.ayuda_marca));
 					epm_config_tab_manager_html_L1(itemData, iL1.prefijoid, data.txt, idtab);
@@ -338,16 +324,23 @@ function epm_config_tab_manager_ajax_get_add_data(data, idtab)
 				
 				$('#' + iL1.prefijoid + "_txt_update").text(data.txt.new_pack_mod + ' [' + itemData.update_vers + ']');
 				$('#' + iL1.prefijoid + "_txt_last_update").text(data.txt.pack_last_mod + ' [' + itemData.cfg_ver_datetime + ']');
-				$('#' + iL1.prefijoid + "_checkbox_install").prop({'checked' : (itemData.local == 0 ? true : false)});
+				$('#' + iL1.prefijoid + "_checkbox_install").prop({'checked' : (itemData.local === "0" ? true : false)});
 				epm_config_tab_manager_bt_enable_disable_ajustar(iL1, itemData, "L1");
-				if (itemData.installed == 0) { epm_global_html_find_hide_and_remove('#' + iL1.boxsubite); return; }
+				if (itemData.installed === 0) { epm_global_html_find_hide_and_remove('#' + iL1.boxsubite); return; }
+				
+				
+				
+				
+				
 				
 				//L2: ini loop productos
 				$(itemData.products).each(function(indexL2, itemDataL2) 
 				{
+if (itemData.products.length === 0) { return false; }
+					
 					var iL2 = new ItemsLevel(idtab, "producto", itemDataL2.id);
-					if (itemDataL2.hidden == 1) { epm_global_html_find_hide_and_remove('#' + iL2.boxelemen); return; }
-					if ( $('#' + iL2.boxelemen).length == 0 ) 
+					if (itemDataL2.hidden === 1) { epm_global_html_find_hide_and_remove('#' + iL2.boxelemen); return; }
+					if ( $('#' + iL2.boxelemen).length === 0 ) 
 					{
 						CrearSubListItem(iL1);
 						$('#' + iL1.boxsubite).append(epm_config_tab_html_L0(iL2.prefijoid, data.txt.ayuda_producto));
@@ -358,9 +351,11 @@ function epm_config_tab_manager_ajax_get_add_data(data, idtab)
 					//L3: Ini loop modelos
 					$(itemDataL2.models).each(function(indexL3, itemDataL3) 
 					{
+if (itemDataL2.models.length === 0) { return false; }
+						
 						var iL3 = new ItemsLevel(idtab, "modelo", itemDataL3.id);
-						if (itemDataL3.hidden == 1) { epm_global_html_find_hide_and_remove('#' + iL3.boxelemen); return; }
-						if ( $('#' + iL3.boxelemen).length == 0 ) 
+						if (itemDataL3.hidden === 1) { epm_global_html_find_hide_and_remove('#' + iL3.boxelemen); return; }
+						if ( $('#' + iL3.boxelemen).length === 0 ) 
 						{
 							CrearSubListItem(iL2);
 							$('#' + iL2.boxsubite).append(epm_config_tab_html_L0(iL3.prefijoid, data.txt.ayuda_model));
@@ -376,13 +371,17 @@ function epm_config_tab_manager_ajax_get_add_data(data, idtab)
 				//L2: end loop productos
 				epm_config_html_ordenar_lista(iL1.boxappend, true);
 				
+				
+				
+				
+				
 			});
 			//L1: end loop marcas
 			epm_config_html_ordenar_lista(boxappendL0, true);
 			
-			if ($(boxappendL0).children("div").length == 0)
+			if ($(boxappendL0).children("div").length === 0)
 			{
-				if ( $('#manager_alert_list_hiden').length == 0 ) 
+				if ( $('#manager_alert_list_hiden').length === 0 ) 
 				{
 					$(boxappendL0).append(
 						$('<div/>', {
@@ -415,59 +414,59 @@ function epm_config_tab_manager_countlist(prefijoid = "", datosxml = "")
 function epm_config_tab_manager_bt_update_check_click() 
 {
 	var urlStr = "config.php?display=epm_config&module_tab=manager&command=check_for_updates";
-	box = epm_global_dialog_action("bt_update_chkeck", urlStr);
+	epm_global_dialog_action("bt_update_chkeck", urlStr);
 }
 
 function epm_config_tab_manager_bt(opt, idfw, command) 
 {
-	if ((opt == "") || (idfw == "") || (command == "")) { return false; }
+	if ((opt === "") || (idfw === "") || (command === "")) { return false; }
 	clearTimeout(v_sTimerUpdateAjax);
 	
 	var urlStr = "config.php?display=epm_config&module_tab=manager&command=" + command + "&command_sub=" + opt + "&idfw=" + idfw;
-	box = epm_global_dialog_action("manager_bt", urlStr, null, "Status", 'epm_config_tab_manager_bt_dialog');
+	epm_global_dialog_action("manager_bt", urlStr, null, "Status", 'epm_config_tab_manager_bt_dialog');
 }
 
 function epm_config_tab_manager_bt_enable_disable_ajustar(iL0, itemData, level) 
 {
-	if (level == "L1") 
+	if (level === "L1") 
 	{
-		epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt_brand_install", ((itemData.installed == 1) ? false : true));
-		epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt_brand_uninstall" , ((itemData.installed == 1) ? true : false));
-		epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt_brand_update", ((itemData.update == 0) ? false : true));
-		epm_global_html_find_show_hide('#' + iL0.prefijoid + "_txt_update" , ((itemData.update == 0) ? false : true));
+		epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt_brand_install", ((itemData.installed === "1") ? false : true));
+		epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt_brand_uninstall" , ((itemData.installed === "1") ? true : false));
+		epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt_brand_update", ((itemData.update !== "0") ? false : true));
+		epm_global_html_find_show_hide('#' + iL0.prefijoid + "_txt_update" , ((itemData.update !== "0") ? false : true));
 		return;
 	}
-	else if (level == "L2") 
+	else if (level === "L2") 
 	{
-		if ((itemData.fw_type == "install") || (itemData.fw_type == "remove")) 
+		if ((itemData.fw_type === "install") || (itemData.fw_type === "remove")) 
 		{
-			epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt_fw_install", 		((itemData.fw_type == "install") ? true : false));
-			epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt_fw_uninstall" , 	((itemData.fw_type == "install") ? false : true));
-			epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt_fw_update" , 		((itemData.update_fw == 0) ? false : true));
+			epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt_fw_install", 		((itemData.fw_type === "install") ? true : false));
+			epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt_fw_uninstall" , 	((itemData.fw_type === "install") ? false : true));
+			epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt_fw_update" , 		((itemData.update_fw === 0) ? false : true));
 		}
-		else if (itemData.fw_type == "nothing") {
+		else if (itemData.fw_type === "nothing") {
 			epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt_fw_install", false);
 			epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt_fw_uninstall", false);
 			epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt_fw_update", false);
 		}
 		return;
 	}
-	else if (level == "L3") 
+	else if (level === "L3") 
 	{
 		//AJUSTAMOS BOTOSNES EN SU STATUS CORRECTO
-		if (itemData.enabled == "") {
+		if (itemData.enabled === "") {
 			$("#" + iL0.prefijoid + "_enable").attr("disabled", true).prop( "checked", false);
 			$("#" + iL0.prefijoid + "_disable").attr("disabled", true).prop( "checked", false);
 			epm_global_html_find_hide_and_remove('#' + iL0.boxsubite);
 		}
 		else {
 			var temp_input = $('input[name = "'+ iL0.prefijoid + '"]:checked');
-			if (temp_input.length == 0) {
+			if (temp_input.length === 0) {
 				temp_input = "-1";
 			}
-			if (itemData.enabled != temp_input) {
-				$("#" + iL0.prefijoid + "_enable").attr("disabled", false).prop( "checked", ((itemData.enabled == 1) ? true : false));
-				$("#" + iL0.prefijoid + "_disable").attr("disabled", false).prop( "checked", ((itemData.enabled == 0) ? true : false));
+			if (itemData.enabled !== temp_input) {
+				$("#" + iL0.prefijoid + "_enable").attr("disabled", false).prop( "checked", ((itemData.enabled === "1") ? true : false));
+				$("#" + iL0.prefijoid + "_disable").attr("disabled", false).prop( "checked", ((itemData.enabled === "0") ? true : false));
 			}
 		}
 		return;
@@ -476,7 +475,7 @@ function epm_config_tab_manager_bt_enable_disable_ajustar(iL0, itemData, level)
 
 function epm_config_tab_manager_bt_enable_disable_change(obt, idtab, idtype, idbt) 
 {
-	if ((idtab == "") || (idbt == "") || (idtype == "")) { return false; }
+	if ((idtab === "") || (idbt === "") || (idtype === "")) { return false; }
 	
 	var obt_name = $(obt).attr("name").toLowerCase();
 	var obt_val = $(obt).val().toLowerCase();
@@ -504,7 +503,7 @@ function epm_config_tab_manager_bt_enable_disable_change(obt, idtab, idtype, idb
 			return false;
 		},
 		success: function(data) {
-			if (data.status == true) {
+			if (data.status === true) {
 				epm_global_html_find_hide_and_remove('#' + obt_name + '_box_subitems');
 				fpbxToast(data.txt.save_changes_ok, '', 'success');
 				return true;
@@ -748,12 +747,12 @@ function epm_config_tab_manager_html_L3(data, prefijo, prefijoid, name, value_di
 //**** INI: TAB/EDITOR ****
 function epm_config_tab_editor_ajax_get_add_data (data, idtab)
 {
-	if (data.status == true) 
+	if (data.status === true) 
 	{
 		var boxappendL0 = "#epm_config_editor_all_list_box";
-		if ((data.datlist == null) || (data.datlist == ""))
+		if ((data.datlist === null) || (data.datlist === ""))
 		{
-			if ( $('#editor_alert_list_emtry').length == 0 ) 
+			if ( $('#editor_alert_list_emtry').length === 0 ) 
 			{
 				$(boxappendL0).children("div").hide("slow", function () { $(this).remove(); });
 				$(boxappendL0).append(
@@ -774,13 +773,13 @@ function epm_config_tab_editor_ajax_get_add_data (data, idtab)
 			$(data.datlist).each(function(index1, itemDataL1) 
 			{
 				var iL1 = new ItemsLevel(idtab, "marca", itemDataL1.id);
-				if ( $('#' + iL1.boxelemen).length == 0 ) 
+				if ( $('#' + iL1.boxelemen).length === 0 ) 
 				{
 					epm_config_tab_html_L1(boxappendL0, iL1.prefijoid, itemDataL1.name, data.txt.ayuda_marca);
 					epm_config_tab_editor_html_L2(itemDataL1, iL1, itemDataL1.name, "1", data.txt.hide, "0", data.txt.show);
 				}
 				epm_config_tab_editor_bt_show_hide_ajustar(iL1, itemDataL1);
-				if (itemDataL1.hidden == 1) { 
+				if (itemDataL1.hidden === 1) { 
 					epm_global_html_find_hide_and_remove('#' + iL1.boxsubite);
 					return; 
 				}
@@ -789,7 +788,7 @@ function epm_config_tab_editor_ajax_get_add_data (data, idtab)
 				$(itemDataL1.products).each(function(indexL2, itemDataL2) 
 				{
 					var iL2 = new ItemsLevel(idtab, "producto", itemDataL2.id);
-					if ( $('#' + iL2.boxelemen).length == 0 ) 
+					if ( $('#' + iL2.boxelemen).length === 0 ) 
 					{
 						CrearSubListItem(iL1);
 						$('#' + iL1.boxsubite).append(epm_config_tab_html_L0(iL2.prefijoid, data.txt.ayuda_producto));
@@ -797,7 +796,7 @@ function epm_config_tab_editor_ajax_get_add_data (data, idtab)
 					}
 					
 					epm_config_tab_editor_bt_show_hide_ajustar(iL2, itemDataL2);
-					if (itemDataL2.hidden == 1) {
+					if (itemDataL2.hidden === 1) {
 						epm_global_html_find_hide_and_remove('#' + iL2.boxsubite);
 						return; 
 					}
@@ -806,7 +805,7 @@ function epm_config_tab_editor_ajax_get_add_data (data, idtab)
 					$(itemDataL2.models).each(function(indexL3, itemDataL3) 
 					{
 						var iL3 = new ItemsLevel(idtab, "modelo", itemDataL3.id);
-						if ( $('#' + iL3.boxelemen).length == 0 ) {
+						if ( $('#' + iL3.boxelemen).length === 0 ) {
 							CrearSubListItem(iL2);
 							$('#' + iL2.boxsubite).append(epm_config_tab_html_L0(iL3.prefijoid, data.txt.ayuda_modelo));
 							epm_config_tab_editor_html_L1(itemDataL3, iL3, itemDataL3.model, "1", data.txt.hide, "0", data.txt.show);
@@ -835,26 +834,26 @@ function epm_config_tab_editor_ajax_get_add_data (data, idtab)
 function epm_config_tab_editor_bt_show_hide_ajustar(iL0, itemData)
 {
 	//AJUSTAMOS BOTOSNES EN SU STATUS CORRECTO
-	if (itemData.hidden == "") {
+	if (itemData.hidden === "") {
 		$("#" + iL0.prefijoid + "_no").attr("disabled", true).prop( "checked", false);
 		$("#" + iL0.prefijoid + "_yes").attr("disabled", true).prop( "checked", false);
 		epm_global_html_find_hide_and_remove('#' + iL0.boxsubite);
 	}
 	else {
 		var temp_input = $('input[name = "'+ iL0.prefijoid + '"]:checked');
-		if (temp_input.length == 0) {
+		if (temp_input.length === 0) {
 			temp_input = "-1";
 		}
-		if (itemData.hidden != temp_input) {
-			$("#" + iL0.prefijoid + "_no").attr("disabled", false).prop( "checked", (itemData.hidden == "0") ? true : false);
-			$("#" + iL0.prefijoid + "_yes").attr("disabled", false).prop( "checked", (itemData.hidden == "1") ? true : false);
+		if (itemData.hidden !== temp_input) {
+			$("#" + iL0.prefijoid + "_no").attr("disabled", false).prop( "checked", (itemData.hidden === "0") ? true : false);
+			$("#" + iL0.prefijoid + "_yes").attr("disabled", false).prop( "checked", (itemData.hidden === "1") ? true : false);
 		}
 	}
 }
 
 function epm_config_tab_editor_bt_show_hide_change(obt, idtab, idtype, idbt)
 {
-	if ((idtab == "") || (idbt == "") || (idtype == "")) { return false; }
+	if ((idtab === "") || (idbt === "") || (idtype === "")) { return false; }
 	var obt_name = $(obt).attr("name").toLowerCase();
 	var obt_val = $(obt).val().toLowerCase();
 	
@@ -883,8 +882,8 @@ function epm_config_tab_editor_bt_show_hide_change(obt, idtab, idtype, idbt)
 			return false;
 		},
 		success: function(data) {
-			if (data.status == true) {
-				if (obt_val == "1")
+			if (data.status === true) {
+				if (obt_val === "1")
 				{
 					epm_global_html_find_hide_and_remove('#' + iL0.boxsubite);
 				}
