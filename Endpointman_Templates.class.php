@@ -11,12 +11,14 @@ namespace FreePBX\modules;
 
 class Endpointman_Templates
 {
-	public function __construct($freepbx = null, $cfgmod = null) 
+	public function __construct($freepbx = null, $cfgmod = null, $epm_config, $eda) 
 	{
 		$this->freepbx = $freepbx;
 		$this->db = $freepbx->Database;
 		$this->config = $freepbx->Config;
-		$this->configmod = $cfgmod;			
+		$this->configmod = $cfgmod;
+		$this->epm_config = $epm_config;
+		$this->eda = $eda;
 	}
 
 	public function myShowPage(&$pagedata) {
@@ -238,5 +240,521 @@ class Endpointman_Templates
 		*/
 		return $row_out;
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/**
+     * Custom Means specific to that MAC
+     * id is either the mac ID (not address) or the template ID
+     * @param integer $id
+     * @param integer $custom
+     */
+    function edit_template_display($id, $custom) {
+    	//endpointman_flush_buffers();
+    	
+    	$alt_configs = NULL;
+    
+    	if ($custom == 0) {
+    		$sql = "SELECT model_id FROM endpointman_template_list WHERE id=" . $id;
+    	} else {
+    		$sql = "SELECT model FROM endpointman_mac_list WHERE id=" . $id;
+    	}
+    
+    	$model_id = sql($sql, 'getOne');
+    
+    	//Make sure the model data from the local confg files are stored in the database and vice-versa. Serious errors will occur if the database is not in sync with the local file
+    	if (!$this->epm_config->sync_model($model_id)) {
+    		die("unable to sync local template files - TYPE:" . $custom);
+    	}
+   
+    	$dReturn = array();
+
+    	
+		//Determine if we are dealing with a general template or a specific [for that phone only] template (custom =0 means general)
+		if ($custom == 0) {
+			$sql = "SELECT endpointman_model_list.max_lines, endpointman_model_list.model as model_name, endpointman_template_list.global_custom_cfg_data,  endpointman_product_list.config_files, endpointman_product_list.short_name, endpointman_product_list.id as product_id, endpointman_model_list.template_data, endpointman_model_list.id as model_id, endpointman_template_list.* FROM endpointman_product_list, endpointman_model_list, endpointman_template_list WHERE endpointman_product_list.id = endpointman_template_list.product_id AND endpointman_template_list.model_id = endpointman_model_list.id AND endpointman_template_list.id = " . $id;
+		} else {
+			$sql = "SELECT endpointman_model_list.max_lines, endpointman_model_list.model as model_name, endpointman_mac_list.global_custom_cfg_data, endpointman_product_list.config_files, endpointman_mac_list.*, endpointman_line_list.*, endpointman_model_list.id as model_id, endpointman_model_list.template_data, endpointman_product_list.id as product_id, endpointman_product_list.short_name, endpointman_product_list.cfg_dir, endpointman_brand_list.directory FROM endpointman_brand_list, endpointman_mac_list, endpointman_model_list, endpointman_product_list, endpointman_line_list WHERE endpointman_mac_list.id=" . $id . " AND endpointman_mac_list.id = endpointman_line_list.mac_id AND endpointman_mac_list.model = endpointman_model_list.id AND endpointman_model_list.brand = endpointman_brand_list.id AND endpointman_model_list.product_id = endpointman_product_list.id";
+		}
+		$row = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
+		
+		
+		$dReturn['template_editor_display'] = 1;
+		
+		//Let the template system know if we are working with a general template or a specific [for that phone only] template
+		$dReturn['custom'] = $custom;
+    	 if ($custom) 
+    	 {
+			$dReturn['ext'] = $row['ext'];
+    	 } 
+    	 else 
+    	 {
+    	 	$dReturn['template_name'] = $row['name'];
+    	 }
+		$dReturn['product'] = $row['short_name'];
+		$dReturn['model'] = $row['model_name'];
+		
+		if ($ma = $this->models_available($row['model_id'], NULL, $row['product_id'])) {
+			$dReturn['models_ava'] = $ma;
+		}
+    	
+		if (isset($_REQUEST['maxlines'])) {
+			$areas = $this->areaAvailable($row['model_id'], $_REQUEST['maxlines']);
+		} else {
+			$areas = $this->areaAvailable($row['model_id'], 1);
+		}
+		$dReturn['area_ava'] = $areas;
+    	
+    	 
+		//Start the display of the html file in the product folder
+		if ($row['config_files_override'] == "") {
+			$config_files_saved = "";
+		} else {
+			$config_files_saved = unserialize($row['config_files_override']);
+		}
+		$config_files_list = explode(",", $row['config_files']);
+		$i = 0;
+		$alt = 0;
+		
+		$i = 0;
+		$b = 0;
+		$only_configs = array();
+		foreach ($config_files_list as $files) {
+			$sql = "SELECT * FROM  endpointman_custom_configs WHERE product_id = '" . $row['product_id'] . "' AND original_name = '" . $files . "'";
+			$alt_configs_list_count = sql($sql);
+			if (! empty($alt_configs_list_count)) {
+				$alt_configs_list = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
+				$alt_configs[$i]['name'] = $files;
+				$files = str_replace(".", "_", $files);
+				$h = 0;
+				foreach ($alt_configs_list as $ccf) {
+					$alt_configs[$i]['list'][$h]['id'] = $ccf['id'];
+					$cf_key = $files;
+					if ((isset($config_files_saved[$cf_key])) AND (is_array($config_files_saved)) AND ($config_files_saved[$cf_key] == $ccf['id'])) {
+						$alt_configs[$i]['list'][$h]['selected'] = 'selected';
+					}
+					$alt_configs[$i]['list'][$h]['name'] = $ccf['name'];
+					$h++;
+				}
+				$alt = 1;
+			} 
+			else {
+				$only_configs[$b]['name'] = $files;
+				$b++;
+			}
+			$i++;
+		}
+		
+		$dReturn['only_configs'] = $only_configs;
+		$dReturn['alt_configs'] = $alt_configs;
+		$dReturn['alt'] = $alt;
+		
+		if (!isset($_REQUEST['maxlines'])) {
+			$maxlines = 1;
+		} else {
+			$maxlines = $_REQUEST['maxlines'];
+		}
+		if ($row['template_data'] != "") {
+			$out = $this->generate_gui_html($row['template_data'], $row['global_custom_cfg_data'], TRUE, NULL, $maxlines);
+		} else {
+			$out = "No Template Data has been defined for this Product<br />";
+		}
+		
+		$dReturn['template_editor'] = $out;
+		$dReturn['hidden_id'] = $row['id'];
+		$dReturn['hidden_custom'] = $custom;
+
+    	return $dReturn;
+    }
+	
+	
+	
+	
+	 /**
+     *
+     * @param integer $model model ID
+     * @param integer $brand brand ID
+     * @param integer $product product ID
+     * @return array
+     */
+    function models_available($model=NULL, $brand=NULL, $product=NULL) {
+    
+    	if ((!isset($oui)) && (!isset($brand)) && (!isset($model))) {
+    		$result1 = $this->eda->all_models();
+    	} elseif ((isset($brand)) && ($brand != 0)) {
+    		$result1 = $this->eda->all_models_by_brand($brand);
+    	} elseif ((isset($product)) && ($product != 0)) {
+    		$result1 = $this->eda->all_models_by_product($product);
+    	} else {
+    		$result1 = $this->eda->all_models();
+    	}
+    
+    	$i = 1;
+    	foreach ($result1 as $row) {
+    		if ($row['id'] == $model) {
+    			$temp[$i]['value'] = $row['id'];
+    			$temp[$i]['text'] = $row['model'];
+    			$temp[$i]['selected'] = 'selected';
+    		} else {
+    			$temp[$i]['value'] = $row['id'];
+    			$temp[$i]['text'] = $row['model'];
+    			$temp[$i]['selected'] = 0;
+    		}
+    		$i++;
+    	}
+    
+    	if (!isset($temp)) {
+    		if (! $this->configmod->isExiste('new')) {
+    			$this->error['modelsAvailable'] = "You need to enable at least ONE model";
+    		}
+    		return(FALSE);
+    	} else {
+    		return($temp);
+    	}
+    }
+	
+	
+	
+	function areaAvailable($model, $area=NULL) {
+    	$sql = "SELECT max_lines FROM endpointman_model_list WHERE id = '" . $model . "'";
+    	$count = sql($sql, 'getOne');
+    
+    	for ($z = 0; $z < $count; $z++) {
+    		$result[$z]['id'] = $z + 1;
+    		$result[$z]['model'] = $z + 1;
+    	}
+    
+    	$i = 1;
+    	foreach ($result as $row) {
+    		if ($row['id'] == $area) {
+    			$temp[$i]['value'] = $row['id'];
+    			$temp[$i]['text'] = $row['model'];
+    			$temp[$i]['selected'] = 'selected';
+    		} else {
+    			$temp[$i]['value'] = $row['id'];
+    			$temp[$i]['text'] = $row['model'];
+    			$temp[$i]['selected'] = 0;
+    		}
+    		$i++;
+    	}
+    
+    	return($temp);
+    }
+	
+	
+	/**
+     * Generates the Visual Display for the end user
+     * @param <type> $cfg_data
+     * @param <type> $custom_cfg_data
+     * @param <type> $admin
+     * @param <type> $user_cfg_data
+     * @return <type>
+     */
+    function generate_gui_html($cfg_data, $custom_cfg_data=NULL, $admin=FALSE, $user_cfg_data=NULL, $max_lines=3, $ext=NULL) {
+    	//take the data out of the database and turn it back into an array for use
+    	$cfg_data = unserialize($cfg_data);
+    	$template_type = 'GENERAL';
+    	//Check to see if there is a custom template for this phone already listed in the endpointman_mac_list database
+    	if (!empty($custom_cfg_data)) {
+    		$custom_cfg_data = unserialize($custom_cfg_data);
+    		if (array_key_exists('data', $custom_cfg_data)) {
+    			if (array_key_exists('ari', $custom_cfg_data)) {
+    				$extra_data = $custom_cfg_data['ari'];
+    			} else {
+    				$template_type = 'GLOBAL';
+    				$extra_data = $custom_cfg_data['freepbx'];
+    			}
+    			$custom_cfg_data = $custom_cfg_data['data'];
+    		} else {
+    			$extra_data = array();
+    		}
+    	} else {
+    		$custom_cfg_data = array();
+    		$extra_data = array();
+    	}
+    	if (isset($user_cfg_data)) {
+    		$user_cfg_data = unserialize($user_cfg_data);
+    	}
+    
+    	$template_variables_array = array();
+    	$group_count = 0;
+    	$variables_count = 0;
+    
+    	foreach ($cfg_data['data'] as $cats_name => $cats) {
+    		if ($admin) {
+    			$group_count++;
+    			$template_variables_array[$group_count]['title'] = $cats_name;
+    		} else {
+    			//Group all ARI stuff into one tab
+    			$template_variables_array[$group_count]['title'] = "Your Phone Settings";
+    		}
+    		foreach ($cats as $subcat_name => $subcats) {
+    			foreach ($subcats as $item_var => $config_options) {
+    				if (preg_match('/(.*)\|(.*)/i', $item_var, $matches)) {
+    					$type = $matches[1];
+    					$variable = $matches[2];
+    				} else {
+    					die('no matches!');
+    				}
+    				if ($admin) {
+    					//Administration View Only
+    					switch ($type) {
+    						case "lineloop":
+    							//line|1|display_name
+    							foreach ($config_options as $var_name => $var_items) {
+    								$lcount = isset($var_items['line_count']) ? $var_items['line_count'] : $lcount;
+    								$key = "line|" . $lcount . "|" . $var_name;
+    								$items[$variables_count] = $items;
+    								$template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($variables_count, $var_items, $key, $custom_cfg_data, $admin, $user_cfg_data, $extra_data, $template_type);
+    								$template_variables_array[$group_count]['data'][$variables_count]['looping'] = TRUE;
+    								$variables_count++;
+    							}
+    
+    							if ($lcount <= $max_lines) {
+    								$template_variables_array[$group_count]['title'] = "Line Options for Line " . $lcount;
+    								$group_count++;
+    							} else {
+    								unset($template_variables_array[$group_count]);
+    							}
+    
+    							continue 2;
+    						case "loop":
+    							foreach ($config_options as $var_name => $var_items) {
+    								//loop|remotephonebook_url_0
+    								$tv = explode('_', $variable);
+    								$key = "loop|" . $tv[0] . "_" . $var_name . "_" . $var_items['loop_count'];
+    								$items[$variables_count] = $var_items;
+    								$template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($variables_count, $var_items, $key, $custom_cfg_data, $admin, $user_cfg_data, $extra_data, $template_type);
+    								$template_variables_array[$group_count]['data'][$variables_count]['looping'] = TRUE;
+    								$variables_count++;
+    							}
+    							continue 2;
+    					}
+    				} else {
+    					//ARI View Only
+    					switch ($type) {
+    						case "loop_line_options":
+    							//$a is the line number
+    							$sql = "SELECT line FROM endpointman_line_list WHERE  ext = " . $ext;
+    							$a = $this->eda->sql($sql, 'getOne');
+    							//TODO: fix this area
+    							$template_variables_array[$group_count]['data'][$variables_count]['type'] = "break";
+    							$variables_count++;
+    							continue 2;
+    						case "loop":
+    							foreach ($config_options as $var_name => $var_items) {
+    								$tv = explode('_', $variable);
+    								$key = "loop|" . $tv[0] . "_" . $var_name . "_" . $var_items['loop_count'];
+    								if (isset($extra_data[$key])) {
+    									$items[$variables_count] = $var_items;
+    									$template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($variables_count, $var_items, $key, $custom_cfg_data, $admin, $user_cfg_data, $extra_data, $template_type);
+    									$template_variables_array[$group_count]['data'][$variables_count]['looping'] = TRUE;
+    									$variables_count++;
+    								}
+    							}
+    							continue 2;
+    					}
+    				}
+    				//Both Views
+    				switch ($config_options['type']) {
+    					case "break":
+    						$template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($variables_count, $config_options, $key, $custom_cfg_data, $admin, $user_cfg_data, $extra_data, $template_type);
+    						$variables_count++;
+    						break;
+    					default:
+    						if (array_key_exists('variable', $config_options)) {
+    							$key = str_replace('$', '', $config_options['variable']);
+    							//TODO: Move this into the sync function
+    							//Checks to see if values are defined in the database, if not then we assume this is a new option and we need a default value here!
+    							if (!isset($custom_cfg_data[$key])) {
+    								//xml2array will take values that have no data and turn them into arrays, we want to avoid the word 'array' as a default value, so we blank it out here if we are an array
+    								if ((array_key_exists('default_value', $config_options)) AND (is_array($config_options['default_value']))) {
+    									$custom_cfg_data[$key] = "";
+    								} elseif ((array_key_exists('default_value', $config_options)) AND (!is_array($config_options['default_value']))) {
+    									$custom_cfg_data[$key] = $config_options['default_value'];
+    								}
+    							}
+    							if ((!$admin) AND (isset($extra_data[$key]))) {
+    								$custom_cfg_data[$key] = $user_cfg_data[$key];
+    								$template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($variables_count, $config_options, $key, $custom_cfg_data, $admin, $user_cfg_data, $extra_data, $template_type);
+    								$variables_count++;
+    							} elseif ($admin) {
+    								$template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($variables_count, $config_options, $key, $custom_cfg_data, $admin, $user_cfg_data, $extra_data, $template_type);
+    								$variables_count++;
+    							}
+    						}
+    						break;
+    				}
+    				continue;
+    			}
+    		}
+    	}
+    
+    	return($template_variables_array);
+    }
+	
+	 /**
+     * Generate an array that will get parsed as HTML from an array of values from XML
+     * @param int $i
+     * @param array $cfg_data
+     * @param string $key
+     * @param array $custom_cfg_data
+     * @return array
+     */
+    function generate_form_data($i, $cfg_data, $key=NULL, $custom_cfg_data=NULL, $admin=FALSE, $user_cfg_data=NULL, $extra_data=NULL, $template_type='GENERAL') {
+    	switch ($cfg_data['type']) {
+    		case "input":
+    			if ((!$admin) && (isset($user_cfg_data[$key]))) {
+    				$custom_cfg_data[$key] = $user_cfg_data[$key];
+    			}
+    			$template_variables_array['type'] = "input";
+    			if (isset($cfg_data['max_chars'])) {
+    				$template_variables_array['max_chars'] = $cfg_data['max_chars'];
+    			}
+    			$template_variables_array['key'] = $key;
+    			$template_variables_array['value'] = isset($custom_cfg_data[$key]) ? $custom_cfg_data[$key] : $cfg_data['default_value'];
+    			$template_variables_array['description'] = $cfg_data['description'];
+    			break;
+    			
+    		case "radio":
+    			if ((!$admin) && (isset($user_cfg_data[$key]))) {
+    				$custom_cfg_data[$key] = $user_cfg_data[$key];
+    			}
+    			$num = isset($custom_cfg_data[$key]) ? $custom_cfg_data[$key] : $cfg_data['default_value'];
+    			$template_variables_array['type'] = "radio";
+    			$template_variables_array['key'] = $key;
+    			$template_variables_array['description'] = $cfg_data['description'];
+    			$z = 0;
+    			while ($z < count($cfg_data['data'])) {
+    				$template_variables_array['data'][$z]['key'] = $key;
+    				$template_variables_array['data'][$z]['value'] = $cfg_data['data'][$z]['value'];
+    				$template_variables_array['data'][$z]['description'] = $cfg_data['data'][$z]['text'];
+    				if ($cfg_data['data'][$z]['value'] == $num) {
+    					$template_variables_array['data'][$z]['checked'] = 'checked';
+    				}
+    				$z++;
+    			}
+    			break;
+    			
+    		case "list":
+    			if ((!$admin) && (isset($user_cfg_data[$key]))) {
+    				$custom_cfg_data[$key] = $user_cfg_data[$key];
+    			}
+    			$num = isset($custom_cfg_data[$key]) ? $custom_cfg_data[$key] : $cfg_data['default_value'];
+    			$template_variables_array['type'] = "list";
+    			$template_variables_array['key'] = $key;
+    			$template_variables_array['description'] = $cfg_data['description'];
+    			$z = 0;
+    			while ($z < count($cfg_data['data'])) {
+    				$template_variables_array['data'][$z]['value'] = $cfg_data['data'][$z]['value'];
+    				$template_variables_array['data'][$z]['description'] = $cfg_data['data'][$z]['text'];
+    				if (isset($cfg_data['data'][$z]['disable'])) {
+    					$cfg_data['data'][$z]['disable'] = str_replace('{$count}', $z, $cfg_data['data'][$z]['disable']);
+    					$template_variables_array['data'][$z]['disables'] = explode(",", $cfg_data['data'][$z]['disable']);
+    				}
+    				if (isset($cfg_data['data'][$z]['enable'])) {
+    					$cfg_data['data'][$z]['enable'] = str_replace('{$count}', $z, $cfg_data['data'][$z]['enable']);
+    					$template_variables_array['data'][$z]['enables'] = explode(",", $cfg_data['data'][$z]['enable']);
+    				}
+    				if ($cfg_data['data'][$z]['value'] == $num) {
+    					$template_variables_array['data'][$z]['selected'] = 'selected';
+    				}
+    				$z++;
+    			}
+    			break;
+    			
+    		case "checkbox":
+    			if ((!$admin) && (isset($user_cfg_data[$key]))) {
+    				$custom_cfg_data[$key] = $user_cfg_data[$key];
+    			}
+    			$num = isset($custom_cfg_data[$key]) ? $custom_cfg_data[$key] : $cfg_data['default_value'];
+    			$template_variables_array['type'] = "checkbox";
+    			$template_variables_array['key'] = $key;
+    			$template_variables_array['description'] = $cfg_data['description'];
+    			$template_variables_array['checked'] = $custom_cfg_data[$key] ? TRUE : NULL;
+    			$template_variables_array['value'] = $key;
+    			break;
+    			
+    		case "group";
+    			$template_variables_array['type'] = "group";
+    			$template_variables_array['description'] = $cfg_data['description'];
+    			break;
+    			
+    		case "header";
+    			$template_variables_array['type'] = "header";
+    			$template_variables_array['description'] = $cfg_data['description'];
+    			break;
+    			
+    		case "textarea":
+    			if ((!$admin) && (isset($user_cfg_data[$key]))) {
+    				$custom_cfg_data[$key] = $user_cfg_data[$key];
+    			}
+    			$template_variables_array['type'] = "textarea";
+    			if (isset($cfg_data['rows'])) {
+    				$template_variables_array['rows'] = $cfg_data['rows'];
+    			}
+    			if (isset($cfg_data['cols'])) {
+    				$template_variables_array['cols'] = $cfg_data['cols'];
+    			}
+    			$template_variables_array['key'] = $key;
+    			$template_variables_array['value'] = isset($custom_cfg_data[$key]) ? $custom_cfg_data[$key] : $cfg_data['default_value'];
+    			$template_variables_array['description'] = $cfg_data['description'];
+    			break;
+    			
+    		case "break":
+    			if ($admin) {
+    				$template_variables_array['type'] = "break";
+    			} else {
+    				$template_variables_array['type'] = "NA";
+    			}
+    			break;
+    			
+    		default:
+    			$template_variables_array['type'] = "NA";
+    			break;
+    	}
+    
+    	if (isset($cfg_data['tooltip'])) {
+    		$template_variables_array['tooltip'] = htmlentities($cfg_data['tooltip']);
+    	}
+    
+    	if (($this->configmod->get('enable_ari')) AND ($admin) AND ($cfg_data['type'] != "break") AND ($cfg_data['type'] != "group") AND ($template_type == 'GENERAL')) {
+    
+    		$template_variables_array['aried'] = 1;
+    		$template_variables_array['ari']['key'] = $key;
+    
+    		if (isset($extra_data[$key])) {
+    			$template_variables_array['ari']['checked'] = "checked";
+    		}
+    	}
+    
+    	if ($template_type == 'GLOBAL') {
+    		$template_variables_array['freepbxed'] = 1;
+    		$template_variables_array['freepbx']['key'] = $key;
+    		if (empty($extra_data)) {
+    			$template_variables_array['freepbx']['checked'] = TRUE;
+    		} elseif (isset($extra_data[$key])) {
+    			$template_variables_array['freepbx']['checked'] = TRUE;
+    		}
+    	}
+    	return($template_variables_array);
+    }
+	
+	
+	
+	
+	
+	
+	
 	
 }
