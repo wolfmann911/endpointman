@@ -153,7 +153,7 @@ class Endpointman_Templates
 			$q = $db->prepare($sql);
 			$ob = $q->execute(array($dget['newproductselec'], addslashes($dget['newnametemplate']), $dget['newclonemodel']));
 			$newid = $db->lastInsertId();
-			$this->edit_template_display($newid,0);
+			//$this->edit_template_display($newid,0);
 			
 			$retarr = array("status" => true, "message" => _("Add New Template OK!"), "newid" => $newid);
 			unset($dget);

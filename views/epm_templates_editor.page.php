@@ -34,7 +34,7 @@
 					<div class="panel-body">
 					
 					
-						<table class="table ">
+						<table class="table">
 							<tr>
 								<td><b><?php echo _("Template Name:")?></b></td>
 								<td><?php if ($request['custom'] != 0): ?>Custom Template: Extension <?php echo $dtemplate['ext']; ?><?php else: ?><?php echo $dtemplate['template_name']; ?><?php endif; ?></td>
