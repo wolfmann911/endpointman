@@ -21,50 +21,57 @@ msgstr ""
 "Project-Id-Version: 2.10\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-03-09 10:30-0800\n"
-"PO-Revision-Date: 2012-11-01 22:35+0400\n"
-"Last-Translator: PostMet <ceo@postmet.com>\n"
-"Language-Team: Russian\n"
+"PO-Revision-Date: 2016-04-26 17:47+0200\n"
+"Last-Translator: ded <ceo@postmet.com>\n"
+"Language-Team: Russian "
+"<http://weblate.freepbx.org/projects/fpbxcn/endpointman/ru_RU/>\n"
+"Language: ru_RU\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<="
+"4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"X-Generator: Weblate 2.4\n"
 
 #: views/epm_advanced_settings.page.php:90
 msgid " - Point your phones to: "
-msgstr ""
+msgstr " - Обозначьте ваш телефон в: "
 
 #: Endpointman.class.php:2870
 msgid "- Copied %_FILE_% to %_FILETO_%."
-msgstr ""
+msgstr "- Скопировано %_FILE_% в %_FILETO_%."
 
 #: Endpointman.class.php:3085
 msgid "- Error Moving %_FILENAME_%!"
-msgstr ""
+msgstr "- Ошибка перемещения  %_FILENAME_%!"
 
 #: Endpointman.class.php:2866
 msgid "- Failed To Copy %_FILE_%!"
-msgstr ""
+msgstr "- Не удалось копировать %_FILE_%!"
 
 #: Endpointman.class.php:3141
 msgid "-- Updating Model Lines................"
-msgstr ""
+msgstr "-- Обновление модельного ряда................"
 
 #: Endpointman.class.php:3152
 msgid "----Old Data Detected! Migrating......"
-msgstr ""
+msgstr "----Обнаружены устаревшие данные! Мигрируем......"
 
 #: Endpointman.class.php:3247
 msgid "---Inserting Model %_NAMEMOD_%"
-msgstr ""
+msgstr "---Добавляем модель %_NAMEMOD_%"
 
 #: Endpointman.class.php:3243
 msgid "---Updating Model %_NAMEMOD_%"
-msgstr ""
+msgstr "---Обновляем модель %_NAMEMOD_%"
 
 #: Endpointman.class.php:2574 Endpointman.class.php:2600
 msgid ""
 "<a href='http://wiki.provisioner.net/index.php/"
 "Endpoint_manager_manual_upload' target='_blank'>Click Here!</a>"
 msgstr ""
+"<a href='http://wiki.provisioner.net/index.php/"
+"Endpoint_manager_manual_upload' target='_blank'>Кликнуть здесь!</a>"
 
 #: views/epm_advanced_settings.page.php:244
 msgid "ARP Executable Path"
