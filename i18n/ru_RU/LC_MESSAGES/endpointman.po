@@ -21,7 +21,7 @@ msgstr ""
 "Project-Id-Version: 2.10\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-03-09 10:30-0800\n"
-"PO-Revision-Date: 2016-04-26 21:04+0200\n"
+"PO-Revision-Date: 2016-04-27 15:52+0200\n"
 "Last-Translator: ded <ceo@postmet.com>\n"
 "Language-Team: Russian "
 "<http://weblate.freepbx.org/projects/fpbxcn/endpointman/ru_RU/>\n"
@@ -169,23 +169,23 @@ msgstr "Не получилось найти файл:"
 
 #: Endpointman.class.php:279
 msgid "Check Online "
-msgstr ""
+msgstr "Проверить он-лайн "
 
 #: views/epm_config_manager.page.php:10
 msgid "Check for Update"
-msgstr ""
+msgstr "Проверить наличие обновлений"
 
 #: Endpointman.class.php:278
 msgid "Check for Update "
-msgstr ""
+msgstr "Проверить наличие обновлений "
 
 #: Endpointman.class.php:294
 msgid "Check for Updates..."
-msgstr ""
+msgstr "Проверить наличие обновлений."
 
 #: Endpointman.class.php:295
 msgid "Check for Updates... Ok!"
-msgstr ""
+msgstr "Проверяем наличие обновлений... ОК!"
 
 #: Endpointman.class.php:2850
 msgid "Checking MD5sum of Package..."
