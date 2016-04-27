@@ -21,7 +21,7 @@ msgstr ""
 "Project-Id-Version: 2.10\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-03-09 10:30-0800\n"
-"PO-Revision-Date: 2016-04-27 15:52+0200\n"
+"PO-Revision-Date: 2016-04-27 16:19+0200\n"
 "Last-Translator: ded <ceo@postmet.com>\n"
 "Language-Team: Russian "
 "<http://weblate.freepbx.org/projects/fpbxcn/endpointman/ru_RU/>\n"
@@ -189,19 +189,19 @@ msgstr "Проверяем наличие обновлений... ОК!"
 
 #: Endpointman.class.php:2850
 msgid "Checking MD5sum of Package..."
-msgstr ""
+msgstr "Проверяем MD5sum пакета..."
 
 #: Endpointman.class.php:3013
 msgid "Checking MD5sum of Package...."
-msgstr ""
+msgstr "Проверяем MD5sum пакета..."
 
 #: Endpointman.class.php:1696
 msgid "Click this link to download:"
-msgstr ""
+msgstr "Кликнуть на линк для скачивания:"
 
 #: Endpointman.class.php:916
 msgid "Clone Model is not number!"
-msgstr ""
+msgstr "Клонированная модель не имеет номера!"
 
 #: Endpointman.class.php:919
 msgid "Clone Model send is negative!"
