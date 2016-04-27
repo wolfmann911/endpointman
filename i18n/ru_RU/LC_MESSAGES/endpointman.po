@@ -21,7 +21,7 @@ msgstr ""
 "Project-Id-Version: 2.10\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-03-09 10:30-0800\n"
-"PO-Revision-Date: 2016-04-26 17:47+0200\n"
+"PO-Revision-Date: 2016-04-26 21:04+0200\n"
 "Last-Translator: ded <ceo@postmet.com>\n"
 "Language-Team: Russian "
 "<http://weblate.freepbx.org/projects/fpbxcn/endpointman/ru_RU/>\n"
@@ -75,95 +75,97 @@ msgstr ""
 
 #: views/epm_advanced_settings.page.php:244
 msgid "ARP Executable Path"
-msgstr ""
+msgstr "Путь для выполнения запроса ARP"
 
 #: Endpointman.class.php:2598 Endpointman.class.php:2599
 msgid ""
 "Aborting Brand Downloads. Can't Get Master File, Assuming Timeout Issues!"
 msgstr ""
+"Отмена скачивания бренда. Невозможно получить мастерз-файл, предполагается "
+"проблема по таймауту!"
 
 #: provisioning/p.php:34 provisioning/p.php:130
 msgid "Access denied!"
-msgstr ""
+msgstr "Доступ отклонён!"
 
 #: views/epm_advanced/oui_manager.views.grid.php:27
 msgid "Actions"
-msgstr ""
+msgstr "Действия"
 
 #: views/epm_advanced/oui_manager.views.grid.php:5
 msgid "Add Custom OUI"
-msgstr ""
+msgstr "Добавить кастомный OUI"
 
 #: views/epm_advanced/oui_manager.views.new.modal.php:62
 msgid "Add New"
-msgstr ""
+msgstr "Добавить новый"
 
 #: Endpointman.class.php:933
 msgid "Add New Template OK!"
-msgstr ""
+msgstr "Добавление нового шаблона ОК!"
 
 #: page.epm_advanced.php:19
 msgid "Advanced Settings"
-msgstr ""
+msgstr "Расширенные настройки"
 
 #: Endpointman.class.php:2955
 msgid "All Done!"
-msgstr ""
+msgstr "Всё сделано!"
 
 #: views/epm_advanced_settings.page.php:428
 msgid "Allow Duplicate Extensions"
-msgstr ""
+msgstr "Разрешить дублирование внутренних номеров"
 
 #: views/epm_advanced_settings.page.php:457
 msgid "Allow Saving Over Default Configuration Files"
-msgstr ""
+msgstr "Разрешить сохранение поверх дефолтных файлов конфигурации"
 
 #: Endpointman.class.php:3058
 msgid "Appears to be a valid Provisioner.net JSON file.....Continuing"
-msgstr ""
+msgstr "Выглядит как действительный Provisioner.net JSON файл.....Продолжаем"
 
 #: views/epm_advanced_settings.page.php:268
 msgid "Asterisk Executable Path"
-msgstr ""
+msgstr "Исполнительный путь для Астериск"
 
 #: views/epm_advanced/oui_manager.views.grid.php:25
 #: views/epm_advanced/oui_manager.views.new.modal.php:36
 #: views/epm_advanced_iedl.page.php:90 views/epm_advanced_iedl.page.php:93
 msgid "Brand"
-msgstr ""
+msgstr "Бренд"
 
 #: views/epm_advanced_manual_upload.page.php:54
 msgid "Brand Package"
-msgstr ""
+msgstr "Пакет бренда"
 
 #: views/epm_advanced_manual_upload.page.php:90
 msgid "Brand's Available"
-msgstr ""
+msgstr "Доступные бренды"
 
 #: views/epm_config_editor.page.php:7
 msgid "Brands/Modules"
-msgstr ""
+msgstr "Бренды/модули"
 
 #: views/epm_advanced_iedl.page.php:78
 msgid "CSV File Format"
-msgstr ""
+msgstr "Формат файла CSV"
 
 #: Endpointman.class.php:1498 Endpointman.class.php:1575
 #: Endpointman.class.php:1734
 msgid "Can Not Find Uploaded Files!"
-msgstr ""
+msgstr "Не найдены загруженные файлы!"
 
 #: Endpointman.class.php:3030
 msgid "Can't Find Downloaded File!"
-msgstr ""
+msgstr "Не найдены закаченные файлы!"
 
 #: views/epm_advanced/oui_manager.views.new.modal.php:61
 msgid "Cancel"
-msgstr ""
+msgstr "Отмена"
 
 #: Endpointman.class.php:2478
 msgid "Cant find file:"
-msgstr ""
+msgstr "Не получилось найти файл:"
 
 #: Endpointman.class.php:279
 msgid "Check Online "
