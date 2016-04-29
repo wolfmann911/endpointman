@@ -21,7 +21,7 @@ msgstr ""
 "Project-Id-Version: 2.10\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-03-09 10:30-0800\n"
-"PO-Revision-Date: 2016-04-29 15:11+0200\n"
+"PO-Revision-Date: 2016-04-29 18:10+0200\n"
 "Last-Translator: ded <ceo@postmet.com>\n"
 "Language-Team: Russian "
 "<http://weblate.freepbx.org/projects/fpbxcn/endpointman/ru_RU/>\n"
@@ -260,52 +260,52 @@ msgstr "Существующие шаблоны"
 
 #: views/epm_advanced/poce.views.button.up.files.php:19
 msgid "Custom Template Files"
-msgstr ""
+msgstr "Файлы пользовательского шаблона"
 
 #: views/epm_advanced_settings.page.php:305
 msgid "Default Mirror FreePBX"
-msgstr ""
+msgstr "Зеркало FreePBX по умолчанию"
 
 #: views/epm_advanced/poce.views.textarea.file.php:36
 msgid "Delete"
-msgstr ""
+msgstr "Удалить"
 
 #: Endpointman.class.php:889
 msgid "Delete Template OK!"
-msgstr ""
+msgstr "Удаление шаблона ОК!"
 
 #: views/epm_advanced_settings.page.php:56
 #: views/epm_advanced_settings.page.php:191
 msgid "Determine for Me"
-msgstr ""
+msgstr "Определить для меня"
 
 #: Endpointman.class.php:588
 msgid "Devices"
-msgstr ""
+msgstr "Устройства"
 
 #: Endpointman.class.php:1965
 msgid "Directory Not Writable!"
-msgstr ""
+msgstr "Директория не имеет прав на запись!"
 
 #: Endpointman.class.php:1490
 msgid "Directory no exists: "
-msgstr ""
+msgstr "Директория не существует: "
 
 #: Endpointman.class.php:287
 msgid "Disable"
-msgstr ""
+msgstr "Отключить"
 
 #: views/epm_advanced_settings.page.php:515
 msgid "Disable Configuration File Backups"
-msgstr ""
+msgstr "Отключить резервирование конфигурационных файлов"
 
 #: views/epm_advanced_settings.page.php:486
 msgid "Disable TFTP Server Check"
-msgstr ""
+msgstr "Отключить проверку сервера TFTP"
 
 #: views/epm_advanced_settings.page.php:399
 msgid "Disable Tooltips"
-msgstr ""
+msgstr "Отключить подсказки"
 
 #: Endpointman.class.php:1526 Endpointman.class.php:1540
 #: Endpointman.class.php:1599 Endpointman.class.php:1604
@@ -320,43 +320,43 @@ msgstr ""
 #: Endpointman.class.php:3284 Endpointman.class.php:3295
 #: Endpointman.class.php:3305
 msgid "Done!"
-msgstr ""
+msgstr "Готово!"
 
 #: views/epm_advanced_manual_upload.page.php:13
 msgid "Download updated releases from "
-msgstr ""
+msgstr "Загрузить обновлённые релизы с "
 
 #: Endpointman.class.php:2997
 msgid "Downloading Brand JSON....."
-msgstr ""
+msgstr "Загружаются JSON бренда....."
 
 #: Endpointman.class.php:3006
 msgid "Downloading Brand Package..."
-msgstr ""
+msgstr "Загружается пакет бренда..."
 
 #: Endpointman.class.php:2828 Endpointman.class.php:2840
 msgid "Downloading firmware..."
-msgstr ""
+msgstr "Загружаются прошивки..."
 
 #: Endpointman.class.php:688
 msgid "Dropping all relevant tables"
-msgstr ""
+msgstr "Обнуляются все соответствующие таблицы"
 
 #: Endpointman.class.php:286
 msgid "Enable"
-msgstr ""
+msgstr "Включить"
 
 #: views/epm_advanced_settings.page.php:370
 msgid "Enable Debug Mode"
-msgstr ""
+msgstr "Включить режим отладки"
 
 #: views/epm_advanced_settings.page.php:334
 msgid "Enable FreePBX ARI Module"
-msgstr ""
+msgstr "Включить модуль FreePBX ARI"
 
 #: page.epm_advanced.php:18 page.epm_config.php:18
 msgid "End Point Configuraction Manager"
-msgstr ""
+msgstr "Менеджер конфигураций конечных устройств"
 
 #: functions.inc.php:234
 msgid "End Point Manager"
@@ -364,218 +364,220 @@ msgstr "Менеджер абонентских устройств"
 
 #: provisioning/p.php:33 provisioning/p.php:129
 msgid "Error 403 Forbidden"
-msgstr ""
+msgstr "Ошибка 403 - Запрещено"
 
 #: provisioning/p.php:107 provisioning/p.php:121
 msgid "Error 404 Not Found"
-msgstr ""
+msgstr "Ошибка 404 - Не найдено"
 
 #: provisioning/p.php:98
 msgid "Error 500 Internal Server Error"
-msgstr ""
+msgstr "Ошибка 500 - Внутренняя ошибка сервера"
 
 #: Endpointman.class.php:3036
 msgid ""
 "Error Connecting to the Package Repository. Module not installed. Please Try "
 "again later."
 msgstr ""
+"Ошибка подключения к репозиторию пакетов. Модуль не инсталлирован. "
+"Попробуйте позже."
 
 #: Endpointman.class.php:2991
 msgid "Error creating directory: %_DIR_%"
-msgstr ""
+msgstr "Ошибка создания директории: %_DIR_%"
 
 #: Endpointman.class.php:3033
 msgid "Error download Brand package!"
-msgstr ""
+msgstr "Ошибка при скачивании пакета бренда!"
 
 #: Endpointman.class.php:2831 Endpointman.class.php:2843
 msgid "Error download frimware package!"
-msgstr ""
+msgstr "Ошибка скачивания пакета прошивой!"
 
 #: Endpointman.class.php:289 Endpointman.class.php:306
 #: Endpointman.class.php:358 Endpointman.class.php:1529
 #: Endpointman.class.php:1607
 msgid "Error!"
-msgstr ""
+msgstr "Ошибка!"
 
 #: Endpointman.class.php:2086 Endpointman.class.php:2123
 msgid "Error: Command not found!"
-msgstr ""
+msgstr "Ошибка: команда не найдена!"
 
 #: Endpointman.class.php:2572
 msgid "Error: No Local File for %_name_% !"
-msgstr ""
+msgstr "Ошибка: нет локального файла для %_name_% !"
 
 #: views/epm_advanced_iedl.page.php:99
 msgid "Examples"
-msgstr ""
+msgstr "Примеры"
 
 #: views/epm_advanced_settings.page.php:323
 msgid "Experimental"
-msgstr ""
+msgstr "Экспериментальные"
 
 #: views/epm_advanced_manual_upload.page.php:122
 msgid "Explor a package brand's availables."
-msgstr ""
+msgstr "Открыть пакет доступных брендов."
 
 #: views/epm_advanced_iedl.page.php:20
 #: views/epm_advanced_manual_upload.page.php:109
 msgid "Export"
-msgstr ""
+msgstr "Экспорт"
 
 #: views/epm_advanced_manual_upload.page.php:79
 msgid "Export Brand Packages"
-msgstr ""
+msgstr "Экспорт пакетов брендов"
 
 #: views/epm_advanced_iedl.page.php:6
 msgid "Export CSV"
-msgstr ""
+msgstr "Экспорт  CSV"
 
 #: views/epm_advanced_iedl.page.php:16
 msgid "Export CSV file of devices"
-msgstr ""
+msgstr "Экспорт CSV файла устройств"
 
 #: views/epm_advanced_iedl.page.php:26
 msgid "Export data configuracion devices."
-msgstr ""
+msgstr "Экспорт данных о конфигурации устройств."
 
 #: Endpointman.class.php:1686
 msgid "Exporting %_NAME_%"
-msgstr ""
+msgstr "Экспортируется %_NAME_%"
 
 #: views/epm_advanced_iedl.page.php:90 views/epm_advanced_iedl.page.php:95
 msgid "Extension"
-msgstr ""
+msgstr "Внутренний номер"
 
 #: Endpointman.class.php:1597
 msgid "Extracting Provisioner Package..."
-msgstr ""
+msgstr "Распаковывается пакет провизионера..."
 
 #: Endpointman.class.php:1535
 msgid "Extracting Tarball %_FILEPACKAGE_% to %_TEMPDIR_%........"
-msgstr ""
+msgstr "Распаковывается архив %_FILEPACKAGE_% в %_TEMPDIR_%........"
 
 #: Endpointman.class.php:3017
 msgid "Extracting Tarball........"
-msgstr ""
+msgstr "Распаковывается архив........"
 
 #: Endpointman.class.php:1537
 msgid "Extracting Tarball........ "
-msgstr ""
+msgstr "Распаковывается архив........ "
 
 #: functions.inc.php:343
 msgid "Failed to install "
-msgstr ""
+msgstr "Ошибка при инсталлировании "
 
 #: Endpointman.class.php:3782
 msgid "Failed to write file to disk"
-msgstr ""
+msgstr "Ошибка при записи на диск"
 
 #: Endpointman.class.php:1752
 msgid "File %_FILE_% size is 0!"
-msgstr ""
+msgstr "Файл %_FILE_% имеет размер 0!"
 
 #: views/epm_advanced_settings.page.php:86
 msgid "File (TFTP/FTP)"
-msgstr ""
+msgstr "Файл (TFTP/FTP)"
 
 #: Endpointman.class.php:1623
 msgid "File Temp no Exists!"
-msgstr ""
+msgstr "Временный файл не существует!"
 
 #: provisioning/p.php:108 provisioning/p.php:122
 msgid "File not Found!"
-msgstr ""
+msgstr "Файл не найден!"
 
 #: Endpointman.class.php:1197
 msgid "File not readable, check the permission! "
-msgstr ""
+msgstr "Файл не читается, проверьте права на чтение! "
 
 #: Endpointman.class.php:3784
 msgid "File upload stopped by extension"
-msgstr ""
+msgstr "Загрузка файла остановлена по расширению"
 
 #: Endpointman.class.php:2891
 msgid "Firmware MD5 didn't match!"
-msgstr ""
+msgstr "Контрольная сумма MD5 файла прошивки не совпадает!"
 
 #: Endpointman.class.php:3122
 msgid "Firmware Requirment Detected!.........."
-msgstr ""
+msgstr "Обнаружено требование по прошивке!.........."
 
 #: views/epm_advanced/poce.views.textarea.file.php:23
 msgid "Full Screen F11"
-msgstr ""
+msgstr "Полный экран F11"
 
 #: views/epm_advanced_settings.page.php:606
 msgid "GIT Branch"
-msgstr ""
+msgstr "Раздел GIT"
 
 #: Endpointman.class.php:963
 msgid "Generate list Ok!"
-msgstr ""
+msgstr "Генерирование списка ОК!"
 
 #: Endpointman.class.php:1947 views/epm_advanced_settings.page.php:23
 msgid "Git not installed!"
-msgstr ""
+msgstr "Git не инсталлирован!"
 
 #: views/epm_advanced_settings.page.php:114
 msgid "Global Final Config & Firmware Directory"
-msgstr ""
+msgstr "Директория для глобальных окончательных конфигураций и прошивок"
 
 #: views/epm_advanced_manual_upload.page.php:97
 msgid "Heads up!"
-msgstr ""
+msgstr "Носы вверх!"
 
 #: Endpointman.class.php:140 Endpointman.class.php:147
 #: Endpointman.class.php:1698
 msgid "Here"
-msgstr ""
+msgstr "Здесь"
 
 #: Endpointman.class.php:304
 msgid "Hide"
-msgstr ""
+msgstr "Скрыть"
 
 #: Endpointman.class.php:1835
 msgid "ID  not valid!"
-msgstr ""
+msgstr "ID не подходит!"
 
 #: Endpointman.class.php:763
 msgid "ID Brand not is numbre"
-msgstr ""
+msgstr "ID бренда не является номером"
 
 #: Endpointman.class.php:1683
 msgid "ID Package send not valid, brand not exist!"
-msgstr ""
+msgstr "Отправленый ID пакета не подходит, бренд не существует!"
 
 #: Endpointman.class.php:748
 msgid "ID Producto not is number"
-msgstr ""
+msgstr "ID продукта не является цифрой"
 
 #: Endpointman.class.php:876
 msgid "ID is not number!"
-msgstr ""
+msgstr "ID не является цифрой!"
 
 #: Endpointman.class.php:879
 msgid "ID send is negative!"
-msgstr ""
+msgstr "Отправленый ID отрицательный!"
 
 #: Endpointman.class.php:945 Endpointman.class.php:2144
 #: Endpointman.class.php:2279
 msgid "ID send is not number!"
-msgstr ""
+msgstr "Посланый ID не является цифрой!"
 
 #: Endpointman.class.php:948
 msgid "ID send is number not valid!"
-msgstr ""
+msgstr "Посланый номер ID не подходит!"
 
 #: Endpointman.class.php:2163 Endpointman.class.php:2302
 msgid "IDType invalid: "
-msgstr ""
+msgstr "Тип ID неверный: "
 
 #: views/epm_advanced_settings.page.php:49
 msgid "IP address of phone server"
-msgstr ""
+msgstr "ИП адрес сервера телефонии"
 
 #: Endpointman.class.php:273
 msgid ""
