@@ -21,7 +21,7 @@ msgstr ""
 "Project-Id-Version: 2.10\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-03-09 10:30-0800\n"
-"PO-Revision-Date: 2016-04-27 16:19+0200\n"
+"PO-Revision-Date: 2016-04-29 15:11+0200\n"
 "Last-Translator: ded <ceo@postmet.com>\n"
 "Language-Team: Russian "
 "<http://weblate.freepbx.org/projects/fpbxcn/endpointman/ru_RU/>\n"
@@ -205,28 +205,29 @@ msgstr "Клонированная модель не имеет номера!"
 
 #: Endpointman.class.php:919
 msgid "Clone Model send is negative!"
-msgstr ""
+msgstr "Клонированная модель имеет отрицательный порядковый номер!"
 
 #: Endpointman.class.php:265 Endpointman.class.php:327
 #: Endpointman.class.php:345 Endpointman.class.php:373
 #: Endpointman.class.php:401 Endpointman.class.php:410
 #: Endpointman.class.php:440 Endpointman.class.php:453
 msgid "Command not found!"
-msgstr ""
+msgstr "Команда не найдена!"
 
 #: Endpointman.class.php:147
 msgid ""
 "Configuration Directory is not a directory or does not exist! Please change "
 "the location here:"
 msgstr ""
+"Директория для конфигураций не та или не существует! Измените путь к ней:"
 
 #: Endpointman.class.php:139
 msgid "Configuration Directory is not writable!"
-msgstr ""
+msgstr "На директории для конфигураций нет прав для записи!"
 
 #: views/epm_advanced_settings.page.php:81
 msgid "Configuration Type"
-msgstr ""
+msgstr "Тип конфигурации"
 
 #: endpointman.i18n.php:6 endpointman.i18n.php:12
 msgid "Connectivity"
@@ -234,27 +235,28 @@ msgstr "Подключения"
 
 #: Endpointman.class.php:2882
 msgid "Copy Error Detected! Aborting Install!"
-msgstr ""
+msgstr "Обнаружена ошибка при копировании! Инсталляция прервана!"
 
 #: Endpointman.class.php:3066
 msgid "Creating Directory Structure for Brand '%_NAME_%' and Moving Files .."
 msgstr ""
+"Создаётся стуктура директории для бренда  '%_NAME_%' и перемещаются файлы .."
 
 #: Endpointman.class.php:2989
 msgid "Creating EPM temp directory"
-msgstr ""
+msgstr "Создаётся временная EPM директория"
 
 #: Endpointman.class.php:1524
 msgid "Creating EPM temp directory..."
-msgstr ""
+msgstr "Создаётся временная EPM директория..."
 
 #: Endpointman.class.php:1602
 msgid "Creating Provisioner Directory..."
-msgstr ""
+msgstr "Создаётся директория провизионера..."
 
 #: Endpointman.class.php:598
 msgid "Current Templates"
-msgstr ""
+msgstr "Существующие шаблоны"
 
 #: views/epm_advanced/poce.views.button.up.files.php:19
 msgid "Custom Template Files"
