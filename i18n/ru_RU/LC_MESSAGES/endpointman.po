@@ -21,7 +21,7 @@ msgstr ""
 "Project-Id-Version: 2.10\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-03-09 10:30-0800\n"
-"PO-Revision-Date: 2016-04-29 18:10+0200\n"
+"PO-Revision-Date: 2016-05-04 17:31+0200\n"
 "Last-Translator: ded <ceo@postmet.com>\n"
 "Language-Team: Russian "
 "<http://weblate.freepbx.org/projects/fpbxcn/endpointman/ru_RU/>\n"
@@ -81,7 +81,7 @@ msgstr "Путь для выполнения запроса ARP"
 msgid ""
 "Aborting Brand Downloads. Can't Get Master File, Assuming Timeout Issues!"
 msgstr ""
-"Отмена скачивания бренда. Невозможно получить мастерз-файл, предполагается "
+"Отмена скачивания бренда. Невозможно получить мастер-файл, предполагается "
 "проблема по таймауту!"
 
 #: provisioning/p.php:34 provisioning/p.php:130
@@ -94,7 +94,7 @@ msgstr "Действия"
 
 #: views/epm_advanced/oui_manager.views.grid.php:5
 msgid "Add Custom OUI"
-msgstr "Добавить кастомный OUI"
+msgstr "Добавить пользовательский OUI"
 
 #: views/epm_advanced/oui_manager.views.new.modal.php:62
 msgid "Add New"
