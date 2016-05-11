@@ -1797,44 +1797,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
 	
     
 
-    
 
-    function prepare_message_box() {
-        $error_message = NULL;
-        foreach ($this->error as $key => $error) {
-            $error_message .= $error;
-            if ($this->global_cfg['debug']) {
-                $error_message .= " Function: [" . $key . "]";
-            }
-            $error_message .= "<br />";
-        }
-        $message = NULL;
-        foreach ($this->message as $key => $error) {
-            if (is_array($error)) {
-                foreach ($error as $sub_error) {
-                    $message .= $sub_error;
-                    if ($this->global_cfg['debug']) {
-                        $message .= " Function: [" . $key . "]";
-                    }
-                    $message .= "<br />";
-                }
-            } else {
-                $message .= $error;
-                if ($this->global_cfg['debug']) {
-                    $message .= " Function: [" . $key . "]";
-                }
-                $message .= "<br />";
-            }
-        }
-
-        if (isset($message)) {
-            $this->display_message_box($message, 0);
-        }
-
-        if (isset($error_message)) {
-            $this->display_message_box($error_message, 1);
-        }
-    }
 
    
 
@@ -2103,6 +2066,58 @@ $this->error['parse_configs'] = "File not written to hard drive!";
     }
 
    
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+    //BORRAR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	//OBSOLETO, ANTIGUAMENTE VENTANAS EMERGENTES, AHORA SON DIALOGOS JQUERY.
+    function prepare_message_box() {
+        $error_message = NULL;
+        foreach ($this->error as $key => $error) {
+            $error_message .= $error;
+            if ($this->global_cfg['debug']) {
+                $error_message .= " Function: [" . $key . "]";
+            }
+            $error_message .= "<br />";
+        }
+        $message = NULL;
+        foreach ($this->message as $key => $error) {
+            if (is_array($error)) {
+                foreach ($error as $sub_error) {
+                    $message .= $sub_error;
+                    if ($this->global_cfg['debug']) {
+                        $message .= " Function: [" . $key . "]";
+                    }
+                    $message .= "<br />";
+                }
+            } else {
+                $message .= $error;
+                if ($this->global_cfg['debug']) {
+                    $message .= " Function: [" . $key . "]";
+                }
+                $message .= "<br />";
+            }
+        }
+
+        if (isset($message)) {
+            $this->display_message_box($message, 0);
+        }
+
+        if (isset($error_message)) {
+            $this->display_message_box($error_message, 1);
+        }
+    }
+	
+	
+	
+	
 
 }
 ?>

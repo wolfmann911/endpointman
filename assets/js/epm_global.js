@@ -203,6 +203,15 @@ function epm_global_refresh_table(snametable = "", showmsg = false)
 }
 
 
+function epm_global_input_value_change_bt(sNameID = "", sValue = "", bSetFocus = false)
+{
+	if (sNameID === "" ) { return false; }
+	
+	$(sNameID).val(sValue);
+	if (bSetFocus === true) { $(sNameID).focus(); }
+}
+
+
 
 
 
