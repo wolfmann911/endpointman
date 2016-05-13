@@ -1,0 +1,17 @@
+@CHARSET "ISO-8859-1";
+
+
+#epm_templates code.inline {
+  padding: 2px 4px;
+  font-size: 0.8em;
+  background-color: #f7f7f9;
+  border: 1px solid #e1e1e8;
+}
+
+#epm_templates ul.nobullets {
+    list-style-type: none;
+}
+
+#epm_templates li {
+  line-height: 24px;
+}

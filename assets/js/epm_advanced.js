@@ -1,3 +1,4 @@
+"use strict";
 var cmeditor = null;
 
 function epm_advanced_document_ready () {
@@ -15,47 +16,35 @@ function epm_advanced_document_ready () {
 	$('#settings input[type=radio]').change(function(){ epm_advanced_tab_setting_input_change(this); });
 	$('#settings select').change(function(){ epm_advanced_tab_setting_input_change(this); });
 
-
+	
 	//TAB OUT_MANAGER
 	$('#AddDlgModal').on('show.bs.modal', function (event) {
 		$(this).find('input, select').val("");
 	});
 	$('#AddDlgModal_bt_new').on("click", function(){ epm_advanced_tab_oui_manager_bt_new(); });
-
-
-	//TAB POCE
-
-
-	//TAB IEDL
-
-
-	//TAB MANUAL_UPLOAD
-
-
 }
 
-function epm_advanced_windows_load (nTab) {
-	nTab = typeof nTab !== "undefined" ? nTab : "";
+function epm_advanced_windows_load (nTab = "") {
 	epm_advanced_select_tab_ajax(nTab);
 }
 
-function epm_advanced_change_tab (nTab) {
-	nTab = typeof nTab !== "undefined" ? nTab : "";
+function epm_advanced_change_tab (nTab = "") {
 	epm_advanced_select_tab_ajax(nTab);
 }
 
 
 // INI: FUNCTION GLOBAL SEC
 
-function epm_advanced_select_tab_ajax(idtab) {
-	idtab = typeof idtab !== "undefined" ? idtab : "";
+function epm_advanced_select_tab_ajax(idtab = "")
+{
 	if (idtab === "") {
-		fpbxToast('epm_advanced_select_tab_ajax -> id invalid (' + idtab + ')!','JS!','warning');
+		fpbxToast('epm_advanced_select_tab_ajax -> id invalid!','JS!','warning');
 		return false;
 	}
 
-	if (idtab == "poce")
+	if (idtab === "poce")
 	{
+		epm_advanced_tab_poce_update_list_brand_bootnav();
 		if (cmeditor === null) {
 			cmeditor = CodeMirror.fromTextArea(document.getElementById("config_textarea"), {
 				lineNumbers: true,
@@ -74,21 +63,21 @@ function epm_advanced_select_tab_ajax(idtab) {
 			});
 		}
 	}
-	else if (idtab == "manual_upload") {
+	else if (idtab === "manual_upload") {
 		epm_advanced_tab_manual_upload_list_files_brand_expor();
 	}
 	return true;
 }
 
 
-function close_module_actions_epm_advanced(goback, acctionname) {
-	goback = typeof goback !== "undefined" ? goback : "";
-	acctionname = typeof acctionname !== "undefined" ? acctionname : "";
+function close_module_actions_epm_advanced(goback, acctionname = "")
+{
+
 }
 
-function end_module_actions_epm_advanced(acctionname) {
-	acctionname = typeof acctionname !== "undefined" ? acctionname : "";
-	if (acctionname == "manual_upload_bt_export_brand") {
+function end_module_actions_epm_advanced(acctionname = "")
+{
+	if (acctionname === "manual_upload_bt_export_brand") {
 		epm_advanced_tab_manual_upload_list_files_brand_expor();
 	}
 }
@@ -104,7 +93,8 @@ function end_module_actions_epm_advanced(acctionname) {
 
 // INI: FUNCTION TAB UPLOAD_MANUAL
 
-function epm_advanced_tab_manual_upload_bt_explor_brand() {
+function epm_advanced_tab_manual_upload_bt_explor_brand()
+{
 	var packageid = $('#brand_export_pack_selected').val();
 	if (packageid === "") {
 		alert ("You have not selected a brand from the list!");
@@ -118,16 +108,15 @@ function epm_advanced_tab_manual_upload_bt_explor_brand() {
 	}
 }
 
-function epm_advanced_tab_manual_upload_bt_upload(command, formname) {
-	command = typeof command !== "undefined" ? command : "";
-	formname = typeof formnname !== "undefined" ? formname : "";
-
+function epm_advanced_tab_manual_upload_bt_upload(command, formname)
+{
 	if ((command === "") || (formname === "")) { return; }
 	var urlStr = "config.php?display=epm_advanced&subpage=manual_upload&command="+command;
 	epm_global_dialog_action("manual_upload_bt_upload", urlStr, formname);
 }
 
-function epm_advanced_tab_manual_upload_list_files_brand_expor() {
+function epm_advanced_tab_manual_upload_list_files_brand_expor()
+{
 	epm_global_html_find_show_hide("#list-brands-export-item-loading", true, 0, true);
 	if ($("#list-brands-export li.item-list-brand-export").length > 0) {
 		$("#list-brands-export li.item-list-brand-export").hide("slow" , function () {
@@ -159,8 +148,8 @@ function epm_advanced_tab_manual_upload_list_files_brand_expor() {
 				epm_global_html_find_show_hide("#list-brands-export-item-loading", false, 1000, true);
 			},
 			success: function(data) {
-				if (data.status === true) {
-					if (data.countlist === 0) {
+				if (data.status == true) {
+					if (data.countlist == 0) {
 						$("#list-brands-export").append($('<li/>', { 'class' : 'list-group-item item-list-brand-export'	}).text("Empty list").append($('<span/>', { 'class' : 'label label-default label-pill pull-xs-right' }).text("0")));
 					}
 					else {
@@ -257,9 +246,115 @@ function epm_advanced_tab_iedl_bt_import()
 
 
 // INI: FUNCTION TAB POCE
-function epm_advanced_tab_poce_select_product(idsel, bclear) {
-	bclear = typeof bclear !== "undefined" ? bclear : true;
 
+function epm_advanced_tab_poce_update_list_brand_bootnav(forzar=false)
+{
+	var nListO = $("#lista_brand_bootnav").children('a').get().length;
+	var nListL = $("#lista_brand_bootnav").children('a.bootnavloadingajax').get().length;
+	var nListT = nListO - nListL
+
+
+	if (nListT > 0) {
+		if (frozar !== true) { return; }
+	}
+
+	if ((nListL === 0) && (nListO > 0)) {
+		$("#lista_brand_bootnav")
+		.empty()
+		.append(
+			$('<a/>', { 'href' : '#', 'class' : 'list-group-item bootnavloadingajax text-center' })
+			.append(
+				$('<i/>', { 'class' : 'fa fa-spinner fa-spin' }),
+				$('<span/>', {}).text(" " + "Loading...")
+			)
+		);
+	}
+
+	epm_advanced_tab_poce_clear_select();
+	$.ajax({
+		type: 'POST',
+		url: "ajax.php",
+		data: {
+			module: "endpointman",
+			module_sec: "epm_advanced",
+			module_tab: "poce",
+			command: "poce_list_brands",
+		},
+		dataType: 'json',
+		timeout: 60000,
+		error: function(xhr, ajaxOptions, thrownError) {
+			fpbxToast('ERROR AJAX:' + thrownError,'ERROR (' + xhr.status + ')!','error');
+			return false;
+		},
+		success: function(data) {
+			if (data.status == true) {
+				if (data.ldatos.length == 0) {
+					$("#lista_brand_bootnav")
+					.append(
+						$('<a/>', { 'href' : '#', 'class' : 'list-group-item' })
+						.append(
+							$('<i/>', { 'class' : 'fa fa-phone fa-fw fa-lg' }),
+							$('<span/>', {}).text(" " + "List Product's Empty")
+						)
+					);
+				}
+				else
+				{
+					$(data.ldatos).each(function(index, itemData) {
+						$("#lista_brand_bootnav")
+						.append(
+							$('<a/>', {
+								'href' 	: 'javascript:epm_advanced_tab_poce_select_product(' + itemData.id + ');',
+								'class' : 'list-group-item',
+								'id'	: 'list_product_' + itemData.id,
+								'title' : itemData.name
+							})
+							.append(
+								$('<i/>', { 'class' : 'fa fa-phone fa-fw fa-lg' }),
+								$('<span/>', {}).text(" " + itemData.name_mini)
+							)
+						);
+					});
+				}
+
+
+				$("#lista_brand_bootnav a.bootnavloadingajax").remove();
+				fpbxToast('Load date Done!', '', 'success');
+				return true;
+			}
+			else {
+				$("#lista_brand_bootnav a.bootnavloadingajax").text("Error get data!");
+				fpbxToast(data.message, data.txt.error, 'error');
+				return false;
+			}
+		},
+	});
+
+}
+
+function epm_advanced_tab_poce_clear_select()
+{
+	$("#poce_NameProductSelect").text("No Selected");
+	$("#poce_file_name_path").text("No Selected");
+	$('#config_textarea').prop('disabled', true);
+	if (cmeditor !== null) {
+		cmeditor.setValue("Select file to config...");
+		cmeditor.setOption("readOnly",true);
+	}
+	$("#box_sec_source button").prop('disabled', true);
+	$("#box_bt_save button").prop('disabled', true);
+	$("#box_bt_share button").prop('disabled', true);
+	$("#box_bt_save_as button").prop('disabled', true);
+	$("#box_bt_save_as input").prop('disabled', true).val("");
+	$('form[name=form_config_text_sec_button] input[name=datosok]').val("false");
+
+	epm_advanced_tab_poce_create_file_list("#select_product_list_files_config", "");
+	epm_advanced_tab_poce_create_file_list("#select_product_list_files_template_custom", "");
+	epm_advanced_tab_poce_create_file_list("#select_product_list_files_user_config", "");
+}
+
+function epm_advanced_tab_poce_select_product(idsel = null, bclear = true)
+{
 	if ($.isNumeric(idsel) === false) { return; }
 	$("div.list-group>a.active").removeClass("active");
 	$("#list_product_"+idsel).addClass("active").blur();
@@ -281,27 +376,16 @@ function epm_advanced_tab_poce_select_product(idsel, bclear) {
 			return false;
 		},
 		success: function(data) {
-			if (bclear === true) {
-				$("#poce_file_name_path").text("No Selected");
-				$('#config_textarea').prop('disabled', true);
-				if (cmeditor !== null) {
-					cmeditor.setValue("Select file to config...");
-					cmeditor.setOption("readOnly",true);
-				}
-				$("#box_sec_source button").prop('disabled', true);
-				$("#box_bt_save button").prop('disabled', true);
-				$("#box_bt_share button").prop('disabled', true);
-				$("#box_bt_save_as button").prop('disabled', true);
-				$("#box_bt_save_as input").prop('disabled', true).val("");
-				$('form[name=form_config_text_sec_button] input[name=datosok]').val("false");
+			if (bclear == true) {
+				epm_advanced_tab_poce_clear_select();
 			}
 
-			if (data.status === true) {
+			if (data.status == true) {
 				epm_advanced_tab_poce_create_file_list("#select_product_list_files_config", data.file_list, data.product_select, "file");
 				epm_advanced_tab_poce_create_file_list("#select_product_list_files_template_custom", data.template_file_list, data.product_select, "tfile");
 				epm_advanced_tab_poce_create_file_list("#select_product_list_files_user_config", data.sql_file_list, data.product_select, "sql");
 
-				if (bclear === true) {
+				if (bclear == true) {
 					$("#poce_NameProductSelect").text(data.product_select_info.long_name);
 				}
 				fpbxToast('Load date Done!', '', 'success');
@@ -321,11 +405,8 @@ function epm_advanced_tab_poce_select_product(idsel, bclear) {
 	});
 }
 
-function epm_advanced_tab_poce_create_file_list(idname, data, product_select, typefile) {
-	data = typeof data !== "undefined" ? data : "";
-	product_select = typeof product_select !== "undefined" ? product_select : "";
-	typefile = typeof typefile !== "undefined" ? typefile : "";
-
+function epm_advanced_tab_poce_create_file_list(idname, data = "", product_select = "", typefile = "")
+{
 	$(idname + " div.dropdown-menu").empty();
 	if (Array.isArray(data) === false)
 	{
@@ -388,7 +469,7 @@ function epm_advanced_tab_poce_select_file_edit (idpro_select, txtnamefile, idna
 			return false;
 		},
 		success: function(data) {
-			if (data.status === true) {
+			if (data.status == true) {
 				$("#poce_file_name_path").text(data.location);
 				$('#config_textarea').prop('disabled', false);
 				if (cmeditor !== null) {
@@ -397,27 +478,30 @@ function epm_advanced_tab_poce_select_file_edit (idpro_select, txtnamefile, idna
 					cmeditor.setOption("readOnly",false);
 				}
 
-				if (data.type == "file") {
+				if (data.type === "file") {
 					$("#box_bt_save button[name=button_save]").prop('disabled', false);
 					$("#box_bt_save button[name=button_delete]").prop('disabled', true);
-					$("#box_bt_share button").prop('disabled', false);
-
-					$("#box_bt_save_as button").prop('disabled', true);
-					$("#box_bt_save_as input").prop('disabled', true).val("");
-				}
-				else if (data.type == "tfile") {
-					$("#box_bt_save button").prop('disabled', true);
-					$("#box_bt_share button").prop('disabled', true);
 
 					$("#box_bt_save_as button").prop('disabled', false);
 					$("#box_bt_save_as input").prop('disabled', false).val(data.save_as_name_value);
+
+					$("#box_bt_share button").prop('disabled', true);
 				}
-				else if (data.type == "sql") {
-					$("#box_bt_save button").prop('disabled', false);
-					$("#box_bt_share button").prop('disabled', false);
+				else if (data.type === "tfile") {
+					$("#box_bt_save button").prop('disabled', true);
+					$("#box_bt_share button").prop('disabled', true);
 
 					$("#box_bt_save_as button").prop('disabled', true);
 					$("#box_bt_save_as input").prop('disabled', true).val(data.save_as_name_value);
+				}
+				else if (data.type === "sql") {
+					$("#box_bt_save button[name=button_save]").prop('disabled', false);
+					$("#box_bt_save button[name=button_delete]").prop('disabled', false);
+
+					$("#box_bt_save_as button").prop('disabled', false);
+					$("#box_bt_save_as input").prop('disabled', false).val(data.save_as_name_value);
+
+					$("#box_bt_share button").prop('disabled', true);
 				}
 
 				$('form[name=form_config_text_sec_button] input[name=type_file]').val(data.type);
@@ -458,7 +542,7 @@ function epm_advanced_tab_poce_bt_acction (command)
 	if (command === "") { return; }
 	var obj_name = $(command).attr("name").toLowerCase();
 
-	if (obj_name == "bt_source_full_screen")
+	if (obj_name === "bt_source_full_screen")
 	{
 		cmeditor.setOption('fullScreen', !cmeditor.getOption('fullScreen'));
 		return true;
@@ -470,12 +554,10 @@ function epm_advanced_tab_poce_bt_acction (command)
 		return false;
 	}
 
-	var cfg_data;
+	var cfg_data = "";
 	switch(obj_name) {
     	case "button_save":
-    		if (confirm("Are you sure to save your changes will be overwritten irreversibly?") === false) {
-    		    return;
-    		}
+    		if (confirm("Are you sure to save your changes will be overwritten irreversibly?") === false) { return; }
 
     		cfg_data = {
     			module: "endpointman",
@@ -509,9 +591,7 @@ function epm_advanced_tab_poce_bt_acction (command)
     		break;
 
     	case "button_delete":
-    		if (confirm("Are you sure you want to delete this file from the database?") === false) {
-    		    return;
-    		}
+    		if (confirm("Are you sure you want to delete this file from the database?") === false) { return; }
 
     		cfg_data = {
     			module: "endpointman",
@@ -556,7 +636,7 @@ function epm_advanced_tab_poce_bt_acction (command)
 			return false;
 		},
 		success: function(data) {
-			if (data.status === true) {
+			if (data.status == true) {
 				switch(obj_name) {
 			    	case "button_save":
 
@@ -572,8 +652,8 @@ function epm_advanced_tab_poce_bt_acction (command)
 						$("#poce_file_name_path").text(data.location);
 						$("#box_bt_save button").prop('disabled', false);
 						$("#box_bt_share button").prop('disabled', false);
-						$("#box_bt_save_as button").prop('disabled', true);
-						$("#box_bt_save_as input").prop('disabled', true);
+						$("#box_bt_save_as button").prop('disabled', false);
+						$("#box_bt_save_as input").prop('disabled', false);
 
 						epm_advanced_tab_poce_select_product(epm_advanced_get_value_by_form("form_config_text_sec_button","product_select"), false);
 						fpbxToast(data.message, 'Save as!', 'success');
@@ -635,9 +715,8 @@ function epm_advanced_tab_oui_manager_grid_customFormatter(value, row, index){
 }
 
 
-function epm_advanced_tab_oui_manager_refresh_table(showmsg)
+function epm_advanced_tab_oui_manager_refresh_table(showmsg = true)
 {
-	showmsg = typeof showmsg !== "undefined" ? showmsg : true;
 	$("#mygrid").bootstrapTable('refresh');
 	if (showmsg === true) {
 		fpbxToast("Table Refrash Ok!", '', 'success');
@@ -683,8 +762,8 @@ function epm_advanced_tab_oui_manager_bt_del(id_del)
 	}
 }
 
-function epm_advanced_tab_oui_manager_ajax (data_ajax){
-	data_ajax = typeof dataajax !== "undefined" ? data_ajax : "";
+function epm_advanced_tab_oui_manager_ajax (data_ajax = "")
+{
 	var response = false;
 	if (data_ajax !== "") {
 		$.ajax({
@@ -717,22 +796,20 @@ function epm_advanced_tab_oui_manager_ajax (data_ajax){
 
 
 // INI: FUNCTION TAB SETTING
-function epm_advanced_tab_setting_input_value_change_bt(sNameID, sValue, bSaveChange, bSetFocus)
+function epm_advanced_tab_setting_input_value_change_bt(sNameID = "", sValue = "", bSaveChange = true, bSetFocus = false)
 {
-	sValue = typeof sValue !== "undefined" ? sValue : "";
-	bSaveChange = typeof bSaveChange !== "undefined" ? bSaveChange : true;
-	bSetFocus = typeof bSetFocus !== "undefined" ? bSetFocus : false;
+	if (sNameID === "" ) { return false; }
+
 	$(sNameID).val(sValue);
 	if (bSetFocus === true) { $(sNameID).focus(); }
 	if (bSaveChange === true) {
 		epm_advanced_tab_setting_input_change(sNameID);
-
 	}
 }
 
 function epm_advanced_tab_setting_input_change(obt)
 {
-	idtab = epm_global_get_tab_actual();
+	var idtab = epm_global_get_tab_actual();
 	if (idtab === "") { return; }
 
 	var obt_name = $(obt).attr("name").toLowerCase();
@@ -758,7 +835,7 @@ function epm_advanced_tab_setting_input_change(obt)
 			return false;
 		},
 		success: function(data) {
-			if (data.status === true) {
+			if (data.status == true) {
 				if (obt_val == "1")
 				{
 					//true
@@ -784,4 +861,3 @@ function epm_advanced_tab_setting_input_change(obt)
 		},
 	});
 }
-// END: FUNCTION TAB SETTING

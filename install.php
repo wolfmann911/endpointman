@@ -1038,12 +1038,11 @@ if (empty($epmdbversion)) {
     $db->query($sql);
 
     out('Creating symlink to web provisioner');
-		if(!file_exists($amp_conf['AMPWEBROOT'] . "/provisioning")) {
-			if (!symlink(LOCAL_PATH . "provisioning", $amp_conf['AMPWEBROOT'] . "/provisioning")) {
-					//out("<strong>Your permissions are wrong on ".$amp_conf['AMPWEBROOT'].", web provisioning link not created!</strong>");
-			}
+	if(!file_exists($amp_conf['AMPWEBROOT'] . "/provisioning")) {
+		if (!symlink(LOCAL_PATH . "provisioning", $amp_conf['AMPWEBROOT'] . "/provisioning")) {
+			//out("<strong>Your permissions are wrong on ".$amp_conf['AMPWEBROOT'].", web provisioning link not created!</strong>");
 		}
-
+	}
 }
 
 out("Update Version Number to " . $epmxmlversion);
