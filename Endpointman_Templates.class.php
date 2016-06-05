@@ -85,7 +85,7 @@ class Endpointman_Templates
 	
 	public function getRightNav($request) {
 		if(isset($request['subpage']) && $request['subpage'] == "editor") {
-			return load_view(__DIR__."/views/epm_templates/rnav.php",array());
+			return load_view(__DIR__."/views/epm_templates/editor.views.rnav.php",array());
 		} else {
 			return '';
 		}

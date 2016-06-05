@@ -29,7 +29,7 @@ if ((! isset($_REQUEST['subpage'])) || ($_REQUEST['subpage'] == "")) {
 				<div class="col-sm-12">
 					<div class="fpbx-container">
 						<div class="display <?php echo ($key == "editor") ? "full" : "no"?>-border">
-							<?php echo $page['content'] ?>
+							<?php include($page['page']); ?>			
 						</div>
 					</div>
 				</div>

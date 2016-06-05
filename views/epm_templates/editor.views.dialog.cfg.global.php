@@ -88,7 +88,6 @@
 	$product_list =& sql($product_list,'getAll', DB_FETCHMODE_ASSOC);
 	*/
 	
-	
     if($_REQUEST['custom'] == 0) {
         //This is a group template
         $sql = 'SELECT global_settings_override FROM endpointman_template_list WHERE id = '.$_REQUEST['idsel'];

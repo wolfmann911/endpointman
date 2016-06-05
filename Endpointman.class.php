@@ -311,6 +311,7 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 				
 			case "epm_templates":
 				$this->epm_templates->myShowPage($this->pagedata);
+				return $this->pagedata;
 				break;
 				
 			case "epm_config":
@@ -339,10 +340,10 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 	
 	//http://wiki.freepbx.org/display/FOP/Adding+Floating+Right+Nav+to+Your+Module
 	public function getRightNav($request) {
-		$module_sec = isset($request['module_sec'])? trim($request['module_sec']) : '';
-		if ($request == "") { return ''; }
+		if (! isset($_REQUEST['display'])) 
+			return '';
 		
-		switch($module_sec)
+		switch($_REQUEST['display'])
 		{
 			case "epm_devices": 
 				return $this->epm_devices->getRightNav($request);
@@ -359,8 +360,11 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 			case "epm_templates": 
 				return $this->epm_templates->getRightNav($request);
 				break;
+				
+			default:
+		        return '';
+			
 		}
-        return '';
 	}
 	
 	//http://wiki.freepbx.org/pages/viewpage.action?pageId=29753755
