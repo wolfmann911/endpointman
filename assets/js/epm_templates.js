@@ -7,20 +7,29 @@ function epm_templates_document_ready () {
 	$('#AddDlgModal_bt_new').on("click", function() { epm_tamplates_grid_add(); });
 	
 	$('#NewProductSelect').on('change', function() { epm_templates_add_NewProductSelect_Change (this); });
- 
-	$('#coda-slider-9').codaSlider({
-		dynamicArrows: false,
-		continuous: false
-	}); 
+
+	//http://kevinbatdorf.github.io/liquidslider/examples/page1.html#right
+	$('#main-slider').liquidSlider({
+		includeTitle:false,
+		continuous:false,
+		slideEaseFunction: "easeInOutCubic",
+		preloader:true,
+		onload: function() {
+			this.alignNavigation();
+			$('.liquid-slider').css('visibility', 'visible');
+		}
+	});
 }
 
 function epm_templates_windows_load (nTab = "") {
-
+	
 }
 
 function epm_templates_change_tab (nTab = "") {
 
 }
+
+
 
 
 

@@ -158,6 +158,7 @@
 	<div class="">
 		<div class="row">
 			<div class="col-sm-12">
+            
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<h3 class="panel-title"><i class="fa  fa-code"></i> <?php echo _("Example of Variables allowed in boxes")?></h3>
@@ -173,6 +174,7 @@
 						</ul>
 					</div>
 				</div>
+                
 			</div>
 		</div>
 	</div>
@@ -181,8 +183,134 @@
 	
 	
 	
+    
+	<div class="">
+		<div class="row">
+			<div class="col-sm-12">
+
 	
 	
+	<div id="main-slider" class="liquid-slider">
+		<?php 
+		foreach($dtemplate['template_editor'] as $row) {
+		?>
+				<div>
+					<h2 class="title"><?php echo $row['title'];?></h2>
+					<table width="100%" border="0" cellspacing="0" cellpadding="0">
+						<?php
+						
+						foreach($row['data'] as $srow) {
+							echo "<tr>";
+							switch ($srow['type']) {
+								case 'input':
+									echo '<td nowrap>'.(! isset($srow['tooltip']) ? $srow['description'] : '<a href="#" class="info">'.$srow['description'].'<span>'.$srow['tooltip'].'</span></a>').':</td><td nowrap><input type="text" name="'.$srow['key'].'" id="'.$srow['key'].'" value="'.$srow['value'].'" size="'.(isset($srow['max_chars']) ? $srow['max_chars'] : "90" ).'">';
+									break;
+									
+								case 'textarea':
+									echo '<td nowrap>'.(! isset($srow['tooltip']) ? $srow['description'] : '<a href="#" class="info">'.$srow['description'].'<span>'.$srow['tooltip'].'</span></a>').':</td><td nowrap><textarea rows="'.(isset($srow['rows']) ? $srow['rows'] : "2" ).'" cols="'.(isset($srow['cols']) ? $srow['cols'] : "20" ).'" name="'.$srow['key'].'" id="'.$srow['key'].'">'.$srow['value'].'</textarea>';
+									break;
+									
+								case 'radio':
+									echo '<td nowrap>'.(! isset($srow['tooltip']) ? $srow['description'] : '<a href="#" class="info">'.$srow['description'].'<span>'.$srow['tooltip'].'</span></a>').':</td><td nowrap>';
+									foreach($srow['data'] as $lrow) {
+										echo '[<label>';
+										echo (! isset($lrow['tooltip']) ? $lrow['description'] : '<a href="#" class="info">'.$lrow['description'].'<span>'.$lrow['tooltip'].'</span></a>').':';
+										//echo '<input type="radio" name="'.$lrow['key'].'" id="'.$lrow['key'].'" value="'.$lrow['value'].'" '.(array_key_exists('checked', $lrow['value']) ? $lrow['checked'] : '').' >';
+										echo '<input type="radio" name="'.$lrow['key'].'" id="'.$lrow['key'].'" value="'.$lrow['value'].'" >';
+										echo '</label>]';
+									}
+									break;
+									
+								case 'list':
+									echo '<td nowrap>'.(! isset($srow['tooltip']) ? $srow['description'] : '<a href="#" class="info">'.$srow['description'].'<span>'.$srow['tooltip'].'</span></a>').':</td><td nowrap>';
+									echo '<select name="'.$srow['key'].'" id="'.$srow['key'].'">';
+									foreach($srow['data'] as $lrow) 
+									{
+										//echo '<option value="'.$lrow['value'].'" '.(array_key_exists('selected',$lrow['selected'])? $lrow['value'] : '').' >'.$lrow['description'].'</option>';
+										echo '<option value="'.$lrow['value'].'" >'.$lrow['description'].'</option>';
+									}
+									echo '</select>';
+									break;
+									
+									
+								case 'checkbox':
+									echo '<td nowrap>'.(! isset($srow['tooltip']) ? $srow['description'] : '<a href="#" class="info">'.$srow['description'].'<span>'.$srow['tooltip'].'</span></a>').':</td><td nowrap><input type="checkbox" name="'.$srow['key'].'" id="'.$srow['key'].'" value="'.$srow['value'].'">';
+									break;
+									
+								case 'break':
+									echo '<td nowrap colspan="2">&nbsp;';
+									break;
+										
+								case 'group':
+									echo '<td nowrap colspan="2"><hr><h3>'.(! isset($srow['tooltip']) ? $srow['description'] : '<a href="#" class="info">'.$srow['description'].'<span>'.$srow['tooltip'].'</span></a>').'</H3>';
+									break;
+											
+								case 'header':
+									echo '<td nowrap colspan="2"><strong>'.(! isset($srow['tooltip']) ? $srow['description'] : '<a href="#" class="info">'.$srow['description'].'<span>'.$srow['tooltip'].'</span></a>').'</strong>';
+									break;
+							}
+							
+							if (isset($srow['aried'])) {
+								echo '<label><input type="checkbox" name="ari_'.$srow['ari']['key'].'" '.(isset($srow['ari']['checked']) ? $srow['ari']['checked'] : '' ).' >End User Editable (<a href="http://projects.colsolgrp.net/documents/29" target="_blank">Through ARI Module</a>)</label></td>';
+							}
+							else {
+								echo "</td>";
+							}
+							echo "</tr>";
+						}
+						
+						?>
+					</table>
+
+					
+					
+				</div>
+		<?php	
+		}
+		?>
+
+	</div><!-- .coda-slider-wrapper -->
+    
+    
+    
+    		</div>
+	    </div>
+    </div>
+    
+    
+	<input name="id" id="id" type="hidden" value="<?php echo $request['idsel'] ?>">
+	<input name="custom" id="custom" type="hidden" value="<?php echo $request['custom'] ?>">
+	
+	<label>Reboot Phone(s) <input type='checkbox' name='epm_reboot'></label>
+	<br />
+	<button type="submit" name="button_save_template"><i class='icon-save blue'></i> <?php echo _('Save Template');?></button>
+
+
+<?php 
+
+return;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+
+
 	
 	<div class="coda-slider-wrapper">
 		<div class="coda-slider preload" id="coda-slider-9">
@@ -266,26 +394,8 @@
 		?>
 		</div><!-- .coda-slider -->
 	</div><!-- .coda-slider-wrapper -->
-	<input name="id" id="id" type="hidden" value="<?php echo $request['idsel'] ?>">
-	<input name="custom" id="custom" type="hidden" value="<?php echo $request['custom'] ?>">
-	
-	<label>Reboot Phone(s) <input type='checkbox' name='epm_reboot'></label>
-	<br />
-	<button type="submit" name="button_save_template"><i class='icon-save blue'></i> <?php echo _('Save Template');?></button>
 
-
-<?php 
-
-return;
-
-
-
-
-
-
-
-
-
+*/
 
 
 
