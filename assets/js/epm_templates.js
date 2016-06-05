@@ -25,22 +25,9 @@ function epm_templates_change_tab (nTab = "") {
 
 
 
-
-
-
-
-
-
-
-
-function epm_templates_rnav_format (value, row, index){
-	var html = '';
-	html += '<a href="?display=epm_templates&subpage=editor&idsel='+row.id+'">';
-	html += value;
-	html += '</a>&nbsp;';
-    return html;
-}
-
+$("#table-all-side").on('click-row.bs.table',function(e,row,elem){
+	window.location = '?display=epm_templates&subpage=editor&custom='+row['custom']+'&idsel='+row['id'];
+})
 
 function epm_templates_grid_FormatThEnabled(value, row, index){
 	var html = '';
