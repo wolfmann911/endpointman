@@ -2,7 +2,7 @@
 	<rawname>endpointman</rawname>
 	<repo>unsupported</repo>
 	<name>OSS PBX End Point Manager</name>
-	<version>13.0.7.4</version>
+	<version>13.0.7.5</version>
 	<type>setup</type>
 	<category>Connectivity</category>
 	<license>GPLv2+</license>
@@ -21,6 +21,7 @@
 		Pull Requests can be made to either of these and are encouraged.
     </description>
 		<changelog>
+		*13.0.7.5* Update CSS Plugin JQuery (Liquid Slider), Fix Bug RightNav, continue update...
 		*13.0.7.4* Update Plugin JQuery (Liquid Slider), continue update...
 		*13.0.7.3* Fix RightNav edit template, Continue to update...
 		*13.0.7.2* Fix Bugs, Continue to update...

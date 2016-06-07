@@ -18,7 +18,7 @@
   top:0;
   left:0;
   z-index:2;
-  
+
 	border-radius: 5px 5px 5px 5px;
 	-moz-border-radius: 5px 5px 5px 5px;
 	-webkit-border-radius: 5px 5px 5px 5px;
@@ -29,19 +29,35 @@
   clear: both;
   overflow: auto;
   position: relative;
+  
+	border-radius: 25px 25px 25px 25px;
+	-moz-border-radius: 25px 25px 25px 25px;
+	-webkit-border-radius: 25px 25px 25px 25px;
+	
+	padding: 15px;
+  	-webkit-box-shadow: 0px 0px 10px 5px rgba(0,0,0,0.4);
+	-moz-box-shadow: 0px 0px 10px 5px rgba(0,0,0,0.4);
+	box-shadow: 0px 0px 10px 5px rgba(0,0,0,0.4);
+	
+	margin-bottom: 20px;
 }
 .liquid-slider {
   width: 100%;
-  margin: 0 auto;
+/*  margin: 0 auto;*/
   float: left;
   overflow: hidden;
   position: relative;
     
 	visibility: hidden;
-	background: #e7a61a;	
-	border-radius: 0px 25px 25px 25px;
-	-moz-border-radius: 0px 25px 25px 25px;
-	-webkit-border-radius: 0px 25px 25px 25px;
+	
+	background: #e7a61a;
+	border-radius: 25px 25px 25px 25px;
+	-moz-border-radius: 25px 25px 25px 25px;
+	-webkit-border-radius: 25px 25px 25px 25px;	
+	
+  	-webkit-box-shadow: 0px 0px 10px 5px rgba(0,0,0,0.4);
+	-moz-box-shadow: 0px 0px 10px 5px rgba(0,0,0,0.4);
+	box-shadow: 0px 0px 10px 5px rgba(0,0,0,0.4);
 }
 .arrows .liquid-slider {
   /* Margin between slider and arrows */
@@ -77,52 +93,71 @@
   position:relative;
 }
 
+
+
+
+
+
+
 /*** Tabbed Navigation ***/
 .ls-nav {
   overflow:hidden;
   clear:both;
+  
+  padding: 20px;
 }
 .ls-nav a {
-	display: block;
+	display: inline-block;
 	color: white;
     text-align: center;
     padding: 14px 16px;
     text-decoration: none;	
 	outline:0;
+
+	text-shadow: 3px 3px 4px rgba(255, 255, 255, 0.76);
+	font-weight: bold;
+	text-transform: capitalize;
 }
 .ls-nav a:hover {
 	background-color: #111;
-	text-shadow: none;
 }
 .ls-nav .current a, .ls-nav .current a:hover {
 	background-color: #4CAF50;
+	text-shadow: 3px 3px 4px rgba(0, 0, 0, 0.76);
 }
 .currentCrossLink {
-  font-weight: bold;
+  /*font-weight: bold;*/
 }
 .ls-nav ul {  
 	clear: both;
-	display: block;
+	display: inline-block;
 	list-style-type: none;
-    margin: auto;  /* ante era 0 */
+    margin: 0 auto;
     padding: 0;
     overflow: hidden;
     background-color: #333;
 	
-	border-radius: 25px 25px 0px 0px;
-	-moz-border-radius: 25px 25px 0px 0px;
-	-webkit-border-radius: 25px 25px 0px 0px;
+	border-radius: 25px 25px 25px 25px;
+	-moz-border-radius: 25px 25px 25px 25px;
+	-webkit-border-radius: 25px 25px 25px 25px;
+	
+	-webkit-box-shadow: 0px 0px 10px 5px rgba(0,0,0,0.4);
+	-moz-box-shadow: 0px 0px 10px 5px rgba(0,0,0,0.4);
+	box-shadow: 0px 0px 10px 5px rgba(0,0,0,0.4);
+	
+	position: relative;
+	left: 50%;
+	transform: translate(-50%);
 	
 	/*width: 100%;  //SI SE ACTIVA ESTA LINEA SE VERA EL LISTADO EN MODO MOVIL*/
 	}
 .ls-nav ul li, .ls-nav ul li a  {
-	display:block;
-	float: left;
+	display: inline-block;
 }
 .ls-nav ul li a {
     color: white;
     text-align: center;
-    padding: 15px 20px;
+    padding: 15px 40px;
     text-decoration: none;
 }
 .ls-nav ul li a:hover {
@@ -238,11 +273,11 @@
 }
 .ls-responsive .ls-nav-left-arrow {
   position: absolute;
-  left: 0;
+  left: 20px;
   z-index: 2;
 }
 .ls-responsive .ls-nav-right-arrow {
   position: absolute;
-  right: 0;
+  right: 20px;
   z-index: 2;
 }
