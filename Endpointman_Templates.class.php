@@ -91,6 +91,42 @@ class Endpointman_Templates
 		}
 	}
 	
+	public function getActionBar($request) {
+		$buttons = array();
+        switch($request['subpage']) {
+            case 'editor':
+                $buttons = array(
+                    'save' => array(
+                        'name' => 'save',
+                        'id' => 'save',
+                        'value' => _('Save Template'),
+                        'hidden' => ''
+                    ),
+                    'saverebootphones' => array(
+                        'name' => 'saverebootphones',
+                        'id' => 'saverebootphones',
+                        'value' => _('Save Template & Reboot Phone(s)'),
+                        'hidden' => ''
+                    )
+                );
+            	break;
+				
+			default:
+        }
+        return $buttons;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	/**** FUNCIONES SEC MODULO "epm_template\manager" ****/
 	public function epm_templates_del_template() 

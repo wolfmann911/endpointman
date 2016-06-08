@@ -40,3 +40,12 @@ if ((! isset($_REQUEST['subpage'])) || ($_REQUEST['subpage'] == "")) {
 	}
 	?>
 </div>
+
+<?php
+
+if ($_REQUEST['subpage'] == "editor")  {
+	echo "<br /><br /><br />";
+}
+
+
+?>

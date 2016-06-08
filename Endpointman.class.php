@@ -369,6 +369,31 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 	
 	//http://wiki.freepbx.org/pages/viewpage.action?pageId=29753755
 	public function getActionBar($request) {
+			if (! isset($_REQUEST['display'])) 
+			return '';
+		
+		switch($_REQUEST['display'])
+		{
+			case "epm_devices": 
+				return $this->epm_devices->getActionBar($request);
+				break;
+			
+			case "epm_config": 
+				return $this->epm_config->getActionBar($request);
+				break;
+				
+			case "epm_advanced": 
+				return $this->epm_advanced->getActionBar($request);
+				break;
+				
+			case "epm_templates": 
+				return $this->epm_templates->getActionBar($request);
+				break;
+				
+			default:
+		        return '';
+			
+		}
 	}
 	
 	public function install() {

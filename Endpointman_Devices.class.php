@@ -64,12 +64,11 @@ class Endpointman_Devices
 	}
 	
 	public function getRightNav($request) {
-		
+		return "";
 	}
-
-
-
-
 	
+	public function getActionBar($request) {
+		return "";
+	}
 	
 }

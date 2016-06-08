@@ -244,7 +244,11 @@ class Endpointman_Advanced
 	}
 	
 	public function getRightNav($request) {
-		
+		return "";
+	}
+	
+	public function getActionBar($request) {
+		return "";
 	}
 	
 	

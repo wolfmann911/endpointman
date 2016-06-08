@@ -187,105 +187,298 @@
 	<div class="">
 		<div class="row">
 			<div class="col-sm-12">
-
-	
-	
-	<div id="main-slider" class="liquid-slider">
-		<?php 
-		foreach($dtemplate['template_editor'] as $row) {
-		?>
-				<div>
-					<h2 class="title"><?php echo $row['title'];?></h2>
-					<table width="100%" border="0" cellspacing="0" cellpadding="0">
-						<?php
-						
-						foreach($row['data'] as $srow) {
-							echo "<tr>";
+				<div id="main-slider" class="liquid-slider">
+				<?php foreach($dtemplate['template_editor'] as $row) : ?> <!-- INI foreach de tabs -->
+					<div>
+                        <h2 class="title"><?php echo $row['title'];?></h2>
+                    	<?php 
+						foreach($row['data'] as $srow) 	//INI foreach objetos de cada tab
+						{
 							switch ($srow['type']) {
 								case 'input':
-									echo '<td nowrap>'.(! isset($srow['tooltip']) ? $srow['description'] : '<a href="#" class="info">'.$srow['description'].'<span>'.$srow['tooltip'].'</span></a>').':</td><td nowrap><input type="text" name="'.$srow['key'].'" id="'.$srow['key'].'" value="'.$srow['value'].'" size="'.(isset($srow['max_chars']) ? $srow['max_chars'] : "90" ).'">';
+									//INI INPUT-TEXT
+									?>
+                                    <div class="element-container">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="row">
+                                                    <div class="form-group">
+                                                        <div class="col-md-3">
+                                                            <label class="control-label" for="<?php echo $srow['key']; ?>">
+                                                            <?php 
+                                                            if (! isset($srow['tooltip'])) { echo $srow['description']; }
+                                                            else { echo '<a href="#" class="info">'.$srow['description'].'<span>'.$srow['tooltip'].'</span></a>'; }
+                                                            ?>
+                                                            </label>
+                                                            <i class="fa fa-question-circle fpbx-help-icon" data-for="<?php echo $srow['key']; ?>"></i>
+                                                        </div>
+                                                        <div class="col-md-9">
+															<input type="text" class="form-control" id="<?php echo $srow['key']; ?>" name="<?php echo $srow['key']; ?>" placeholder="" value="<?php echo $srow['value']; ?>" size="<?php echo (isset($srow['max_chars']) ? $srow['max_chars'] : "90" ); ?>">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <span class="help-block fpbx-help-block" id="<?php echo $srow['key']; ?>-help">Texto ayuda ("<?php echo $srow['key']; ?>")!</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php
+									//END INPUT-TEXT
 									break;
 									
 								case 'textarea':
-									echo '<td nowrap>'.(! isset($srow['tooltip']) ? $srow['description'] : '<a href="#" class="info">'.$srow['description'].'<span>'.$srow['tooltip'].'</span></a>').':</td><td nowrap><textarea rows="'.(isset($srow['rows']) ? $srow['rows'] : "2" ).'" cols="'.(isset($srow['cols']) ? $srow['cols'] : "20" ).'" name="'.$srow['key'].'" id="'.$srow['key'].'">'.$srow['value'].'</textarea>';
+									//INI TEXTAREA
+									?>
+                                     <div class="element-container">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="row">
+                                                    <div class="form-group">
+                                                        <div class="col-md-3">
+                                                            <label class="control-label" for="<?php echo $srow['key']; ?>">
+                                                            <?php 
+                                                            if (! isset($srow['tooltip'])) { echo $srow['description']; }
+                                                            else { echo '<a href="#" class="info">'.$srow['description'].'<span>'.$srow['tooltip'].'</span></a>'; }
+                                                            ?>
+                                                            </label>
+                                                            <i class="fa fa-question-circle fpbx-help-icon" data-for="<?php echo $srow['key']; ?>"></i>
+                                                        </div>
+                                                        <div class="col-md-9">
+	                      									<textarea class="form-control" id="<?php echo $srow['key']; ?>" name="<?php echo $srow['key']; ?>" rows="<?php echo (isset($srow['rows']) ? $srow['rows'] : "2" ); ?>" cols="<?php echo (isset($srow['cols']) ? $srow['cols'] : "20" ); ?>"><?php echo $srow['value']; ?></textarea>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <span class="help-block fpbx-help-block" id="<?php echo $srow['key']; ?>-help">Texto ayuda ("<?php echo $srow['key']; ?>")!</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php
+									//END TEXTAREA
 									break;
 									
 								case 'radio':
-									echo '<td nowrap>'.(! isset($srow['tooltip']) ? $srow['description'] : '<a href="#" class="info">'.$srow['description'].'<span>'.$srow['tooltip'].'</span></a>').':</td><td nowrap>';
-									foreach($srow['data'] as $lrow) {
-										echo '[<label>';
-										echo (! isset($lrow['tooltip']) ? $lrow['description'] : '<a href="#" class="info">'.$lrow['description'].'<span>'.$lrow['tooltip'].'</span></a>').':';
-										//echo '<input type="radio" name="'.$lrow['key'].'" id="'.$lrow['key'].'" value="'.$lrow['value'].'" '.(array_key_exists('checked', $lrow['value']) ? $lrow['checked'] : '').' >';
-										echo '<input type="radio" name="'.$lrow['key'].'" id="'.$lrow['key'].'" value="'.$lrow['value'].'" >';
-										echo '</label>]';
-									}
+									//INI RADIO
+									?>
+                                     <div class="element-container">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="row">
+                                                    <div class="form-group">
+                                                        <div class="col-md-3">
+                                                            <label class="control-label" for="<?php echo $srow['key']; ?>">
+                                                            <?php 
+                                                            if (! isset($srow['tooltip'])) { echo $srow['description']; }
+                                                            else { echo '<a href="#" class="info">'.$srow['description'].'<span>'.$srow['tooltip'].'</span></a>'; }
+                                                            ?>
+                                                            </label>
+                                                            <i class="fa fa-question-circle fpbx-help-icon" data-for="<?php echo $srow['key']; ?>"></i>
+                                                        </div>
+                                                        <div class="col-md-9 radioset">
+                                                        	<?php
+															foreach($srow['data'] as $lrow) {
+																/*
+																echo '[<label>';
+																echo (! isset($lrow['tooltip']) ? $lrow['description'] : '<a href="#" class="info">'.$lrow['description'].'<span>'.$lrow['tooltip'].'</span></a>').':';
+																//echo '<input type="radio" name="'.$lrow['key'].'" id="'.$lrow['key'].'" value="'.$lrow['value'].'" '.(array_key_exists('checked', $lrow['value']) ? $lrow['checked'] : '').' >';
+																echo '<input type="radio" name="'.$lrow['key'].'" id="'.$lrow['key'].'" value="'.$lrow['value'].'" >';
+																echo '</label>]';
+																
+																<input type="radio" class="form-control" id="addtocdrno" name="addtocdr" value="0" <?php echo ($addtocdr == '1' ? '' : 'CHECKED'); ?>>
+																<label for="addtocdrno"><?php echo _("No")?></label>
+																*/
+		                                                        echo '<input type="radio" class="form-control" id="'.$lrow['key'].'" name="'.$srow['key'].'" value="'.$lrow['value'].'" '.($lrow['value'] == $lrow['checked'] ? 'CHECKED' : '').'>';
+																echo '<label for="'.$lrow['key'].'">'.(! isset($lrow['tooltip']) ? $lrow['description'] : '<a href="#" class="info">'.$lrow['description'].'<span>'.$lrow['tooltip'].'</span></a>').'</label>';
+															}
+															?>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <span class="help-block fpbx-help-block" id="<?php echo $srow['key']; ?>-help">Texto ayuda ("<?php echo $srow['key']; ?>")!</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php
+									//END RAIDO
 									break;
 									
 								case 'list':
-									echo '<td nowrap>'.(! isset($srow['tooltip']) ? $srow['description'] : '<a href="#" class="info">'.$srow['description'].'<span>'.$srow['tooltip'].'</span></a>').':</td><td nowrap>';
-									echo '<select name="'.$srow['key'].'" id="'.$srow['key'].'">';
-									foreach($srow['data'] as $lrow) 
-									{
-										//echo '<option value="'.$lrow['value'].'" '.(array_key_exists('selected',$lrow['selected'])? $lrow['value'] : '').' >'.$lrow['description'].'</option>';
-										echo '<option value="'.$lrow['value'].'" >'.$lrow['description'].'</option>';
-									}
-									echo '</select>';
+									//INI LIST
+									?>
+                                    <div class="element-container">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="row">
+                                                    <div class="form-group">
+                                                        <div class="col-md-3">
+                                                            <label class="control-label" for="<?php echo $srow['key']; ?>">
+                                                            <?php 
+                                                            if (! isset($srow['tooltip'])) { echo $srow['description']; }
+                                                            else { echo '<a href="#" class="info">'.$srow['description'].'<span>'.$srow['tooltip'].'</span></a>'; }
+                                                            ?>
+                                                            </label>
+                                                            <i class="fa fa-question-circle fpbx-help-icon" data-for="<?php echo $srow['key']; ?>"></i>
+                                                        </div>
+                                                        <div class="col-md-9">
+                                                        	<?php
+	                    									echo '<select name="'.$srow['key'].'" id="'.$srow['key'].'" class="form-control">';
+															foreach($srow['data'] as $lrow) 
+															{
+																//echo '<option value="'.$lrow['value'].'" '.(array_key_exists('selected',$lrow['selected'])? $lrow['value'] : '').' >'.$lrow['description'].'</option>';
+																echo '<option value="'.$lrow['value'].'" '.($lrow['value'] == $lrow['selected'] ? 'selected' : '').' >'.$lrow['description'].'</option>';
+															}
+															echo '</select>';
+															?>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <span class="help-block fpbx-help-block" id="<?php echo $srow['key']; ?>-help">Texto ayuda ("<?php echo $srow['key']; ?>")!</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php
+									//END LIST
 									break;
 									
 									
 								case 'checkbox':
-									echo '<td nowrap>'.(! isset($srow['tooltip']) ? $srow['description'] : '<a href="#" class="info">'.$srow['description'].'<span>'.$srow['tooltip'].'</span></a>').':</td><td nowrap><input type="checkbox" name="'.$srow['key'].'" id="'.$srow['key'].'" value="'.$srow['value'].'">';
+									//INI CHEBOX
+									//PENDIENTE UPATEAR.....
+									?>
+                                    <div class="element-container">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="row">
+                                                    <div class="form-group">
+                                                        <div class="col-md-3">
+                                                            <label class="control-label" for="<?php echo $srow['key']; ?>">
+                                                            <?php 
+                                                            if (! isset($srow['tooltip'])) { echo $srow['description']; }
+                                                            else { echo '<a href="#" class="info">'.$srow['description'].'<span>'.$srow['tooltip'].'</span></a>'; }
+                                                            ?>
+                                                            </label>
+                                                            <i class="fa fa-question-circle fpbx-help-icon" data-for="<?php echo $srow['key']; ?>"></i>
+                                                        </div>
+                                                        <div class="col-md-9">
+															<input type="checkbox" class="form-control" name="<?php echo $srow['key']; ?>" id="<?php echo $srow['key']; ?>" value="<?php echo $srow['value']; ?>">';
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <span class="help-block fpbx-help-block" id="<?php echo $srow['key']; ?>-help">Texto ayuda ("<?php echo $srow['key']; ?>")!</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php
+									//END CHEKBOX
 									break;
 									
 								case 'break':
-									echo '<td nowrap colspan="2">&nbsp;';
+									//INI BREAK
+									?>
+                                     <div class="element-container">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="row">
+                                                    <div class="form-group">
+                                                        <div class="col-md-12">&nbsp;</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php
+									//END BREAK
 									break;
 										
 								case 'group':
-									echo '<td nowrap colspan="2"><hr><h3>'.(! isset($srow['tooltip']) ? $srow['description'] : '<a href="#" class="info">'.$srow['description'].'<span>'.$srow['tooltip'].'</span></a>').'</H3>';
+									//INI group
+									?>
+                                     <div class="element-container">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="row">
+                                                    <div class="form-group">
+                                                        <div class="col-md-12">
+                                                        	<hr>
+															<?php echo '<h3>'.(! isset($srow['tooltip']) ? $srow['description'] : '<a href="#" class="info">'.$srow['description'].'<span>'.$srow['tooltip'].'</span></a>').'</h3><br />'; ?>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php
+									//END group
 									break;
 											
 								case 'header':
-									echo '<td nowrap colspan="2"><strong>'.(! isset($srow['tooltip']) ? $srow['description'] : '<a href="#" class="info">'.$srow['description'].'<span>'.$srow['tooltip'].'</span></a>').'</strong>';
+									//INI HEADER
+									?>
+                                     <div class="element-container">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="row">
+                                                    <div class="form-group">
+                                                        <div class="col-md-12">
+                                                        	<?php echo '<strong>'.(! isset($srow['tooltip']) ? $srow['description'] : '<a href="#" class="info">'.$srow['description'].'<span>'.$srow['tooltip'].'</span></a>').'</strong><br/>'; ?>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php
+									//END HEADER
 									break;
 							}
 							
 							if (isset($srow['aried'])) {
-								echo '<label><input type="checkbox" name="ari_'.$srow['ari']['key'].'" '.(isset($srow['ari']['checked']) ? $srow['ari']['checked'] : '' ).' >End User Editable (<a href="http://projects.colsolgrp.net/documents/29" target="_blank">Through ARI Module</a>)</label></td>';
+								//INI ARIED
+								?>
+								 <div class="element-container">
+									<div class="row">
+										<div class="col-md-12">
+											<div class="row">
+												<div class="form-group">
+													<div class="col-md-12">
+														<?php echo '<label><input type="checkbox" name="ari_'.$srow['ari']['key'].'" '.(isset($srow['ari']['checked']) ? $srow['ari']['checked'] : '' ).' >End User Editable (<a href="http://projects.colsolgrp.net/documents/29" target="_blank">Through ARI Module</a>)</label>'; ?>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<?php
+								//END ARIEND
 							}
-							else {
-								echo "</td>";
-							}
-							echo "</tr>";
-						}
-						
+							
+						} //END foreach objetos de cada tabs
 						?>
-					</table>
-
-					
-					
+	                    </div>
+					<?php endforeach; ?> <!-- END foreach tabs -->
 				</div>
-		<?php	
-		}
-		?>
-
-	</div><!-- .coda-slider-wrapper -->
-    
-    
-    
     		</div>
 	    </div>
     </div>
-    
-    
-	<input name="id" id="id" type="hidden" value="<?php echo $request['idsel'] ?>">
-	<input name="custom" id="custom" type="hidden" value="<?php echo $request['custom'] ?>">
-	
-	<label>Reboot Phone(s) <input type='checkbox' name='epm_reboot'></label>
-	<br />
-	<button type="submit" name="button_save_template"><i class='icon-save blue'></i> <?php echo _('Save Template');?></button>
-
-
 <?php 
 
 return;
@@ -309,6 +502,17 @@ return;
 
 
 /*
+
+<input name="id" id="id" type="hidden" value="<?php echo $request['idsel'] ?>">
+	<input name="custom" id="custom" type="hidden" value="<?php echo $request['custom'] ?>">
+	
+	<label>Reboot Phone(s) <input type='checkbox' name='epm_reboot'></label>
+	<br />
+	<button type="submit" name="button_save_template"><i class='icon-save blue'></i> <?php echo _('Save Template');?></button>
+
+
+
+
 
 
 	
