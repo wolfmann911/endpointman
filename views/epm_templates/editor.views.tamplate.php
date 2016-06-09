@@ -687,6 +687,7 @@ if($default_display) {
                 if (window.focus) {newwindow.focus()}
                 return false;
         }
+		
         function popitup3(url) {
             newwindow=window.open(url + '&custom=' + document.getElementById('custom').value + '&tid=' + document.getElementById('id').value + '&value=0_' + name + '&rand=' + new Date().getTime(),'name','height=700,width=800,scrollbars=yes,location=no');
                 if (window.focus) {newwindow.focus()}

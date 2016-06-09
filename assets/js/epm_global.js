@@ -87,7 +87,7 @@ function epm_global_get_tab_actual()
 	return sTab;
 }
 
-function epm_advanced_get_value_by_form(sform, snameopt, formtype = "name")
+function epm_global_get_value_by_form(sform, snameopt, formtype = "name")
 {
 	var rdata = null;
 	$('form['+formtype+'='+sform+']')
@@ -101,6 +101,28 @@ function epm_advanced_get_value_by_form(sform, snameopt, formtype = "name")
 	});
 	return rdata;
 }
+
+//http://oldblog.jesusyepes.com/jquery/limpiar-todos-los-campos-de-un-formulario-con-jquery/
+function epm_global_limpiaForm(miForm) {
+	// recorremos todos los campos que tiene el formulario
+	$(':input', miForm).each(function() {
+		var type = this.type;
+		var tag = this.tagName.toLowerCase();
+		//limpiamos los valores de los campos…
+		if (type == 'text' || type == 'password' || tag == 'textarea')
+			this.value = "";
+			// excepto de los checkboxes y radios, le quitamos el checked
+			// pero su valor no debe ser cambiado
+		else if (type == 'checkbox' || type == 'radio')
+			this.checked = false;
+			// los selects le ponesmos el indice a -
+		else if (tag == 'select')
+			this.selectedIndex = -1;
+	});
+}
+
+
+
 
 function epm_global_dialog_action(actionname = "", urlStr = "", formname = null, titleStr = "Status", ClassDlg = "")
 {

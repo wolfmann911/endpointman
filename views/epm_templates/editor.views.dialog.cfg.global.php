@@ -1,88 +1,4 @@
 <?php
-
-/*
-
-    if(isset($_REQUEST['button_update_globals'])) {
-        $_POST['srvip'] = trim($_POST['srvip']);  #trim whitespace from IP address
-
-        $_POST['config_loc'] = trim($_POST['config_loc']);  #trim whitespace from Config Location
-
-        //No trailing slash. Help the user out and add one :-)
-        if($_POST['config_loc'][strlen($_POST['config_loc'])-1] != "/") {
-            $_POST['config_loc'] = $_POST['config_loc'] ."/";
-        }
-
-        if((isset($_POST['config_loc'])) AND ($_POST['config_loc'] != "")) {
-            if((file_exists($_POST['config_loc'])) AND (is_dir($_POST['config_loc']))) {
-                if(is_writable($_POST['config_loc'])) {
-                    $settings['config_location'] = $_POST['config_loc'];
-                } else {
-                    $endpoint->error['config_dir'] = "Directory Not Writable!";
-                    $settings['config_location'] = $endpoint->global_cfg['config_location'];
-                }
-            } else {
-                $endpoint->error['config_dir'] = "Not a Vaild Directory";
-                $settings['config_location'] = $endpoint->global_cfg['config_location'];
-            }
-        } else {
-            $endpoint->error['config_dir'] = "No Configuration Location Defined!";
-            $settings['config_location'] = $endpoint->global_cfg['config_location'];
-        }
-
-        $settings['srvip'] = $_POST['srvip'];
-        $settings['ntp'] = $_POST['ntp_server'];
-        $settings['tz'] = $_POST['tz'];
-
-        $settings_ser = serialize($settings);
-        if($_REQUEST['custom'] == 0) {
-            //This is a group template
-            $sql = "UPDATE endpointman_template_list SET global_settings_override = '".addslashes($settings_ser)."' WHERE id = ".$_REQUEST['tid'];
-            $endpoint->eda->sql($sql);
-        } else {
-            //This is an individual template
-            $sql = "UPDATE endpointman_mac_list SET global_settings_override = '".addslashes($settings_ser)."' WHERE id = ".$_REQUEST['tid'];
-            $endpoint->eda->sql($sql);
-        }
-
-        $endpoint->message['advanced_settings'] = "Updated!";
-    }
-	
-	
-	
-	
-	
-    if(isset($_REQUEST['button_reset_globals'])) {
-        if($_REQUEST['custom'] == 0) {
-            //This is a group template
-            $sql = "UPDATE endpointman_template_list SET global_settings_override = NULL WHERE id = ".$_REQUEST['tid'];
-            $endpoint->eda->sql($sql);
-        } else {
-            //This is an individual template
-            $sql = "UPDATE endpointman_mac_list SET global_settings_override = NULL WHERE id = ".$_REQUEST['tid'];
-            $endpoint->eda->sql($sql);
-        }
-        $endpoint->message['advanced_settings'] = "Globals Reset to Default!";
-    }
-	
-	*/
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	/*
 	$product_list = "SELECT * FROM endpointman_product_list WHERE id > 0";
 	$product_list =& sql($product_list,'getAll', DB_FETCHMODE_ASSOC);
@@ -109,21 +25,20 @@
         $settings['ntp'] = FreePBX::Endpointman()->configmod->get("ntp");
         $settings['config_location'] = FreePBX::Endpointman()->configmod->get("config_location");
         $settings['tz'] = FreePBX::Endpointman()->configmod->get("tz");
+        $settings['server_type'] = FreePBX::Endpointman()->configmod->get("server_type");
     }
     //Because we are working with global variables we probably updated them, so lets refresh those variables
     //$endpoint->global_cfg = $endpoint->eda->sql("SELECT var_name, value FROM endpointman_global_vars",'getAssoc');
 	
-
 	//$settings['srvip']
 	//$settings['ntp']
 	//$settings['config_location']
 	//$settings['tz']
 	
-	
-	
-	
 	//onclick="return popitup3('config.php?type=tool&display=epm_config&amp;quietmode=1&amp;handler=file&amp;file=popup.html.php&amp;module=endpointman&amp;pop_type=global_over')"
 ?>
+
+<form action="" id="FormCfgGlobalTemplate">
 
 <div class="modal fade" id="CfgGlobalTemplate" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 	<div class="modal-dialog modal-lg" role="document">
@@ -173,24 +88,21 @@
 	</div>
 	<!--END IP address of phone server-->
 	<!--Configuration Type-->
-	<?php
-		$server_type = FreePBX::Endpointman()->configmod->get("server_type");
-	?>
 	<div class="element-container">
 		<div class="row">
 			<div class="col-md-12">
 				<div class="row">
 					<div class="form-group">
 						<div class="col-md-3">
-							<label class="control-label" for="cfg_type"><?php echo _("Configuration Type")?></label>
-							<i class="fa fa-question-circle fpbx-help-icon" data-for="cfg_type"></i>
+							<label class="control-label" for="server_type"><?php echo _("Configuration Type")?></label>
+							<i class="fa fa-question-circle fpbx-help-icon" data-for="server_type"></i>
 						</div>
 						<div class="col-md-9">
-							<select name="cfg_type" class="form-control" id="cfg_type">
-								<option value="file" <?php echo ($server_type == "file" ? "selected" : "") ?> ><?php echo _("File (TFTP/FTP)")?></option>
-								<option value="http" <?php echo ($server_type == "http"? "selected" : "") ?> ><?php echo _("Web (HTTP)")?></option>
+							<select name="server_type" class="form-control" id="server_type">
+								<option value="file" <?php echo ($settings['server_type'] == "file" ? "selected" : "") ?> ><?php echo _("File (TFTP/FTP)")?></option>
+								<option value="http" <?php echo ($settings['server_type'] == "http"? "selected" : "") ?> ><?php echo _("Web (HTTP)")?></option>
 							</select>
-							<div class="alert alert-info" role="alert" id="cfg_type_alert">
+							<div class="alert alert-info" role="alert" id="server_type_alert">
 								<strong><?php echo _("Updated!"); ?></strong><?php echo _(" - Point your phones to: "); ?><a href="http://<?php echo $_SERVER['SERVER_ADDR']; ?>/provisioning/p.php/" class="alert-link" target="_blank">http://<?php echo $_SERVER['SERVER_ADDR']; ?>/provisioning/p.php/</a>.
 							</div>
 						</div>
@@ -200,13 +112,10 @@
 		</div>
 		<div class="row">
 			<div class="col-md-12">
-				<span class="help-block fpbx-help-block" id="cfg_type-help">Texto ayuda!</span>
+				<span class="help-block fpbx-help-block" id="server_type-help">Texto ayuda!</span>
 			</div>
 		</div>
 	</div>
-	<?php
-		unset($server_type);
-	?>
 	<!--END Configuration Type-->
 	<!--Global Final Config & Firmware Directory-->
 	<div class="element-container">
@@ -326,14 +235,14 @@
                 
 			</div>
 			<div class="modal-footer">
-                <button type="button" class="btn btn-success" name="button_update_globals"><i class="fa fa-floppy-o" aria-hidden="true"></i> <?php echo _('Update Global Overrides')?></button>
-				<button type="button" class="btn btn-danger" name="button_reset_globals"><i class="fa fa-refresh" aria-hidden="true"></i> <?php echo _('Reset Global Overrides to Default')?></button>
+                <button type="button" class="btn btn-success" name="button_update_globals" onclick="epm_template_custom_config_update_global(this)"><i class="fa fa-floppy-o" aria-hidden="true"></i> <?php echo _('Update Global Overrides')?></button>
+				<button type="button" class="btn btn-danger" name="button_reset_globals" onclick="epm_template_custom_config_reset_global(this)"><i class="fa fa-refresh" aria-hidden="true"></i> <?php echo _('Reset Global Overrides to Default')?></button>
 			</div>
 		</div><!-- /.modal-content -->
 	</div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
-
+</form>
 
 
 
