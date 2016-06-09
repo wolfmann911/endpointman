@@ -548,7 +548,7 @@ function epm_advanced_tab_poce_bt_acction (command)
 		return true;
 	}
 	
-	if (epm_advanced_get_value_by_form("form_config_text_sec_button","datosok") === false)
+	if (epm_global_get_value_by_form("form_config_text_sec_button","datosok") === false)
 	{
 		fpbxToast("The form is not ready!", "Error!", 'error');
 		return false;
@@ -564,12 +564,12 @@ function epm_advanced_tab_poce_bt_acction (command)
     			module_sec: "epm_advanced",
     			module_tab: "poce",
     			command: "poce_save_file",
-    			type_file: epm_advanced_get_value_by_form("form_config_text_sec_button","type_file"),
-    			sendid : epm_advanced_get_value_by_form("form_config_text_sec_button","sendid"),
-    			product_select: epm_advanced_get_value_by_form("form_config_text_sec_button","product_select"),
-    			save_as_name: epm_advanced_get_value_by_form("form_config_text_sec_button","save_as_name"),
-    			original_name: epm_advanced_get_value_by_form("form_config_text_sec_button","original_name"),
-    			file_name: epm_advanced_get_value_by_form("form_config_text_sec_button","filename"),
+    			type_file: epm_global_get_value_by_form("form_config_text_sec_button","type_file"),
+    			sendid : epm_global_get_value_by_form("form_config_text_sec_button","sendid"),
+    			product_select: epm_global_get_value_by_form("form_config_text_sec_button","product_select"),
+    			save_as_name: epm_global_get_value_by_form("form_config_text_sec_button","save_as_name"),
+    			original_name: epm_global_get_value_by_form("form_config_text_sec_button","original_name"),
+    			file_name: epm_global_get_value_by_form("form_config_text_sec_button","filename"),
     			config_text: cmeditor.getValue()
     		};
     		break;
@@ -580,12 +580,12 @@ function epm_advanced_tab_poce_bt_acction (command)
     			module_sec: "epm_advanced",
     			module_tab: "poce",
     			command: "poce_save_as_file",
-    			type_file: epm_advanced_get_value_by_form("form_config_text_sec_button","type_file"),
-    			sendid : epm_advanced_get_value_by_form("form_config_text_sec_button","sendid"),
-    			product_select: epm_advanced_get_value_by_form("form_config_text_sec_button","product_select"),
-    			save_as_name: epm_advanced_get_value_by_form("form_config_text_sec_button","save_as_name"),
-    			original_name: epm_advanced_get_value_by_form("form_config_text_sec_button","original_name"),
-    			file_name: epm_advanced_get_value_by_form("form_config_text_sec_button","filename"),
+    			type_file: epm_global_get_value_by_form("form_config_text_sec_button","type_file"),
+    			sendid : epm_global_get_value_by_form("form_config_text_sec_button","sendid"),
+    			product_select: epm_global_get_value_by_form("form_config_text_sec_button","product_select"),
+    			save_as_name: epm_global_get_value_by_form("form_config_text_sec_button","save_as_name"),
+    			original_name: epm_global_get_value_by_form("form_config_text_sec_button","original_name"),
+    			file_name: epm_global_get_value_by_form("form_config_text_sec_button","filename"),
     			config_text: cmeditor.getValue()
     		};
     		break;
@@ -598,9 +598,9 @@ function epm_advanced_tab_poce_bt_acction (command)
     			module_sec: "epm_advanced",
     			module_tab: "poce",
     			command: "poce_delete_config_custom",
-    			type_file : epm_advanced_get_value_by_form("form_config_text_sec_button","type_file"),
-    			product_select: epm_advanced_get_value_by_form("form_config_text_sec_button","product_select"),
-    			sql_select: epm_advanced_get_value_by_form("form_config_text_sec_button","sendid"),
+    			type_file : epm_global_get_value_by_form("form_config_text_sec_button","type_file"),
+    			product_select: epm_global_get_value_by_form("form_config_text_sec_button","product_select"),
+    			sql_select: epm_global_get_value_by_form("form_config_text_sec_button","sendid"),
     		};
     		break;
     	
@@ -610,11 +610,11 @@ function epm_advanced_tab_poce_bt_acction (command)
     			module_sec: "epm_advanced",
     			module_tab: "poce",
     			command: "poce_sendid",
-    			type_file : epm_advanced_get_value_by_form("form_config_text_sec_button","type_file"),
-    			sendid : epm_advanced_get_value_by_form("form_config_text_sec_button","sendid"),
-    			product_select: epm_advanced_get_value_by_form("form_config_text_sec_button","product_select"),
-    			original_name: epm_advanced_get_value_by_form("form_config_text_sec_button","original_name"),
-    			file_name: epm_advanced_get_value_by_form("form_config_text_sec_button","filename"),
+    			type_file : epm_global_get_value_by_form("form_config_text_sec_button","type_file"),
+    			sendid : epm_global_get_value_by_form("form_config_text_sec_button","sendid"),
+    			product_select: epm_global_get_value_by_form("form_config_text_sec_button","product_select"),
+    			original_name: epm_global_get_value_by_form("form_config_text_sec_button","original_name"),
+    			file_name: epm_global_get_value_by_form("form_config_text_sec_button","filename"),
     			config_text : cmeditor.getValue()
     		};
     		break;
@@ -640,7 +640,7 @@ function epm_advanced_tab_poce_bt_acction (command)
 				switch(obj_name) {
 			    	case "button_save":
 			    		
-			    		epm_advanced_tab_poce_select_product(epm_advanced_get_value_by_form("form_config_text_sec_button","product_select"), false);
+			    		epm_advanced_tab_poce_select_product(epm_global_get_value_by_form("form_config_text_sec_button","product_select"), false);
 			    		fpbxToast(data.message, 'Save!', 'success');
 			    		break;
 			    	
@@ -655,13 +655,13 @@ function epm_advanced_tab_poce_bt_acction (command)
 						$("#box_bt_save_as button").prop('disabled', false);
 						$("#box_bt_save_as input").prop('disabled', false);
 						
-						epm_advanced_tab_poce_select_product(epm_advanced_get_value_by_form("form_config_text_sec_button","product_select"), false);
+						epm_advanced_tab_poce_select_product(epm_global_get_value_by_form("form_config_text_sec_button","product_select"), false);
 						fpbxToast(data.message, 'Save as!', 'success');
 			    		break;
 			    		
 			    	case "button_delete":
 			    		
-			    		epm_advanced_tab_poce_select_product(epm_advanced_get_value_by_form("form_config_text_sec_button","product_select"));
+			    		epm_advanced_tab_poce_select_product(epm_global_get_value_by_form("form_config_text_sec_button","product_select"));
 			    		fpbxToast(data.message, 'Delete!', 'success');
 			    		break;
 			    	

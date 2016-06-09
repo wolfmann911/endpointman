@@ -183,5 +183,99 @@ function epm_tamplates_grid_add()
 }
 
 
+function epm_template_custom_config_update_global(elmnt)
+{
+	$.ajax({
+		type: 'POST',
+		url: "ajax.php",
+		data: {
+			module: "endpointman",
+			module_sec: "epm_templates",
+			module_tab: "editor",
+			command: "custom_config_update_gloabl",
+			custom : $.getUrlVar('custom'),
+			tid : $.getUrlVar('idsel'),
+			tz: epm_global_get_value_by_form("FormCfgGlobalTemplate","tz"),
+			ntp: epm_global_get_value_by_form("FormCfgGlobalTemplate","ntp"),
+			srvip: epm_global_get_value_by_form("FormCfgGlobalTemplate","srvip"),			
+			config_loc: epm_global_get_value_by_form("FormCfgGlobalTemplate","config_loc"),
+			server_type: epm_global_get_value_by_form("FormCfgGlobalTemplate","server_type")
+		},
+		dataType: 'json',
+		timeout: 60000,
+		error: function(xhr, ajaxOptions, thrownError) {
+			fpbxToast('ERROR AJAX:' + thrownError,'ERROR (' + xhr.status + ')!','error');
+			return false;
+		},
+		success: function(data) {
+			if (data.status == true) 
+			{
+				fpbxToast(data.message, '', 'success');
+			} 
+			else { fpbxToast(data.message, "Error!", 'error'); }
+		}
+	});
+	
+		
+}
+
+function epm_template_custom_config_reset_global(elmnt)
+{
+	$.ajax({
+		type: 'POST',
+		url: "ajax.php",
+		data: {
+			module: "endpointman",
+			module_sec: "epm_templates",
+			module_tab: "editor",
+			command: "custom_config_reset_gloabl",
+			custom : $.getUrlVar('custom'),
+			tid : $.getUrlVar('idsel')
+		},
+		dataType: 'json',
+		timeout: 60000,
+		error: function(xhr, ajaxOptions, thrownError) {
+			fpbxToast('ERROR AJAX:' + thrownError,'ERROR (' + xhr.status + ')!','error');
+			return false;
+		},
+		success: function(data) {
+			if (data.status == true) 
+			{
+				fpbxToast(data.message, '', 'success');
+				//epm_global_limpiaForm($("#FormCfgGlobalTemplate"));
+				$("#FormCfgGlobalTemplate")[0].reset();
+			} 
+			else { fpbxToast(data.message, "Error!", 'error'); }
+		}
+	});
+}
 
 
+
+
+
+
+
+
+
+
+
+	
+	/*
+		//edit
+		//<a href="#" onclick="return popitup('config.php?type=tool&display=epm_config&amp;quietmode=1&amp;handler=file&amp;file=popup.html.php&amp;module=endpointman&amp;pop_type=alt_cfg_edit', '<?php echo $row['name']; ?>')">
+		function popitup(url, name) {
+            newwindow=window.open(url + '&custom=' + document.getElementById('custom').value + '&tid=' + document.getElementById('id').value + '&value=' + document.getElementById('altconfig_'+ name).value + '&rand=' + new Date().getTime(),'name','height=710,width=800,scrollbars=yes,location=no');
+                if (window.focus) {newwindow.focus()}
+                return false;
+        }
+		//edit
+		//<a href='#' onclick='return popitup2("config.php?type=tool&display=epm_config&amp;quietmode=1&amp;handler=file&amp;file=popup.html.php&amp;module=endpointman&amp;pop_type=alt_cfg_edit", "<?php echo $row['name']?>")'>
+        function popitup2(url, name) {
+            newwindow=window.open(url + '&custom=' + document.getElementById('custom').value + '&tid=' + document.getElementById('id').value + '&value=0_' + name + '&rand=' + new Date().getTime(),'name','height=700,width=800,scrollbars=yes,location=no');
+                if (window.focus) {newwindow.focus()}
+                return false;
+        }
+		
+
+*/	
