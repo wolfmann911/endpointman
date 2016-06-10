@@ -4,41 +4,11 @@
 	$product_list =& sql($product_list,'getAll', DB_FETCHMODE_ASSOC);
 	*/
 	
-    if($_REQUEST['custom'] == 0) {
-        //This is a group template
-        $sql = 'SELECT global_settings_override FROM endpointman_template_list WHERE id = '.$_REQUEST['idsel'];
-		//$settings = $endpoint->eda->sql($sql,'getOne');
-
-    } else {
-        //This is an individual template
-        $sql = 'SELECT global_settings_override FROM endpointman_mac_list WHERE id = '.$_REQUEST['idsel'];
-        //$settings = $endpoint->eda->sql($sql,'getOne');
-    }
-	$settings =& sql($sql, 'getOne');
-	
-	
-    if(isset($settings)) {
-        $settings = unserialize($settings);
-        //$settings['tz'] = FreePBX::Endpointman()->listTZ(FreePBX::Endpointman()->configmod->get("tz"));
-    } else {
-        $settings['srvip'] = FreePBX::Endpointman()->configmod->get("srvip");
-        $settings['ntp'] = FreePBX::Endpointman()->configmod->get("ntp");
-        $settings['config_location'] = FreePBX::Endpointman()->configmod->get("config_location");
-        $settings['tz'] = FreePBX::Endpointman()->configmod->get("tz");
-        $settings['server_type'] = FreePBX::Endpointman()->configmod->get("server_type");
-    }
     //Because we are working with global variables we probably updated them, so lets refresh those variables
-    //$endpoint->global_cfg = $endpoint->eda->sql("SELECT var_name, value FROM endpointman_global_vars",'getAssoc');
-	
-	//$settings['srvip']
-	//$settings['ntp']
-	//$settings['config_location']
-	//$settings['tz']
-	
-	//onclick="return popitup3('config.php?type=tool&display=epm_config&amp;quietmode=1&amp;handler=file&amp;file=popup.html.php&amp;module=endpointman&amp;pop_type=global_over')"
+    //$endpoint->global_cfg = $endpoint->eda->sql("SELECT var_name, value FROM endpointman_global_vars",'getAssoc');	
 ?>
 
-<form action="" id="FormCfgGlobalTemplate">
+
 
 <div class="modal fade" id="CfgGlobalTemplate" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 	<div class="modal-dialog modal-lg" role="document">
@@ -48,9 +18,8 @@
 				<h4 class="modal-title"><?php echo _('End Point Configuration Manager')?></h4>
 			</div>
 			<div class="modal-body">
+				<form action="" id="FormCfgGlobalTemplate" name="FormCfgGlobalTemplate">
 
-
-           
            
            
 <div class="section-title" data-for="setting_provision">
@@ -70,9 +39,9 @@
 						</div>
 						<div class="col-md-9">
 							<div class="input-group">
-      							<input type="text" class="form-control" placeholder="Server PBX..." id="srvip" name="srvip" value="<?php echo $settings['srvip']; ?>">
+      							<input type="text" class="form-control" placeholder="<?php echo _("Server PBX..."); ?>" id="srvip" name="srvip" value="">
       							<span class="input-group-btn">
-        							<button class="btn btn-default" type="button" id='autodetect' onclick="epm_global_input_value_change_bt('#srvip', sValue = '<?php echo $_SERVER["SERVER_ADDR"]; ?>');"><i class='fa fa-search'></i> <?php echo _("Determine for Me")?></button>
+        							<button class="btn btn-default" type="button" id='autodetect' onclick="epm_global_input_value_change_bt('#srvip', sValue = '<?php echo $_SERVER["SERVER_ADDR"]; ?>');"><i class='fa fa-search'></i> <?php echo _("Use me!")?></button>
       							</span>
     						</div>
 						</div>
@@ -82,7 +51,7 @@
 		</div>
 		<div class="row">
 			<div class="col-md-12">
-				<span class="help-block fpbx-help-block" id="srvip-help">Texto ayuda!</span>
+				<span class="help-block fpbx-help-block" id="srvip-help"><?php echo _("IP address of the PBX server that will use the terminals."); ?></span>
 			</div>
 		</div>
 	</div>
@@ -99,8 +68,9 @@
 						</div>
 						<div class="col-md-9">
 							<select name="server_type" class="form-control" id="server_type">
-								<option value="file" <?php echo ($settings['server_type'] == "file" ? "selected" : "") ?> ><?php echo _("File (TFTP/FTP)")?></option>
-								<option value="http" <?php echo ($settings['server_type'] == "http"? "selected" : "") ?> ><?php echo _("Web (HTTP)")?></option>
+								<option value="file"><?php echo _("File (TFTP/FTP)")?></option>
+								<option value="http"><?php echo _("Web (HTTP)")?></option>
+                                <!-- TODO: Pendiente añadir soporte HTTPS. -->
 							</select>
 							<div class="alert alert-info" role="alert" id="server_type_alert">
 								<strong><?php echo _("Updated!"); ?></strong><?php echo _(" - Point your phones to: "); ?><a href="http://<?php echo $_SERVER['SERVER_ADDR']; ?>/provisioning/p.php/" class="alert-link" target="_blank">http://<?php echo $_SERVER['SERVER_ADDR']; ?>/provisioning/p.php/</a>.
@@ -112,7 +82,7 @@
 		</div>
 		<div class="row">
 			<div class="col-md-12">
-				<span class="help-block fpbx-help-block" id="server_type-help">Texto ayuda!</span>
+				<span class="help-block fpbx-help-block" id="server_type-help"><?php echo _("Type Terminal Server where to obtain configuration data and firmware update. It can be http or ftp."); ?></span>
 			</div>
 		</div>
 	</div>
@@ -128,7 +98,7 @@
 							<i class="fa fa-question-circle fpbx-help-icon" data-for="config_loc"></i>
 						</div>
 						<div class="col-md-9">
-							<input type="text" class="form-control" id="config_loc" name="config_loc" value="<?php echo $settings['config_location']; ?>">
+							<input type="text" class="form-control" placeholder="<?php echo _("Path...."); ?>" id="config_loc" name="config_loc" value="">
 						</div>
 					</div>
 				</div>
@@ -136,7 +106,7 @@
 		</div>
 		<div class="row">
 			<div class="col-md-12">
-				<span class="help-block fpbx-help-block" id="config_loc-help">Texto ayuda!</span>
+				<span class="help-block fpbx-help-block" id="config_loc-help"><?php echo _("Location where configuration files and firmware for terminals are housed."); ?></span>
 			</div>
 		</div>
 	</div>
@@ -150,14 +120,6 @@
 </div>
 <div class="section" data-id="setting_time">
 	<!--Time Zone-->
-	<?php
-		$list_tz = FreePBX::Endpointman()->listTZ($settings['tz']);
-		$lnhtm = '';
-		foreach ($list_tz as $row) {
-			$lnhtm .= '<option value="'.$row['value'].'" '. ($row['selected'] == 1 ? 'selected="selected"' : '') .' > '.$row['text'].'</option>';
-		}
-		unset ($list_tz);
-	?>
 	<div class="element-container">
 		<div class="row">
 			<div class="col-md-12">
@@ -170,7 +132,12 @@
 						<div class="col-md-9">
 							<div class="input-group">
       							<select name="tz" class="form-control" id="tz">
-								<?php echo $lnhtm; ?>
+                                <?php
+									//TODO: Pendiente actualizar a ajax!!!!
+									foreach (FreePBX::Endpointman()->listTZ("") as $row) {
+										echo '<option value="'.$row['value'].'" > '.$row['text'].'</option>';
+									}
+								?>
 								</select>
       							<span class="input-group-btn">
         							<button class="btn btn-default" type="button" id='tzphp' onclick="epm_global_input_value_change_bt('#tz', sValue = '<?php echo FreePBX::Endpointman()->config->get('PHPTIMEZONE'); ?>');"><i class="fa fa-clock-o"></i> <?php echo _("TimeZone by PBX Setting")?></button>
@@ -183,11 +150,10 @@
 		</div>
 		<div class="row">
 			<div class="col-md-12">
-				<span class="help-block fpbx-help-block" id="tz-help">Like England/London</span>
+				<span class="help-block fpbx-help-block" id="tz-help"><?php echo _("Select the time zone for the terminals. Example England/London"); ?></span>
 			</div>
 		</div>
 	</div>
-	<?php unset($lnhtm); ?>
 	<!--END Time Zone-->
 	<!--Time Server - NTP Server-->
 	<div class="element-container">
@@ -201,9 +167,9 @@
 						</div>
 						<div class="col-md-9">
 							<div class="input-group">
-      							<input type="text" class="form-control" placeholder="Server NTP..." id="ntp_server" name="ntp_server" value="<?php echo $settings['ntp']; ?>">
+      							<input type="text" class="form-control" placeholder="<?php echo _("Server NTP..."); ?>" id="ntp_server" name="ntp_server" value="">
       							<span class="input-group-btn">
-        							<button class="btn btn-default" type="button" id='autodetectntp' onclick="epm_global_input_value_change_bt('#ntp_server', sValue = '<?php echo $_SERVER["SERVER_ADDR"]; ?>');"><i class='fa fa-search'></i> <?php echo _("Determine for Me")?></button>
+        							<button class="btn btn-default" type="button" id='autodetectntp' onclick="epm_global_input_value_change_bt('#ntp_server', sValue = '<?php echo $_SERVER["SERVER_ADDR"]; ?>');"><i class='fa fa-search'></i> <?php echo _("Use me!")?></button>
       							</span>
     						</div>
 							
@@ -214,7 +180,7 @@
 		</div>
 		<div class="row">
 			<div class="col-md-12">
-				<span class="help-block fpbx-help-block" id="ntp_server-help">Texto ayuda!</span>
+				<span class="help-block fpbx-help-block" id="ntp_server-help"><?php echo _("NTP server that syncs the time the terminals."); ?></span>
 			</div>
 		</div>
 	</div>
@@ -223,161 +189,13 @@
 
 
 
-
-
-
-
-
-
-
-
-                
-                
+				</form>
 			</div>
 			<div class="modal-footer">
+                <button type="button" class="btn btn-success" name="button_undo_globals" onclick="epm_template_custom_config_get_global(this)"><i class="fa fa-undo" aria-hidden="true"></i> <?php echo _('Reload Config')?></button>
                 <button type="button" class="btn btn-success" name="button_update_globals" onclick="epm_template_custom_config_update_global(this)"><i class="fa fa-floppy-o" aria-hidden="true"></i> <?php echo _('Update Global Overrides')?></button>
 				<button type="button" class="btn btn-danger" name="button_reset_globals" onclick="epm_template_custom_config_reset_global(this)"><i class="fa fa-refresh" aria-hidden="true"></i> <?php echo _('Reset Global Overrides to Default')?></button>
 			</div>
 		</div><!-- /.modal-content -->
 	</div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
-
-</form>
-
-
-
-
-
-
-<?php
-
-
-/*
-<button type="button" class="btn btn-danger" name="button_cancel_globals" data-dismiss="modal"><i class="fa fa-times" aria-hidden="true"></i> <?php echo _('Cancel')?></button>
-*/
-
-
-
-/*
-
-<tr>
-<td width='50%' align='right'><?php echo _("IP address of phone server")?>:</td>
-<td width='50%' align='left'><input type='text' id='srvip' name='srvip' value='{$srvip}'><a href='#' onclick="document.getElementById('srvip').value = '{$ip}'; "><?php echo _("Determine for me")?></a></td>
-</tr>
-
-
-<tr>
-  <td align='right'><?php echo _("Configuration Type")?></td>
-  <td align='left'>
-      <select name="cfg_type" id="cfg_type" disabled>
-            <option value="file">File (TFTP/FTP)</option>
-            <option value="web">Web (HTTP)</option>
-        </select>
-  </td>
-</tr>
-
-
-<tr>
-  <td align='right'><?php echo _("Global Final Config & Firmware Directory")?></td>
-  <td align='left'><label>
-    <input type="text" name="config_loc" value="{$config_location}">
-  </label></td>
-</tr>
-
-
-<tr>
-  <td align='right'><br/></td>
-  <td align='left'></td>
-</tr>
-
-
-<tr>
-<td width='50%' align='right'><?php echo _("Time Zone")?> (<?php echo _('like')?> USA-5)</td>
-<td width='50%' align='left'><select name="tz" id="tz">
-	{loop name="list_tz"}
-	<option value="{$value.value}" {if condition="$value.selected == 1"}selected='selected'{/if}>{$value.text}</option>
-	{/loop}
-</select>
-</td
-</tr>
-
-
-
-<tr>
-<td width='50%' align='right'><?php echo _("Time Server (NTP Server)")?></td>
-  <td align='left'><label>
-    <input type="text" name="ntp_server" value="{$ntp_server}">
-  </label></td>
-</tr>
-<tr>
-            
-
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-				<div class="element-container">
-					<div class="row">
-						<div class="col-md-12">
-							<div class="row">
-								<div class="form-group">
-									<div class="col-md-3">
-										<label class="control-label" for="number_new_oui"><?php echo _("OUI")?></label>
-										<i class="fa fa-question-circle fpbx-help-icon" data-for="number_new_oui"></i>
-									</div>
-									<div class="col-md-9">
-										<input type="text" maxlength="6" class="form-control" id="number_new_oui" name="number_new_oui" value="" placeholder="<?php echo _("OUI Brand")?>">
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-md-12">
-							<span class="help-block fpbx-help-block" id="number_new_oui-help"><?php echo _("They are the first 6 characters of the MAC device that identifies the brand (manufacturer).")?></span>
-						</div>
-					</div>
-				</div>
-				<div class="element-container">
-					<div class="row">
-						<div class="col-md-12">
-							<div class="row">
-								<div class="form-group">
-									<div class="col-md-3">
-										<label class="control-label" for="brand_new_oui"><?php echo _("Brand")?></label>
-										<i class="fa fa-question-circle fpbx-help-icon" data-for="brand_new_oui"></i>
-									</div>
-									<div class="col-md-9">
-			      						<select class="form-control" id="brand_new_oui" name="brand_new_oui">
-			      							<option value=""><?php echo _("Select Brand:")?></option>
-											<?php
-											foreach ($brands as $row) {
-												echo '<option value="'.$row['id'].'">'.$row['name'].'</option>';
-											}
-											?>
-										</select>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-md-12">
-							<span class="help-block fpbx-help-block" id="brand_new_oui-help"><?php echo _("It is the brand of OUI we specified.")?></span>
-						</div>
-					</div>
-				</div>
-
-
-*/
-?>

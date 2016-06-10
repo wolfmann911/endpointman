@@ -36,7 +36,7 @@ class Endpointman_Templates
 	}
 
 	public function ajaxRequest($req, &$setting) {
-		$arrVal = array("model_clone", "list_current_template", "add_template", "del_template", "custom_config_update_gloabl", "custom_config_reset_gloabl");
+		$arrVal = array("model_clone", "list_current_template", "add_template", "del_template", "custom_config_get_gloabl", "custom_config_update_gloabl", "custom_config_reset_gloabl");
 		if (in_array($req, $arrVal)) {
 			$setting['authenticate'] = true;
 			$setting['allowremote'] = false;
@@ -77,6 +77,10 @@ class Endpointman_Templates
 		{
 			switch ($command)
 			{
+				case "custom_config_get_gloabl":
+					$retarr = $this->epm_template_custom_config_get_global();
+					break;
+				
 				case "custom_config_update_gloabl":
 					$retarr = $this->epm_template_custom_config_update_global();
 					break;
@@ -113,19 +117,29 @@ class Endpointman_Templates
         switch($request['subpage']) {
             case 'editor':
                 $buttons = array(
-                    'save' => array(
-                        'name' => 'save',
-                        'id' => 'save',
-                        'value' => _('Save Template'),
+					'delete' => array(
+                        'name' => 'delete',
+                        'id' => 'delete',
+                        'value' => _('Delete'),
                         'hidden' => ''
                     ),
                     'saverebootphones' => array(
                         'name' => 'saverebootphones',
                         'id' => 'saverebootphones',
-                        'value' => _('Save Template & Reboot Phone(s)'),
+                        'value' => _('Save & Reboot Phone(s)'),
+                        'hidden' => ''
+                    ),
+					'save' => array(
+                        'name' => 'save',
+                        'id' => 'save',
+                        'value' => _('Save'),
                         'hidden' => ''
                     )
                 );
+				
+				if(empty($request['idsel']) && empty($request['custom'])){
+					$buttons = NULL;
+				}
             	break;
 				
 			default:
@@ -138,7 +152,48 @@ class Endpointman_Templates
 	
 	
 	
-	
+	public function epm_template_custom_config_get_global()
+	{
+		if (! isset($_REQUEST['custom'])) {
+			$retarr = array("status" => false, "message" => _("No send Custom Value!"));
+		}
+		elseif (! isset($_REQUEST['tid'])) {
+			$retarr = array("status" => false, "message" => _("No send TID!"));
+		}
+		elseif (! is_numeric($_REQUEST['tid'])) {
+			$retarr = array("status" => false, "message" => _("TID is not number!"));
+		}
+		else 
+		{
+			$dget['custom'] = $_REQUEST['custom'];
+			$dget['tid'] = $_REQUEST['tid'];
+			
+			if($dget['custom'] == 0) {
+				//This is a group template
+		        $sql = 'SELECT global_settings_override FROM endpointman_template_list WHERE id = '.$dget['tid'];
+			} else {
+				//This is an individual template
+		        $sql = 'SELECT global_settings_override FROM endpointman_mac_list WHERE id = '.$dget['tid'];;
+			}
+			$settings = sql($sql, 'getOne');
+
+			if ((isset($settings)) and (strlen($settings) > 0)) {
+				$settings = unserialize($settings);
+				//$settings['tz'] = FreePBX::Endpointman()->listTZ(FreePBX::Endpointman()->configmod->get("tz"));
+			} 
+			else {
+				$settings['srvip'] = ""; //$this->configmod->get("srvip");
+				$settings['ntp'] = ""; //$this->configmod->get("ntp");
+				$settings['config_location'] = ""; //$this->configmod->get("config_location");
+				$settings['tz'] = $this->configmod->get("tz");
+				$settings['server_type'] = $this->configmod->get("server_type");
+			}
+    		
+			$retarr = array("status" => true, "settings" => $settings, "message" => _("Global Config Read OK!"));
+			unset($dget);
+		}
+		return $retarr;
+	}
 	
 	
 	public function epm_template_custom_config_update_global ()

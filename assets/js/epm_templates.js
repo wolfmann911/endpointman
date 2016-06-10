@@ -19,6 +19,16 @@ function epm_templates_document_ready () {
 			$('.liquid-slider').css('visibility', 'visible');
 		}
 	});
+		
+	//Al iniciar la apertura de la ventana
+	$('#CfgGlobalTemplate').on('show.bs.modal', function (e) {
+		epm_template_custom_config_get_global(e);	
+	});
+	
+	//Al finalizar la apertura de la ventana	$('#CfgGlobalTemplate').on('shown.bs.modal', function (e) { });
+	//Antes de iniciar el cierre de la ventana	$('#CfgGlobalTemplate').on('hide.bs.modal', function (e) { });
+	//Despues de Cerrar la ventana				$('#CfgGlobalTemplate').on('hidden.bs.modal', function (e) { });
+	
 }
 
 function epm_templates_windows_load (nTab = "") {
@@ -183,6 +193,48 @@ function epm_tamplates_grid_add()
 }
 
 
+
+
+
+
+
+function epm_template_custom_config_get_global(elmnt)
+{
+	$.ajax({
+		type: 'POST',
+		url: "ajax.php",
+		data: {
+			module: "endpointman",
+			module_sec: "epm_templates",
+			module_tab: "editor",
+			command: "custom_config_get_gloabl",
+			custom : $.getUrlVar('custom'),
+			tid : $.getUrlVar('idsel')
+		},
+		dataType: 'json',
+		timeout: 60000,
+		error: function(xhr, ajaxOptions, thrownError) {
+			fpbxToast('ERROR AJAX:' + thrownError,'ERROR (' + xhr.status + ')!','error');
+			return false;
+		},
+		success: function(data) {
+			if (data.status == true) 
+			{
+				$("#srvip").val( data.settings.srvip );
+				$("#server_type").val( data.settings.server_type );
+				$("#config_loc").val( data.settings.config_location );
+				$("#tz").val( data.settings.tz );
+				$("#ntp_server").val( data.settings.ntp );
+				
+				if (elmnt.name == "button_undo_globals") {
+					fpbxToast(data.message, '', 'success');
+				}
+			} 
+			else { fpbxToast(data.message, "Error!", 'error'); }
+		}
+	});
+}
+
 function epm_template_custom_config_update_global(elmnt)
 {
 	$.ajax({
@@ -196,7 +248,7 @@ function epm_template_custom_config_update_global(elmnt)
 			custom : $.getUrlVar('custom'),
 			tid : $.getUrlVar('idsel'),
 			tz: epm_global_get_value_by_form("FormCfgGlobalTemplate","tz"),
-			ntp: epm_global_get_value_by_form("FormCfgGlobalTemplate","ntp"),
+			ntp_server: epm_global_get_value_by_form("FormCfgGlobalTemplate","ntp_server"),
 			srvip: epm_global_get_value_by_form("FormCfgGlobalTemplate","srvip"),			
 			config_loc: epm_global_get_value_by_form("FormCfgGlobalTemplate","config_loc"),
 			server_type: epm_global_get_value_by_form("FormCfgGlobalTemplate","server_type")
@@ -214,9 +266,7 @@ function epm_template_custom_config_update_global(elmnt)
 			} 
 			else { fpbxToast(data.message, "Error!", 'error'); }
 		}
-	});
-	
-		
+	});	
 }
 
 function epm_template_custom_config_reset_global(elmnt)
@@ -242,8 +292,7 @@ function epm_template_custom_config_reset_global(elmnt)
 			if (data.status == true) 
 			{
 				fpbxToast(data.message, '', 'success');
-				//epm_global_limpiaForm($("#FormCfgGlobalTemplate"));
-				$("#FormCfgGlobalTemplate")[0].reset();
+				epm_template_custom_config_get_global(elmnt);
 			} 
 			else { fpbxToast(data.message, "Error!", 'error'); }
 		}
