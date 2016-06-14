@@ -512,11 +512,11 @@ class Endpointman_Templates
     	 }
 		$dReturn['product'] = $row['short_name'];
 		$dReturn['model'] = $row['model_name'];
-		
+
 		if ($ma = $this->models_available($row['model_id'], NULL, $row['product_id'])) {
 			$dReturn['models_ava'] = $ma;
 		}
-    	
+
 		if (isset($_REQUEST['maxlines'])) {
 			$areas = $this->areaAvailable($row['model_id'], $_REQUEST['maxlines']);
 		} else {
@@ -524,7 +524,6 @@ class Endpointman_Templates
 		}
 		$dReturn['area_ava'] = $areas;
     	
-    	 
 		//Start the display of the html file in the product folder
 		if ($row['config_files_override'] == "") {
 			$config_files_saved = "";
@@ -532,15 +531,14 @@ class Endpointman_Templates
 			$config_files_saved = unserialize($row['config_files_override']);
 		}
 		$config_files_list = explode(",", $row['config_files']);
-		$i = 0;
+
 		$alt = 0;
-		
 		$i = 0;
 		$b = 0;
 		$only_configs = array();
 		foreach ($config_files_list as $files) {
 			$sql = "SELECT * FROM  endpointman_custom_configs WHERE product_id = '" . $row['product_id'] . "' AND original_name = '" . $files . "'";
-			$alt_configs_list_count = sql($sql);
+			$alt_configs_list_count = sql($sql, 'getAll', DB_FETCHMODE_ASSOC );
 			if (! empty($alt_configs_list_count)) {
 				$alt_configs_list = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
 				$alt_configs[$i]['name'] = $files;

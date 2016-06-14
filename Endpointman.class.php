@@ -825,10 +825,10 @@ $this->error['add_device'] = _("Invalid MAC Address") . "!";
     				$lines = array_values($this->linesAvailable(NULL, $mac_id));
     
     				$sql = "SELECT description FROM devices WHERE id = " . $reg[0]['value'];
-    				$name = $this->eda->sql($sql, 'getOne');
+    				$name = sql($sql, 'getOne');
     
     				$sql = "INSERT INTO `endpointman_line_list` (`mac_id`, `ext`, `line`, `description`) VALUES ('" . $mac_id . "', '" . $reg[0]['value'] . "', '" . $lines[0]['value'] . "', '" . addslashes($name) . "')";
-    				$this->eda->sql($sql);
+    				sql($sql);
     
 $this->message['add_line'] = "Added '<i>" . $name . "</i>' to line '<i>" . $lines[0]['value'] . "</i>' on device '<i>" . $reg[0]['value'] . "</i>' <br/> Configuration Files will not be Generated until you click Save!";
     				return($mac_id);
@@ -1006,7 +1006,8 @@ $this->error['get_phone_info'] = "Mac ID is not set";
     	}
     	$sql = "SELECT id FROM endpointman_mac_list WHERE model > 0 AND id =" . $mac_id;
     
-    	$res = sql($sql);
+    	//$res = sql($sql);
+		$res = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
     	if ($res->numRows()) {
     		//Returns Brand Name, Brand Directory, Model Name, Mac Address, Extension (FreePBX), Custom Configuration Template, Custom Configuration Data, Product Name, Product ID, Product Configuration Directory, Product Configuration Version, Product XML name,
     		$sql = "SELECT endpointman_mac_list.specific_settings, endpointman_mac_list.config_files_override, endpointman_mac_list.global_user_cfg_data, endpointman_model_list.id as model_id, endpointman_brand_list.id as brand_id, endpointman_brand_list.name, endpointman_brand_list.directory, endpointman_model_list.model, endpointman_mac_list.mac, endpointman_mac_list.template_id, endpointman_mac_list.global_custom_cfg_data, endpointman_product_list.long_name, endpointman_product_list.id as product_id, endpointman_product_list.cfg_dir, endpointman_product_list.cfg_ver, endpointman_model_list.template_data, endpointman_model_list.enabled, endpointman_mac_list.global_settings_override FROM endpointman_line_list, endpointman_mac_list, endpointman_model_list, endpointman_brand_list, endpointman_product_list WHERE endpointman_mac_list.model = endpointman_model_list.id AND endpointman_brand_list.id = endpointman_model_list.brand AND endpointman_product_list.id = endpointman_model_list.product_id AND endpointman_mac_list.id = endpointman_line_list.mac_id AND endpointman_mac_list.id = " . $mac_id;
@@ -1180,7 +1181,8 @@ $this->error['parse_configs'] = 'Error Returned From Timezone Library: ' . $e->g
     					$temp = unserialize($phone_info['template_data_info']['config_files_override']);
     					foreach ($temp as $list) {
     						$sql = "SELECT original_name,data FROM endpointman_custom_configs WHERE id = " . $list;
-    						$res = sql($sql);
+    						//$res = sql($sql);
+							$res = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
     						if ($res->numRows()) {
     							$data = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
     							$provisioner_lib->config_files_override[$data['original_name']] = $data['data'];
@@ -1194,7 +1196,8 @@ $this->error['parse_configs'] = 'Error Returned From Timezone Library: ' . $e->g
     					$temp = unserialize($phone_info['config_files_override']);
     					foreach ($temp as $list) {
     						$sql = "SELECT original_name,data FROM endpointman_custom_configs WHERE id = " . $list;
-    						$res = sql($sql);
+    						//$res = sql($sql);
+							$res = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
     						if ($res->numRows()) {
     							$data = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
     							$provisioner_lib->config_files_override[$data['original_name']] = $data['data'];
@@ -1790,12 +1793,11 @@ $this->error['parse_configs'] = "File not written to hard drive!";
     function display_templates($product_id, $temp_select = NULL) {
         $i = 0;
         $sql = "SELECT id FROM  endpointman_product_list WHERE endpointman_product_list.id ='" . $product_id . "'";
-
-        $id = $this->eda->sql($sql, 'getOne');
+        $id = sql($sql, 'getOne');
 
         $sql = "SELECT * FROM  endpointman_template_list WHERE  product_id = '" . $id . "'";
-
-        $data = $this->eda->sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
+        $data = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
+		
         foreach ($data as $row) {
             $temp[$i]['value'] = $row['id'];
             $temp[$i]['text'] = $row['name'];
@@ -1839,7 +1841,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
 
     function update_device($macid, $model, $template, $luid=NULL, $name=NULL, $line=NULL, $update_lines=TRUE) {
         $sql = "UPDATE endpointman_mac_list SET model = " . $model . ", template_id =  " . $template . " WHERE id = " . $macid;
-        $this->eda->sql($sql);
+        sql($sql);
 
         if ($update_lines) {
             if (isset($luid)) {
@@ -1859,24 +1861,24 @@ $this->error['parse_configs'] = "File not written to hard drive!";
 
             if (!isset($name)) {
                 $sql = "SELECT description FROM devices WHERE id = " . $row['ext'];
-                $name = $this->eda->sql($sql, 'getOne');
+                $name = sql($sql, 'getOne');
             }
 
             if (!isset($line)) {
                 $line = $row['line'];
             }
             $sql = "UPDATE endpointman_line_list SET line = '" . $line . "', ext = '" . $row['ext'] . "', description = '" . $this->eda->escapeSimple($name) . "' WHERE luid =  " . $row['luid'];
-            $this->eda->sql($sql);
+            sql($sql);
             return(TRUE);
         } else {
             $sql = "SELECT * FROM endpointman_line_list WHERE mac_id = " . $macid;
-            $lines_info = $this->eda->sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
+            $lines_info = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
             foreach ($lines_info as $row) {
                 $sql = "SELECT description FROM devices WHERE id = " . $row['ext'];
-                $name = $this->eda->sql($sql, 'getOne');
+                $name = sql($sql, 'getOne');
 
                 $sql = "UPDATE endpointman_line_list SET line = '" . $row['line'] . "', ext = '" . $row['ext'] . "', description = '" . $this->eda->escapeSimple($name) . "' WHERE luid =  " . $row['luid'];
-                $this->eda->sql($sql);
+                sql($sql);
             }
             return(TRUE);
         }
@@ -1889,23 +1891,23 @@ $this->error['parse_configs'] = "File not written to hard drive!";
      */
     function delete_line($lineid, $allow_device_remove=FALSE) {
         $sql = 'SELECT mac_id FROM endpointman_line_list WHERE luid = ' . $lineid;
-        $mac_id = $this->eda->sql($sql, 'getOne');
+        $mac_id = sql($sql, 'getOne');
         $row = $this->get_phone_info($mac_id);
 
         $sql = 'SELECT COUNT(*) FROM endpointman_line_list WHERE mac_id = ' . $mac_id;
-        $num_lines = $this->eda->sql($sql, 'getOne');
+        $num_lines = sql($sql, 'getOne');
         if ($num_lines > 1) {
             $sql = "DELETE FROM endpointman_line_list WHERE luid=" . $lineid;
-            $this->eda->sql($sql);
+            sql($sql);
             $this->message['delete_line'] = "Deleted!";
             return(TRUE);
         } else {
             if ($allow_device_remove) {
                 $sql = "DELETE FROM endpointman_line_list WHERE luid=" . $lineid;
-                $this->eda->sql($sql);
+                sql($sql);
 
                 $sql = "DELETE FROM endpointman_mac_list WHERE id=" . $mac_id;
-                $this->eda->sql($sql);
+                sql($sql);
                 $this->message['delete_line'] = "Deleted!";
                 return(TRUE);
             } else {
@@ -1917,10 +1919,10 @@ $this->error['parse_configs'] = "File not written to hard drive!";
 
     function delete_device($mac_id) {
         $sql = "DELETE FROM endpointman_mac_list WHERE id=" . $mac_id;
-        $this->eda->sql($sql);
+        sql($sql);
 
         $sql = "DELETE FROM endpointman_line_list WHERE mac_id=" . $mac_id;
-        $this->eda->sql($sql);
+        sql($sql);
         $this->message['delete_device'] = "Deleted!";
         return(TRUE);
     }
@@ -2056,8 +2058,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
             $sql = 'UPDATE endpointman_mac_list SET config_files_override = \'' . addslashes($config_files_selected) . '\', template_id = 0, global_custom_cfg_data = \'' . addslashes($save) . '\' WHERE id =' . $id;
             $location = "devices_manager";
         }
-
-        $this->eda->sql($sql);
+        sql($sql);
 
         $phone_info = array();
 
@@ -2070,7 +2071,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
             }
         } else {
             $sql = 'SELECT id FROM endpointman_mac_list WHERE template_id = ' . $id;
-            $phones = $this->eda->sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
+            $phones = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
             foreach ($phones as $data) {
                 $phone_info = $this->get_phone_info($data['id']);
                 if (isset($_REQUEST['epm_reboot'])) {

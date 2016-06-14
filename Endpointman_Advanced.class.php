@@ -1150,7 +1150,8 @@ class Endpointman_Advanced
 								if ($device[0] != "") {
 									if ($mac = $this->mac_check_clean($device[0])) {
 										$sql = "SELECT id FROM endpointman_brand_list WHERE name LIKE '%" . $device[1] . "%' LIMIT 1";
-										$res = sql($sql);
+										//$res = sql($sql);
+										$res = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
 										
 										if ($res->numRows() > 0) {
 											$brand_id = sql($sql, 'getOne');

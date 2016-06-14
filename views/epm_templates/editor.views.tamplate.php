@@ -15,7 +15,6 @@
 
 
 	<!--
-	if ($request['custom'] != 0): 
 	<form action="config.php?type=tool&display=epm_templates" method="post">
 	{if condition="isset($silent_mode)"}
 	<input name="silent_mode" id="silent_mode" type="hidden" value="1">
@@ -33,8 +32,10 @@
 						<h3 class="panel-title"><i class="fa  fa-info-circle fa-lg"></i> <?php echo _("Info Template")?></h3>
 					</div>
 					<div class="panel-body">
-					
-					
+                    
+                    
+                    
+                    
 						<table class="table">
 							<tr>
 								<td><b><?php echo _("Template Name:")?></b></td>
@@ -46,9 +47,9 @@
 							</tr>
 							<tr>
 								<td><b><?php echo _("Clone of Model:")?></b></td>
-								<?php if ($request['custom'] != 0): ?>
+							<?php if ($request['custom'] != 0): ?>
 								<td><?php echo $dtemplate['model'] ?></td>
-								<?php else: ?>
+							<?php else: ?>
 								<td>
 								<select class="form-control" name="model_list" id="model_list" disabled>
 									<?php
@@ -58,16 +59,15 @@
 									?>
 								</select>
 								</td>
-								<?php endif; ?>
 							</tr>
 							<tr>
 								<td><b><?php echo _("Display:")?></b></td>
 								<td>
 									<!-- 
 									{if condition="isset($silent_mode)"}
-									onchange="window.location.href='config.php?display=epm_config&quietmode=1&handler=file&file=popup.html.php&module=endpointman&pop_type=edit_template&edit_id={$hidden_id}&model_list=126&template_list=0&rand='+ new Date().getTime() + '&maxlines='+this.options[this.selectedIndex].value"
+									select name="area_list" onchange="window.location.href='config.php?display=epm_config&quietmode=1&handler=file&file=popup.html.php&module=endpointman&pop_type=edit_template&edit_id={$hidden_id}&model_list=126&template_list=0&rand='+ new Date().getTime() + '&maxlines='+this.options[this.selectedIndex].value"
 									{else}
-									onchange="window.location.href='config.php?type=tool&edit_template=true&display=epm_templates&custom='+ document.getElementById('custom').value +'&id='+ document.getElementById('id').value +'&maxlines='+this.options[this.selectedIndex].value"
+									select name="area_list" onchange="window.location.href='config.php?type=tool&edit_template=true&display=epm_templates&custom='+ document.getElementById('custom').value +'&id='+ document.getElementById('id').value +'&maxlines='+this.options[this.selectedIndex].value"
 									{/if}
 							 		-->
 									<select class="form-control" name="area_list" id="area_list">
@@ -80,9 +80,22 @@
 									</select>
 									<strong><?php echo _('Line settings on this page')?></strong><i><font size="-2"> (Note: This is NOT the number of supported lines on the phone(s))</font></i>
 								</td>
+                                
+                                
+							<?php endif; ?>
+							
 							</tr>
 						</table>
 						
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
 						
 					</div>
 				</div>
@@ -95,8 +108,6 @@
 						<h3 class="panel-title"><i class="fa  fa-file-code-o fa-lg"></i> <?php echo _("Settings")?></h3>
 					</div>
 					<div class="panel-body">
-					
-					
 						<table class="table">
 							<tr>
 								<td colspan="2">
@@ -105,9 +116,47 @@
 							</tr>
 							
 							
+
+
+
+
+	<?php /*           
+	{if condition="$alt != 0"}
+        {loop name="alt_configs"}
+            <p><strong><?php echo _('Edit File Configurations for:')?></strong>
+            <a href="#" onclick="return popitup('config.php?type=tool&display=epm_config&amp;quietmode=1&amp;handler=file&amp;file=popup.html.php&amp;module=endpointman&amp;pop_type=alt_cfg_edit', '{$value.name}')">
+            <code>{$value.name}</code> <i class='icon-pencil blue' ALT='<?php echo _('Edit')?> {$value.name}'></i></a>
+            <br>
+			
+			
+            <strong><?php echo _('Select Alternative File Configurations for')?> <code>{$value.name}</code></strong>
+            <select name="{$value.name}" id="altconfig_{$value.name}">';
+            <option value="0_{$value.name}">{$value.name} (No Change)</option>';
+            {loop name="value.list"}
+                <option value="{$value.id}_{$value.name}" {if condition="isset($value.selected)"}selected{/if}>{$value.name}</option>';
+            {/loop}
+            </select>
+            <br/>
+        {/loop}
+            <br/>
+	{/if}
+    
+    {loop name="only_configs"}
+        <strong><?php echo _('Edit File Configurations for:')?></strong>&nbsp;
+        <a href="#" onclick="return popitup2('config.php?type=tool&display=epm_config&amp;quietmode=1&amp;handler=file&amp;file=popup.html.php&amp;module=endpointman&amp;pop_type=alt_cfg_edit', '{$value.name}')"><code>{$value.name}</code>&nbsp;<i class='icon-pencil blue' ALT='<?php echo _('Edit')?>'></i></a>
+        <br/>
+    {/loop}
+	*/ ?>
+
+
+
+
+
 							
+                            
+                            
 							<?php 
-							if ($dtemplate['area_ava'] != 0) {
+							if ($dtemplate['alt'] != 0) {
 						    	foreach($dtemplate['alt_configs'] as $row): ?>
 						    		<tr>
 										<td><b><?php echo _("Edit File Configurations for:")?></b></td>
@@ -147,8 +196,32 @@
 									</td>
 								</tr>
 							<?php endforeach; ?>
+                            
+                            
+                            
+                            
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                            
+                            
+                            
 						</table>
-						
 					</div>
 				</div>
 			</div>
