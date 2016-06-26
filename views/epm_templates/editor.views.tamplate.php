@@ -1,4 +1,3 @@
-
 <?php
 	if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 	
@@ -14,111 +13,157 @@
 ?>
 
 
-	<!--
-	<form action="config.php?type=tool&display=epm_templates" method="post">
-	{if condition="isset($silent_mode)"}
-	<input name="silent_mode" id="silent_mode" type="hidden" value="1">
-	{/if}
-	-->
 
 
-
-
+<form action="" method="post" id="epm_tamplate_edit_form" name="epm_tamplate_edit_form">
+	<?php if (isset($_REQUEST['silent_mode'])) { echo '<input name="silent_mode" id="silent_mode" type="hidden" value="1">'; } ?>
+	<input name="id" id="id" type="hidden" value="<?php echo $dtemplate['hidden_id']; ?>">
+	<input name="custom" id="custom" type="hidden" value="<?php echo $dtemplate['hidden_custom'] ; ?>">
+	
 	<div class="">
 		<div class="row">
-			<div class="col-sm-6">
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<h3 class="panel-title"><i class="fa  fa-info-circle fa-lg"></i> <?php echo _("Info Template")?></h3>
-					</div>
-					<div class="panel-body">
+			<div class="col-md-6">
+	            <div class="row">
+             		<div class="col-md-12">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h3 class="panel-title"><i class="fa  fa-info-circle fa-lg"></i> <?php echo _("Info Template")?></h3>
+							</div>
+							<div class="panel-body">
                     
                     
                     
                     
-						<table class="table">
-							<tr>
-								<td><b><?php echo _("Template Name:")?></b></td>
-								<td><?php if ($request['custom'] != 0): ?>Custom Template: Extension <?php echo $dtemplate['ext']; ?><?php else: ?><?php echo $dtemplate['template_name']; ?><?php endif; ?></td>
-							</tr>
-							<tr>
-								<td><b><?php echo _("Product Line:")?></b></td>
-								<td><?php echo $dtemplate['product']; ?></td>
-							</tr>
-							<tr>
-								<td><b><?php echo _("Clone of Model:")?></b></td>
-							<?php if ($request['custom'] != 0): ?>
-								<td><?php echo $dtemplate['model'] ?></td>
-							<?php else: ?>
-								<td>
-								<select class="form-control" name="model_list" id="model_list" disabled>
-									<?php
-									foreach($dtemplate['models_ava'] as $row) {
-										echo '<option value="'.$row['value'].'" '.(!empty($row['selected']) ? "selected" : "").'>'.$row['text'].'</option>';
-									}
-									?>
-								</select>
-								</td>
-							</tr>
-							<tr>
-								<td><b><?php echo _("Display:")?></b></td>
-								<td>
-									<!-- 
-									{if condition="isset($silent_mode)"}
-									select name="area_list" onchange="window.location.href='config.php?display=epm_config&quietmode=1&handler=file&file=popup.html.php&module=endpointman&pop_type=edit_template&edit_id={$hidden_id}&model_list=126&template_list=0&rand='+ new Date().getTime() + '&maxlines='+this.options[this.selectedIndex].value"
-									{else}
-									select name="area_list" onchange="window.location.href='config.php?type=tool&edit_template=true&display=epm_templates&custom='+ document.getElementById('custom').value +'&id='+ document.getElementById('id').value +'&maxlines='+this.options[this.selectedIndex].value"
-									{/if}
-							 		-->
-									<select class="form-control" name="area_list" id="area_list">
-										<option value=""></option>
-										<?php 	
-										foreach($dtemplate['area_ava'] as $row) {
-											echo '<option value="'.$row['value'].'" '.(!empty($row['selected']) ? "selected" : "").'>'.$row['text'].'</option>';
-										}
-										?>
-									</select>
-									<strong><?php echo _('Line settings on this page')?></strong><i><font size="-2"> (Note: This is NOT the number of supported lines on the phone(s))</font></i>
-								</td>
-                                
-                                
-							<?php endif; ?>
-							
-							</tr>
-						</table>
+                                <table class="table">
+                                    <tr>
+                                        <td><b><?php echo _("Template Name:")?></b></td>
+                                        <td><?php if ($request['custom'] != 0): ?>Custom Template: Extension <?php echo $dtemplate['ext']; ?><?php else: ?><?php echo $dtemplate['template_name']; ?><?php endif; ?></td>
+                                    </tr>
+                                    <tr>
+                                        <td><b><?php echo _("Product Line:")?></b></td>
+                                        <td><?php echo $dtemplate['product']; ?></td>
+                                    </tr>
+                                    <tr>
+                                        <td><b><?php echo _("Clone of Model:")?></b></td>
+                                    <?php if ($request['custom'] != 0): ?>
+                                        <td><?php echo $dtemplate['model'] ?></td>
+                                    <?php else: ?>
+                                        <td>
+                                        <select class="form-control" name="model_list" id="model_list" disabled>
+                                            <?php
+                                            foreach($dtemplate['models_ava'] as $row) {
+                                                echo '<option value="'.$row['value'].'" '.(!empty($row['selected']) ? "selected" : "").'>'.$row['text'].'</option>';
+                                            }
+                                            ?>
+                                        </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><b><?php echo _("Display:")?></b></td>
+                                        <td>
+                                            <select class="form-control" name="area_list" id="area_list" onchange="epm_template_edit_select_area_list(this)">
+                                                <option value=""></option>
+                                                <?php 	
+                                                foreach($dtemplate['area_ava'] as $row) {
+                                                    echo '<option value="'.$row['value'].'" '.(!empty($row['selected']) ? "selected" : "").'>'.$row['text'].'</option>';
+                                                }
+                                                ?>
+                                            </select>
+                                            <strong><?php echo _('Line settings on this page')?></strong><i><font size="-2"> (Note: This is NOT the number of supported lines on the phone(s))</font></i>
+                                        </td>
+                                        
+                                        
+                                    <?php endif; ?>
+                                    
+                                    </tr>
+                                </table>
 						
                         
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-						
+							</div>
+						</div>
 					</div>
+	           </div>
+           </div>
+			<div class="col-md-6">
+            	<div class="row">
+             		<div class="col-md-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title"><i class="fa  fa-file-code-o fa-lg"></i> <?php echo _("Settings")?></h3>
+                            </div>
+                            <div class="panel-body">
+                                <button type="button" class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#CfgGlobalTemplate"><i class='fa fa-pencil-square-o'></i> <?php echo _('Edit Global Settings Overrides')?></button>
+                            </div>
+                        </div>
+                	</div>
 				</div>
-			</div>
-            
-            
-			<div class="col-sm-6">
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<h3 class="panel-title"><i class="fa  fa-file-code-o fa-lg"></i> <?php echo _("Settings")?></h3>
-					</div>
-					<div class="panel-body">
-						<table class="table">
-							<tr>
-								<td colspan="2">
-									<button type="button" class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#CfgGlobalTemplate"><i class='fa fa-pencil-square-o'></i> <?php echo _('Edit Global Settings Overrides')?></button>
-								</td>
-							</tr>
-							
-							
-
-
-
+                <div class="row">
+             		<div class="col-md-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title"><i class="fa  fa-file-code-o fa-lg"></i> <?php echo _("Edit File Configurations")?></h3>
+                            </div>
+                            <div class="panel-body">
+                                <?php 
+                                if ($dtemplate['alt'] != 0) {
+                                    foreach($dtemplate['alt_configs'] as $row): 
+                                    ?>
+                                    <div class="col-md-12">
+	                                    <div class="input-group input-group-br">
+                                            <select class="form-control selectpicker" data-style="btn-success" data-live-search-placeholder="Buscar" data-live-search="true" name="<?php echo $row['name']; ?>" id="altconfig_<?php echo $row['name']; ?>">
+	                                            <option data-divider="true" disabled></option>
+                                               	<option data-icon="fa fa-files-o" value="0_<?php echo $row['name']; ?>"><?php echo $row['name']; ?> (No Change)</option>
+                                                <optgroup label="MODIFICACIONES">
+                                                    <?php
+                                                    if (isset($row['list'])) {
+                                                        foreach($row['list'] as $srow) {
+                                                            echo '<option data-icon="fa fa-pencil-square-o" style="background: #5cb85c; color: #fff;" value="'.$srow['id'].'_'.$srow['name'].'" '.(isset($srow['selected']) ? "selected" : "" ).'>'.$srow['name'].'</option>';
+                                                        }
+                                                    }
+                                                    ?>
+                                                </optgroup>
+                                            </select>
+                                          	<span class="input-group-btn">
+                                                <button class="btn btn-success" type="button">
+                                                    <i class='fa fa-pencil-square-o'>&nbsp;</i>
+                                                </button>
+                                    		</span>
+                                    	</div>
+                                    </div>
+                                    <?php 
+                                    endforeach;
+                                }
+                                
+                                foreach($dtemplate['only_configs'] as $row): 
+                                ?>
+								<div class="col-md-12">
+                                	<div class="input-group input-group-br">
+                                        <select class="form-control selectpicker"  name="<?php echo $row['name']; ?>" id="altconfig_<?php echo $row['name']; ?>">
+                                            <option data-icon="fa fa-files-o" value="0_<?php echo $row['name']; ?>"><?php echo $row['name']; ?> (No Change)</option>
+                                        </select>
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-default" type="button"><i class='fa fa-files-o'>&nbsp;</i></button>
+                                        </span>
+                                    </div>
+								</div>
+                                <?php endforeach; ?> 
+                            </div>
+                        </div>
+	                </div>
+                </div>
+    		</div>
+		</div>
+	</div>
+	
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
 	<?php /*           
 	{if condition="$alt != 0"}
@@ -147,90 +192,19 @@
         <br/>
     {/loop}
 	*/ ?>
-
-
-
-
-
-							
-                            
-                            
-							<?php 
-							if ($dtemplate['alt'] != 0) {
-						    	foreach($dtemplate['alt_configs'] as $row): ?>
-						    		<tr>
-										<td><b><?php echo _("Edit File Configurations for:")?></b></td>
-										<td>
-											<a href="#" onclick="return popitup('config.php?type=tool&display=epm_config&amp;quietmode=1&amp;handler=file&amp;file=popup.html.php&amp;module=endpointman&amp;pop_type=alt_cfg_edit', '<?php echo $row['name']; ?>')">
-							            		<code><?php echo $row['name']; ?></code> <i class='fa fa-pencil fa-lg' ALT='<?php echo _('Edit')?> <?php echo $row['name']; ?>'></i>
-							            	</a>
-										</td>
-									</tr>
-									
-									<tr>
-										<td><b><?php echo _("Select Alternative File Configurations for ")?></b><code><?php echo $row['name']; ?></code></td>
-										<td>
-											<select class="form-control" name="<?php echo $row['name']; ?>" id="altconfig_<?php echo $row['name']; ?>">';
-							            		<option value="0_<?php echo $row['name']; ?>"><?php echo $row['name']; ?> (No Change)</option>';
-							            		<?php
-							            		if (isset($row['list'])) {
-								            		foreach($row['list'] as $srow) {
-								                		echo '<option value="'.$srow['id'].'_'.$srow['name'].'" '.(isset($srow['selected']) ? "selected" : "" ).'>'.$srow['name'].'</option>';
-								            		}
-							            		}
-												?>
-							            	</select>
-										</td>
-									</tr>
-								<?php 
-							   	endforeach;
-		    				}
-		    				
-		    				foreach($dtemplate['only_configs'] as $row): ?>
-								<tr>
-									<td><b><?php echo _("Edit File Configurations for:")?></b></td>
-									<td>
-										<a href='#' onclick='return popitup2("config.php?type=tool&display=epm_config&amp;quietmode=1&amp;handler=file&amp;file=popup.html.php&amp;module=endpointman&amp;pop_type=alt_cfg_edit", "<?php echo $row['name']?>")'>
-											<code><?php echo $row['name']?></code>&nbsp;<i class='fa fa-pencil fa-lg'></i>
-										</a>
-									</td>
-								</tr>
-							<?php endforeach; ?>
-                            
-                            
-                            
-                            
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                            
-                            
-                            
-						</table>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 	<div class="">
 		<div class="row">
-			<div class="col-sm-12">
+			<div class="col-md-12">
             
 				<div class="panel panel-default">
 					<div class="panel-heading">
@@ -259,7 +233,7 @@
     
 	<div class="">
 		<div class="row">
-			<div class="col-sm-12">
+			<div class="col-md-12">
 				<div id="main-slider" class="liquid-slider">
 				<?php foreach($dtemplate['template_editor'] as $row) : ?> <!-- INI foreach de tabs -->
 					<div>
@@ -552,6 +526,8 @@
     		</div>
 	    </div>
     </div>
+    
+</form>
 <?php 
 
 return;
@@ -575,17 +551,9 @@ return;
 
 
 /*
-
-<input name="id" id="id" type="hidden" value="<?php echo $request['idsel'] ?>">
-	<input name="custom" id="custom" type="hidden" value="<?php echo $request['custom'] ?>">
-	
 	<label>Reboot Phone(s) <input type='checkbox' name='epm_reboot'></label>
 	<br />
 	<button type="submit" name="button_save_template"><i class='icon-save blue'></i> <?php echo _('Save Template');?></button>
-
-
-
-
 
 
 	

@@ -1,6 +1,5 @@
 @CHARSET "ISO-8859-1";
 
-
 #epm_templates option[value=""], #epm_advanced option[value=""], #epm_config option[value=""] {
 	background-color: #E5FFCC;
 }

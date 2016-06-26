@@ -2,7 +2,7 @@
 	<rawname>endpointman</rawname>
 	<repo>unsupported</repo>
 	<name>OSS PBX End Point Manager</name>
-	<version>13.0.7.8</version>
+	<version>13.0.7.9</version>
 	<type>setup</type>
 	<category>Connectivity</category>
 	<license>GPLv2+</license>
@@ -21,6 +21,7 @@
 		Pull Requests can be made to either of these and are encouraged.
     </description>
 		<changelog>
+		*13.0.7.9* Add bootstrap-select, continue updating Template Editor...
 		*13.0.7.8* Fix bug multi sql query is not found. Continue updating Template Editor...
 		*13.0.7.7* Update i18n-es, global config dialog save, load config for ajax....
 		*13.0.7.6* Add new function  getActionBar all class, update style textbox, textare Template Editor....

@@ -15,3 +15,7 @@
 #epm_templates li {
   line-height: 24px;
 }
+
+div.input-group-br {
+	margin-bottom: 5px;
+}

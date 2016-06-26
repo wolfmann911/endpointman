@@ -307,6 +307,81 @@ function epm_template_custom_config_reset_global(elmnt)
 
 
 
+function epm_template_edit_select_area_list (obj)
+{
+	
+	var maxlines = obj.options[obj.selectedIndex].value;
+	var id = epm_global_get_value_by_form("epm_tamplate_edit_form", "id");
+	
+	var silent_mode = $.getUrlVar('silent_mode');
+	if (silent_mode == true) 
+	{
+		
+		alert ("true");
+		
+
+		if (id == 0) {
+			fpbxToast("No Device Selected to Edit!!", "Error!", 'error');
+		}
+		else {
+
+			
+			/*
+			model_list = 126
+			template_list = 0
+			and = new Date().getTime()
+		
+	    <?php if (isset($_REQUEST['silent_mode'])) { echo '<input name="silent_mode" id="silent_mode" type="hidden" value="1">'; } ?>
+		<input name="" id="id" type="hidden" value="<?php echo $dtemplate['hidden_id']; ?>">
+		<input name="custom" id="custom" type="hidden" value="<?php echo $dtemplate['hidden_custom'] ; ?>">
+
+		
+			// --> PHP
+			$template_editor = TRUE;
+			$sql = "UPDATE  endpointman_mac_list SET  model =  '".$_REQUEST['model_list']."' WHERE  id =".$_REQUEST['edit_id']; -> id cambiar por template_id
+			$endpoint->eda->sql($sql);
+			$endpoint->tpl->assign("silent_mode", 1);
+	
+			if ($_REQUEST['template_list'] == 0) {
+				$endpoint->edit_template_display($_REQUEST['edit_id'],1);
+			} else {
+				$endpoint->edit_template_display($_REQUEST['template_list'],0);
+			}
+			// <-- PHP
+		*/	
+		}
+	}
+	else 
+	{
+		var custom = $.getUrlVar('custom');
+		window.location.href='config.php?display=epm_templates&subpage=editor&custom=' + custom + '&idsel=' + id + '&maxlines=' + maxlines
+	}
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 	
