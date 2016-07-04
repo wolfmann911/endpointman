@@ -33,17 +33,20 @@ function epm_config_select_tab_ajax(idtab = "")
 		return false;
 	}
 	clearTimeout(v_sTimerUpdateAjax);
-	$("#epm_config_"+ idtab +"_load_init").each(function() {
-		if ($(this).css('display') === "none") 
-		{
-			$(this).show("slow", function() {
-				var $tmp = epm_config_LoadContenidoAjax(idtab, "list_all_brand");
-			});
-		}
-		else {
-			var $tmp = epm_config_LoadContenidoAjax(idtab, "list_all_brand");
-		}
-	});
+
+	epm_global_html_find_show_hide("#epm_config_" + idtab + "_list_loading", true, 0, true);
+	
+	waitingDialog.show();
+	var $tmp = epm_config_LoadContenidoAjax(idtab, "list_all_brand");
+	if ($tmp = "false") {
+		setTimeout(function () {waitingDialog.hide();}, 3000);
+		epm_global_html_find_show_hide("#epm_config_" + idtab + "_list_loading", false, 3000, true);
+	}
+	else {
+		epm_global_html_find_show_hide("#epm_config_" + idtab + "_list_loading", false, 1000, true);
+	}
+
+	
 	return true;
 }
 
@@ -64,13 +67,13 @@ function end_module_actions_epm_config(acctionname = "")
 function epm_config_LoadContenidoAjax(idtab, opt)
 {
 	clearTimeout(v_sTimerUpdateAjax);
+	
 	opt = opt.trim();
 	idtab = idtab.trim();
+	if ((idtab === "") || (opt === "")) { return false; }
 	
 	var statustab = $("#" + idtab).css('display').trim();
-	
-	if ((idtab === "") || (statustab === "") || (opt === "")) { return false; }
-	if (statustab === "none") { return false; }
+	if ((statustab === "") || (statustab === "none")) { return false; }
 	
 	$.ajax({
 		type: 'POST',
@@ -124,7 +127,7 @@ function epm_config_LoadContenidoAjax(idtab, opt)
 				}
 			}
 			v_sTimerUpdateAjax = setTimeout(function () { epm_config_LoadContenidoAjax(idtab, "list_all_brand"); }, tTimer);
-			epm_global_html_find_show_hide("#epm_config_"+ idtab +"_load_init", false, 800, true);
+			setTimeout(function () {waitingDialog.hide();}, 3000);
 		}
 	});
 	return true;
@@ -414,7 +417,7 @@ function epm_config_tab_manager_countlist(prefijoid = "", datosxml = "")
 function epm_config_tab_manager_bt_update_check_click() 
 {
 	var urlStr = "config.php?display=epm_config&module_tab=manager&command=check_for_updates";
-	epm_global_dialog_action("bt_update_chkeck", urlStr);
+	epm_global_dialog_action("bt_update_chkeck", urlStr, null, "Update Package Info", "", { "Close": function() { $(this).dialog("close"); } });	
 }
 
 function epm_config_tab_manager_bt(opt, idfw, command) 

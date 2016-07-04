@@ -124,7 +124,7 @@ function epm_global_limpiaForm(miForm) {
 
 
 
-function epm_global_dialog_action(actionname = "", urlStr = "", formname = null, titleStr = "Status", ClassDlg = "")
+function epm_global_dialog_action(actionname = "", urlStr = "", formname = null, titleStr = "Status", ClassDlg = "", buttons = "")
 {
 	var oData = null;
 	
@@ -140,8 +140,10 @@ function epm_global_dialog_action(actionname = "", urlStr = "", formname = null,
 		maxHeight: 350,
 		scroll: true,
 		position: { my: "top-175", at: "center", of: window },
+		buttons: buttons,
 		open: function (e) {
 			$('#moduledialogwrapper').html('Loading... ' + '<i class="fa fa-spinner fa-spin fa-2x">');
+			$('#moduledialogwrapper').dialog('widget').find('div.ui-dialog-buttonpane div.ui-dialog-buttonset button').eq(0).button('disable');
 			
 			if (formname !== null) {
 				var form = document.forms.namedItem(formname);
@@ -156,7 +158,8 @@ function epm_global_dialog_action(actionname = "", urlStr = "", formname = null,
 				//$('#moduledialogwrapper').animate({ scrollTop: $(this).scrollTop() + $(document).height() });
 				if (xhr.readyState === XMLHttpRequest.DONE) {
 					window.clearTimeout(timer);
-					if (typeof end_module_actions === 'function') { 
+					if (typeof end_module_actions === 'function') {
+						$('#moduledialogwrapper').dialog('widget').find('div.ui-dialog-buttonpane div.ui-dialog-buttonset button').eq(0).button('enable');
 						end_module_actions(actionname); 
 					}
 				}

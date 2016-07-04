@@ -117,6 +117,7 @@ function epm_advanced_tab_manual_upload_bt_upload(command, formname)
 
 function epm_advanced_tab_manual_upload_list_files_brand_expor()
 {
+	waitingDialog.show();
 	epm_global_html_find_show_hide("#list-brands-export-item-loading", true, 0, true);
 	if ($("#list-brands-export li.item-list-brand-export").length > 0) {
 		$("#list-brands-export li.item-list-brand-export").hide("slow" , function () {
@@ -207,7 +208,7 @@ function epm_advanced_tab_manual_upload_list_files_brand_expor()
 						$(this).blur();
 					});
 					
-					fpbxToast(data.message, '', 'success');
+					//fpbxToast(data.message, '', 'success');
 					return true;
 				} 
 				else {
@@ -217,6 +218,7 @@ function epm_advanced_tab_manual_upload_list_files_brand_expor()
 				}
 			},
 		});
+		setTimeout(function () {waitingDialog.hide();}, 1000);
 	}
 }
 
@@ -270,6 +272,7 @@ function epm_advanced_tab_poce_update_list_brand_bootnav(forzar=false)
 		);
 	}
 	
+waitingDialog.show();
 	epm_advanced_tab_poce_clear_select();
 	$.ajax({
 		type: 'POST',
@@ -319,7 +322,7 @@ function epm_advanced_tab_poce_update_list_brand_bootnav(forzar=false)
 				
 				
 				$("#lista_brand_bootnav a.bootnavloadingajax").remove();
-				fpbxToast('Load date Done!', '', 'success');
+//				fpbxToast('Load date Done!', '', 'success');
 				return true;
 			} 
 			else {
@@ -329,6 +332,7 @@ function epm_advanced_tab_poce_update_list_brand_bootnav(forzar=false)
 			}
 		},
 	});
+setTimeout(function () {waitingDialog.hide();}, 1000);
 	
 }
 
@@ -358,7 +362,8 @@ function epm_advanced_tab_poce_select_product(idsel = null, bclear = true)
 	if ($.isNumeric(idsel) === false) { return; }
 	$("div.list-group>a.active").removeClass("active");
 	$("#list_product_"+idsel).addClass("active").blur();
-    
+
+waitingDialog.show();
 	$.ajax({
 		type: 'POST',
 		url: "ajax.php",
@@ -388,7 +393,7 @@ function epm_advanced_tab_poce_select_product(idsel = null, bclear = true)
 				if (bclear == true) {
 					$("#poce_NameProductSelect").text(data.product_select_info.long_name);
 				}
-				fpbxToast('Load date Done!', '', 'success');
+//				fpbxToast('Load date Done!', '', 'success');
 				return true;
 			} 
 			else {
@@ -403,6 +408,7 @@ function epm_advanced_tab_poce_select_product(idsel = null, bclear = true)
 			}
 		},
 	});	
+setTimeout(function () {waitingDialog.hide();}, 1000);
 }
 
 function epm_advanced_tab_poce_create_file_list(idname, data = "", product_select = "", typefile = "") 
@@ -436,6 +442,7 @@ function epm_advanced_tab_poce_create_file_list(idname, data = "", product_selec
 
 function epm_advanced_tab_poce_select_file_edit (idpro_select, txtnamefile, idnamefile, typefile)
 {
+waitingDialog.show();
 	$.ajax({
 		type: 'POST',
 		url: "ajax.php",
@@ -513,7 +520,7 @@ function epm_advanced_tab_poce_select_file_edit (idpro_select, txtnamefile, idna
 				$('form[name=form_config_text_sec_button] input[name=location]').val(data.location);
 				$('form[name=form_config_text_sec_button] input[name=datosok]').val("true");
 				
-				fpbxToast('File Load date Done!', '', 'success');
+//				fpbxToast('File Load date Done!', '', 'success');
 				return true;
 			} 
 			else {
@@ -534,7 +541,7 @@ function epm_advanced_tab_poce_select_file_edit (idpro_select, txtnamefile, idna
 			}
 		},
 	});	
-	
+setTimeout(function () {waitingDialog.hide();}, 1000);	
 }
 
 function epm_advanced_tab_poce_bt_acction (command)
