@@ -244,7 +244,11 @@ class Endpointman_Advanced
 	}
 	
 	public function getRightNav($request) {
-		
+		return "";
+	}
+	
+	public function getActionBar($request) {
+		return "";
 	}
 	
 	
@@ -1084,13 +1088,11 @@ class Endpointman_Advanced
 				$time = time();
 				//TODO: Pendiente validar si exec no retorna error!!!!!
 				exec("tar zcf ".$this->PHONE_MODULES_PATH."temp/export/".$row['directory']."-".$time.".tgz --exclude .svn --exclude firmware -C ".$this->PHONE_MODULES_PATH."/endpoint ".$row['directory']);
-				out(_("Done!"));
+				out(_("Done!") . "<br />");
+
 				
-				
-				out(_("Click this link to download:"));
-				out("<a href='config.php?display=epm_advanced&subpage=manual_upload&command=export_brands_availables_file&file_package=".$row['directory']."-".$time.".tgz' target='_blank'>");
-				out(_("Here"));
-				out("</a>");
+				out(_("Click this link to download:"). "<br />");
+				out("<a href='config.php?display=epm_advanced&subpage=manual_upload&command=export_brands_availables_file&file_package=".$row['directory']."-".$time.".tgz' class='btn btn-success btn-lg active btn-block' role='button' target='_blank'>" . _("Here")."</a>");
 				//echo "Done! Click this link to download:<a href='modules/_ep_phone_modules/temp/export/".$row['directory']."-".$time.".tgz' target='_blank'>Here</a>";
 			}
 			unset ($dget);
@@ -1148,7 +1150,8 @@ class Endpointman_Advanced
 								if ($device[0] != "") {
 									if ($mac = $this->mac_check_clean($device[0])) {
 										$sql = "SELECT id FROM endpointman_brand_list WHERE name LIKE '%" . $device[1] . "%' LIMIT 1";
-										$res = sql($sql);
+										//$res = sql($sql);
+										$res = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
 										
 										if ($res->numRows() > 0) {
 											$brand_id = sql($sql, 'getOne');

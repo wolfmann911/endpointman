@@ -198,7 +198,11 @@ class Endpointman_Config
 	}
 	
 	public function getRightNav($request) {
-		
+		return "";
+	}
+	
+	public function getActionBar($request) {
+		return "";
 	}
 	
 	

@@ -1,4 +1,3 @@
-
 <?php
 	if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 	
@@ -14,150 +13,199 @@
 ?>
 
 
-	<!--
-	if ($request['custom'] != 0): 
-	<form action="config.php?type=tool&display=epm_templates" method="post">
-	{if condition="isset($silent_mode)"}
-	<input name="silent_mode" id="silent_mode" type="hidden" value="1">
-	{/if}
-	-->
 
 
-
-
-	<div class="">
-		<div class="row">
-			<div class="col-sm-6">
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<h3 class="panel-title"><i class="fa  fa-info-circle fa-lg"></i> <?php echo _("Info Template")?></h3>
-					</div>
-					<div class="panel-body">
-					
-					
-						<table class="table">
-							<tr>
-								<td><b><?php echo _("Template Name:")?></b></td>
-								<td><?php if ($request['custom'] != 0): ?>Custom Template: Extension <?php echo $dtemplate['ext']; ?><?php else: ?><?php echo $dtemplate['template_name']; ?><?php endif; ?></td>
-							</tr>
-							<tr>
-								<td><b><?php echo _("Product Line:")?></b></td>
-								<td><?php echo $dtemplate['product']; ?></td>
-							</tr>
-							<tr>
-								<td><b><?php echo _("Clone of Model:")?></b></td>
-								<?php if ($request['custom'] != 0): ?>
-								<td><?php echo $dtemplate['model'] ?></td>
-								<?php else: ?>
-								<td>
-								<select class="form-control" name="model_list" id="model_list" disabled>
-									<?php
-									foreach($dtemplate['models_ava'] as $row) {
-										echo '<option value="'.$row['value'].'" '.(!empty($row['selected']) ? "selected" : "").'>'.$row['text'].'</option>';
-									}
-									?>
-								</select>
-								</td>
-								<?php endif; ?>
-							</tr>
-							<tr>
-								<td><b><?php echo _("Display:")?></b></td>
-								<td>
-									<!-- 
-									{if condition="isset($silent_mode)"}
-									onchange="window.location.href='config.php?display=epm_config&quietmode=1&handler=file&file=popup.html.php&module=endpointman&pop_type=edit_template&edit_id={$hidden_id}&model_list=126&template_list=0&rand='+ new Date().getTime() + '&maxlines='+this.options[this.selectedIndex].value"
-									{else}
-									onchange="window.location.href='config.php?type=tool&edit_template=true&display=epm_templates&custom='+ document.getElementById('custom').value +'&id='+ document.getElementById('id').value +'&maxlines='+this.options[this.selectedIndex].value"
-									{/if}
-							 		-->
-									<select class="form-control" name="area_list" id="area_list">
-										<option value=""></option>
-										<?php 	
-										foreach($dtemplate['area_ava'] as $row) {
-											echo '<option value="'.$row['value'].'" '.(!empty($row['selected']) ? "selected" : "").'>'.$row['text'].'</option>';
-										}
-										?>
-									</select>
-									<strong><?php echo _('Line settings on this page')?></strong><i><font size="-2"> (Note: This is NOT the number of supported lines on the phone(s))</font></i>
-								</td>
-							</tr>
-						</table>
-						
-						
-					</div>
-				</div>
-			</div>
-            
-            
-			<div class="col-sm-6">
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<h3 class="panel-title"><i class="fa  fa-file-code-o fa-lg"></i> <?php echo _("Settings")?></h3>
-					</div>
-					<div class="panel-body">
-					
-					
-						<table class="table">
-							<tr>
-								<td colspan="2">
-									<button type="button" class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#CfgGlobalTemplate"><i class='fa fa-pencil-square-o'></i> <?php echo _('Edit Global Settings Overrides')?></button>
-								</td>
-							</tr>
-							
-							
-							
-							<?php 
-							if ($dtemplate['area_ava'] != 0) {
-						    	foreach($dtemplate['alt_configs'] as $row): ?>
-						    		<tr>
-										<td><b><?php echo _("Edit File Configurations for:")?></b></td>
-										<td>
-											<a href="#" onclick="return popitup('config.php?type=tool&display=epm_config&amp;quietmode=1&amp;handler=file&amp;file=popup.html.php&amp;module=endpointman&amp;pop_type=alt_cfg_edit', '<?php echo $row['name']; ?>')">
-							            		<code><?php echo $row['name']; ?></code> <i class='fa fa-pencil fa-lg' ALT='<?php echo _('Edit')?> <?php echo $row['name']; ?>'></i>
-							            	</a>
-										</td>
-									</tr>
-									
-									<tr>
-										<td><b><?php echo _("Select Alternative File Configurations for ")?></b><code><?php echo $row['name']; ?></code></td>
-										<td>
-											<select class="form-control" name="<?php echo $row['name']; ?>" id="altconfig_<?php echo $row['name']; ?>">';
-							            		<option value="0_<?php echo $row['name']; ?>"><?php echo $row['name']; ?> (No Change)</option>';
-							            		<?php
-							            		if (isset($row['list'])) {
-								            		foreach($row['list'] as $srow) {
-								                		echo '<option value="'.$srow['id'].'_'.$srow['name'].'" '.(isset($srow['selected']) ? "selected" : "" ).'>'.$srow['name'].'</option>';
-								            		}
-							            		}
-												?>
-							            	</select>
-										</td>
-									</tr>
-								<?php 
-							   	endforeach;
-		    				}
-		    				
-		    				foreach($dtemplate['only_configs'] as $row): ?>
-								<tr>
-									<td><b><?php echo _("Edit File Configurations for:")?></b></td>
-									<td>
-										<a href='#' onclick='return popitup2("config.php?type=tool&display=epm_config&amp;quietmode=1&amp;handler=file&amp;file=popup.html.php&amp;module=endpointman&amp;pop_type=alt_cfg_edit", "<?php echo $row['name']?>")'>
-											<code><?php echo $row['name']?></code>&nbsp;<i class='fa fa-pencil fa-lg'></i>
-										</a>
-									</td>
-								</tr>
-							<?php endforeach; ?>
-						</table>
-						
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+<form action="" method="post" id="epm_tamplate_edit_form" name="epm_tamplate_edit_form">
+	<?php if (isset($_REQUEST['silent_mode'])) { echo '<input name="silent_mode" id="silent_mode" type="hidden" value="1">'; } ?>
+	<input name="id" id="id" type="hidden" value="<?php echo $dtemplate['hidden_id']; ?>">
+	<input name="custom" id="custom" type="hidden" value="<?php echo $dtemplate['hidden_custom'] ; ?>">
 	
 	<div class="">
 		<div class="row">
-			<div class="col-sm-12">
+			<div class="col-md-6">
+	            <div class="row">
+             		<div class="col-md-12">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h3 class="panel-title"><i class="fa  fa-info-circle fa-lg"></i> <?php echo _("Info Template")?></h3>
+							</div>
+							<div class="panel-body">
+                    
+                    
+                    
+                    
+                                <table class="table">
+                                    <tr>
+                                        <td><b><?php echo _("Template Name:")?></b></td>
+                                        <td><?php if ($request['custom'] != 0): ?>Custom Template: Extension <?php echo $dtemplate['ext']; ?><?php else: ?><?php echo $dtemplate['template_name']; ?><?php endif; ?></td>
+                                    </tr>
+                                    <tr>
+                                        <td><b><?php echo _("Product Line:")?></b></td>
+                                        <td><?php echo $dtemplate['product']; ?></td>
+                                    </tr>
+                                    <tr>
+                                        <td><b><?php echo _("Clone of Model:")?></b></td>
+                                    <?php if ($request['custom'] != 0): ?>
+                                        <td><?php echo $dtemplate['model'] ?></td>
+                                    <?php else: ?>
+                                        <td>
+                                        <select class="form-control" name="model_list" id="model_list" disabled>
+                                            <?php
+                                            foreach($dtemplate['models_ava'] as $row) {
+                                                echo '<option value="'.$row['value'].'" '.(!empty($row['selected']) ? "selected" : "").'>'.$row['text'].'</option>';
+                                            }
+                                            ?>
+                                        </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><b><?php echo _("Display:")?></b></td>
+                                        <td>
+                                            <select class="form-control" name="area_list" id="area_list" onchange="epm_template_edit_select_area_list(this)">
+                                                <option value=""></option>
+                                                <?php 	
+                                                foreach($dtemplate['area_ava'] as $row) {
+                                                    echo '<option value="'.$row['value'].'" '.(!empty($row['selected']) ? "selected" : "").'>'.$row['text'].'</option>';
+                                                }
+                                                ?>
+                                            </select>
+                                            <strong><?php echo _('Line settings on this page')?></strong><i><font size="-2"> (Note: This is NOT the number of supported lines on the phone(s))</font></i>
+                                        </td>
+                                        
+                                        
+                                    <?php endif; ?>
+                                    
+                                    </tr>
+                                </table>
+						
+                        
+							</div>
+						</div>
+					</div>
+	           </div>
+           </div>
+			<div class="col-md-6">
+            	<div class="row">
+             		<div class="col-md-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title"><i class="fa  fa-file-code-o fa-lg"></i> <?php echo _("Settings")?></h3>
+                            </div>
+                            <div class="panel-body">
+                                <button type="button" class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#CfgGlobalTemplate"><i class='fa fa-pencil-square-o'></i> <?php echo _('Edit Global Settings Overrides')?></button>
+                            </div>
+                        </div>
+                	</div>
+				</div>
+                <div class="row">
+             		<div class="col-md-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title"><i class="fa  fa-file-code-o fa-lg"></i> <?php echo _("Edit File Configurations")?></h3>
+                            </div>
+                            <div class="panel-body">
+                                <?php 
+                                if ($dtemplate['alt'] != 0) {
+                                    foreach($dtemplate['alt_configs'] as $row): 
+                                    ?>
+                                    <div class="col-md-12">
+	                                    <div class="input-group input-group-br">
+                                            <select class="form-control selectpicker" data-style="btn-success" data-live-search-placeholder="Buscar" data-live-search="true" name="<?php echo $row['name']; ?>" id="altconfig_<?php echo $row['name']; ?>">
+	                                            <option data-divider="true" disabled></option>
+                                               	<option data-icon="fa fa-files-o" value="0_<?php echo $row['name']; ?>"><?php echo $row['name']; ?> (No Change)</option>
+                                                <optgroup label="MODIFICACIONES">
+                                                    <?php
+                                                    if (isset($row['list'])) {
+                                                        foreach($row['list'] as $srow) {
+                                                            echo '<option data-icon="fa fa-pencil-square-o" style="background: #5cb85c; color: #fff;" value="'.$srow['id'].'_'.$srow['name'].'" '.(isset($srow['selected']) ? "selected" : "" ).'>'.$srow['name'].'</option>';
+                                                        }
+                                                    }
+                                                    ?>
+                                                </optgroup>
+                                            </select>
+                                          	<span class="input-group-btn">
+                                                <button class="btn btn-success" type="button">
+                                                    <i class='fa fa-pencil-square-o'>&nbsp;</i>
+                                                </button>
+                                    		</span>
+                                    	</div>
+                                    </div>
+                                    <?php 
+                                    endforeach;
+                                }
+                                
+                                foreach($dtemplate['only_configs'] as $row): 
+                                ?>
+								<div class="col-md-12">
+                                	<div class="input-group input-group-br">
+                                        <select class="form-control selectpicker"  name="<?php echo $row['name']; ?>" id="altconfig_<?php echo $row['name']; ?>">
+                                            <option data-icon="fa fa-files-o" value="0_<?php echo $row['name']; ?>"><?php echo $row['name']; ?> (No Change)</option>
+                                        </select>
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-default" type="button"><i class='fa fa-files-o'>&nbsp;</i></button>
+                                        </span>
+                                    </div>
+								</div>
+                                <?php endforeach; ?> 
+                            </div>
+                        </div>
+	                </div>
+                </div>
+    		</div>
+		</div>
+	</div>
+	
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+	<?php /*           
+	{if condition="$alt != 0"}
+        {loop name="alt_configs"}
+            <p><strong><?php echo _('Edit File Configurations for:')?></strong>
+            <a href="#" onclick="return popitup('config.php?type=tool&display=epm_config&amp;quietmode=1&amp;handler=file&amp;file=popup.html.php&amp;module=endpointman&amp;pop_type=alt_cfg_edit', '{$value.name}')">
+            <code>{$value.name}</code> <i class='icon-pencil blue' ALT='<?php echo _('Edit')?> {$value.name}'></i></a>
+            <br>
+			
+			
+            <strong><?php echo _('Select Alternative File Configurations for')?> <code>{$value.name}</code></strong>
+            <select name="{$value.name}" id="altconfig_{$value.name}">';
+            <option value="0_{$value.name}">{$value.name} (No Change)</option>';
+            {loop name="value.list"}
+                <option value="{$value.id}_{$value.name}" {if condition="isset($value.selected)"}selected{/if}>{$value.name}</option>';
+            {/loop}
+            </select>
+            <br/>
+        {/loop}
+            <br/>
+	{/if}
+    
+    {loop name="only_configs"}
+        <strong><?php echo _('Edit File Configurations for:')?></strong>&nbsp;
+        <a href="#" onclick="return popitup2('config.php?type=tool&display=epm_config&amp;quietmode=1&amp;handler=file&amp;file=popup.html.php&amp;module=endpointman&amp;pop_type=alt_cfg_edit', '{$value.name}')"><code>{$value.name}</code>&nbsp;<i class='icon-pencil blue' ALT='<?php echo _('Edit')?>'></i></a>
+        <br/>
+    {/loop}
+	*/ ?>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+	<div class="">
+		<div class="row">
+			<div class="col-md-12">
+            
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<h3 class="panel-title"><i class="fa  fa-code"></i> <?php echo _("Example of Variables allowed in boxes")?></h3>
@@ -173,6 +221,7 @@
 						</ul>
 					</div>
 				</div>
+                
 			</div>
 		</div>
 	</div>
@@ -181,8 +230,332 @@
 	
 	
 	
-	
-	
+    
+	<div class="">
+		<div class="row">
+			<div class="col-md-12">
+				<div id="main-slider" class="liquid-slider">
+				<?php foreach($dtemplate['template_editor'] as $row) : ?> <!-- INI foreach de tabs -->
+					<div>
+                        <h2 class="title"><?php echo $row['title'];?></h2>
+                    	<?php 
+						foreach($row['data'] as $srow) 	//INI foreach objetos de cada tab
+						{
+							switch ($srow['type']) {
+								case 'input':
+									//INI INPUT-TEXT
+									?>
+                                    <div class="element-container">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="row">
+                                                    <div class="form-group">
+                                                        <div class="col-md-3">
+                                                            <label class="control-label" for="<?php echo $srow['key']; ?>">
+                                                            <?php 
+                                                            if (! isset($srow['tooltip'])) { echo $srow['description']; }
+                                                            else { echo '<a href="#" class="info">'.$srow['description'].'<span>'.$srow['tooltip'].'</span></a>'; }
+                                                            ?>
+                                                            </label>
+                                                            <i class="fa fa-question-circle fpbx-help-icon" data-for="<?php echo $srow['key']; ?>"></i>
+                                                        </div>
+                                                        <div class="col-md-9">
+															<input type="text" class="form-control" id="<?php echo $srow['key']; ?>" name="<?php echo $srow['key']; ?>" placeholder="" value="<?php echo $srow['value']; ?>" size="<?php echo (isset($srow['max_chars']) ? $srow['max_chars'] : "90" ); ?>">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <span class="help-block fpbx-help-block" id="<?php echo $srow['key']; ?>-help">Texto ayuda ("<?php echo $srow['key']; ?>")!</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php
+									//END INPUT-TEXT
+									break;
+									
+								case 'textarea':
+									//INI TEXTAREA
+									?>
+                                     <div class="element-container">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="row">
+                                                    <div class="form-group">
+                                                        <div class="col-md-3">
+                                                            <label class="control-label" for="<?php echo $srow['key']; ?>">
+                                                            <?php 
+                                                            if (! isset($srow['tooltip'])) { echo $srow['description']; }
+                                                            else { echo '<a href="#" class="info">'.$srow['description'].'<span>'.$srow['tooltip'].'</span></a>'; }
+                                                            ?>
+                                                            </label>
+                                                            <i class="fa fa-question-circle fpbx-help-icon" data-for="<?php echo $srow['key']; ?>"></i>
+                                                        </div>
+                                                        <div class="col-md-9">
+	                      									<textarea class="form-control" id="<?php echo $srow['key']; ?>" name="<?php echo $srow['key']; ?>" rows="<?php echo (isset($srow['rows']) ? $srow['rows'] : "2" ); ?>" cols="<?php echo (isset($srow['cols']) ? $srow['cols'] : "20" ); ?>"><?php echo $srow['value']; ?></textarea>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <span class="help-block fpbx-help-block" id="<?php echo $srow['key']; ?>-help">Texto ayuda ("<?php echo $srow['key']; ?>")!</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php
+									//END TEXTAREA
+									break;
+									
+								case 'radio':
+									//INI RADIO
+									?>
+                                     <div class="element-container">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="row">
+                                                    <div class="form-group">
+                                                        <div class="col-md-3">
+                                                            <label class="control-label" for="<?php echo $srow['key']; ?>">
+                                                            <?php 
+                                                            if (! isset($srow['tooltip'])) { echo $srow['description']; }
+                                                            else { echo '<a href="#" class="info">'.$srow['description'].'<span>'.$srow['tooltip'].'</span></a>'; }
+                                                            ?>
+                                                            </label>
+                                                            <i class="fa fa-question-circle fpbx-help-icon" data-for="<?php echo $srow['key']; ?>"></i>
+                                                        </div>
+                                                        <div class="col-md-9 radioset">
+                                                        	<?php
+															foreach($srow['data'] as $lrow) {
+																/*
+																echo '[<label>';
+																echo (! isset($lrow['tooltip']) ? $lrow['description'] : '<a href="#" class="info">'.$lrow['description'].'<span>'.$lrow['tooltip'].'</span></a>').':';
+																//echo '<input type="radio" name="'.$lrow['key'].'" id="'.$lrow['key'].'" value="'.$lrow['value'].'" '.(array_key_exists('checked', $lrow['value']) ? $lrow['checked'] : '').' >';
+																echo '<input type="radio" name="'.$lrow['key'].'" id="'.$lrow['key'].'" value="'.$lrow['value'].'" >';
+																echo '</label>]';
+																
+																<input type="radio" class="form-control" id="addtocdrno" name="addtocdr" value="0" <?php echo ($addtocdr == '1' ? '' : 'CHECKED'); ?>>
+																<label for="addtocdrno"><?php echo _("No")?></label>
+																*/
+		                                                        echo '<input type="radio" class="form-control" id="'.$lrow['key'].'" name="'.$srow['key'].'" value="'.$lrow['value'].'" '.($lrow['value'] == $lrow['checked'] ? 'CHECKED' : '').'>';
+																echo '<label for="'.$lrow['key'].'">'.(! isset($lrow['tooltip']) ? $lrow['description'] : '<a href="#" class="info">'.$lrow['description'].'<span>'.$lrow['tooltip'].'</span></a>').'</label>';
+															}
+															?>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <span class="help-block fpbx-help-block" id="<?php echo $srow['key']; ?>-help">Texto ayuda ("<?php echo $srow['key']; ?>")!</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php
+									//END RAIDO
+									break;
+									
+								case 'list':
+									//INI LIST
+									?>
+                                    <div class="element-container">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="row">
+                                                    <div class="form-group">
+                                                        <div class="col-md-3">
+                                                            <label class="control-label" for="<?php echo $srow['key']; ?>">
+                                                            <?php 
+                                                            if (! isset($srow['tooltip'])) { echo $srow['description']; }
+                                                            else { echo '<a href="#" class="info">'.$srow['description'].'<span>'.$srow['tooltip'].'</span></a>'; }
+                                                            ?>
+                                                            </label>
+                                                            <i class="fa fa-question-circle fpbx-help-icon" data-for="<?php echo $srow['key']; ?>"></i>
+                                                        </div>
+                                                        <div class="col-md-9">
+                                                        	<?php
+	                    									echo '<select name="'.$srow['key'].'" id="'.$srow['key'].'" class="form-control">';
+															foreach($srow['data'] as $lrow) 
+															{
+																//echo '<option value="'.$lrow['value'].'" '.(array_key_exists('selected',$lrow['selected'])? $lrow['value'] : '').' >'.$lrow['description'].'</option>';
+																echo '<option value="'.$lrow['value'].'" '.($lrow['value'] == $lrow['selected'] ? 'selected' : '').' >'.$lrow['description'].'</option>';
+															}
+															echo '</select>';
+															?>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <span class="help-block fpbx-help-block" id="<?php echo $srow['key']; ?>-help">Texto ayuda ("<?php echo $srow['key']; ?>")!</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php
+									//END LIST
+									break;
+									
+									
+								case 'checkbox':
+									//INI CHEBOX
+									//PENDIENTE UPATEAR.....
+									?>
+                                    <div class="element-container">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="row">
+                                                    <div class="form-group">
+                                                        <div class="col-md-3">
+                                                            <label class="control-label" for="<?php echo $srow['key']; ?>">
+                                                            <?php 
+                                                            if (! isset($srow['tooltip'])) { echo $srow['description']; }
+                                                            else { echo '<a href="#" class="info">'.$srow['description'].'<span>'.$srow['tooltip'].'</span></a>'; }
+                                                            ?>
+                                                            </label>
+                                                            <i class="fa fa-question-circle fpbx-help-icon" data-for="<?php echo $srow['key']; ?>"></i>
+                                                        </div>
+                                                        <div class="col-md-9">
+															<input type="checkbox" class="form-control" name="<?php echo $srow['key']; ?>" id="<?php echo $srow['key']; ?>" value="<?php echo $srow['value']; ?>">';
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <span class="help-block fpbx-help-block" id="<?php echo $srow['key']; ?>-help">Texto ayuda ("<?php echo $srow['key']; ?>")!</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php
+									//END CHEKBOX
+									break;
+									
+								case 'break':
+									//INI BREAK
+									?>
+                                     <div class="element-container">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="row">
+                                                    <div class="form-group">
+                                                        <div class="col-md-12">&nbsp;</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php
+									//END BREAK
+									break;
+										
+								case 'group':
+									//INI group
+									?>
+                                     <div class="element-container">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="row">
+                                                    <div class="form-group">
+                                                        <div class="col-md-12">
+                                                        	<hr>
+															<?php echo '<h3>'.(! isset($srow['tooltip']) ? $srow['description'] : '<a href="#" class="info">'.$srow['description'].'<span>'.$srow['tooltip'].'</span></a>').'</h3><br />'; ?>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php
+									//END group
+									break;
+											
+								case 'header':
+									//INI HEADER
+									?>
+                                     <div class="element-container">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="row">
+                                                    <div class="form-group">
+                                                        <div class="col-md-12">
+                                                        	<?php echo '<strong>'.(! isset($srow['tooltip']) ? $srow['description'] : '<a href="#" class="info">'.$srow['description'].'<span>'.$srow['tooltip'].'</span></a>').'</strong><br/>'; ?>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php
+									//END HEADER
+									break;
+							}
+							
+							if (isset($srow['aried'])) {
+								//INI ARIED
+								?>
+								 <div class="element-container">
+									<div class="row">
+										<div class="col-md-12">
+											<div class="row">
+												<div class="form-group">
+													<div class="col-md-12">
+														<?php echo '<label><input type="checkbox" name="ari_'.$srow['ari']['key'].'" '.(isset($srow['ari']['checked']) ? $srow['ari']['checked'] : '' ).' >End User Editable (<a href="http://projects.colsolgrp.net/documents/29" target="_blank">Through ARI Module</a>)</label>'; ?>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<?php
+								//END ARIEND
+							}
+							
+						} //END foreach objetos de cada tabs
+						?>
+	                    </div>
+					<?php endforeach; ?> <!-- END foreach tabs -->
+				</div>
+    		</div>
+	    </div>
+    </div>
+    
+</form>
+<?php 
+
+return;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+	<label>Reboot Phone(s) <input type='checkbox' name='epm_reboot'></label>
+	<br />
+	<button type="submit" name="button_save_template"><i class='icon-save blue'></i> <?php echo _('Save Template');?></button>
+
+
 	
 	<div class="coda-slider-wrapper">
 		<div class="coda-slider preload" id="coda-slider-9">
@@ -266,26 +639,8 @@
 		?>
 		</div><!-- .coda-slider -->
 	</div><!-- .coda-slider-wrapper -->
-	<input name="id" id="id" type="hidden" value="<?php echo $request['idsel'] ?>">
-	<input name="custom" id="custom" type="hidden" value="<?php echo $request['custom'] ?>">
-	
-	<label>Reboot Phone(s) <input type='checkbox' name='epm_reboot'></label>
-	<br />
-	<button type="submit" name="button_save_template"><i class='icon-save blue'></i> <?php echo _('Save Template');?></button>
 
-
-<?php 
-
-return;
-
-
-
-
-
-
-
-
-
+*/
 
 
 
@@ -373,6 +728,7 @@ if($default_display) {
                 if (window.focus) {newwindow.focus()}
                 return false;
         }
+		
         function popitup3(url) {
             newwindow=window.open(url + '&custom=' + document.getElementById('custom').value + '&tid=' + document.getElementById('id').value + '&value=0_' + name + '&rand=' + new Date().getTime(),'name','height=700,width=800,scrollbars=yes,location=no');
                 if (window.focus) {newwindow.focus()}

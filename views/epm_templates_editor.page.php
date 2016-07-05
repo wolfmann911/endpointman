@@ -1,6 +1,10 @@
 <?php
 	if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 	
+	if ($_REQUEST['subpage'] != "editor") {
+		echo "Pagina no valida!";
+		return;
+	}
 	
 	$product_list = "SELECT * FROM endpointman_product_list WHERE id > 0";
 	$product_list =& sql($product_list,'getAll', DB_FETCHMODE_ASSOC);

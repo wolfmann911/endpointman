@@ -36,7 +36,7 @@ class Endpointman_Templates
 	}
 
 	public function ajaxRequest($req, &$setting) {
-		$arrVal = array("model_clone", "list_current_template", "add_template", "del_template");
+		$arrVal = array("model_clone", "list_current_template", "add_template", "del_template", "custom_config_get_gloabl", "custom_config_update_gloabl", "custom_config_reset_gloabl");
 		if (in_array($req, $arrVal)) {
 			$setting['authenticate'] = true;
 			$setting['allowremote'] = false;
@@ -73,6 +73,27 @@ class Endpointman_Templates
 					break;
 			}
 		}
+		elseif ($module_tab == "editor")
+		{
+			switch ($command)
+			{
+				case "custom_config_get_gloabl":
+					$retarr = $this->epm_template_custom_config_get_global();
+					break;
+				
+				case "custom_config_update_gloabl":
+					$retarr = $this->epm_template_custom_config_update_global();
+					break;
+				
+				case "custom_config_reset_gloabl":
+					$retarr = $this->epm_template_custom_config_reset_global();
+					break;
+					
+				default:
+					$retarr = array("status" => false, "message" => _("Command not found!") . " [" .$command. "]");
+					break;
+			}
+		}
 		else {
 			$retarr = array("status" => false, "message" => _("Tab not found!") . " [" .$module_tab. "]");
 		}
@@ -85,11 +106,199 @@ class Endpointman_Templates
 	
 	public function getRightNav($request) {
 		if(isset($request['subpage']) && $request['subpage'] == "editor") {
-			return load_view(__DIR__."/views/epm_templates/rnav.php",array());
+			return load_view(__DIR__."/views/epm_templates/editor.views.rnav.php",array());
 		} else {
 			return '';
 		}
 	}
+	
+	public function getActionBar($request) {
+		$buttons = array();
+        switch($request['subpage']) {
+            case 'editor':
+                $buttons = array(
+					'delete' => array(
+                        'name' => 'delete',
+                        'id' => 'delete',
+                        'value' => _('Delete'),
+                        'hidden' => ''
+                    ),
+                    'saverebootphones' => array(
+                        'name' => 'saverebootphones',
+                        'id' => 'saverebootphones',
+                        'value' => _('Save & Reboot Phone(s)'),
+                        'hidden' => ''
+                    ),
+					'save' => array(
+                        'name' => 'save',
+                        'id' => 'save',
+                        'value' => _('Save'),
+                        'hidden' => ''
+                    )
+                );
+				
+				if(empty($request['idsel']) && empty($request['custom'])){
+					$buttons = NULL;
+				}
+            	break;
+				
+			default:
+        }
+        return $buttons;
+	}
+	
+	
+	
+	
+	
+	
+	public function epm_template_custom_config_get_global()
+	{
+		if (! isset($_REQUEST['custom'])) {
+			$retarr = array("status" => false, "message" => _("No send Custom Value!"));
+		}
+		elseif (! isset($_REQUEST['tid'])) {
+			$retarr = array("status" => false, "message" => _("No send TID!"));
+		}
+		elseif (! is_numeric($_REQUEST['tid'])) {
+			$retarr = array("status" => false, "message" => _("TID is not number!"));
+		}
+		else 
+		{
+			$dget['custom'] = $_REQUEST['custom'];
+			$dget['tid'] = $_REQUEST['tid'];
+			
+			if($dget['custom'] == 0) {
+				//This is a group template
+		        $sql = 'SELECT global_settings_override FROM endpointman_template_list WHERE id = '.$dget['tid'];
+			} else {
+				//This is an individual template
+		        $sql = 'SELECT global_settings_override FROM endpointman_mac_list WHERE id = '.$dget['tid'];;
+			}
+			$settings = sql($sql, 'getOne');
+
+			if ((isset($settings)) and (strlen($settings) > 0)) {
+				$settings = unserialize($settings);
+				//$settings['tz'] = FreePBX::Endpointman()->listTZ(FreePBX::Endpointman()->configmod->get("tz"));
+			} 
+			else {
+				$settings['srvip'] = ""; //$this->configmod->get("srvip");
+				$settings['ntp'] = ""; //$this->configmod->get("ntp");
+				$settings['config_location'] = ""; //$this->configmod->get("config_location");
+				$settings['tz'] = $this->configmod->get("tz");
+				$settings['server_type'] = $this->configmod->get("server_type");
+			}
+    		
+			$retarr = array("status" => true, "settings" => $settings, "message" => _("Global Config Read OK!"));
+			unset($dget);
+		}
+		return $retarr;
+	}
+	
+	
+	public function epm_template_custom_config_update_global ()
+	{
+		if (! isset($_REQUEST['custom'])) {
+			$retarr = array("status" => false, "message" => _("No send Custom Value!"));
+		}
+		elseif (! isset($_REQUEST['tid'])) {
+			$retarr = array("status" => false, "message" => _("No send TID!"));
+		}
+		elseif (! is_numeric($_REQUEST['tid'])) {
+			$retarr = array("status" => false, "message" => _("TID is not number!"));
+		}
+		else 
+		{
+			$dget['custom'] = $_REQUEST['custom'];
+			$dget['tid'] = $_REQUEST['tid'];
+			
+			
+			$_REQUEST['srvip'] = trim($_REQUEST['srvip']);  #trim whitespace from IP address
+			$_REQUEST['config_loc'] = trim($_REQUEST['config_loc']);  #trim whitespace from Config Location
+	
+			$settings_warning = "";
+			if (strlen($_REQUEST['config_loc']) > 0) {
+				//No trailing slash. Help the user out and add one :-)
+				if($_REQUEST['config_loc'][strlen($_REQUEST['config_loc'])-1] != "/") {
+					$_REQUEST['config_loc'] = $_REQUEST['config_loc'] ."/";
+				}
+				
+				if((isset($_REQUEST['config_loc'])) AND ($_REQUEST['config_loc'] != "")) {
+					if((file_exists($_REQUEST['config_loc'])) AND (is_dir($_REQUEST['config_loc']))) {
+						if(is_writable($_REQUEST['config_loc'])) {
+							$_REQUEST['config_loc'] = $_REQUEST['config_loc'];
+						} else {
+							$settings_warning = _("Directory Not Writable!");
+							$_REQUEST['config_loc'] = $this->configmod->get('config_location');
+						}
+					} else {
+						$settings_warning = _("Not a Vaild Directory");
+						$_REQUEST['config_loc'] = $this->configmod->get('config_location');
+					}
+				} else {
+					$settings_warning = _("No Configuration Location Defined!");
+					$_REQUEST['config_loc'] = $this->configmod->get('config_location');
+				}
+			}
+			
+			$settings['config_location'] = $_REQUEST['config_loc'];
+			$settings['server_type'] = (isset($_REQUEST['server_type']) ? $_REQUEST['server_type'] : "");	//REVISAR NO ESTABA ANTES
+			$settings['srvip'] = (isset($_REQUEST['srvip']) ? $_REQUEST['srvip'] : "");
+			$settings['ntp'] = (isset($_REQUEST['ntp_server']) ? $_REQUEST['ntp_server'] : "");
+			$settings['tz'] = (isset($_REQUEST['tz']) ? $_REQUEST['tz'] : "");
+			$settings_ser = serialize($settings);
+			unset($settings);
+			
+			if($dget['custom'] == 0) {
+				//This is a group template
+				$sql = "UPDATE endpointman_template_list SET global_settings_override = '".addslashes($settings_ser)."' WHERE id = ".$dget['tid'];
+			} else {
+				//This is an individual template
+				$sql = "UPDATE endpointman_mac_list SET global_settings_override = '".addslashes($settings_ser)."' WHERE id = ".$dget['tid'];
+			}
+			unset($settings_ser);
+			sql($sql);
+			
+			if (strlen($settings_warning) > 0) { $settings_warning = " ".$settings_warning; }
+			$retarr = array("status" => true, "message" => _("Updated!").$settings_warning);
+			unset($dget);
+		}
+		return $retarr;
+	}
+	
+	
+	public function epm_template_custom_config_reset_global()
+	{
+		if (! isset($_REQUEST['custom'])) {
+			$retarr = array("status" => false, "message" => _("No send Custom Value!"));
+		}
+		elseif (! isset($_REQUEST['tid'])) {
+			$retarr = array("status" => false, "message" => _("No send TID!"));
+		}
+		elseif (! is_numeric($_REQUEST['tid'])) {
+			$retarr = array("status" => false, "message" => _("TID is not number!"));
+		}
+		else 
+		{
+			$dget['custom'] = $_REQUEST['custom'];
+			$dget['tid'] = $_REQUEST['tid'];
+			
+			if($dget['custom'] == 0) {
+				//This is a group template
+				$sql = "UPDATE endpointman_template_list SET global_settings_override = NULL WHERE id = ".$dget['tid'];
+			} else {
+				//This is an individual template
+				$sql = "UPDATE endpointman_mac_list SET global_settings_override = NULL WHERE id = ".$dget['tid'];
+			}
+			sql($sql);
+			
+			$retarr = array("status" => true, "message" => _("Globals Reset to Default!"));
+			unset($dget);
+		}
+		return $retarr;
+	}
+	
+	
 	
 	
 	/**** FUNCIONES SEC MODULO "epm_template\manager" ****/
@@ -303,11 +512,11 @@ class Endpointman_Templates
     	 }
 		$dReturn['product'] = $row['short_name'];
 		$dReturn['model'] = $row['model_name'];
-		
+
 		if ($ma = $this->models_available($row['model_id'], NULL, $row['product_id'])) {
 			$dReturn['models_ava'] = $ma;
 		}
-    	
+
 		if (isset($_REQUEST['maxlines'])) {
 			$areas = $this->areaAvailable($row['model_id'], $_REQUEST['maxlines']);
 		} else {
@@ -315,7 +524,6 @@ class Endpointman_Templates
 		}
 		$dReturn['area_ava'] = $areas;
     	
-    	 
 		//Start the display of the html file in the product folder
 		if ($row['config_files_override'] == "") {
 			$config_files_saved = "";
@@ -323,15 +531,14 @@ class Endpointman_Templates
 			$config_files_saved = unserialize($row['config_files_override']);
 		}
 		$config_files_list = explode(",", $row['config_files']);
-		$i = 0;
+
 		$alt = 0;
-		
 		$i = 0;
 		$b = 0;
 		$only_configs = array();
 		foreach ($config_files_list as $files) {
 			$sql = "SELECT * FROM  endpointman_custom_configs WHERE product_id = '" . $row['product_id'] . "' AND original_name = '" . $files . "'";
-			$alt_configs_list_count = sql($sql);
+			$alt_configs_list_count = sql($sql, 'getAll', DB_FETCHMODE_ASSOC );
 			if (! empty($alt_configs_list_count)) {
 				$alt_configs_list = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
 				$alt_configs[$i]['name'] = $files;

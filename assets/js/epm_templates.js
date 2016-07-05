@@ -7,15 +7,32 @@ function epm_templates_document_ready () {
 	$('#AddDlgModal_bt_new').on("click", function() { epm_tamplates_grid_add(); });
 	
 	$('#NewProductSelect').on('change', function() { epm_templates_add_NewProductSelect_Change (this); });
- 
-	$('#coda-slider-9').codaSlider({
-		dynamicArrows: false,
-		continuous: false
-	}); 
+
+	//http://kevinbatdorf.github.io/liquidslider/examples/page1.html#right
+	$('#main-slider').liquidSlider({
+		includeTitle:false,
+		continuous:false,
+		slideEaseFunction: "easeInOutCubic",
+		preloader:true,
+		onload: function() {
+			this.alignNavigation();
+			$('.liquid-slider').css('visibility', 'visible');
+		}
+	});
+		
+	//Al iniciar la apertura de la ventana
+	$('#CfgGlobalTemplate').on('show.bs.modal', function (e) {
+		epm_template_custom_config_get_global(e);	
+	});
+	
+	//Al finalizar la apertura de la ventana	$('#CfgGlobalTemplate').on('shown.bs.modal', function (e) { });
+	//Antes de iniciar el cierre de la ventana	$('#CfgGlobalTemplate').on('hide.bs.modal', function (e) { });
+	//Despues de Cerrar la ventana				$('#CfgGlobalTemplate').on('hidden.bs.modal', function (e) { });
+	
 }
 
 function epm_templates_windows_load (nTab = "") {
-
+	
 }
 
 function epm_templates_change_tab (nTab = "") {
@@ -27,20 +44,9 @@ function epm_templates_change_tab (nTab = "") {
 
 
 
-
-
-
-
-
-
-function epm_templates_rnav_format (value, row, index){
-	var html = '';
-	html += '<a href="?display=epm_templates&subpage=editor&idsel='+row.id+'">';
-	html += value;
-	html += '</a>&nbsp;';
-    return html;
-}
-
+$("#table-all-side").on('click-row.bs.table',function(e,row,elem){
+	window.location = '?display=epm_templates&subpage=editor&custom='+row['custom']+'&idsel='+row['id'];
+})
 
 function epm_templates_grid_FormatThEnabled(value, row, index){
 	var html = '';
@@ -189,3 +195,211 @@ function epm_tamplates_grid_add()
 
 
 
+
+
+
+function epm_template_custom_config_get_global(elmnt)
+{
+	$.ajax({
+		type: 'POST',
+		url: "ajax.php",
+		data: {
+			module: "endpointman",
+			module_sec: "epm_templates",
+			module_tab: "editor",
+			command: "custom_config_get_gloabl",
+			custom : $.getUrlVar('custom'),
+			tid : $.getUrlVar('idsel')
+		},
+		dataType: 'json',
+		timeout: 60000,
+		error: function(xhr, ajaxOptions, thrownError) {
+			fpbxToast('ERROR AJAX:' + thrownError,'ERROR (' + xhr.status + ')!','error');
+			return false;
+		},
+		success: function(data) {
+			if (data.status == true) 
+			{
+				$("#srvip").val( data.settings.srvip );
+				$("#server_type").val( data.settings.server_type );
+				$("#config_loc").val( data.settings.config_location );
+				$("#tz").val( data.settings.tz );
+				$("#ntp_server").val( data.settings.ntp );
+				
+				if (elmnt.name == "button_undo_globals") {
+					fpbxToast(data.message, '', 'success');
+				}
+			} 
+			else { fpbxToast(data.message, "Error!", 'error'); }
+		}
+	});
+}
+
+function epm_template_custom_config_update_global(elmnt)
+{
+	$.ajax({
+		type: 'POST',
+		url: "ajax.php",
+		data: {
+			module: "endpointman",
+			module_sec: "epm_templates",
+			module_tab: "editor",
+			command: "custom_config_update_gloabl",
+			custom : $.getUrlVar('custom'),
+			tid : $.getUrlVar('idsel'),
+			tz: epm_global_get_value_by_form("FormCfgGlobalTemplate","tz"),
+			ntp_server: epm_global_get_value_by_form("FormCfgGlobalTemplate","ntp_server"),
+			srvip: epm_global_get_value_by_form("FormCfgGlobalTemplate","srvip"),			
+			config_loc: epm_global_get_value_by_form("FormCfgGlobalTemplate","config_loc"),
+			server_type: epm_global_get_value_by_form("FormCfgGlobalTemplate","server_type")
+		},
+		dataType: 'json',
+		timeout: 60000,
+		error: function(xhr, ajaxOptions, thrownError) {
+			fpbxToast('ERROR AJAX:' + thrownError,'ERROR (' + xhr.status + ')!','error');
+			return false;
+		},
+		success: function(data) {
+			if (data.status == true) 
+			{
+				fpbxToast(data.message, '', 'success');
+			} 
+			else { fpbxToast(data.message, "Error!", 'error'); }
+		}
+	});	
+}
+
+function epm_template_custom_config_reset_global(elmnt)
+{
+	$.ajax({
+		type: 'POST',
+		url: "ajax.php",
+		data: {
+			module: "endpointman",
+			module_sec: "epm_templates",
+			module_tab: "editor",
+			command: "custom_config_reset_gloabl",
+			custom : $.getUrlVar('custom'),
+			tid : $.getUrlVar('idsel')
+		},
+		dataType: 'json',
+		timeout: 60000,
+		error: function(xhr, ajaxOptions, thrownError) {
+			fpbxToast('ERROR AJAX:' + thrownError,'ERROR (' + xhr.status + ')!','error');
+			return false;
+		},
+		success: function(data) {
+			if (data.status == true) 
+			{
+				fpbxToast(data.message, '', 'success');
+				epm_template_custom_config_get_global(elmnt);
+			} 
+			else { fpbxToast(data.message, "Error!", 'error'); }
+		}
+	});
+}
+
+
+
+
+
+
+
+
+
+function epm_template_edit_select_area_list (obj)
+{
+	
+	var maxlines = obj.options[obj.selectedIndex].value;
+	var id = epm_global_get_value_by_form("epm_tamplate_edit_form", "id");
+	
+	var silent_mode = $.getUrlVar('silent_mode');
+	if (silent_mode == true) 
+	{
+		
+		alert ("true");
+		
+
+		if (id == 0) {
+			fpbxToast("No Device Selected to Edit!!", "Error!", 'error');
+		}
+		else {
+
+			
+			/*
+			model_list = 126
+			template_list = 0
+			and = new Date().getTime()
+		
+	    <?php if (isset($_REQUEST['silent_mode'])) { echo '<input name="silent_mode" id="silent_mode" type="hidden" value="1">'; } ?>
+		<input name="" id="id" type="hidden" value="<?php echo $dtemplate['hidden_id']; ?>">
+		<input name="custom" id="custom" type="hidden" value="<?php echo $dtemplate['hidden_custom'] ; ?>">
+
+		
+			// --> PHP
+			$template_editor = TRUE;
+			$sql = "UPDATE  endpointman_mac_list SET  model =  '".$_REQUEST['model_list']."' WHERE  id =".$_REQUEST['edit_id']; -> id cambiar por template_id
+			$endpoint->eda->sql($sql);
+			$endpoint->tpl->assign("silent_mode", 1);
+	
+			if ($_REQUEST['template_list'] == 0) {
+				$endpoint->edit_template_display($_REQUEST['edit_id'],1);
+			} else {
+				$endpoint->edit_template_display($_REQUEST['template_list'],0);
+			}
+			// <-- PHP
+		*/	
+		}
+	}
+	else 
+	{
+		var custom = $.getUrlVar('custom');
+		window.location.href='config.php?display=epm_templates&subpage=editor&custom=' + custom + '&idsel=' + id + '&maxlines=' + maxlines
+	}
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+	/*
+		//edit
+		//<a href="#" onclick="return popitup('config.php?type=tool&display=epm_config&amp;quietmode=1&amp;handler=file&amp;file=popup.html.php&amp;module=endpointman&amp;pop_type=alt_cfg_edit', '<?php echo $row['name']; ?>')">
+		function popitup(url, name) {
+            newwindow=window.open(url + '&custom=' + document.getElementById('custom').value + '&tid=' + document.getElementById('id').value + '&value=' + document.getElementById('altconfig_'+ name).value + '&rand=' + new Date().getTime(),'name','height=710,width=800,scrollbars=yes,location=no');
+                if (window.focus) {newwindow.focus()}
+                return false;
+        }
+		//edit
+		//<a href='#' onclick='return popitup2("config.php?type=tool&display=epm_config&amp;quietmode=1&amp;handler=file&amp;file=popup.html.php&amp;module=endpointman&amp;pop_type=alt_cfg_edit", "<?php echo $row['name']?>")'>
+        function popitup2(url, name) {
+            newwindow=window.open(url + '&custom=' + document.getElementById('custom').value + '&tid=' + document.getElementById('id').value + '&value=0_' + name + '&rand=' + new Date().getTime(),'name','height=700,width=800,scrollbars=yes,location=no');
+                if (window.focus) {newwindow.focus()}
+                return false;
+        }
+		
+
+*/	

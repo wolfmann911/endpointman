@@ -19,10 +19,11 @@
 	<h3><i class="fa fa-minus"></i><?php echo _("List Packages Manager") ?></h3>
 </div>
 <div class="section" data-id="epm_manager_list">
-	<div class="alert alert-info" role="alert" id="epm_config_manager_load_init">
-		<center><h2><?php echo _("Loading data...."); ?></h2></center>
-		<center><img src="assets/endpointman/images/ajax-loader-bar.gif" alt="" /></center>
-	</div>
+	<ul class="list-group" id="epm_config_manager_list_loading">
+		<li class="list-group-item text-center bg-info">
+			<i class="fa fa-spinner fa-pulse"></i>&nbsp; <?php echo _("Loading...")?>
+		</li>
+	</ul>
 	<div id="epm_config_manager_all_list_box">
 	</div>
 </div>
