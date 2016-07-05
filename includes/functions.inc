@@ -102,14 +102,6 @@ class endpointmanager {
             }
         }
 
-        //Define error reporting
-        if (($this->global_cfg['debug']) AND (!isset($_REQUEST['quietmode']))) {
-            error_reporting(E_ALL);
-            ini_set('display_errors', 1);
-        } else {
-            ini_set('display_errors', 0);
-        }
-
         //Check if config location is writable and/or exists!
         if (isset($this->global_cfg['config_location'])) {
             if (is_dir($this->global_cfg['config_location'])) {
