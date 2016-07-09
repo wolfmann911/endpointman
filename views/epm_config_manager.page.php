@@ -8,6 +8,19 @@
 				<div class="display no-border">
 					<div id="toolbar-all">
 						<button type="button" id="button_check_for_updates" class="btn btn-primary" disabled="true"><i class="fa fa-refresh"></i> <?php echo _("Check for Update"); ?></button>
+                        
+                        
+                        <form class="form-inline pull-xs-right">
+	                        <div class="input-group">
+								<input id="search" type="text" class="form-control" placeholder="Buscar Modelo..." />
+	                            <span class="input-group-btn">
+    	                            <button class="btn btn-info btn-lg" type="button">
+        	                            <i class="glyphicon glyphicon-search"></i>
+            	                    </button>
+                	            </span>
+                            </div>
+						</form>
+                        
 					</div>
 				</div>
 			</div>

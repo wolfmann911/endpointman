@@ -3,6 +3,32 @@ var v_sTimerUpdateAjax = "";
 
 function epm_config_document_ready () {
 	
+	$('#search').keyup(function(){	
+		var current_query = $('#search').val().toLowerCase();
+		if (current_query !== "") {
+			$("#epm_config_manager_all_list_box ul.list-group li").not('.active').hide().removeClass("search_list_ok");
+			$("#epm_config_manager_all_list_box ul.list-group li").not('.active').each(function(){
+				var current_keyword = $(this).text().toLowerCase();
+				if (current_keyword.indexOf(current_query) >=0) { $(this).show().addClass("search_list_ok"); }
+			});
+		} 
+		$("#epm_config_manager_all_list_box .element-container").each(function(){
+			if (current_query !== "") {
+				$(this).find("ul.list-group").each(function(){
+					$(this).show();
+					if ($(this).find("li.search_list_ok").not('.active').length == 0) 	{ $(this).hide(); }
+				});
+				$(this).show();
+				if ($(this).find("ul.list-group:visible").length == 0) 	{ $(this).hide(); }
+			}
+			else {
+				$(this).show();
+				$(this).find(".list-group").show();
+				$(this).find(".list-group li").show();
+			}
+		});
+	});
+	
 }
 
 function epm_config_windows_load (nTab = "") {
@@ -45,10 +71,9 @@ function epm_config_select_tab_ajax(idtab = "")
 	else {
 		epm_global_html_find_show_hide("#epm_config_" + idtab + "_list_loading", false, 1000, true);
 	}
-
-	
 	return true;
 }
+
 
 function end_module_actions_epm_config(acctionname = "")
 {
@@ -61,6 +86,9 @@ function end_module_actions_epm_config(acctionname = "")
 		case "manager_bt":
 			epm_config_select_tab_ajax(actTab);
 			break;
+		
+		default:
+			fpbxToast('end_module_actions_epm_config -> acctionname no send!','JS!','warning');
 	}
 }
 
@@ -291,18 +319,19 @@ function epm_config_tab_manager_ajax_get_add_data(data, idtab)
 	}
 	if (data.status === true) {
 		var boxappendL0 = "#epm_config_manager_all_list_box";
+		
 		if ((data.datlist === null) || (data.datlist === ""))
 		{
+			//LISTA VACIA NO HAY NINGUNA MARCA.
 			if ( $('#manager_alert_list_emtry').length === 0 ) 
 			{
 				$(boxappendL0).children("div").hide("slow", function () { $(this).remove(); });
 				$(boxappendL0).append(
-					$('<div/>', {
-						'class' : 'alert alert-info',
-						'role': 'alert',
-						'id' : 'manager_alert_list_emtry'
-					})
-					.text('List empty. Click the "check for updates" button to search for data on the server.')
+					$('<div/>', { 'class' : 'panel panel-warning', 'id' : 'manager_alert_list_emtry' })
+					.append(
+						$('<div/>', { 'class' : 'panel-heading' }).append( $('<h3/>', { 'class' : 'panel-title' }).text('LIST EMTRY!!!') ),
+						$('<div/>', { 'class' : 'panel-body' }).text('Click the "CHECK FOR UPDATES" button to search for data on the server.')
+					)
 				);
 			}
 		}
@@ -325,11 +354,38 @@ function epm_config_tab_manager_ajax_get_add_data(data, idtab)
 					epm_config_tab_manager_html_L1(itemData, iL1.prefijoid, data.txt, idtab);
 				}
 				
-				$('#' + iL1.prefijoid + "_txt_update").text(data.txt.new_pack_mod + ' [' + itemData.update_vers + ']');
-				$('#' + iL1.prefijoid + "_txt_last_update").text(data.txt.pack_last_mod + ' [' + itemData.cfg_ver_datetime + ']');
-				$('#' + iL1.prefijoid + "_checkbox_install").prop({'checked' : (itemData.local === "0" ? true : false)});
+				
+				
+				
+				$('#' + iL1.prefijoid + "_txt_update").text(data.txt.new_pack_mod + ' [' + itemData.update_vers_txt + ']');
+				$('#' + iL1.prefijoid + "_txt_last_update").text(data.txt.pack_last_mod + ' [' + itemData.cfg_ver_datetime_txt + ']');
 				epm_config_tab_manager_bt_enable_disable_ajustar(iL1, itemData, "L1");
-				if (itemData.installed === 0) { epm_global_html_find_hide_and_remove('#' + iL1.boxsubite); return; }
+				
+				
+				
+				if (itemData.installed === "0") {
+					epm_global_html_find_hide_and_remove('#' + iL1.boxsubite);
+					
+					//EN CASO DE QUE NO ESTE INSTALADO LA MARCA MUESTAR UN RECUADRO DICIENDOLO
+					if ($('#' + iL1.boxappend).find('div.panel').length === 0)
+					{
+						$('#' + iL1.boxappend).children("div").hide("slow", function () { $(this).remove(); });
+						$('#' + iL1.boxappend).append(
+							$('<div/>', { 'class' : 'panel panel-warning' }).append(
+								$('<div/>', { 'class' : 'panel-heading' }).append( $('<h3/>', { 'class' : 'panel-title' }).text('MARCA NO INSTALADA!') ),
+								$('<div/>', { 'class' : 'panel-body' }).text('Esta marca no esta instalada, haz Click en el boton Instalar para instalar el paquete.')
+							)
+						);
+					}
+					return;
+				}
+				else {
+					if ($('#' + iL1.boxappend).find('div.panel').length === 1)
+					{
+						$('#' + iL1.boxappend).children("div").hide("slow", function () { $(this).remove(); });
+					}
+				}
+				
 				
 				
 				
@@ -338,18 +394,79 @@ function epm_config_tab_manager_ajax_get_add_data(data, idtab)
 				
 				//L2: ini loop productos
 				$(itemData.products).each(function(indexL2, itemDataL2) 
-				{
+				{	
 if (itemData.products.length === 0) { return false; }
 					
-					var iL2 = new ItemsLevel(idtab, "producto", itemDataL2.id);
+					var iL2 = new ItemsLevel(idtab, "producto", itemDataL2.id);	
 					if (itemDataL2.hidden === 1) { epm_global_html_find_hide_and_remove('#' + iL2.boxelemen); return; }
 					if ( $('#' + iL2.boxelemen).length === 0 ) 
 					{
+						/*
 						CrearSubListItem(iL1);
 						$('#' + iL1.boxsubite).append(epm_config_tab_html_L0(iL2.prefijoid, data.txt.ayuda_producto));
 						epm_config_tab_manager_html_L2(itemDataL2, iL2.prefijoid, data.txt, idtab);
+						*/
+						
+						$('#' + iL1.boxappend).append(
+							$("<div/>", { 'id' : iL2.boxelemen, 'class' : 'col-lg-12'})
+							.append(
+								$('<ul/>', { 'id' : iL2.prefijoid, 'class' : 'list-group' })
+								.append(
+									//LI -> LINE DEL TITULO
+									$('<li/>', { 'class' : 'list-group-item active' })
+									.append(
+										$('<span/>', { 'class' : 'label label-default label-pill pull-xs-right count-products-brand' }).text("?/?"),
+										$('<i/>',    { 'class' : 'fa fa-list-alt fa-lg' })
+									).append( 
+										$("<b/>", {}).text(" " + itemDataL2.long_name) 
+									),
+									
+									//LI -> LINE DE LOS BOTONES GLOBALES
+									$('<li/>', { 'class' : 'list-group-item' })
+									.append(
+										$('<div/>', { 'class' : 'btn-group btn-group-sm', 'role' : 'group' })
+										.append(
+											$('<button/>', {
+												'type'	: 'button',
+												'id'	: iL2.prefijoid + '_bt_fw_install',
+												'class'	: 'btn btn-default btn-sm navbar-toggler hidden-sm-up'
+											})
+											.on( "click", function(){ epm_config_tab_manager_bt('fw_install', itemDataL2.id, 'firmware'); })
+											.append( 
+												$('<i/>', { 'class' : 'fa fa-plus-square-o fa-lg' }),
+												$('<span/>', {}).text(" " + data.txt.fw_install)
+											),
+											$('<button/>', {
+												'type'	: 'button',
+												'id'	: iL2.prefijoid + '_bt_fw_uninstall',
+												'class'	: 'btn btn-danger btn-sm'
+											})
+											.on( "click", function(){ epm_config_tab_manager_bt('fw_uninstall', itemDataL2.id, 'firmware'); })
+											.append( 
+												$('<i/>', { 'class' : 'fa fa-trash-o fa-lg' }),
+												$('<span/>', {}).text(" " + data.txt.fw_uninstall)
+											),
+											$('<button/>', {
+												'type'	: 'button',
+												'id'	: iL2.prefijoid + '_bt_fw_update',
+												'class'	: 'btn btn-default btn-sm'
+											})
+											.on( "click", function(){ epm_config_tab_manager_bt('fw_update', itemDataL2.id, 'firmware'); })
+											.append( 
+												$('<i/>', { 'class' : 'fa fa-refresh fa-spin fa-lg' }),
+												$('<span/>', {}).text(" " + data.txt.fw_update)
+											)
+										) // END GRUPO BOTONES
+									)  // END LI -> LINEA BOTONES GLOBLES
+								)  // END UL
+							) // END DIV GRUPO UL/LI
+						);
+
 					}
 					epm_config_tab_manager_bt_enable_disable_ajustar(iL2, itemDataL2, "L2");
+					
+					
+					
 					
 					//L3: Ini loop modelos
 					$(itemDataL2.models).each(function(indexL3, itemDataL3) 
@@ -360,27 +477,68 @@ if (itemDataL2.models.length === 0) { return false; }
 						if (itemDataL3.hidden === 1) { epm_global_html_find_hide_and_remove('#' + iL3.boxelemen); return; }
 						if ( $('#' + iL3.boxelemen).length === 0 ) 
 						{
+							/*
 							CrearSubListItem(iL2);
 							$('#' + iL2.boxsubite).append(epm_config_tab_html_L0(iL3.prefijoid, data.txt.ayuda_model));
 							epm_config_tab_manager_html_L3(itemDataL3, iL3.prefijo, iL3.prefijoid, itemDataL3.model, "0", data.txt.disable + " ", "1", data.txt.enable + " ", idtab);
+							*/
+							
+							$('#' + iL2.prefijoid)
+							.append(
+								$('<li/>', { 'class' : 'list-group-item radioset text-right', 'id' : iL3.boxelemen })
+								.append(
+									$('<span/>', { 'class' : 'pull-left' })
+									.append(
+										$('<label/>', {
+											'class' : 'control-label',
+											'for'   : iL3.prefijoid
+										}).text(" " + itemDataL3.model)
+									),
+									$('<input/>', {
+										'type'		: 'radio',
+										'name'		: iL3.prefijoid,
+										'id'		: iL3.prefijoid +'_disable',
+										'value'		: 0
+									})
+									.change(function(){ epm_config_tab_manager_bt_enable_disable_change(this, iL3.prefijo, itemDataL3.id); }),
+									$('<label/>', {
+										'for'  		: iL3.prefijoid +'_disable',
+										'data-for'	: iL3.prefijoid
+									})
+									.text(data.txt.disable + " ")
+									.append(
+										$('<i/>', { 'class' : 'fa fa-toggle-off' })
+									),
+									$('<input/>', {
+										'type'		: 'radio',
+										'name'		: iL3.prefijoid,
+										'id'		: iL3.prefijoid + '_enable',
+										'value'		: 1
+									})
+									.change(function(){ epm_config_tab_manager_bt_enable_disable_change(this, iL3.prefijo, itemDataL3.id); }),
+									$('<label/>', {
+										'for'  	: iL3.prefijoid + '_enable',
+										'data-for'	: iL3.prefijoid
+									})
+									.text(data.txt.enable + " ")
+									.append(
+										$('<i/>', { 'class' : 'fa fa-toggle-on' })
+									)
+								)
+							);
 						}
 						epm_config_tab_manager_bt_enable_disable_ajustar(iL3, itemDataL3, "L3");
 					});
 					//L3: end loop modelos
-					epm_config_html_ordenar_lista(iL2.boxappend, true);
 					epm_config_tab_manager_countlist(iL2.prefijoid, itemDataL2.models);
+					
 					
 				});
 				//L2: end loop productos
-				epm_config_html_ordenar_lista(iL1.boxappend, true);
-				
-				
-				
 				
 				
 			});
 			//L1: end loop marcas
-			epm_config_html_ordenar_lista(boxappendL0, true);
 			
 			if ($(boxappendL0).children("div").length === 0)
 			{
@@ -435,22 +593,29 @@ function epm_config_tab_manager_bt_enable_disable_ajustar(iL0, itemData, level)
 	{
 		epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt_brand_install", ((itemData.installed === "1") ? false : true));
 		epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt_brand_uninstall" , ((itemData.installed === "1") ? true : false));
-		epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt_brand_update", ((itemData.update !== "0") ? false : true));
-		epm_global_html_find_show_hide('#' + iL0.prefijoid + "_txt_update" , ((itemData.update !== "0") ? false : true));
+		epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt_brand_update", ((itemData.update === 1) ? true : false));
+		epm_global_html_find_show_hide('#' + iL0.prefijoid + "_txt_update" , ((itemData.update === 1) ? true : false));
 		return;
 	}
 	else if (level === "L2") 
 	{
 		if ((itemData.fw_type === "install") || (itemData.fw_type === "remove")) 
 		{
-			epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt_fw_install", 		((itemData.fw_type === "install") ? true : false));
-			epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt_fw_uninstall" , 	((itemData.fw_type === "install") ? false : true));
-			epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt_fw_update" , 		((itemData.update_fw === 0) ? false : true));
+			//epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt_fw_install", 		((itemData.fw_type === "install") ? true : false));
+			//epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt_fw_uninstall" , 	((itemData.fw_type === "install") ? false : true));
+			//epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt_fw_update" , 		((itemData.update_fw === 0) ? false : true));
+			
+			$('#' + iL0.prefijoid + "_bt_fw_install").attr("disabled", 	((itemData.fw_type === "install") ? true : false));
+			$('#' + iL0.prefijoid + "_bt_fw_uninstall").attr("disabled",((itemData.fw_type === "install") ? false : true));
+			$('#' + iL0.prefijoid + "_bt_fw_update").attr("disabled", 	((itemData.update_fw === 0) ? false : true));
 		}
 		else if (itemData.fw_type === "nothing") {
-			epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt_fw_install", false);
-			epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt_fw_uninstall", false);
-			epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt_fw_update", false);
+			//epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt_fw_install", false);
+			//epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt_fw_uninstall", false);
+			//epm_global_html_find_show_hide('#' + iL0.prefijoid + "_bt_fw_update", false);
+			$('#' + iL0.prefijoid + "_bt_fw_install").attr("disabled", true);
+			$('#' + iL0.prefijoid + "_bt_fw_uninstall").attr("disabled", true);
+			$('#' + iL0.prefijoid + "_bt_fw_update").attr("disabled", true);
 		}
 		return;
 	}
@@ -476,9 +641,9 @@ function epm_config_tab_manager_bt_enable_disable_ajustar(iL0, itemData, level)
 	}	
 }
 
-function epm_config_tab_manager_bt_enable_disable_change(obt, idtab, idtype, idbt) 
+function epm_config_tab_manager_bt_enable_disable_change(obt, idtype, idbt) 
 {
-	if ((idtab === "") || (idbt === "") || (idtype === "")) { return false; }
+	if ((idbt === "") || (idtype === "")) { return false; }
 	
 	var obt_name = $(obt).attr("name").toLowerCase();
 	var obt_val = $(obt).val().toLowerCase();
@@ -489,7 +654,7 @@ function epm_config_tab_manager_bt_enable_disable_change(obt, idtab, idtype, idb
 		data: {
 			module: "endpointman",
 			module_sec: "epm_config",
-			module_tab: idtab,
+			module_tab: "manager",
 			command: "saveconfig",
 			name:  obt_name,
 			value: obt_val,
@@ -539,16 +704,14 @@ function epm_config_tab_manager_html_L1(data, prefijoid, txt, idtab)
 					'data-for'	: prefijoid + '_label'
 				})
 			);
-			
+
 			$(this)
 			.children('.col-md-2')
-			.addClass("text-center")
 			.append(
-				$('<br/>', {}),
 				$('<button/>', {
 					'type'	: 'button',
 					'id'	: prefijoid + '_bt_brand_install',
-					'class'	: 'btn btn-success',
+					'class'	: 'btn btn-success col-md-12',
 					'value'	: txt.install
 				})
 				.on( "click", function(){ epm_config_tab_manager_bt('brand_install', data.id, 'brand'); })
@@ -559,7 +722,7 @@ function epm_config_tab_manager_html_L1(data, prefijoid, txt, idtab)
 				$('<button/>', {
 					'type'	: 'button',
 					'id'	: prefijoid + '_bt_brand_uninstall',
-					'class'	: 'btn btn-danger',
+					'class'	: 'btn btn-danger col-md-12',
 					'value'	: txt.uninstall
 				})
 				.on( "click", function(){ epm_config_tab_manager_bt('brand_uninstall', data.id, 'brand'); })
@@ -570,7 +733,7 @@ function epm_config_tab_manager_html_L1(data, prefijoid, txt, idtab)
 				$('<button/>', {
 					'type'	: 'button',
 					'id'	: prefijoid + '_bt_brand_update',
-					'class'	: 'btn btn-default',
+					'class'	: 'btn btn-success col-md-12',
 					'value'	: txt.update
 				})
 				.on( "click", function(){ epm_config_tab_manager_bt('brand_update', data.id, 'brand'); })
@@ -583,15 +746,8 @@ function epm_config_tab_manager_html_L1(data, prefijoid, txt, idtab)
 				$('<p/>', { 'id' : prefijoid + '_txt_last_update' }),
 				$('<p/>', {	'id' : prefijoid + '_txt_update' })
 			);
+
 			
-			/*
-			$(this)
-			.children('.col-md-10')
-			.append(
-				$('<p/>', { 'id' : prefijoid + '_txt_last_update' })
-				$('<p/>', {	'id' : prefijoid + '_txt_update' })
-			);
-			*/
 			
 		});
 	});
@@ -603,27 +759,30 @@ function epm_config_tab_manager_html_L2(data, prefijoid, txt, idtab)
 	.addClass( "L2" )
 	.each( function() {
 		$(this).find('.form-group').each( function() {
+			
 			$(this)
 			.children('.col-md-12')
 			.append(
-				$('<label/>', {
-					'class' : 'control-label',
-					'for'   : prefijoid
-				}).text(data.long_name + " "),
-				$('<i/>', {
-					'class'  	: 'fa fa-question-circle fpbx-help-icon',
-					'data-for'	: prefijoid
-				})
+				$('<ul/>', { 'class' : 'list-group' })
+				.append(
+					$('<li/>', { 'class' : 'list-group-item active' })
+					.append(
+						$('<span/>', { 'class' : 'label label-default label-pill pull-xs-right count-products-brand' }).text("?/?"),
+						$('<i/>',    { 'class' : 'fa fa-list-alt fa-lg' })
+					)
+					.append(
+						$("<b/>", {}).text(" " + data.long_name)
+					)
+				)
 			);
 			
 			$(this)
 			.children('.col-md-2')
-			.addClass("text-center")
 			.append(
 				$('<button/>', {
 					'type'	: 'button',
 					'id'	: prefijoid + '_bt_fw_install',
-					'class'	: 'btn btn-default'
+					'class'	: 'btn btn-default col-md-12'
 				})
 				.on( "click", function(){ epm_config_tab_manager_bt('fw_install', data.id, 'firmware'); })
 				.append( 
@@ -633,7 +792,7 @@ function epm_config_tab_manager_html_L2(data, prefijoid, txt, idtab)
 				$('<button/>', {
 					'type'	: 'button',
 					'id'	: prefijoid + '_bt_fw_uninstall',
-					'class'	: 'btn btn-danger'
+					'class'	: 'btn btn-danger col-md-12'
 				})
 				.on( "click", function(){ epm_config_tab_manager_bt('fw_uninstall', data.id, 'firmware'); })
 				.append( 
@@ -643,7 +802,7 @@ function epm_config_tab_manager_html_L2(data, prefijoid, txt, idtab)
 				$('<button/>', {
 					'type'	: 'button',
 					'id'	: prefijoid + '_bt_fw_update',
-					'class'	: 'btn btn-default'
+					'class'	: 'btn btn-default col-md-12'
 				})
 				.on( "click", function(){ epm_config_tab_manager_bt('fw_update', data.id, 'firmware'); })
 				.append( 
@@ -651,23 +810,6 @@ function epm_config_tab_manager_html_L2(data, prefijoid, txt, idtab)
 					$('<span/>', {}).text(" " + txt.fw_update)
 				)
 			);
-			
-			$(this)
-			.children('.col-md-10')
-			.append(
-				$('<ul/>', { 'class' : 'list-group' })
-				.append(
-					$('<li/>', { 'class' : 'list-group-item active' })
-					.append(
-						$('<span/>', { 'class' : 'label label-default label-pill pull-xs-right count-products-brand' }).text("?"),
-						$('<i/>',    { 'class' : 'fa fa-list-alt fa-lg' })
-					)
-					.append(
-						$("<b/>", {}).text(" " + "Lista de productos...")
-					)
-				)
-			);
-			
 			
 		});
 	});
@@ -731,6 +873,40 @@ function epm_config_tab_manager_html_L3(data, prefijo, prefijoid, name, value_di
 	});
 }
 //**** END: TAB/MANAGER ****
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
