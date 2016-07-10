@@ -317,7 +317,7 @@ class Endpointman_Config
 	{
 		$row_out = array();
 		$i = 0;
-		foreach ($this->epm_config_hardware_get_list_brand(true) as $row) 
+		foreach ($this->epm_config_hardware_get_list_brand(true, "name") as $row) 
 		{
 			$row_out[$i] = $row;
 			$row_out[$i]['count'] = $i;

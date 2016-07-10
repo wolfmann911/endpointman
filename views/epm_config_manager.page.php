@@ -7,7 +7,7 @@
 			<div class="fpbx-container">
 				<div class="display no-border">
 					<div id="toolbar-all">
-						<button type="button" id="button_check_for_updates" class="btn btn-primary" disabled="true"><i class="fa fa-refresh"></i> <?php echo _("Check for Update"); ?></button>
+						<button type="button" id="button_check_for_updates" class="btn btn-primary" disabled="false"><i class="fa fa-refresh"></i> <?php echo _("Check for Update"); ?></button>
                         
                         
                         <form class="form-inline pull-xs-right">
