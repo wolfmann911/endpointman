@@ -232,7 +232,12 @@ function epm_global_input_value_change_bt(sNameID = "", sValue = "", bSetFocus =
 {
 	if (sNameID === "" ) { return false; }
 	
-	$(sNameID).val(sValue);
+	if ($(sNameID).hasClass("selectpicker") == true) {
+		$(sNameID).selectpicker('val', sValue);
+	}
+	else {
+		$(sNameID).val(sValue);
+	}
 	if (bSetFocus === true) { $(sNameID).focus(); }
 }
 

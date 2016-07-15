@@ -573,7 +573,7 @@ function epm_config_tab_manager_html_L2(iL1, iL2, itemDataL2, txt)
 						$('<button/>', {
 							'type'	: 'button',
 							'id'	: iL2.prefijoid + '_bt_fw_install',
-							'class'	: 'btn btn-default btn-sm navbar-toggler hidden-sm-up'
+							'class'	: 'btn btn-default btn-sm'
 						})
 						.on( "click", function(){ epm_config_tab_manager_bt('fw_install', itemDataL2.id, 'firmware'); })
 						.append( 

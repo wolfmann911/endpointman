@@ -112,10 +112,14 @@ function epm_templates_add_NewProductSelect_Change (obj)
 				}
 				$("#NewCloneModel").html(options);
 				$('#NewCloneModel option:first').attr('selected', 'selected');
+				$('#NewCloneModel').selectpicker('refresh');
 			}
 		});
 	}
-	else { $("#NewCloneModel").html(''); }
+	else { 
+		$("#NewCloneModel").html(''); 
+		$('#NewCloneModel').selectpicker('refresh');
+	}
 }
 
 function epm_templates_grid_del (iddel)
@@ -220,11 +224,11 @@ function epm_template_custom_config_get_global(elmnt)
 		success: function(data) {
 			if (data.status == true) 
 			{
-				$("#srvip").val( data.settings.srvip );
-				$("#server_type").val( data.settings.server_type );
-				$("#config_loc").val( data.settings.config_location );
-				$("#tz").val( data.settings.tz );
-				$("#ntp_server").val( data.settings.ntp );
+				epm_global_input_value_change_bt("#srvip", data.settings.srvip, false);
+				epm_global_input_value_change_bt("#server_type", data.settings.server_type, false);
+				epm_global_input_value_change_bt("#config_loc", data.settings.config_location, false);
+				epm_global_input_value_change_bt("#tz", data.settings.tz, false);
+				epm_global_input_value_change_bt("#ntp_server", data.settings.ntp, false);
 				
 				if (elmnt.name == "button_undo_globals") {
 					fpbxToast(data.message, '', 'success');

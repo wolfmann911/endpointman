@@ -39,7 +39,7 @@
 										<i class="fa fa-question-circle fpbx-help-icon" data-for="NewProductSelect"></i>
 									</div>
 									<div class="col-md-8">
-										<select class="form-control" name="NewProductSelect" id="NewProductSelect">
+										<select class="form-control selectpicker show-tick" data-style="" data-live-search-placeholder="Buscar" data-live-search="true" name="NewProductSelect" id="NewProductSelect">
 											<option value=""><?php echo _("Select Product:")?></option>
 											<?php
 											$sql = "SELECT DISTINCT endpointman_product_list.* FROM endpointman_product_list, endpointman_model_list WHERE endpointman_product_list.id = endpointman_model_list.product_id AND endpointman_model_list.hidden = 0 AND endpointman_model_list.enabled = 1 AND endpointman_product_list.hidden != 1 AND endpointman_product_list.cfg_dir !=  ''";
@@ -73,7 +73,7 @@
 										<i class="fa fa-question-circle fpbx-help-icon" data-for="NewCloneModel"></i>
 									</div>
 									<div class="col-md-8">
-										<select class="form-control" name="NewCloneModel" id="NewCloneModel"></select>
+										<select class="form-control selectpicker show-tick" data-style="" data-live-search-placeholder="Buscar" data-live-search="true" name="NewCloneModel" id="NewCloneModel"></select>
 									</div>
 								</div>
 							</div>
