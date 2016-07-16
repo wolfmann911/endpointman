@@ -1,19 +1,6 @@
 <?php
 	if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
-	
-	if ((! isset($_REQUEST['idsel'])) || (! isset($_REQUEST['custom'])))
-	{
-		echo '<div class="alert alert-warning" role="alert">';
-		echo '<strong>'._("Warning!").'</strong>'.(" No select ID o Custom!");
-		echo '</div>';
-		return;
-	}
-	$dtemplate = FreePBX::Endpointman()->epm_templates->edit_template_display($_REQUEST['idsel'],$_REQUEST['custom']);
-	$request = $_REQUEST;
 ?>
-
-
-
 
 <form action="" method="post" id="epm_tamplate_edit_form" name="epm_tamplate_edit_form">
 	<?php if (isset($_REQUEST['silent_mode'])) { echo '<input name="silent_mode" id="silent_mode" type="hidden" value="1">'; } ?>
@@ -100,24 +87,22 @@
                                     foreach($dtemplate['alt_configs'] as $row): 
                                     ?>
                                     <div class="col-md-12">
-	                                    <div class="input-group input-group-br">
-                                            <select class="form-control selectpicker show-tick" data-style="btn-success" data-live-search-placeholder="Buscar" data-live-search="true" name="<?php echo $row['name']; ?>" id="altconfig_<?php echo $row['name']; ?>">
+	                                    <div class="input-group input-group-br alt_configs" name="alt_boxselect_<?php echo $row['id_p']; ?>" id="alt_boxselect_<?php echo $row['id_p']; ?>">
+                                            <select class="form-control selectpicker show-tick" data-style="btn-success" data-live-search-placeholder="Buscar" data-live-search="true" name="sl_alt_boxselect_<?php echo $row['id_p']; ?>" id="sl_alt_boxselect_<?php echo $row['id_p']; ?>">
 	                                            <option data-divider="true" disabled></option>
-                                               	<option data-icon="fa fa-files-o" value="0_<?php echo $row['name']; ?>"><?php echo $row['name']; ?> (No Change)</option>
+                                               	<option data-icon="fa fa-files-o" value="0_0_<?php echo $row['name']; ?>"><?php echo $row['name']; ?> (No Change)</option>
                                                 <optgroup label="MODIFICACIONES">
                                                     <?php
                                                     if (isset($row['list'])) {
                                                         foreach($row['list'] as $srow) {
-                                                            echo '<option data-icon="fa fa-pencil-square-o" style="background: #5cb85c; color: #fff;" value="'.$srow['id'].'_'.$srow['name'].'" '.(isset($srow['selected']) ? "selected" : "" ).'>'.$srow['name'].'</option>';
+                                                            echo '<option data-icon="fa fa-pencil-square-o" style="background: #5cb85c; color: #fff;" value="'.$row['id_p'].'_'.$srow['id'].'_'.$srow['name'].'" '.(isset($srow['selected']) ? "selected" : "" ).'>'.$srow['name'].'</option>';
                                                         }
                                                     }
                                                     ?>
                                                 </optgroup>
                                             </select>
                                           	<span class="input-group-btn">
-                                                <button class="btn btn-success" type="button">
-                                                    <i class='fa fa-pencil-square-o'>&nbsp;</i>
-                                                </button>
+                                                <button class="btn btn-success" type="button" name="bt_alt_boxselect_<?php echo $row['id_p']; ?>" id="bt_alt_boxselect_<?php echo $row['id_p']; ?>"><i class='fa fa-pencil-square-o'>&nbsp;</i></button>
                                     		</span>
                                     	</div>
                                     </div>
@@ -128,12 +113,12 @@
                                 foreach($dtemplate['only_configs'] as $row): 
                                 ?>
 								<div class="col-md-12">
-                                	<div class="input-group input-group-br">
-                                        <select class="form-control selectpicker"  name="<?php echo $row['name']; ?>" id="altconfig_<?php echo $row['name']; ?>">
-                                            <option data-icon="fa fa-files-o" value="0_<?php echo $row['name']; ?>"><?php echo $row['name']; ?> (No Change)</option>
+                                	<div class="input-group input-group-br only_configs" name="boxselect_<?php echo $row['id_p']."_".$row['id']; ?>" id="boxselect_<?php echo $row['id_p']."_".$row['id']; ?>">
+                                        <select class="form-control selectpicker" name="sl_boxselect_<?php echo $row['id_p']."_".$row['id']; ?>" id="sl_boxselect_<?php echo $row['id_p']."_".$row['id']; ?>">
+                                            <option data-icon="fa fa-files-o" value="<?php echo $row['name']; ?>"><?php echo $row['name']; ?> (No Change)</option>
                                         </select>
                                         <span class="input-group-btn">
-                                            <button class="btn btn-default" type="button"><i class='fa fa-files-o'>&nbsp;</i></button>
+                                            <button class="btn btn-default" type="button" name="bt_boxselect_<?php echo $row['id_p']."_".$row['id']; ?>" id="bt_boxselect_<?php echo $row['id']."_".$row['id']; ?>"><i class='fa fa-files-o'>&nbsp;</i></button>
                                         </span>
                                     </div>
 								</div>

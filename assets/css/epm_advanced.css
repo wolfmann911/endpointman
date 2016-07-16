@@ -101,11 +101,10 @@
   background-color: #f5f5f5;
 }
 
-#config_textarea {
+#poce > #config_textarea {
 	width: 100%;
 	-ms-overflow-style: none;
 	overflow: hidden;
-	
 }
 
 

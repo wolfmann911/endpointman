@@ -542,6 +542,7 @@ class Endpointman_Templates
 			if (! empty($alt_configs_list_count)) {
 				$alt_configs_list = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
 				$alt_configs[$i]['name'] = $files;
+				$alt_configs[$i]['id_p'] = $row['product_id'];
 				$files = str_replace(".", "_", $files);
 				$h = 0;
 				foreach ($alt_configs_list as $ccf) {
@@ -550,12 +551,16 @@ class Endpointman_Templates
 					if ((isset($config_files_saved[$cf_key])) AND (is_array($config_files_saved)) AND ($config_files_saved[$cf_key] == $ccf['id'])) {
 						$alt_configs[$i]['list'][$h]['selected'] = 'selected';
 					}
+					$alt_configs[$i]['list'][$h]['id'] = $h;
 					$alt_configs[$i]['list'][$h]['name'] = $ccf['name'];
 					$h++;
 				}
 				$alt = 1;
 			} 
 			else {
+				$only_configs[$b]['id'] = $b;
+				$only_configs[$b]['id_d'] = $id;
+				$only_configs[$b]['id_p'] = $row['product_id'];
 				$only_configs[$b]['name'] = $files;
 				$b++;
 			}

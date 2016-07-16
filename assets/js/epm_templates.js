@@ -1,11 +1,18 @@
+"use strict";
+var cmeditor = null;
+
 function epm_templates_document_ready () {
 	
-	$('#AddDlgModal').on('show.bs.modal', function (event) {
-		$(this).find('input, select').val("");
+	var arrayJs = ['assets/endpointman/js/addon/simplescrollbars.js', 'assets/endpointman/js/mode/xml.js'];
+	arrayJs.forEach(function (item, index, array) {
+		var x = document.createElement('script');
+		x.src = item;
+		document.getElementsByTagName("head")[0].appendChild(x);
 	});
 	
-	$('#AddDlgModal_bt_new').on("click", function() { epm_tamplates_grid_add(); });
 	
+	$('#AddDlgModal').on('show.bs.modal', function (event) { $(this).find('input, select').val(""); });
+	$('#AddDlgModal_bt_new').on("click", function() { epm_tamplates_grid_add(); });
 	$('#NewProductSelect').on('change', function() { epm_templates_add_NewProductSelect_Change (this); });
 
 	//http://kevinbatdorf.github.io/liquidslider/examples/page1.html#right
@@ -29,6 +36,62 @@ function epm_templates_document_ready () {
 	//Antes de iniciar el cierre de la ventana	$('#CfgGlobalTemplate').on('hide.bs.modal', function (e) { });
 	//Despues de Cerrar la ventana				$('#CfgGlobalTemplate').on('hidden.bs.modal', function (e) { });
 	
+	
+	
+	
+	
+	
+	$('#CfgEditFileTemplate').on('show.bs.modal', function (e) {
+		
+	});	
+	
+	$('#CfgEditFileTemplate').on('shown.bs.modal', function (e) {
+		if (cmeditor === null) {
+			cmeditor = CodeMirror.fromTextArea(document.getElementById("config_textarea"), {
+				lineNumbers: true,
+				matchBrackets: true,
+				readOnly: false,
+				viewportMargin: Infinity,
+				scrollbarStyle: "simple"
+			});
+		}
+	});
+	
+	$('#CfgEditFileTemplate').on('hidden.bs.modal', function (e) {
+		$('#edit_file_name_path').val("No Selected");
+		$('#config_textarea').val("");
+	});
+	
+	
+	
+	
+	$('.only_configs button').click(function(e){
+		var NameBox = "sl_" + e.target.parentNode.parentNode.id;
+		var NameFile = $('#' + NameBox).val();
+		
+		$('#edit_file_name_path').text(NameFile);
+		$('#config_textarea').val("Texto 123");
+		$('#CfgEditFileTemplate').modal('show');
+	});  
+	
+	$('.alt_configs button').click(function(e){
+		var NameBox = "sl_" + e.target.parentNode.parentNode.id;
+		var ValueSel = $('#' + NameBox).val();
+		var ids =  ValueSel.split("_", 2);
+		var NameFile = ValueSel.substr( ValueSel.lastIndexOf("_") + 1 , ValueSel.len);
+		
+		if ((ids[0] == "0") && (ids[1] == "0")){
+			$('#edit_file_name_path').text(NameFile);
+			$('#config_textarea').val("Texto 456");
+		}
+		else 
+		{
+			$('#edit_file_name_path').text("SQL:" + NameFile);
+			$('#config_textarea').val("Texto 789");
+		}
+		$('#CfgEditFileTemplate').modal('show');
+	});  
+	
 }
 
 function epm_templates_windows_load (nTab = "") {
@@ -38,10 +101,6 @@ function epm_templates_windows_load (nTab = "") {
 function epm_templates_change_tab (nTab = "") {
 
 }
-
-
-
-
 
 
 $("#table-all-side").on('click-row.bs.table',function(e,row,elem){
