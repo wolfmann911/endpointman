@@ -36,13 +36,16 @@ class Endpointman_Templates
 	}
 
 	public function ajaxRequest($req, &$setting) {
-		$arrVal = array("model_clone", "list_current_template", "add_template", "del_template", "custom_config_get_gloabl", "custom_config_update_gloabl", "custom_config_reset_gloabl");
+		$arrVal = array("model_clone", "list_current_template", "add_template", "del_template", "custom_config_get_gloabl", "custom_config_update_gloabl", "custom_config_reset_gloabl", "list_files_edit");
 		if (in_array($req, $arrVal)) {
 			$setting['authenticate'] = true;
 			$setting['allowremote'] = false;
 			return true;
 		}
-		return false;
+		else 
+		{
+			return false;
+		}
 	}
 	
     public function ajaxHandler($module_tab = "", $command = "") 
@@ -87,6 +90,16 @@ class Endpointman_Templates
 				
 				case "custom_config_reset_gloabl":
 					$retarr = $this->epm_template_custom_config_reset_global();
+					break;
+					
+				case "list_files_edit":
+				/*
+					$return = array();
+					$return[] = array('value' => 'va11', 'txt' => 'txt1', 'select' => "OFF");
+					$return[] = array('value' => 'va12', 'txt' => 'txt2', 'select' => "ON");
+					$return[] = array('value' => 'va13', 'txt' => 'txt3', 'select' => "OFF");
+				*/
+					return $this->edit_template_display_files($_REQUEST['idsel'],$_REQUEST['custom'], $_REQUEST['namefile']);
 					break;
 					
 				default:
@@ -457,6 +470,81 @@ class Endpointman_Templates
 	
 	
 	
+	
+	function edit_template_display_files($id, $custom, $namefile = "")
+	{
+    	if ($custom == 0) {
+    		$sql = "SELECT model_id FROM endpointman_template_list WHERE id=" . $id;
+    	} else {
+    		$sql = "SELECT model FROM endpointman_mac_list WHERE id=" . $id;
+    	}
+    	$model_id = sql($sql, 'getOne');
+    	if (!$this->epm_config->sync_model($model_id)) {
+    		die("unable to sync local template files - TYPE:" . $custom);
+    	}
+		
+    	$dReturn = array();
+		if ($custom == 0) {
+			$sql = "SELECT endpointman_model_list.max_lines, endpointman_model_list.model as model_name, endpointman_template_list.global_custom_cfg_data,  endpointman_product_list.config_files, endpointman_product_list.short_name, endpointman_product_list.id as product_id, endpointman_model_list.template_data, endpointman_model_list.id as model_id, endpointman_template_list.* FROM endpointman_product_list, endpointman_model_list, endpointman_template_list WHERE endpointman_product_list.id = endpointman_template_list.product_id AND endpointman_template_list.model_id = endpointman_model_list.id AND endpointman_template_list.id = " . $id;
+		} else {
+			$sql = "SELECT endpointman_model_list.max_lines, endpointman_model_list.model as model_name, endpointman_mac_list.global_custom_cfg_data, endpointman_product_list.config_files, endpointman_mac_list.*, endpointman_line_list.*, endpointman_model_list.id as model_id, endpointman_model_list.template_data, endpointman_product_list.id as product_id, endpointman_product_list.short_name, endpointman_product_list.cfg_dir, endpointman_brand_list.directory FROM endpointman_brand_list, endpointman_mac_list, endpointman_model_list, endpointman_product_list, endpointman_line_list WHERE endpointman_mac_list.id=" . $id . " AND endpointman_mac_list.id = endpointman_line_list.mac_id AND endpointman_mac_list.model = endpointman_model_list.id AND endpointman_model_list.brand = endpointman_brand_list.id AND endpointman_model_list.product_id = endpointman_product_list.id";
+		}
+		$row = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
+		
+		
+		if ($row['config_files_override'] == "") {
+			$config_files_saved = "";
+		} else {
+			$config_files_saved = unserialize($row['config_files_override']);
+		}
+		$config_files_list = explode(",", $row['config_files']);
+		
+		
+		$i = 0;
+		$b = 0;
+		$alt_configs = array();
+		$only_configs = array();
+		foreach ($config_files_list as $files) 
+		{
+			if ($namefile != $files)  { continue; }
+			
+			$only_configs[$b]['id'] = $b;
+			$only_configs[$b]['id_d'] = $id;
+			$only_configs[$b]['id_p'] = $row['product_id'];
+			$only_configs[$b]['name'] = $files;
+			$only_configs[$b]['selected'] = "ON";
+			
+			$sql = "SELECT * FROM  endpointman_custom_configs WHERE product_id = '" . $row['product_id'] . "' AND original_name = '" . $files . "'";
+			$alt_configs_list = sql($sql, 'getAll', DB_FETCHMODE_ASSOC );
+				
+			if ( count($alt_configs_list) > 0) 
+			{
+				$files = str_replace(".", "_", $files);
+				foreach ($alt_configs_list as $ccf) 
+				{
+					$cf_key = $files;
+					if ((isset($config_files_saved[$cf_key])) AND (is_array($config_files_saved)) AND ($config_files_saved[$cf_key] == $ccf['id'])) {
+						$alt_configs[$i]['selected'] = 'ON';
+						$only_configs[$b]['selected'] = "OFF";
+					}
+					else {
+						$alt_configs[$i]['selected'] = 'OFF';
+					}
+					$alt_configs[$i]['id'] = $ccf['id'];
+					$alt_configs[$i]['id_p'] = $row['product_id'];
+					$alt_configs[$i]['name'] = $ccf['name'];
+					$alt_configs[$i]['name_original'] = $files;
+					
+					$i++;
+				}
+			}
+		}
+		
+		$dReturn['only_configs'] = $only_configs;
+		$dReturn['alt_configs'] = $alt_configs;
+		
+    	return $dReturn;		
+	}
 	
 	
 	

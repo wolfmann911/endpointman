@@ -191,9 +191,9 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 	public function ajaxRequest($req, &$setting) {
 		//AVISO!!!!!!!!!!!!!!!!!!!!!!!!!!
 		//PERMITE TODO!!!!!!!!!!!!!!!!!!!
-		//$setting['authenticate'] = true;
-		//$setting['allowremote'] = true;
-		//return true;
+		$setting['authenticate'] = true;
+		$setting['allowremote'] = true;
+		return true;
 		
 		$module_sec = isset($_REQUEST['module_sec'])? trim($_REQUEST['module_sec']) : '';
 		if ($module_sec == "") { return false; }
@@ -201,19 +201,19 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 		switch($module_sec)
 		{
 			case "epm_devices": 
-				return $this->epm_devices->ajaxRequest($req, $setting);
+				return $this->epm_devices->ajaxRequest(trim($req), $setting);
 				break;
 			
 			case "epm_config": 
-				return $this->epm_config->ajaxRequest($req, $setting);
+				return $this->epm_config->ajaxRequest(trim($req), $setting);
 				break;
 				
 			case "epm_advanced": 
-				return $this->epm_advanced->ajaxRequest($req, $setting);
+				return $this->epm_advanced->ajaxRequest(trim($req), $setting);
 				break;
 				
 			case "epm_templates": 
-				return $this->epm_templates->ajaxRequest($req, $setting);
+				return $this->epm_templates->ajaxRequest(trim($req), $setting);
 				break;
 		}
         return false;

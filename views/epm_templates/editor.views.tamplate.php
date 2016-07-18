@@ -83,46 +83,40 @@
                             </div>
                             <div class="panel-body">
                                 <?php 
+								
+								$list_all_files = array();
                                 if ($dtemplate['alt'] != 0) {
-                                    foreach($dtemplate['alt_configs'] as $row): 
-                                    ?>
-                                    <div class="col-md-12">
-	                                    <div class="input-group input-group-br alt_configs" name="alt_boxselect_<?php echo $row['id_p']; ?>" id="alt_boxselect_<?php echo $row['id_p']; ?>">
-                                            <select class="form-control selectpicker show-tick" data-style="btn-success" data-live-search-placeholder="Buscar" data-live-search="true" name="sl_alt_boxselect_<?php echo $row['id_p']; ?>" id="sl_alt_boxselect_<?php echo $row['id_p']; ?>">
-	                                            <option data-divider="true" disabled></option>
-                                               	<option data-icon="fa fa-files-o" value="0_0_<?php echo $row['name']; ?>"><?php echo $row['name']; ?> (No Change)</option>
-                                                <optgroup label="MODIFICACIONES">
-                                                    <?php
-                                                    if (isset($row['list'])) {
-                                                        foreach($row['list'] as $srow) {
-                                                            echo '<option data-icon="fa fa-pencil-square-o" style="background: #5cb85c; color: #fff;" value="'.$row['id_p'].'_'.$srow['id'].'_'.$srow['name'].'" '.(isset($srow['selected']) ? "selected" : "" ).'>'.$srow['name'].'</option>';
-                                                        }
-                                                    }
-                                                    ?>
-                                                </optgroup>
-                                            </select>
-                                          	<span class="input-group-btn">
-                                                <button class="btn btn-success" type="button" name="bt_alt_boxselect_<?php echo $row['id_p']; ?>" id="bt_alt_boxselect_<?php echo $row['id_p']; ?>"><i class='fa fa-pencil-square-o'>&nbsp;</i></button>
-                                    		</span>
-                                    	</div>
-                                    </div>
-                                    <?php 
-                                    endforeach;
-                                }
+									$list_all_files = array_merge($dtemplate['alt_configs'], $dtemplate['only_configs']);
+								}
+								else {
+									$list_all_files = $dtemplate['only_configs'];
+								}
                                 
-                                foreach($dtemplate['only_configs'] as $row): 
+                                foreach($list_all_files as $row): 
+								//config.php?display=epm_templates&subpage=&custom=0&idsel=41
                                 ?>
 								<div class="col-md-12">
                                 	<div class="input-group input-group-br only_configs" name="boxselect_<?php echo $row['id_p']."_".$row['id']; ?>" id="boxselect_<?php echo $row['id_p']."_".$row['id']; ?>">
-                                        <select class="form-control selectpicker" name="sl_boxselect_<?php echo $row['id_p']."_".$row['id']; ?>" id="sl_boxselect_<?php echo $row['id_p']."_".$row['id']; ?>">
-                                            <option data-icon="fa fa-files-o" value="<?php echo $row['name']; ?>"><?php echo $row['name']; ?> (No Change)</option>
+                                        <select 
+                                        	class="form-control selectpicker show-tick" 
+                                            data-url="ajax.php?module=endpointman&amp;module_sec=epm_templates&amp;module_tab=editor&amp;command=list_files_edit&amp;idsel=<?php echo $_REQUEST['idsel']; ?>&amp;custom=<?php echo $_REQUEST['custom']; ?>&amp;namefile=<?php echo $row['name']; ?>"
+											data-cache="false"
+                                            data-id = "id"
+											data-label = "name"
+                                            data-style = ""
+											data-live-search-placeholder = "Buscar..."
+											data-live-search = "true"
+                                            name="sl_boxselect_<?php echo $row['id_p']."_".$row['id']; ?>" 
+                                            id="sl_boxselect_<?php echo $row['id_p']."_".$row['id']; ?>">
                                         </select>
                                         <span class="input-group-btn">
                                             <button class="btn btn-default" type="button" name="bt_boxselect_<?php echo $row['id_p']."_".$row['id']; ?>" id="bt_boxselect_<?php echo $row['id']."_".$row['id']; ?>"><i class='fa fa-files-o'>&nbsp;</i></button>
                                         </span>
                                     </div>
 								</div>
-                                <?php endforeach; ?> 
+                                <?php endforeach;
+								
+								?> 
                             </div>
                         </div>
 	                </div>
