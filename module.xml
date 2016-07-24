@@ -2,7 +2,7 @@
 	<rawname>endpointman</rawname>
 	<repo>unsupported</repo>
 	<name>OSS PBX End Point Manager</name>
-	<version>13.0.7.13</version>
+	<version>13.0.7.14</version>
 	<type>setup</type>
 	<category>Connectivity</category>
 	<license>GPLv2+</license>
@@ -21,6 +21,7 @@
 		Pull Requests can be made to either of these and are encouraged.
     </description>
 		<changelog>
+		*13.0.7.14* Update, Complete design of Package Manager. Continuous updating, Template Manager. Fix Bug's.
 		*13.0.7.13* Use bootstrap-select all Select, Fix Bug's, update translate ES, and anything else that I forget.
 		*13.0.7.12* End update style list Install/Uninstall and Hide/Show brands, products and models.
 		*13.0.7.11* Fix bug no detect update Packages, continue upate...
