@@ -498,7 +498,7 @@ class Endpointman_Templates
 			$config_files_saved = unserialize($row['config_files_override']);
 		}
 		$config_files_list = explode(",", $row['config_files']);
-		
+		asort($config_files_list);
 		
 		$i = 0;
 		$b = 0;
@@ -516,7 +516,7 @@ class Endpointman_Templates
 			
 			$sql = "SELECT * FROM  endpointman_custom_configs WHERE product_id = '" . $row['product_id'] . "' AND original_name = '" . $files . "'";
 			$alt_configs_list = sql($sql, 'getAll', DB_FETCHMODE_ASSOC );
-				
+			
 			if ( count($alt_configs_list) > 0) 
 			{
 				$files = str_replace(".", "_", $files);
@@ -543,6 +543,44 @@ class Endpointman_Templates
 		$dReturn['only_configs'] = $only_configs;
 		$dReturn['alt_configs'] = $alt_configs;
 		
+    	return $dReturn;		
+	}
+	
+	function edit_template_display_files_list($id, $custom)
+	{
+    	if ($custom == 0) {
+    		$sql = "SELECT model_id FROM endpointman_template_list WHERE id=" . $id;
+    	} else {
+    		$sql = "SELECT model FROM endpointman_mac_list WHERE id=" . $id;
+    	}
+    	$model_id = sql($sql, 'getOne');
+    	if (!$this->epm_config->sync_model($model_id)) {
+    		die("unable to sync local template files - TYPE:" . $custom);
+    	}
+		
+
+		if ($custom == 0) {
+			$sql = "SELECT endpointman_model_list.max_lines, endpointman_model_list.model as model_name, endpointman_template_list.global_custom_cfg_data,  endpointman_product_list.config_files, endpointman_product_list.short_name, endpointman_product_list.id as product_id, endpointman_model_list.template_data, endpointman_model_list.id as model_id, endpointman_template_list.* FROM endpointman_product_list, endpointman_model_list, endpointman_template_list WHERE endpointman_product_list.id = endpointman_template_list.product_id AND endpointman_template_list.model_id = endpointman_model_list.id AND endpointman_template_list.id = " . $id;
+		} else {
+			$sql = "SELECT endpointman_model_list.max_lines, endpointman_model_list.model as model_name, endpointman_mac_list.global_custom_cfg_data, endpointman_product_list.config_files, endpointman_mac_list.*, endpointman_line_list.*, endpointman_model_list.id as model_id, endpointman_model_list.template_data, endpointman_product_list.id as product_id, endpointman_product_list.short_name, endpointman_product_list.cfg_dir, endpointman_brand_list.directory FROM endpointman_brand_list, endpointman_mac_list, endpointman_model_list, endpointman_product_list, endpointman_line_list WHERE endpointman_mac_list.id=" . $id . " AND endpointman_mac_list.id = endpointman_line_list.mac_id AND endpointman_mac_list.model = endpointman_model_list.id AND endpointman_model_list.brand = endpointman_brand_list.id AND endpointman_model_list.product_id = endpointman_product_list.id";
+		}
+		$row = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
+		$config_files_list = explode(",", $row['config_files']);
+		asort($config_files_list);
+		
+		$i = 0;
+		$b = 0;
+		$dReturn = array();
+		foreach ($config_files_list as $files) 
+		{
+			$dReturn[$b]['id'] = $b;
+			$dReturn[$b]['id_d'] = $id;
+			$dReturn[$b]['id_p'] = $row['product_id'];
+			$dReturn[$b]['name'] = $files;
+			$b++;
+		}
+		unset($config_files_list);
+
     	return $dReturn;		
 	}
 	
@@ -619,7 +657,8 @@ class Endpointman_Templates
 			$config_files_saved = unserialize($row['config_files_override']);
 		}
 		$config_files_list = explode(",", $row['config_files']);
-
+		asort($config_files_list);
+		
 		$alt = 0;
 		$i = 0;
 		$b = 0;

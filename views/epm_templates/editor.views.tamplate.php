@@ -14,7 +14,7 @@
              		<div class="col-md-12">
 						<div class="panel panel-default">
 							<div class="panel-heading">
-								<h3 class="panel-title"><i class="fa  fa-info-circle fa-lg"></i> <?php echo _("Info Template")?></h3>
+								<h3 class="panel-title"><i class="fa fa-info-circle fa-lg"></i> <?php echo _("Info Template")?></h3>
 							</div>
 							<div class="panel-body">
                                 <table class="table">
@@ -84,19 +84,22 @@
                             <div class="panel-body">
                                 <?php 
 								
-								$list_all_files = array();
-                                if ($dtemplate['alt'] != 0) {
-									$list_all_files = array_merge($dtemplate['alt_configs'], $dtemplate['only_configs']);
-								}
-								else {
-									$list_all_files = $dtemplate['only_configs'];
-								}
+								//$list_all_files = array();
+                                //if ($dtemplate['alt'] != 0) {
+								//	$list_all_files = array_merge($dtemplate['alt_configs'], $dtemplate['only_configs']);
+								//}
+								//else {
+								//	$list_all_files = $dtemplate['only_configs'];
+								//}
                                 
+								
+								$list_all_files = FreePBX::Endpointman()->epm_templates->edit_template_display_files_list($_REQUEST['idsel'],$_REQUEST['custom']);
                                 foreach($list_all_files as $row): 
 								//config.php?display=epm_templates&subpage=&custom=0&idsel=41
+								$row['idrefbox'] = $row['id']."_".$row['id_d']."_".$row['id_p'];
                                 ?>
 								<div class="col-md-12">
-                                	<div class="input-group input-group-br only_configs" name="boxselect_<?php echo $row['id_p']."_".$row['id']; ?>" id="boxselect_<?php echo $row['id_p']."_".$row['id']; ?>">
+                                	<div class="input-group input-group-br files_edit_configs" name="boxselect_<?php echo $row['idrefbox']; ?>" id="boxselect_<?php echo $row['idrefbox']; ?>">
                                         <select 
                                         	class="form-control selectpicker show-tick" 
                                             data-url="ajax.php?module=endpointman&amp;module_sec=epm_templates&amp;module_tab=editor&amp;command=list_files_edit&amp;idsel=<?php echo $_REQUEST['idsel']; ?>&amp;custom=<?php echo $_REQUEST['custom']; ?>&amp;namefile=<?php echo $row['name']; ?>"
@@ -106,17 +109,15 @@
                                             data-style = ""
 											data-live-search-placeholder = "Buscar..."
 											data-live-search = "true"
-                                            name="sl_boxselect_<?php echo $row['id_p']."_".$row['id']; ?>" 
-                                            id="sl_boxselect_<?php echo $row['id_p']."_".$row['id']; ?>">
+                                            name="sl_boxselect_<?php echo $row['idrefbox']; ?>" 
+                                            id="sl_boxselect_<?php echo $row['idrefbox']; ?>">
                                         </select>
                                         <span class="input-group-btn">
-                                            <button class="btn btn-default" type="button" name="bt_boxselect_<?php echo $row['id_p']."_".$row['id']; ?>" id="bt_boxselect_<?php echo $row['id']."_".$row['id']; ?>"><i class='fa fa-files-o'>&nbsp;</i></button>
+                                            <button class="btn btn-default" type="button" name="bt_boxselect_<?php echo $row['idrefbox']; ?>" id="bt_boxselect_<?php echo $row['idrefbox']; ?>"><i class='fa fa-files-o'>&nbsp;</i></button>
                                         </span>
                                     </div>
 								</div>
-                                <?php endforeach;
-								
-								?> 
+                                <?php endforeach; ?> 
                             </div>
                         </div>
 	                </div>

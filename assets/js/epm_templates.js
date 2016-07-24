@@ -41,9 +41,16 @@ function epm_templates_document_ready () {
 	
 	
 	
-	$('#CfgEditFileTemplate').on('show.bs.modal', function (e) {
-		
-	});	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	$('#CfgEditFileTemplate').on('show.bs.modal', function (e) {         });	
 	
 	$('#CfgEditFileTemplate').on('shown.bs.modal', function (e) {
 		if (cmeditor === null) {
@@ -55,32 +62,30 @@ function epm_templates_document_ready () {
 				scrollbarStyle: "simple"
 			});
 		}
+		cmeditor.setValue(document.getElementById("config_textarea").value);
 	});
 	
 	$('#CfgEditFileTemplate').on('hidden.bs.modal', function (e) {
+		/* DESPUES DE CERRAR: CODIGO QUE ACTUALIZA EL SELECT... */
+		
 		$('#edit_file_name_path').val("No Selected");
 		$('#config_textarea').val("");
+		cmeditor.setValue("");
 	});
+	$('#CfgEditFileTemplate').on('hidden.bs.modal', function (e) {        });
 	
-	
-	
-	
-	$('.only_configs button').click(function(e){
-		var NameBox = "sl_" + e.target.parentNode.parentNode.id;
-		var NameFile = $('#' + NameBox).val();
 		
-		$('#edit_file_name_path').text(NameFile);
-		$('#config_textarea').val("Texto 123");
-		$('#CfgEditFileTemplate').modal('show');
-	});  
-	
-	$('.alt_configs button').click(function(e){
-		var NameBox = "sl_" + e.target.parentNode.parentNode.id;
-		var ValueSel = $('#' + NameBox).val();
-		var ids =  ValueSel.split("_", 2);
+		
+		
+	$('.files_edit_configs button').click(function(e){
+		var NameBox = e.target.parentNode.parentNode.id;
+		var NameBoxSel = "sl_" + NameBox;
+		var ValueSel = $('#' + NameBoxSel).val();
+				
+		var ids =  ValueSel.split("_", 1);
 		var NameFile = ValueSel.substr( ValueSel.lastIndexOf("_") + 1 , ValueSel.len);
-		
-		if ((ids[0] == "0") && (ids[1] == "0")){
+
+		if (ids[0] == "0"){
 			$('#edit_file_name_path').text(NameFile);
 			$('#config_textarea').val("Texto 456");
 		}
@@ -90,59 +95,13 @@ function epm_templates_document_ready () {
 			$('#config_textarea').val("Texto 789");
 		}
 		$('#CfgEditFileTemplate').modal('show');
-	});  
-	
-	
-	
-	
-	
-	
-	
-	
-	$('select[class~="selectpicker"][data-url]').each(function(index, value)
-    {
-        var select = $(this);
-        var url    = $(this).attr('data-url');
-        var id     = $(this).attr('data-id');
-        var label  = $(this).attr('data-label');
-		
-		select.html('');
-		select.append('<option data-icon="fa fa-refresh fa-spin fa-fw" value="" selected>Cargando...</option>');
-		select.selectpicker('refresh');
 
-        $.getJSON(url, function(data)
-        {
-            select.html('');
-
-            $.each(data.only_configs, function(key, val)
-            {
-				if (val['select'] == "ON") {
-					select.append('<option data-icon="fa fa-files-o" value="' + val[id] + '" selected>' + val[label] + ' (No Change)</option>');
-				}
-				else {
-                	select.append('<option data-icon="fa fa-files-o" value="' + val[id] + '">' + val[label] + ' (No Change)</option>');
-				}
-            });
-			
-			if (data.alt_configs != null) 
-			{
-				select.append('<optgroup label="Modificaiones"></optgroup>');
-				var seloptgroup = select.find("optgroup");
-				$.each(data.alt_configs, function(key, val)
-				{
-					if (val['select'] == "ON") {
-						seloptgroup.append('<option data-icon="fa fa-pencil-square-o" style="background: #5cb85c; color: #fff;" value="' + val[id] + '" selected>' + val[label] + '</option>');
-					}
-					else {
-						seloptgroup.append('<option data-icon="fa fa-pencil-square-o" style="background: #5cb85c; color: #fff;" value="' + val[id] + '">' + val[label] + '</option>');
-					}
-				});
-				
-			};
-			
-            select.selectpicker('refresh');
-        });
-    });
+	});
+	
+	$('select[class~="selectpicker"][data-url]').each(function(index, value) { epm_template_update_select_files_config($(this)); });
+	
+	
+	
 	
 	
 }
@@ -154,6 +113,64 @@ function epm_templates_windows_load (nTab = "") {
 function epm_templates_change_tab (nTab = "") {
 
 }
+
+
+
+
+
+
+
+
+function epm_template_update_select_files_config (e) {
+	var select = e;
+	var url    = e.attr('data-url');
+	var id     = e.attr('data-id');
+	var label  = e.attr('data-label');
+	select.html('');
+	select.append('<option data-icon="fa fa-refresh fa-spin fa-fw" value="" selected>Cargando...</option>');
+	select.selectpicker('refresh');
+	$.getJSON(url, function(data)
+	{
+		select.html('');
+		$.each(data.only_configs, function(key, val)
+		{
+			if (val['select'] == "ON") {
+				select.append('<option data-icon="fa fa-files-o" value="' + val[id] + '_' + val[label] + '" selected>' + val[label] + ' (No Change)</option>');
+			}
+			else {
+				select.append('<option data-icon="fa fa-files-o" value="' + val[id] + '_' + val[label] + '">' + val[label] + ' (No Change)</option>');
+			}
+		});
+		if (data.alt_configs != null) 
+		{
+			select.append('<optgroup label="Modificaiones"></optgroup>');
+			var seloptgroup = select.find("optgroup");
+			$.each(data.alt_configs, function(key, val)
+			{
+				if (val['select'] == "ON") {
+					seloptgroup.append('<option data-icon="fa fa-pencil-square-o" style="background: #5cb85c; color: #fff;" value="' + val[id] + '_' + val[label] + '" selected>' + val[label] + '</option>');
+				}
+				else {
+					seloptgroup.append('<option data-icon="fa fa-pencil-square-o" style="background: #5cb85c; color: #fff;" value="' + val[id] + '_' + val[label] + '">' + val[label] + '</option>');
+				}
+			});
+			
+		};
+		select.selectpicker('refresh');
+	});
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 $("#table-all-side").on('click-row.bs.table',function(e,row,elem){

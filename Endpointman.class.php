@@ -220,6 +220,7 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
     }
 	
     public function ajaxHandler() {
+
 		$module_sec = isset($_REQUEST['module_sec'])? trim($_REQUEST['module_sec']) : '';
 		$module_tab = isset($_REQUEST['module_tab'])? trim($_REQUEST['module_tab']) : '';
 		$command = isset($_REQUEST['command'])? trim($_REQUEST['command']) : '';
