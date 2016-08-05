@@ -51,21 +51,10 @@ class Endpointman_Config
 	}
 
 	public function myShowPage(&$pagedata) {
-		if(empty($pagedata)) 
-		{
-			$pagedata['manager'] = array(
-				"name" => _("Install/Unistall"),
-				"page" => 'views/epm_config_manager.page.php'
-			);
-			$pagedata['editor'] = array(
-				"name" => _("Show/Hide"),
-				"page" => 'views/epm_config_editor.page.php'
-			);
-		}
 	}
 
 	public function ajaxRequest($req, &$setting) {
-		$arrVal = array("saveconfig", "list_all_brand");
+		$arrVal = array("saveconfig", "list_all_brand", "list_brand_model_hide");
 		if (in_array($req, $arrVal)) {
 			$setting['authenticate'] = true;
 			$setting['allowremote'] = false;
@@ -76,8 +65,7 @@ class Endpointman_Config
 	
     public function ajaxHandler($module_tab = "", $command = "") 
 	{
-		$txt = array();
-		$txt['manager'] = array(
+		$txt = array(
 			'ayuda_model' => _("If we can activate the model set terminals of the models.<br /> If this model is disabled will not appear in the list of models that can be configured for PBX."),
 			'ayuda_producto' => _('The button "Install Firmware" installs the necessary files to the server for the terminal alone are updated via TFTP or HTTP.<br /> The button "Remove frimware" delete files server products.<br /> The button "Update frimware" appears if a newer frimware detected on the server and asks if you want to update.<br /> The "Update" button appears when a new version of this model pack is detected.'),
 			'ayuda_marca' => _('The "Install" button installs the configuration package brand models we selected.<br /> The "Uninstall" button removes the package configuration models of the brand selected.<br /> The "Update" button appears if a new version of the package that is already installed to upgrade to the latest version is detected.'),
@@ -88,11 +76,13 @@ class Endpointman_Config
 			'install' => _("Install"),
 			'uninstall' => _("Uninstall"),
 			'update' => _("Update"),
-			'fw_install' => _('Install Firmware'), 
-			'fw_uninstall' =>  _('Remove Firmware'),
-			'fw_update' => _('Update Firmware'),
+			'fw_install' => _('FW Install'), 
+			'fw_uninstall' =>  _('FW Delete'),
+			'fw_update' => _('FW Update'),
 			'enable' => _('Enable'),
 			'disable' => _('Disable'),
+			'show' => _("Show"),
+			'hide' => _("Hide"),
 			'ready' => _("Ready!"),
 			'error' => _("Error!"),
 			'title_update' => _("Update!"),
@@ -104,95 +94,53 @@ class Endpointman_Config
 			'update_content' => _("Update Content..."),
 			'opt_invalid' => _("Invalid Option!")
 		);
-		$txt['editor'] = array(
-			'ayuda_marca' => _("If you select Hide this brand will disappear and all products and models on the list of Install/Uninstall."),
-			'ayuda_producto' => _("If you select Hide disappear all models of the product selected from the Install/Uninstall list."),
-			'ayuda_modelo' => _("If you select Hide disappear this model the Install/Uninstall list."),
-			'show' => _("Show"),
-			'hide' => _("Hide"),
-			'ready'=> _("Ready!"),
-			'error' => _("Error!"),
-			'save_changes' => _("Saving Changes..."),
-			'save_changes_ok' => _("Saving Changes... Ok!"),
-			'ready' => _("Ready!"),
-			'err_upload_content' => _("Upload Content!"),
-			'opt_invalid' => _("Invalid Option!")
-		);
 		
-		if ($module_tab == "manager") 
+		switch ($command)
 		{
-			switch ($command)
-			{
-				case "saveconfig": 
-					$retarr = $this->epm_config_manager_saveconfig();
-					break;
+			case "saveconfig": 
+				$retarr = $this->epm_config_manager_saveconfig();
+				break;
+			
+			case "list_all_brand": 
+				$retarr = array("status" => true, "message" => "OK", "datlist" => $this->epm_config_manager_hardware_get_list_all());
+				break;
 				
-				case "list_all_brand": 
-					$retarr = array("status" => true, "message" => "OK", "datlist" => $this->epm_config_manager_hardware_get_list_all(false));
-					break;
-						
-				default:
-					$retarr = array("status" => false, "message" => _("Command not found!") . " [" .$command. "]");
-					break;
-			}
-			$retarr['txt'] = $txt['manager'];
-		}
-		elseif ($module_tab == "editor") 
-		{
-			switch ($command) 
-			{
-				case "saveconfig": 
-					$retarr = $this->epm_config_editor_saveconfig();
-					break;
+			case "list_brand_model_hide":
+				$retarr = array("status" => true, "message" => "OK", "datlist" => $this->epm_config_manager_hardware_get_list_all_hide_show());
+				break;
 					
-				case "list_all_brand":
-					$retarr = array("status" => true, "message" => "OK", "datlist" => $this->epm_config_editor_hardware_get_list_all());
-					break;
-					
-				default:
-					$retarr = array("status" => false, "message" => _("Command not found!") . " [" .$command. "]");
-					break;
-			}
-			$retarr['txt'] = $txt['editor'];
+			default:
+				$retarr = array("status" => false, "message" => _("Command not found!") . " [" .$command. "]");
+				break;
 		}
-		else {
-			$retarr = array("status" => false, "message" => _("Tab is not valid!") . " [" .$module_tab. "]");
-		}
+		$retarr['txt'] = $txt;
 		return $retarr;
 	}
 	
 	public function doConfigPageInit($module_tab = "", $command = "") {
-		switch ($module_tab) 
-		{
-			case "manager":
-				switch ($command) {
-					case "check_for_updates":
-						$this->epm_config_manager_check_for_updates();
-						echo "<br /><hr><br />";
-						exit;
-						break;
-					
-					case "manual_install":
-						$this->epm_config_manual_install();
-						echo "<br /><hr><br />";
-						exit;
-						break;
-					
-					case "firmware":
-						$this->epm_config_manager_firmware();
-						echo "<br /><hr><br />";
-						exit;
-						break;
-					
-					case "brand":
-						$this->epm_config_manager_brand();
-						echo "<br /><hr><br />";
-						exit;
-						break;
-				}
+		switch ($command) {
+			case "check_for_updates":
+				$this->epm_config_manager_check_for_updates();
+				echo "<br /><hr><br />";
+				exit;
 				break;
-					
-			case "editor":
+			
+			case "manual_install":
+				$this->epm_config_manual_install();
+				echo "<br /><hr><br />";
+				exit;
+				break;
+			
+			case "firmware":
+				$this->epm_config_manager_firmware();
+				echo "<br /><hr><br />";
+				exit;
+				break;
+			
+			case "brand":
+				$this->epm_config_manager_brand();
+				echo "<br /><hr><br />";
+				exit;
 				break;
 		}
 	}
@@ -212,11 +160,11 @@ class Endpointman_Config
 	 * @param bool $show_all True return all, False return hidden = 0
      * @return array
      */
-	public function epm_config_hardware_get_list_models($id_product=NULL, $show_all = true) 
+	public function epm_config_hardware_get_list_models($id_product=NULL, $show_all = true, $byorder = "model") 
 	{
 		if(! is_numeric($id_product)) { throw new \Exception( _("ID Producto not is number")." (".$id_product.")"); }
-		if($show_all == true) 	{ $sql = 'SELECT * FROM endpointman_model_list WHERE product_id = '.$id_product; }
-		else 					{ $sql = 'SELECT * FROM endpointman_model_list WHERE hidden = 0 AND product_id = '.$id_product; }
+		if($show_all == true) 	{ $sql = 'SELECT * FROM endpointman_model_list WHERE product_id = '.$id_product.' ORDER BY '.$byorder.' ASC'; }
+		else 					{ $sql = 'SELECT * FROM endpointman_model_list WHERE hidden = 0 AND product_id = '.$id_product.' ORDER BY '.$byorder.' ASC'; }
 		$result = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
 		return $result;
 	}
@@ -227,11 +175,11 @@ class Endpointman_Config
 	 * @param bool $show_all True return all, FAlse return hidde = 0
      * @return array
      */
-	public function epm_config_hardware_get_list_product($id_brand=NULL, $show_all = true) 
+	public function epm_config_hardware_get_list_product($id_brand=NULL, $show_all = true, $byorder = "long_name") 
 	{
 		if(! is_numeric($id_brand)) { throw new \Exception(_("ID Brand not is numbre")." (".$id_brand.")"); }
-		if ($show_all == true) 	{ $sql = 'SELECT * FROM endpointman_product_list WHERE brand = '.$id_brand.' ORDER BY long_name ASC'; }
-		else 					{ $sql = 'SELECT * FROM endpointman_product_list WHERE hidden = 0 AND brand = '.$id_brand.' ORDER BY long_name ASC'; }
+		if ($show_all == true) 	{ $sql = 'SELECT * FROM endpointman_product_list WHERE brand = '.$id_brand.' ORDER BY '.$byorder.' ASC'; }
+		else 					{ $sql = 'SELECT * FROM endpointman_product_list WHERE hidden = 0 AND brand = '.$id_brand.' ORDER BY '.$byorder.' ASC'; }
 		$result = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
 		return $result;
 	}
@@ -241,76 +189,26 @@ class Endpointman_Config
 	 * @param bool $show_all True return all, False return hidde = 0
      * @return array
      */
-	public function epm_config_hardware_get_list_brand($show_all = true) {
-		if ($show_all == true) 	{ $sql = "SELECT * from endpointman_brand_list WHERE id > 0 ORDER BY id ASC "; }
-		else 					{ $sql = "SELECT * from endpointman_brand_list WHERE id > 0 AND hidden = 0 ORDER BY id ASC "; }
+	public function epm_config_hardware_get_list_brand($show_all = true, $byorder = "id") {
+		if ($show_all == true) 	{ $sql = "SELECT * from endpointman_brand_list WHERE id > 0 ORDER BY " . $byorder . " ASC "; }
+		else 					{ $sql = "SELECT * from endpointman_brand_list WHERE id > 0 AND hidden = 0 ORDER BY " . $byorder . " ASC "; }
 		$result = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
 		return $result;
 	}
 	
 	
 	/**** FUNCIONES SEC MODULO "epm_config\editor" ****/
-	private function epm_config_editor_saveconfig()
-	{
-		$arrVal['VAR_REQUEST'] = array("name", "value", "idtype", "idbt");
-		foreach ($arrVal['VAR_REQUEST'] as $valor) {
-			if (! array_key_exists($valor, $_REQUEST)) {
-				return array("status" => false, "message" => _("No send value!")." [".$valor."]");
-			}
-		}
-		
-		$arrVal['VAR_IS_NUM'] = array("value", "idbt");
-		foreach ($arrVal['VAR_IS_NUM'] as $valor) {
-			if (! is_numeric($_REQUEST[$valor])) {
-				return array("status" => false, "message" => _("Value send is not number!")." [".$valor."]");
-			}
-		}
-		
-		if (($_REQUEST['value'] > 1 ) and ($_REQUEST['value'] < 0)) {
-			return array("status" => false, "message" => _("Invalid Value!"));
-		}
-		
-		
-		$dget['name'] = strtolower($_REQUEST['name']);
-		$dget['value'] = strtolower($_REQUEST['value']);
-		$dget['idtype'] = strtolower($_REQUEST['idtype']);
-		$dget['id'] = $_REQUEST['idbt'];
-		
-		switch($dget['idtype']) {
-			case "marca":
-				$sql = "UPDATE endpointman_brand_list SET hidden = '".$dget['value'] ."' WHERE id = '".$dget['id']."'";
-				break;
-				
-			case "producto":
-				$sql = "UPDATE endpointman_product_list SET hidden = '". $dget['value'] ."' WHERE id = '".$dget['id']."'";
-				break;
-						
-			case "modelo":
-				$sql = "UPDATE endpointman_model_list SET hidden = '". $dget['value'] ."' WHERE id = '".$dget['id']."'";
-				break;
-					
-			default:
-				$retarr = array("status" => false, "message" => _("IDType invalid: ") . $dget['idtype'] ); 
-		}
-		if (isset($sql)) {
-			sql($sql);
-			$retarr = array("status" => true, "message" => "OK", "name" => $dget['name'], "value" => $dget['value'], "idtype" => $dget['idtype'], "id" => $dget['id']);
-			unset($sql);
-		}
-		
-		unset($dget);
-		return $retarr;
-	}
-	
 	/**
      * Get info all brdans, prodics, models.
      * @return array
      */
+	 /*
+	 SE DESACTIVA A VERS SI NO SE USA EN NINGUN SITIO.
 	public function epm_config_editor_hardware_get_list_all () 
 	{
 		$row_out = array();
 		$i = 0;
-		foreach ($this->epm_config_hardware_get_list_brand(true) as $row) 
+		foreach ($this->epm_config_hardware_get_list_brand(true, "name") as $row) 
 		{
 			$row_out[$i] = $row;
 			$row_out[$i]['count'] = $i;
@@ -332,7 +230,12 @@ class Endpointman_Config
 		}
 		return $row_out;
 	}
+	*/
 	/*** END SEC FUNCTIONS ***/
+	
+	
+	
+	
 	
 	
 	/**** FUNCIONES SEC MODULO "epm_config\manager" ****/
@@ -424,40 +327,63 @@ class Endpointman_Config
 	
 	private function epm_config_manager_saveconfig()
 	{
-		$arrVal['VAR_REQUEST'] = array("name", "value", "idtype", "idbt");
+		$arrVal['VAR_REQUEST'] = array("typesavecfg", "value", "idtype", "idbt");
 		foreach ($arrVal['VAR_REQUEST'] as $valor) {
 			if (! array_key_exists($valor, $_REQUEST)) {
 				return array("status" => false, "message" => _("No send value!")." [".$valor."]");
 			}
 		}
 		
-		$arrVal['VAR_IS_NUM'] = array("idbt");
+		$arrVal['VAR_IS_NUM'] = array("value", "idbt");
 		foreach ($arrVal['VAR_IS_NUM'] as $valor) {
 			if (! is_numeric($_REQUEST[$valor])) {
 				return array("status" => false, "message" => _("Value send is not number!")." [".$valor."]");
 			}
 		}
 		
-		$dget['name'] = strtolower($_REQUEST['name']);
+		$dget['typesavecfg'] = strtolower($_REQUEST['typesavecfg']);
 		$dget['value'] = strtolower($_REQUEST['value']);
 		$dget['idtype'] = strtolower($_REQUEST['idtype']);
 		$dget['id'] = $_REQUEST['idbt'];
 		
-		switch($dget['idtype']) {
-			case "marca":
-				$sql = "UPDATE endpointman_brand_list SET enabled = '" .$dget['value']. "' WHERE id = '".$dget['id']."'";
-				break;
-				
-			case "modelo":
-				$sql = "UPDATE endpointman_model_list SET enabled = " .$dget['value']. " WHERE id = '".$dget['id']."'";
-				break;
-				
-			default:
-				$retarr = array("status" => false, "message" => _("IDType invalid: ") . $dget['idtype'] ); 
+		if (! in_array($dget['typesavecfg'], array("hidden", "enabled"))) {
+			return array("status" => false, "message" => _("Type Save Config is not valid!")." [".$dget['typesavecfg']."]");
 		}
+		
+		if (($dget['value'] > 1 ) and ($dget['value'] < 0)) {
+			return array("status" => false, "message" => _("Invalid Value!"));
+		}
+	
+	
+		if ($dget['typesavecfg'] == "enabled") {
+			if (($dget['idtype']) == "modelo") {
+				$sql = "UPDATE endpointman_model_list SET enabled = " .$dget['value']. " WHERE id = '".$dget['id']."'";
+			}
+			else {
+				$retarr = array("status" => false, "message" => _("IdType not valid to typesavecfg!"));
+			}
+		}
+		else {
+			switch($dget['idtype']) {
+				case "marca":
+					$sql = "UPDATE endpointman_brand_list SET hidden = '".$dget['value'] ."' WHERE id = '".$dget['id']."'";
+					break;
+					
+				case "producto":
+					$sql = "UPDATE endpointman_product_list SET hidden = '". $dget['value'] ."' WHERE id = '".$dget['id']."'";
+					break;
+					
+				case "modelo":
+					$sql = "UPDATE endpointman_model_list SET hidden = '". $dget['value'] ."' WHERE id = '".$dget['id']."'";
+					break;
+					
+				default:
+					$retarr = array("status" => false, "message" => _("IDType invalid: ") . $dget['idtype'] ); 
+			}
+		}	
 		if (isset($sql)) {
 			sql($sql);
-			$retarr = array("status" => true, "message" => "OK", "name" => $dget['name'], "value" => $dget['value'], "idtype" => $dget['idtype'], "id" => $dget['id']);
+			$retarr = array("status" => true, "message" => "OK", "typesavecfg" => $dget['typesavecfg'], "value" => $dget['value'], "idtype" => $dget['idtype'], "id" => $dget['id']);
 			unset($sql);
 		}
 		
@@ -465,86 +391,247 @@ class Endpointman_Config
 		return $retarr;
 	}
 	
-	public function epm_config_manager_hardware_get_list_all($check_for_updates = true)
+	public function epm_config_manager_hardware_get_list_all_hide_show()
 	{
 		$row_out = array();
+		
 		$i = 0;
-		$brand_list = $this->epm_config_hardware_get_list_brand(true);
-		//FIX: https://github.com/FreePBX-ContributedModules/endpointman/commit/2ad929d0b38f05c9da1b847426a4094c3314be3b
-		if($check_for_updates) 	$brand_up = $this->update_check();
+		$brand_list = $this->epm_config_hardware_get_list_brand(true, "name");
 		foreach ($brand_list as $row) 
 		{
-			$row_out[$i] = $row;
+			//$row_out[$i] = $row;
+			$row_out[$i]['id'] = $row['id'];
+			$row_out[$i]['name'] = $row['name'];
+			$row_out[$i]['directory'] = $row['directory'];
+			$row_out[$i]['installed'] = $row['installed'];
+			$row_out[$i]['hidden'] = $row['hidden'];
 			$row_out[$i]['count'] = $i;
-			$row_out[$i]['cfg_ver_datetime'] = date("c",$row['cfg_ver']);
-			
-			if($check_for_updates) 
-			{
-				$id = $this->system->arraysearchrecursive($row['name'], $brand_up,'name');
-				$id = $id[0];
-				if((isset($brand_up[$id]['update'])) AND ($row['installed'] == 1)) {
-					$row_out[$i]['update'] = $brand_up[$id]['update'];
-				} else {
-					$row_out[$i]['update'] = "";
-				}
-				if(isset($brand_up[$id]['update_vers'])) {
-					//$row_out[$i]['update_vers'] = date("n-j-y",$brand_up[$id]['update_vers']) . " at " . date("g:ia",$brand_up[$id]['update_vers']);
-					$row_out[$i]['update_vers'] = date("c",$brand_up[$id]['update_vers']);
-				} else {
-					$row_out[$i]['update_vers'] = "";
-				}
+			$row_out[$i]['products'] = "";
+			if ($row['hidden'] == 1) 
+			{ 
+				$i++;
+				continue; 
 			}
-			else 
-			{
-				if (! isset($row_out[$i]['update'])) 		{ $row_out[$i]['update'] = ""; }
-				if (! isset($row_out[$i]['update_vers'])) 	{ $row_out[$i]['update_vers'] = ""; }
-			}
-			if ($row['hidden'] == 1) { continue; }
-			
 			
 			$j = 0;
 			$product_list = $this->epm_config_hardware_get_list_product($row['id'], true);
 			foreach($product_list as $row2) {
-				$row_out[$i]['products'][$j] = $row2;
-				
-				if($check_for_updates) {
-					if((array_key_exists('firmware_vers', $row2)) AND ($row2['firmware_vers'] > 0)) {
-						$temp = $this->firmware_update_check($row2['id']);
-						$row_out[$i]['products'][$j]['update_fw'] = 1;
-						$row_out[$i]['products'][$j]['update_vers_fw'] = $temp['data']['version'];
-					} else {
-						$row_out[$i]['products'][$j]['update_fw'] = 0;
-						$row_out[$i]['products'][$j]['update_vers_fw'] = "";
-					}
+				//$row_out[$i]['products'][$j] = $row2;
+				$row_out[$i]['products'][$j]['id'] = $row2['id'];
+				$row_out[$i]['products'][$j]['brand'] = $row2['brand'];
+				$row_out[$i]['products'][$j]['long_name'] = $row2['long_name'];
+				$row_out[$i]['products'][$j]['short_name'] = $row2['short_name'];
+				$row_out[$i]['products'][$j]['hidden'] = $row2['hidden'];
+				$row_out[$i]['products'][$j]['count'] = $j;
+				$row_out[$i]['products'][$j]['models'] = "";
+				if ($row2['hidden'] == 1) 
+				{ 
+					$j++;
+					continue; 
 				}
-				else 
-				{
-					if (! isset($row_out[$i]['products'][$j]['update_fw'])) 		{ $row_out[$i]['products'][$j]['update_fw'] = 0; }
-					if (! isset($row_out[$i]['products'][$j]['update_vers_fw'])) 	{ $row_out[$i]['products'][$j]['update_vers_fw'] = ""; }
-				}
-				$row_out[$i]['products'][$j]['fw_type'] = $this->firmware_local_check($row2['id']);
-				if ($row2['hidden'] == 1) { continue; }
 				
 				$k = 0;
 				$model_list = $this->epm_config_hardware_get_list_models($row2['id'], true);
 				foreach($model_list as $row3) 
 				{
-					$row_out[$i]['products'][$j]['models'][$k] = $row3;
-					if($row_out[$i]['products'][$j]['models'][$k]['enabled']){
-						$row_out[$i]['products'][$j]['models'][$k]['enabled_checked'] = 'checked';
-					}
+					//$row_out[$i]['products'][$j]['models'][$k] = $row3;
+					$row_out[$i]['products'][$j]['models'][$k]['id'] = $row3['id'];
+					$row_out[$i]['products'][$j]['models'][$k]['brand'] = $row3['brand'];
+					$row_out[$i]['products'][$j]['models'][$k]['model'] = $row3['model'];
+					$row_out[$i]['products'][$j]['models'][$k]['product_id'] = $row3['product_id'];
+					$row_out[$i]['products'][$j]['models'][$k]['enabled'] = $row3['enabled'];
+					$row_out[$i]['products'][$j]['models'][$k]['hidden'] = $row3['hidden'];
+					$row_out[$i]['products'][$j]['models'][$k]['count'] = $k;
 					$k++;
 				}
 				$j++;
 			}
 			$i++;
 		}
+		//echo "<textarea>" . print_r($row_out, true)  . "</textarea>";
+		return $row_out;
+	}
+	
+	
+	//TODO: PENDIENTE ACTUALIZAR Y ELIMINAR DATOS NO NECESARIOS (TEMPLATES)
+	//http://pbx.cerebelum.lan/admin/ajax.php?module=endpointman&module_sec=epm_config&module_tab=manager&command=list_all_brand
+	public function epm_config_manager_hardware_get_list_all()
+	{
+		$row_out = array();
+		$i = 0;
+		$brand_list = $this->epm_config_hardware_get_list_brand(true, "name");
+		//FIX: https://github.com/FreePBX-ContributedModules/endpointman/commit/2ad929d0b38f05c9da1b847426a4094c3314be3b
+		
+		foreach ($brand_list as $row) 
+		{
+			$row_out[$i] = $row;
+			$row_out[$i]['count'] = $i;
+			$row_out[$i]['cfg_ver_datetime'] = $row['cfg_ver'];
+			$row_out[$i]['cfg_ver_datetime_txt'] = date("c",$row['cfg_ver']);
+			
+			$row_mod = $this->brand_update_check($row['directory']);
+			$row_out[$i]['update'] = $row_mod['update'];
+			if(isset($row_mod['update_vers'])) {
+				$row_out[$i]['update_vers'] = $row_mod['update_vers'];
+				$row_out[$i]['update_vers_txt'] = date("c",$row_mod['update_vers']);
+			}
+
+			if (! isset($row_out[$i]['update'])) 			{ $row_out[$i]['update'] = ""; }
+			if (! isset($row_out[$i]['update_vers'])) 		{ $row_out[$i]['update_vers'] = $row_out[$i]['cfg_ver_datetime']; }
+			if (! isset($row_out[$i]['update_vers_txt'])) 	{ $row_out[$i]['update_vers_txt'] = $row_out[$i]['cfg_ver_datetime_txt']; }
+
+			if ($row['hidden'] == 1) 
+			{
+				$i++;
+				continue; 
+			}
+			
+			
+			$j = 0;
+			$product_list = $this->epm_config_hardware_get_list_product($row['id'], true);
+			foreach($product_list as $row2) {
+				$row_out[$i]['products'][$j] = $row2;
+				if((array_key_exists('firmware_vers', $row2)) AND ($row2['firmware_vers'] > 0)) {
+					$temp = $this->firmware_update_check($row2['id']);
+					$row_out[$i]['products'][$j]['update_fw'] = 1;
+					$row_out[$i]['products'][$j]['update_vers_fw'] = $temp['data']['version'];
+				} else {
+					$row_out[$i]['products'][$j]['update_fw'] = 0;
+					$row_out[$i]['products'][$j]['update_vers_fw'] = "";
+				}
+				if (! isset($row_out[$i]['products'][$j]['update_fw'])) 		{ $row_out[$i]['products'][$j]['update_fw'] = 0; }
+				if (! isset($row_out[$i]['products'][$j]['update_vers_fw'])) 	{ $row_out[$i]['products'][$j]['update_vers_fw'] = ""; }
+	
+	
+				$row_out[$i]['products'][$j]['fw_type'] = $this->firmware_local_check($row2['id']);
+				$row_out[$i]['products'][$j]['count'] = $j;
+				if ($row2['hidden'] == 1) 
+				{ 
+					$j++;
+					continue; 
+				}
+				
+				$k = 0;
+				$model_list = $this->epm_config_hardware_get_list_models($row2['id'], true);
+				foreach($model_list as $row3) 
+				{
+					$row_out[$i]['products'][$j]['models'][$k] = $row3;
+					
+					unset ($row_out[$i]['products'][$j]['models'][$k]['template_list']);
+					unset ($row_out[$i]['products'][$j]['models'][$k]['template_data']);
+					
+					if($row_out[$i]['products'][$j]['models'][$k]['enabled']){
+						$row_out[$i]['products'][$j]['models'][$k]['enabled_checked'] = 'checked';
+					}
+					$row_out[$i]['products'][$j]['models'][$k]['count'] = $k;
+					$k++;
+				}
+				$j++;
+			}
+			
+			
+			$i++;
+		}
+		//echo "<textarea>".print_r($row_out,true)."</textarea>";
 		return $row_out;
 	}
 	/*** END SEC FUNCTIONS ***/
 	
 	
 	
+	
+	function brand_update_check($brand_name_find = NULL) 
+	{
+		if ($brand_name_find == NULL) { return $this->brand_update_check_all(); }
+		
+		$sql = "SELECT * FROM  endpointman_brand_list WHERE directory = '" . $brand_name_find . "'";
+		$row = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
+		
+		$out = array();		
+		if  (! isset($row['directory'])) 
+		{
+			$out['update'] = -2;
+		}
+		else 
+		{			
+			if (file_exists($this->PHONE_MODULES_PATH . "endpoint/" . $row['directory'] . "/brand_data.json")) 
+			{
+				$temp = $this->file2json($this->PHONE_MODULES_PATH . "endpoint/" . $row['directory'] . "/brand_data.json");
+				$temp = $temp['data']['brands'];
+
+				$version = $temp['last_modified'];
+				$last_mod = "";
+				foreach ($temp['family_list'] as $list) {
+					$last_mod = max($last_mod, $list['last_modified']);
+				}
+				$last_mod = max($last_mod, $version);
+				$version = $last_mod;
+				
+				if ($row['cfg_ver'] < $version) {
+					$out['update'] = 1;
+					$out['update_vers'] = $version;
+				} else {
+					$out['update'] = NULL;
+					$out['update_vers'] = $version;
+				}
+			}
+			else {
+				$out['update'] = -1;
+			}
+		}
+		return $out;
+	}
+	
+	
+	
+	function brand_update_check_all() 
+	{
+		$temp = $this->file2json($this->PHONE_MODULES_PATH . 'endpoint/master.json');
+		$endpoint_package = $temp['data']['package'];
+		$endpoint_last_mod = $temp['data']['last_modified'];
+		
+		$version = array();
+		$out = $temp['data']['brands'];
+		foreach ($out as $data) {
+			if (file_exists($this->PHONE_MODULES_PATH . "endpoint/" . $data['directory'] . "/brand_data.json")) {
+				$temp = $this->file2json($this->PHONE_MODULES_PATH . "endpoint/" . $data['directory'] . "/brand_data.json");
+				$temp = $temp['data']['brands'];
+
+				$brand_name = $temp['directory'];
+				$version[$brand_name] = $temp['last_modified'];
+				$last_mod = "";
+				foreach ($temp['family_list'] as $list) {
+					$last_mod = max($last_mod, $list['last_modified']);
+				}
+				$last_mod = max($last_mod, $version[$brand_name]);
+				$version[$brand_name] = $last_mod;
+			}
+		}
+		
+		$sql = 'SELECT * FROM  endpointman_brand_list WHERE id > 0';
+		$row = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
+		foreach ($row as $ava_brands) {
+			$key = $this->system->arraysearchrecursive($ava_brands['directory'], $out, 'directory');
+			
+			if ($key === FALSE) {
+				$tmp = $ava_brands;
+				$tmp['update'] = -1;
+				$out[] = $tmp;
+			}
+			else {
+				$key = $key[0];
+				$brand_name = $ava_brands['directory'];
+				if (! isset($version[$brand_name])) { $version[$brand_name] = 0; }
+				if ($ava_brands['cfg_ver'] < $version[$brand_name]) {
+					$out[$key]['update'] = 1;
+					$out[$key]['update_vers'] = $version[$brand_name];
+				} else {
+					$out[$key]['update'] = NULL;
+				}
+			}
+		}
+		return $out;
+	}
 	
 	
 	

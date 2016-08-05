@@ -4,7 +4,7 @@
 	FreePBX::Endpointman()->configmod->getConfigModuleSQL(false);
 	
 	
-	if ((FreePBX::Endpointman()->configmod->get("server_type") == 'file') AND (FreePBX::Endpointman()->epm_advanced_config_loc_is_writable())) {
+	if ((FreePBX::Endpointman()->configmod->get("server_type") == 'file') AND (FreePBX::Endpointman()->epm_advanced->epm_advanced_config_loc_is_writable())) {
 		FreePBX::Endpointman()->tftp_check();
 	}
 	
@@ -63,7 +63,7 @@
 		</div>
 		<div class="row">
 			<div class="col-md-12">
-				<span class="help-block fpbx-help-block" id="srvip-help">Texto ayuda!</span>
+				<span class="help-block fpbx-help-block" id="srvip-help"><?php echo _("Address IP by my server PBX."); ?></span>
 			</div>
 		</div>
 	</div>
@@ -82,10 +82,12 @@
 							<i class="fa fa-question-circle fpbx-help-icon" data-for="cfg_type"></i>
 						</div>
 						<div class="col-md-9">
-							<select name="cfg_type" class="form-control" id="cfg_type">
-								<option value="file" <?php echo ($server_type == "file" ? "selected" : "") ?> ><?php echo _("File (TFTP/FTP)")?></option>
-								<option value="http" <?php echo ($server_type == "http"? "selected" : "") ?> ><?php echo _("Web (HTTP)")?></option>
+	                        <select class="form-control selectpicker show-tick" data-style="btn-info" name="cfg_type" id="cfg_type">
+                            	<option data-icon="fa fa-upload" value="file" <?php echo ($server_type == "file" ? 'selected="selected"' : '') ?> ><?php echo _("File (TFTP/FTP)")?></option>
+								<option data-icon="fa fa-upload" value="http" <?php echo ($server_type == "http"? 'selected="selected"' : '') ?> ><?php echo _("Web (HTTP)")?></option>
+                                <option data-icon="fa fa-upload" value="https" <?php echo ($server_type == "https"? 'selected="selected"' : '') ?> disabled><?php echo _("Web (HTTPS)")?></option>
 							</select>
+                            <br /><br />
 							<div class="alert alert-info" role="alert" id="cfg_type_alert">
 								<strong><?php echo _("Updated!"); ?></strong><?php echo _(" - Point your phones to: "); ?><a href="http://<?php echo $_SERVER['SERVER_ADDR']; ?>/provisioning/p.php/" class="alert-link" target="_blank">http://<?php echo $_SERVER['SERVER_ADDR']; ?>/provisioning/p.php/</a>.
 							</div>
@@ -96,7 +98,7 @@
 		</div>
 		<div class="row">
 			<div class="col-md-12">
-				<span class="help-block fpbx-help-block" id="cfg_type-help">Texto ayuda!</span>
+				<span class="help-block fpbx-help-block" id="cfg_type-help"><?php echo _("Type the server by aprovisonament setting. Server TFTP, Server HTTP, Server HTTPS (not found, future version!)."); ?></span>
 			</div>
 		</div>
 	</div>
@@ -123,7 +125,7 @@
 		</div>
 		<div class="row">
 			<div class="col-md-12">
-				<span class="help-block fpbx-help-block" id="config_loc-help">Texto ayuda!</span>
+				<span class="help-block fpbx-help-block" id="config_loc-help"><?php echo _("Path location root TFTP server."); ?></span>
 			</div>
 		</div>
 	</div>
@@ -135,14 +137,6 @@
 </div>
 <div class="section" data-id="setting_time">
 	<!--Time Zone-->
-	<?php
-		$list_tz = FreePBX::Endpointman()->listTZ(FreePBX::Endpointman()->configmod->get("tz"));
-		$lnhtm = '';
-		foreach ($list_tz as $row) {
-			$lnhtm .= '<option value="'.$row['value'].'" '. ($row['selected'] == 1 ? 'selected="selected"' : '') .' > '.$row['text'].'</option>';
-		}
-		unset ($list_tz);
-	?>
 	<div class="element-container">
 		<div class="row">
 			<div class="col-md-12">
@@ -153,14 +147,20 @@
 							<i class="fa fa-question-circle fpbx-help-icon" data-for="tz"></i>
 						</div>
 						<div class="col-md-9">
-							<div class="input-group">
-      							<select name="tz" class="form-control" id="tz">
-								<?php echo $lnhtm; ?>
+                        	<div class="input-group input-group-br">
+                            	<select class="form-control selectpicker show-tick" data-style="btn-primary" data-live-search-placeholder="Buscar" data-size="10" data-live-search="true" name="tz" id="tz">
+								<?php
+									$list_tz = FreePBX::Endpointman()->listTZ(FreePBX::Endpointman()->configmod->get("tz"));
+								   	foreach ($list_tz as $row) {
+										echo '<option data-icon="fa fa-clock-o" value="'.$row['value'].'" '.($row['selected'] == 1 ? 'selected="selected"' : '' ).'>'.$row['text'].'</option>';
+									}
+									unset ($list_tz);
+								?>
 								</select>
-      							<span class="input-group-btn">
-        							<button class="btn btn-default" type="button" id='tzphp' onclick="epm_advanced_tab_setting_input_value_change_bt('#tz', sValue = '<?php echo FreePBX::Endpointman()->config->get('PHPTIMEZONE'); ?>', bSaveChange = true);"><i class="fa fa-clock-o"></i> <?php echo _("TimeZone by PBX Setting")?></button>
-      							</span>
-    						</div>
+								<span class="input-group-btn">
+									<button class="btn btn-default" type="button" id='tzphp' onclick="epm_advanced_tab_setting_input_value_change_bt('#tz', sValue = '<?php echo FreePBX::Endpointman()->config->get('PHPTIMEZONE'); ?>', bSaveChange = true);"><i class="fa fa-clock-o"></i> <?php echo _("TimeZone PBX")?></button>
+								</span>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -168,11 +168,10 @@
 		</div>
 		<div class="row">
 			<div class="col-md-12">
-				<span class="help-block fpbx-help-block" id="tz-help">Like England/London</span>
+				<span class="help-block fpbx-help-block" id="tz-help"><?php echo _("TimeZone configuration terminasl. Like England/London"); ?></span>
 			</div>
 		</div>
 	</div>
-	<?php unset($lnhtm); ?>
 	<!--END Time Zone-->
 	<!--Time Server - NTP Server-->
 	<div class="element-container">
@@ -199,7 +198,7 @@
 		</div>
 		<div class="row">
 			<div class="col-md-12">
-				<span class="help-block fpbx-help-block" id="ntp_server-help">Texto ayuda!</span>
+				<span class="help-block fpbx-help-block" id="ntp_server-help"><?php echo _("Server NTP use the configuration terminals."); ?></span>
 			</div>
 		</div>
 	</div>
@@ -229,7 +228,7 @@
 		</div>
 		<div class="row">
 			<div class="col-md-12">
-				<span class="help-block fpbx-help-block" id="nmap_loc-help">Texto ayuda!</span>
+				<span class="help-block fpbx-help-block" id="nmap_loc-help"><?php echo _("Path location NMAP."); ?></span>
 			</div>
 		</div>
 	</div>
@@ -253,7 +252,7 @@
 		</div>
 		<div class="row">
 			<div class="col-md-12">
-				<span class="help-block fpbx-help-block" id="arp_loc-help">Texto ayuda!</span>
+				<span class="help-block fpbx-help-block" id="arp_loc-help"><?php echo _("Path location ARP."); ?></span>
 			</div>
 		</div>
 	</div>
@@ -277,7 +276,7 @@
 		</div>
 		<div class="row">
 			<div class="col-md-12">
-				<span class="help-block fpbx-help-block" id="asterisk_loc-help">Texto ayuda!</span>
+				<span class="help-block fpbx-help-block" id="asterisk_loc-help"><?php echo _("Path location Asterisk."); ?></span>
 			</div>
 		</div>
 	</div>
@@ -312,7 +311,7 @@
 		</div>
 		<div class="row">
 			<div class="col-md-12">
-				<span class="help-block fpbx-help-block" id="package_server-help">Texto ayuda!</span>
+				<span class="help-block fpbx-help-block" id="package_server-help"><?php echo _("URL download files and packages the configuration terminals."); ?></span>
 			</div>
 		</div>
 	</div>
@@ -330,16 +329,16 @@
 			<div class="col-md-12">
 				<div class="row">
 					<div class="form-group">
-						<div class="col-md-3">
+						<div class="col-md-12">
 							<label class="control-label" for="enable_ari"><?php echo _("Enable FreePBX ARI Module")?></label>
 							<i class="fa fa-question-circle fpbx-help-icon" data-for="enable_ari"></i>
-						</div>
-						<div class="col-md-9 radioset">
-							<input type="radio" name="enable_ari" id="enable_ari_yes" value="Yes" <?php echo ($ari_selected  == 1 ? "CHECKED" : "") ?>>
-							<label for="enable_ari_yes"><i class="fa fa-check"></i> <?php echo _("Yes");?></label>
-							<input type="radio" name="enable_ari" id="enable_ari_no" value="No" <?php echo ($ari_selected == 0 ? "CHECKED" : "") ?>>
-							<label for="enable_ari_no"><i class="fa fa-times"></i> <?php echo _("No");?></label>
-						</div>
+                            <div class="radioset pull-xs-right">
+                                <input type="radio" name="enable_ari" id="enable_ari_yes" value="Yes" <?php echo ($ari_selected  == 1 ? "CHECKED" : "") ?>>
+                                <label for="enable_ari_yes"><i class="fa fa-check"></i> <?php echo _("Yes");?></label>
+                                <input type="radio" name="enable_ari" id="enable_ari_no" value="No" <?php echo ($ari_selected == 0 ? "CHECKED" : "") ?>>
+                                <label for="enable_ari_no"><i class="fa fa-times"></i> <?php echo _("No");?></label>
+                            </div>
+                     	</div>
 					</div>
 				</div>
 			</div>
@@ -366,16 +365,16 @@
 			<div class="col-md-12">
 				<div class="row">
 					<div class="form-group">
-						<div class="col-md-3">
+						<div class="col-md-12">
 							<label class="control-label" for="enable_debug"><?php echo _("Enable Debug Mode")?></label>
 							<i class="fa fa-question-circle fpbx-help-icon" data-for="enable_debug"></i>
-						</div>
-						<div class="col-md-9 radioset">
-							<input type="radio" name="enable_debug" id="enable_debug_yes" value="Yes" <?php echo ($debug_selected  == 1 ? "CHECKED" : "") ?>>
-							<label for="enable_debug_yes"><i class="fa fa-check"></i> <?php echo _("Yes");?></label>
-							<input type="radio" name="enable_debug" id="enable_debug_no" value="No" <?php echo ($debug_selected == 0 ? "CHECKED" : "") ?>>
-							<label for="enable_debug_no"><i class="fa fa-times"></i> <?php echo _("No");?></label>
-						</div>
+                            <div class="radioset pull-xs-right">
+                                <input type="radio" name="enable_debug" id="enable_debug_yes" value="Yes" <?php echo ($debug_selected  == 1 ? "CHECKED" : "") ?>>
+                                <label for="enable_debug_yes"><i class="fa fa-check"></i> <?php echo _("Yes");?></label>
+                                <input type="radio" name="enable_debug" id="enable_debug_no" value="No" <?php echo ($debug_selected == 0 ? "CHECKED" : "") ?>>
+                                <label for="enable_debug_no"><i class="fa fa-times"></i> <?php echo _("No");?></label>
+                            </div>
+                     	</div>
 					</div>
 				</div>
 			</div>
@@ -395,16 +394,16 @@
 			<div class="col-md-12">
 				<div class="row">
 					<div class="form-group">
-						<div class="col-md-3">
+						<div class="col-md-12">
 							<label class="control-label" for="disable_help"><?php echo _("Disable Tooltips")?></label>
 							<i class="fa fa-question-circle fpbx-help-icon" data-for="disable_help"></i>
-						</div>
-						<div class="col-md-9 radioset">
-							<input type="radio" name="disable_help" id="disable_help_yes" value="Yes" <?php echo ($help_selected  == 1 ? "CHECKED" : "") ?>>
-							<label for="disable_help_yes"><i class="fa fa-check"></i> <?php echo _("Yes");?></label>
-							<input type="radio" name="disable_help" id="disable_help_no" value="No" <?php echo ($help_selected == 0 ? "CHECKED" : "") ?>>
-							<label for="disable_help_no"><i class="fa fa-times"></i> <?php echo _("No");?></label>
-						</div>
+                            <div class="radioset pull-xs-right">
+                                <input type="radio" name="disable_help" id="disable_help_yes" value="Yes" <?php echo ($help_selected  == 1 ? "CHECKED" : "") ?>>
+                                <label for="disable_help_yes"><i class="fa fa-check"></i> <?php echo _("Yes");?></label>
+                                <input type="radio" name="disable_help" id="disable_help_no" value="No" <?php echo ($help_selected == 0 ? "CHECKED" : "") ?>>
+                                <label for="disable_help_no"><i class="fa fa-times"></i> <?php echo _("No");?></label>
+                            </div>
+                      	</div>
 					</div>
 				</div>
 			</div>
@@ -424,16 +423,16 @@
 			<div class="col-md-12">
 				<div class="row">
 					<div class="form-group">
-						<div class="col-md-3">
+						<div class="col-md-12">
 							<label class="control-label" for="allow_dupext"><?php echo _("Allow Duplicate Extensions")?></label>
 							<i class="fa fa-question-circle fpbx-help-icon" data-for="allow_dupext"></i>
-						</div>
-						<div class="col-md-9 radioset">
-							<input type="radio" name="allow_dupext" id="allow_dupext_yes" value="Yes" <?php echo ($dupext_selected  == 1 ? "CHECKED" : "") ?>>
-							<label for="allow_dupext_yes"><i class="fa fa-check"></i> <?php echo _("Yes");?></label>
-							<input type="radio" name="allow_dupext" id="allow_dupext_no" value="No" <?php echo ($dupext_selected == 0 ? "CHECKED" : "") ?>>
-							<label for="allow_dupext_no"><i class="fa fa-times"></i> <?php echo _("No");?></label>
-						</div>
+                            <div class="radioset pull-xs-right">
+                                <input type="radio" name="allow_dupext" id="allow_dupext_yes" value="Yes" <?php echo ($dupext_selected  == 1 ? "CHECKED" : "") ?>>
+                                <label for="allow_dupext_yes"><i class="fa fa-check"></i> <?php echo _("Yes");?></label>
+                                <input type="radio" name="allow_dupext" id="allow_dupext_no" value="No" <?php echo ($dupext_selected == 0 ? "CHECKED" : "") ?>>
+                                <label for="allow_dupext_no"><i class="fa fa-times"></i> <?php echo _("No");?></label>
+                            </div>
+                    	</div>
 					</div>
 				</div>
 			</div>
@@ -453,15 +452,15 @@
 			<div class="col-md-12">
 				<div class="row">
 					<div class="form-group">
-						<div class="col-md-3">
+						<div class="col-md-12">
 							<label class="control-label" for="allow_hdfiles"><?php echo _("Allow Saving Over Default Configuration Files")?></label>
 							<i class="fa fa-question-circle fpbx-help-icon" data-for="allow_hdfiles"></i>
-						</div>
-						<div class="col-md-9 radioset">
-							<input type="radio" name="allow_hdfiles" id="allow_hdfiles_yes" value="Yes" <?php echo ($allow_hdfiles  == 1 ? "CHECKED" : "") ?>>
-							<label for="allow_hdfiles_yes"><i class="fa fa-check"></i> <?php echo _("Yes");?></label>
-							<input type="radio" name="allow_hdfiles" id="allow_hdfiles_no" value="No" <?php echo ($allow_hdfiles == 0 ? "CHECKED" : "") ?>>
-							<label for="allow_hdfiles_no"><i class="fa fa-times"></i> <?php echo _("No");?></label>
+                            <div class="radioset pull-xs-right">
+                                <input type="radio" name="allow_hdfiles" id="allow_hdfiles_yes" value="Yes" <?php echo ($allow_hdfiles  == 1 ? "CHECKED" : "") ?>>
+                                <label for="allow_hdfiles_yes"><i class="fa fa-check"></i> <?php echo _("Yes");?></label>
+                                <input type="radio" name="allow_hdfiles" id="allow_hdfiles_no" value="No" <?php echo ($allow_hdfiles == 0 ? "CHECKED" : "") ?>>
+                                <label for="allow_hdfiles_no"><i class="fa fa-times"></i> <?php echo _("No");?></label>
+                            </div>
 						</div>
 					</div>
 				</div>
@@ -482,15 +481,15 @@
 			<div class="col-md-12">
 				<div class="row">
 					<div class="form-group">
-						<div class="col-md-3">
+						<div class="col-md-12">
 							<label class="control-label" for="tftp_check"><?php echo _("Disable TFTP Server Check")?></label>
 							<i class="fa fa-question-circle fpbx-help-icon" data-for="tftp_check"></i>
-						</div>
-						<div class="col-md-9 radioset">
-							<input type="radio" name="tftp_check" id="tftp_check_yes" value="Yes" <?php echo ($tftp_checked  == 1 ? "CHECKED" : "") ?>>
-							<label for="tftp_check_yes"><i class="fa fa-check"></i> <?php echo _("Yes");?></label>
-							<input type="radio" name="tftp_check" id="tftp_check_no" value="No" <?php echo ($tftp_checked == 0 ? "CHECKED" : "") ?>>
-							<label for="tftp_check_no"><i class="fa fa-times"></i> <?php echo _("No");?></label>
+							<div class="radioset pull-xs-right">
+								<input type="radio" name="tftp_check" id="tftp_check_yes" value="Yes" <?php echo ($tftp_checked  == 1 ? "CHECKED" : "") ?>>
+								<label for="tftp_check_yes"><i class="fa fa-check"></i> <?php echo _("Yes");?></label>
+								<input type="radio" name="tftp_check" id="tftp_check_no" value="No" <?php echo ($tftp_checked == 0 ? "CHECKED" : "") ?>>
+								<label for="tftp_check_no"><i class="fa fa-times"></i> <?php echo _("No");?></label>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -511,16 +510,16 @@
 			<div class="col-md-12">
 				<div class="row">
 					<div class="form-group">
-						<div class="col-md-3">
+						<div class="col-md-12">
 							<label class="control-label" for="backup_check"><?php echo _("Disable Configuration File Backups")?></label>
 							<i class="fa fa-question-circle fpbx-help-icon" data-for="backup_check"></i>
-						</div>
-						<div class="col-md-9 radioset">
-							<input type="radio" name="backup_check" id="backup_check_yes" value="Yes" <?php echo ($backup_checked  == 1 ? "CHECKED" : "") ?>>
-							<label for="backup_check_yes"><i class="fa fa-check"></i> <?php echo _("Yes");?></label>
-							<input type="radio" name="backup_check" id="backup_check_no" value="No" <?php echo ($backup_checked == 0 ? "CHECKED" : "") ?>>
-							<label for="backup_check_no"><i class="fa fa-times"></i> <?php echo _("No");?></label>
-						</div>
+                            <div class="radioset pull-xs-right">
+                                <input type="radio" name="backup_check" id="backup_check_yes" value="Yes" <?php echo ($backup_checked  == 1 ? "CHECKED" : "") ?>>
+                                <label for="backup_check_yes"><i class="fa fa-check"></i> <?php echo _("Yes");?></label>
+                                <input type="radio" name="backup_check" id="backup_check_no" value="No" <?php echo ($backup_checked == 0 ? "CHECKED" : "") ?>>
+                                <label for="backup_check_no"><i class="fa fa-times"></i> <?php echo _("No");?></label>
+                            </div>
+   						</div>
 					</div>
 				</div>
 			</div>
@@ -540,15 +539,15 @@
 			<div class="col-md-12">
 				<div class="row">
 					<div class="form-group">
-						<div class="col-md-3">
+						<div class="col-md-12">
 							<label class="control-label" for="use_repo"><?php echo _("Use GITHUB Live Repo")?></label>
 							<i class="fa fa-question-circle fpbx-help-icon" data-for="use_repo"></i>
-						</div>
-						<div class="col-md-9 radioset">
-							<input type="radio" name="use_repo" id="use_repo_yes" value="Yes" <?php echo ($use_repo  == 1 ? "CHECKED" : "") ?>>
-							<label for="use_repo_yes"><i class="fa fa-check"></i> <?php echo _("Yes");?></label>
-							<input type="radio" name="use_repo" id="use_repo_no" value="No" <?php echo ($use_repo == 0 ? "CHECKED" : "") ?>>
-							<label for="use_repo_no"><i class="fa fa-times"></i> <?php echo _("No");?></label>
+                            <div class="radioset pull-xs-right">
+                                <input type="radio" name="use_repo" id="use_repo_yes" value="Yes" <?php echo ($use_repo  == 1 ? "CHECKED" : "") ?>>
+                                <label for="use_repo_yes"><i class="fa fa-check"></i> <?php echo _("Yes");?></label>
+                                <input type="radio" name="use_repo" id="use_repo_no" value="No" <?php echo ($use_repo == 0 ? "CHECKED" : "") ?>>
+                                <label for="use_repo_no"><i class="fa fa-times"></i> <?php echo _("No");?></label>
+                            </div>
 						</div>
 					</div>
 				</div>

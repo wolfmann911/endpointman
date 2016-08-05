@@ -1,19 +1,6 @@
 <?php
 	if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
-	
-	if ((! isset($_REQUEST['idsel'])) || (! isset($_REQUEST['custom'])))
-	{
-		echo '<div class="alert alert-warning" role="alert">';
-		echo '<strong>'._("Warning!").'</strong>'.(" No select ID o Custom!");
-		echo '</div>';
-		return;
-	}
-	$dtemplate = FreePBX::Endpointman()->epm_templates->edit_template_display($_REQUEST['idsel'],$_REQUEST['custom']);
-	$request = $_REQUEST;
 ?>
-
-
-
 
 <form action="" method="post" id="epm_tamplate_edit_form" name="epm_tamplate_edit_form">
 	<?php if (isset($_REQUEST['silent_mode'])) { echo '<input name="silent_mode" id="silent_mode" type="hidden" value="1">'; } ?>
@@ -27,41 +14,37 @@
              		<div class="col-md-12">
 						<div class="panel panel-default">
 							<div class="panel-heading">
-								<h3 class="panel-title"><i class="fa  fa-info-circle fa-lg"></i> <?php echo _("Info Template")?></h3>
+								<h3 class="panel-title"><i class="fa fa-info-circle fa-lg"></i> <?php echo _("Info Template")?></h3>
 							</div>
 							<div class="panel-body">
-                    
-                    
-                    
-                    
                                 <table class="table">
                                     <tr>
-                                        <td><b><?php echo _("Template Name:")?></b></td>
-                                        <td><?php if ($request['custom'] != 0): ?>Custom Template: Extension <?php echo $dtemplate['ext']; ?><?php else: ?><?php echo $dtemplate['template_name']; ?><?php endif; ?></td>
+                                        <td class="col-md-3"><b><?php echo _("Template Name:")?></b></td>
+                                        <td class="col-md-9"><?php if ($request['custom'] != 0): ?>Custom Template: Extension <?php echo $dtemplate['ext']; ?><?php else: ?><?php echo $dtemplate['template_name']; ?><?php endif; ?></td>
                                     </tr>
                                     <tr>
-                                        <td><b><?php echo _("Product Line:")?></b></td>
-                                        <td><?php echo $dtemplate['product']; ?></td>
+                                        <td class="col-md-3"><b><?php echo _("Product Line:")?></b></td>
+                                        <td class="col-md-9"><?php echo $dtemplate['product']; ?></td>
                                     </tr>
                                     <tr>
-                                        <td><b><?php echo _("Clone of Model:")?></b></td>
+                                        <td class="col-md-3"><b><?php echo _("Clone of Model:")?></b></td>
                                     <?php if ($request['custom'] != 0): ?>
-                                        <td><?php echo $dtemplate['model'] ?></td>
+                                        <td class="col-md-9"><?php echo $dtemplate['model'] ?></td>
                                     <?php else: ?>
-                                        <td>
-                                        <select class="form-control" name="model_list" id="model_list" disabled>
+                                        <td class="col-md-9">
+                                        <select class="form-control selectpicker show-tick" data-style="btn-primary" data-live-search-placeholder="Buscar" data-live-search="true" name="model_list" id="model_list" disabled>
                                             <?php
                                             foreach($dtemplate['models_ava'] as $row) {
                                                 echo '<option value="'.$row['value'].'" '.(!empty($row['selected']) ? "selected" : "").'>'.$row['text'].'</option>';
                                             }
                                             ?>
                                         </select>
-                                        </td>
+										</td>
                                     </tr>
                                     <tr>
-                                        <td><b><?php echo _("Display:")?></b></td>
-                                        <td>
-                                            <select class="form-control" name="area_list" id="area_list" onchange="epm_template_edit_select_area_list(this)">
+                                        <td class="col-md-3"><b><?php echo _("Display:")?></b></td>
+                                        <td class="col-md-9">
+                                            <select class="form-control selectpicker show-tick" data-style="btn-primary" data-live-search-placeholder="Buscar" data-live-search="true" name="area_list" id="area_list" onchange="epm_template_edit_select_area_list(this)">
                                                 <option value=""></option>
                                                 <?php 	
                                                 foreach($dtemplate['area_ava'] as $row) {
@@ -71,14 +54,9 @@
                                             </select>
                                             <strong><?php echo _('Line settings on this page')?></strong><i><font size="-2"> (Note: This is NOT the number of supported lines on the phone(s))</font></i>
                                         </td>
-                                        
-                                        
                                     <?php endif; ?>
-                                    
                                     </tr>
                                 </table>
-						
-                        
 							</div>
 						</div>
 					</div>
@@ -105,44 +83,37 @@
                             </div>
                             <div class="panel-body">
                                 <?php 
-                                if ($dtemplate['alt'] != 0) {
-                                    foreach($dtemplate['alt_configs'] as $row): 
-                                    ?>
-                                    <div class="col-md-12">
-	                                    <div class="input-group input-group-br">
-                                            <select class="form-control selectpicker" data-style="btn-success" data-live-search-placeholder="Buscar" data-live-search="true" name="<?php echo $row['name']; ?>" id="altconfig_<?php echo $row['name']; ?>">
-	                                            <option data-divider="true" disabled></option>
-                                               	<option data-icon="fa fa-files-o" value="0_<?php echo $row['name']; ?>"><?php echo $row['name']; ?> (No Change)</option>
-                                                <optgroup label="MODIFICACIONES">
-                                                    <?php
-                                                    if (isset($row['list'])) {
-                                                        foreach($row['list'] as $srow) {
-                                                            echo '<option data-icon="fa fa-pencil-square-o" style="background: #5cb85c; color: #fff;" value="'.$srow['id'].'_'.$srow['name'].'" '.(isset($srow['selected']) ? "selected" : "" ).'>'.$srow['name'].'</option>';
-                                                        }
-                                                    }
-                                                    ?>
-                                                </optgroup>
-                                            </select>
-                                          	<span class="input-group-btn">
-                                                <button class="btn btn-success" type="button">
-                                                    <i class='fa fa-pencil-square-o'>&nbsp;</i>
-                                                </button>
-                                    		</span>
-                                    	</div>
-                                    </div>
-                                    <?php 
-                                    endforeach;
-                                }
+								
+								//$list_all_files = array();
+                                //if ($dtemplate['alt'] != 0) {
+								//	$list_all_files = array_merge($dtemplate['alt_configs'], $dtemplate['only_configs']);
+								//}
+								//else {
+								//	$list_all_files = $dtemplate['only_configs'];
+								//}
                                 
-                                foreach($dtemplate['only_configs'] as $row): 
+								
+								$list_all_files = FreePBX::Endpointman()->epm_templates->edit_template_display_files_list($_REQUEST['idsel'],$_REQUEST['custom']);
+                                foreach($list_all_files as $row): 
+								//config.php?display=epm_templates&subpage=&custom=0&idsel=41
+								$row['idrefbox'] = $row['id']."_".$row['id_d']."_".$row['id_p'];
                                 ?>
 								<div class="col-md-12">
-                                	<div class="input-group input-group-br">
-                                        <select class="form-control selectpicker"  name="<?php echo $row['name']; ?>" id="altconfig_<?php echo $row['name']; ?>">
-                                            <option data-icon="fa fa-files-o" value="0_<?php echo $row['name']; ?>"><?php echo $row['name']; ?> (No Change)</option>
+                                	<div class="input-group input-group-br files_edit_configs" name="boxselect_<?php echo $row['idrefbox']; ?>" id="boxselect_<?php echo $row['idrefbox']; ?>">
+                                        <select 
+                                        	class="form-control selectpicker show-tick" 
+                                            data-url="ajax.php?module=endpointman&amp;module_sec=epm_templates&amp;module_tab=editor&amp;command=list_files_edit&amp;idsel=<?php echo $_REQUEST['idsel']; ?>&amp;custom=<?php echo $_REQUEST['custom']; ?>&amp;namefile=<?php echo $row['name']; ?>"
+											data-cache="false"
+                                            data-id = "id"
+											data-label = "name"
+                                            data-style = ""
+											data-live-search-placeholder = "Buscar..."
+											data-live-search = "true"
+                                            name="sl_boxselect_<?php echo $row['idrefbox']; ?>" 
+                                            id="sl_boxselect_<?php echo $row['idrefbox']; ?>">
                                         </select>
                                         <span class="input-group-btn">
-                                            <button class="btn btn-default" type="button"><i class='fa fa-files-o'>&nbsp;</i></button>
+                                            <button class="btn btn-default" type="button" name="bt_boxselect_<?php echo $row['idrefbox']; ?>" id="bt_boxselect_<?php echo $row['idrefbox']; ?>"><i class='fa fa-files-o'>&nbsp;</i></button>
                                         </span>
                                     </div>
 								</div>
@@ -318,7 +289,7 @@
                                             <div class="col-md-12">
                                                 <div class="row">
                                                     <div class="form-group">
-                                                        <div class="col-md-3">
+                                                        <div class="col-md-12">
                                                             <label class="control-label" for="<?php echo $srow['key']; ?>">
                                                             <?php 
                                                             if (! isset($srow['tooltip'])) { echo $srow['description']; }
@@ -326,25 +297,25 @@
                                                             ?>
                                                             </label>
                                                             <i class="fa fa-question-circle fpbx-help-icon" data-for="<?php echo $srow['key']; ?>"></i>
-                                                        </div>
-                                                        <div class="col-md-9 radioset">
-                                                        	<?php
-															foreach($srow['data'] as $lrow) {
-																/*
-																echo '[<label>';
-																echo (! isset($lrow['tooltip']) ? $lrow['description'] : '<a href="#" class="info">'.$lrow['description'].'<span>'.$lrow['tooltip'].'</span></a>').':';
-																//echo '<input type="radio" name="'.$lrow['key'].'" id="'.$lrow['key'].'" value="'.$lrow['value'].'" '.(array_key_exists('checked', $lrow['value']) ? $lrow['checked'] : '').' >';
-																echo '<input type="radio" name="'.$lrow['key'].'" id="'.$lrow['key'].'" value="'.$lrow['value'].'" >';
-																echo '</label>]';
-																
-																<input type="radio" class="form-control" id="addtocdrno" name="addtocdr" value="0" <?php echo ($addtocdr == '1' ? '' : 'CHECKED'); ?>>
-																<label for="addtocdrno"><?php echo _("No")?></label>
-																*/
-		                                                        echo '<input type="radio" class="form-control" id="'.$lrow['key'].'" name="'.$srow['key'].'" value="'.$lrow['value'].'" '.($lrow['value'] == $lrow['checked'] ? 'CHECKED' : '').'>';
-																echo '<label for="'.$lrow['key'].'">'.(! isset($lrow['tooltip']) ? $lrow['description'] : '<a href="#" class="info">'.$lrow['description'].'<span>'.$lrow['tooltip'].'</span></a>').'</label>';
-															}
-															?>
-
+                                                            <div class="radioset pull-xs-right">
+                                                                <?php
+                                                                foreach($srow['data'] as $lrow) {
+                                                                    /*
+                                                                    echo '[<label>';
+                                                                    echo (! isset($lrow['tooltip']) ? $lrow['description'] : '<a href="#" class="info">'.$lrow['description'].'<span>'.$lrow['tooltip'].'</span></a>').':';
+                                                                    //echo '<input type="radio" name="'.$lrow['key'].'" id="'.$lrow['key'].'" value="'.$lrow['value'].'" '.(array_key_exists('checked', $lrow['value']) ? $lrow['checked'] : '').' >';
+                                                                    echo '<input type="radio" name="'.$lrow['key'].'" id="'.$lrow['key'].'" value="'.$lrow['value'].'" >';
+                                                                    echo '</label>]';
+                                                                    
+                                                                    <input type="radio" class="form-control" id="addtocdrno" name="addtocdr" value="0" <?php echo ($addtocdr == '1' ? '' : 'CHECKED'); ?>>
+                                                                    <label for="addtocdrno"><?php echo _("No")?></label>
+                                                                    */
+                                                                    echo '<input type="radio" class="form-control" id="'.$lrow['key'].'" name="'.$srow['key'].'" value="'.$lrow['value'].'" '.($lrow['value'] == $lrow['checked'] ? 'CHECKED' : '').'>';
+                                                                    echo '<label for="'.$lrow['key'].'">'.(! isset($lrow['tooltip']) ? $lrow['description'] : '<a href="#" class="info">'.$lrow['description'].'<span>'.$lrow['tooltip'].'</span></a>').'</label>';
+                                                                }
+                                                                ?>
+    
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -379,7 +350,7 @@
                                                         </div>
                                                         <div class="col-md-9">
                                                         	<?php
-	                    									echo '<select name="'.$srow['key'].'" id="'.$srow['key'].'" class="form-control">';
+	                    									echo '<select name="'.$srow['key'].'" id="'.$srow['key'].'" class="form-control selectpicker show-tick" data-style="" data-live-search-placeholder="Buscar" data-live-search="true">';
 															foreach($srow['data'] as $lrow) 
 															{
 																//echo '<option value="'.$lrow['value'].'" '.(array_key_exists('selected',$lrow['selected'])? $lrow['value'] : '').' >'.$lrow['description'].'</option>';

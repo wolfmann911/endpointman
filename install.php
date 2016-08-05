@@ -933,7 +933,7 @@ if (empty($epmdbversion)) {
             (4, 'gmthr', ''),
             (5, 'config_location', '/tftpboot/'),
             (6, 'update_server', 'http://mirror.freepbx.org/provisioner/v3/'),
-            (7, 'version', '" . $epmxmlversion . "'),
+            (7, 'version', '" . $epmxmlversion  . "'),
             (8, 'enable_ari', '0'),
             (9, 'debug', '0'),
             (10, 'arp_location', '" . $arp . "'),
