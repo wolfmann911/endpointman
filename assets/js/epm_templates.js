@@ -1,11 +1,18 @@
+"use strict";
+var cmeditor = null;
+
 function epm_templates_document_ready () {
 	
-	$('#AddDlgModal').on('show.bs.modal', function (event) {
-		$(this).find('input, select').val("");
+	var arrayJs = ['assets/endpointman/js/addon/simplescrollbars.js', 'assets/endpointman/js/mode/xml.js'];
+	arrayJs.forEach(function (item, index, array) {
+		var x = document.createElement('script');
+		x.src = item;
+		document.getElementsByTagName("head")[0].appendChild(x);
 	});
 	
-	$('#AddDlgModal_bt_new').on("click", function() { epm_tamplates_grid_add(); });
 	
+	$('#AddDlgModal').on('show.bs.modal', function (event) { $(this).find('input, select').val(""); });
+	$('#AddDlgModal_bt_new').on("click", function() { epm_tamplates_grid_add(); });
 	$('#NewProductSelect').on('change', function() { epm_templates_add_NewProductSelect_Change (this); });
 
 	//http://kevinbatdorf.github.io/liquidslider/examples/page1.html#right
@@ -29,6 +36,74 @@ function epm_templates_document_ready () {
 	//Antes de iniciar el cierre de la ventana	$('#CfgGlobalTemplate').on('hide.bs.modal', function (e) { });
 	//Despues de Cerrar la ventana				$('#CfgGlobalTemplate').on('hidden.bs.modal', function (e) { });
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	$('#CfgEditFileTemplate').on('show.bs.modal', function (e) {         });	
+	
+	$('#CfgEditFileTemplate').on('shown.bs.modal', function (e) {
+		if (cmeditor === null) {
+			cmeditor = CodeMirror.fromTextArea(document.getElementById("config_textarea"), {
+				lineNumbers: true,
+				matchBrackets: true,
+				readOnly: false,
+				viewportMargin: Infinity,
+				scrollbarStyle: "simple"
+			});
+		}
+		cmeditor.setValue(document.getElementById("config_textarea").value);
+	});
+	
+	$('#CfgEditFileTemplate').on('hidden.bs.modal', function (e) {
+		/* DESPUES DE CERRAR: CODIGO QUE ACTUALIZA EL SELECT... */
+		
+		$('#edit_file_name_path').val("No Selected");
+		$('#config_textarea').val("");
+		cmeditor.setValue("");
+	});
+	$('#CfgEditFileTemplate').on('hidden.bs.modal', function (e) {        });
+	
+		
+		
+		
+	$('.files_edit_configs button').click(function(e){
+		var NameBox = e.target.parentNode.parentNode.id;
+		var NameBoxSel = "sl_" + NameBox;
+		var ValueSel = $('#' + NameBoxSel).val();
+				
+		var ids =  ValueSel.split("_", 1);
+		var NameFile = ValueSel.substr( ValueSel.lastIndexOf("_") + 1 , ValueSel.len);
+
+		if (ids[0] == "0"){
+			$('#edit_file_name_path').text(NameFile);
+			$('#config_textarea').val("Texto 456");
+		}
+		else 
+		{
+			$('#edit_file_name_path').text("SQL:" + NameFile);
+			$('#config_textarea').val("Texto 789");
+		}
+		$('#CfgEditFileTemplate').modal('show');
+
+	});
+	
+	$('select[class~="selectpicker"][data-url]').each(function(index, value) { epm_template_update_select_files_config($(this)); });
+	
+	
+	
+	
+	
 }
 
 function epm_templates_windows_load (nTab = "") {
@@ -38,6 +113,60 @@ function epm_templates_windows_load (nTab = "") {
 function epm_templates_change_tab (nTab = "") {
 
 }
+
+
+
+
+
+
+
+
+function epm_template_update_select_files_config (e) {
+	var select = e;
+	var url    = e.attr('data-url');
+	var id     = e.attr('data-id');
+	var label  = e.attr('data-label');
+	select.html('');
+	select.append('<option data-icon="fa fa-refresh fa-spin fa-fw" value="" selected>Cargando...</option>');
+	select.selectpicker('refresh');
+	$.getJSON(url, function(data)
+	{
+		select.html('');
+		$.each(data.only_configs, function(key, val)
+		{
+			if (val['select'] == "ON") {
+				select.append('<option data-icon="fa fa-files-o" value="' + val[id] + '_' + val[label] + '" selected>' + val[label] + ' (No Change)</option>');
+			}
+			else {
+				select.append('<option data-icon="fa fa-files-o" value="' + val[id] + '_' + val[label] + '">' + val[label] + ' (No Change)</option>');
+			}
+		});
+		if (data.alt_configs != null) 
+		{
+			select.append('<optgroup label="Modificaiones"></optgroup>');
+			var seloptgroup = select.find("optgroup");
+			$.each(data.alt_configs, function(key, val)
+			{
+				if (val['select'] == "ON") {
+					seloptgroup.append('<option data-icon="fa fa-pencil-square-o" style="background: #5cb85c; color: #fff;" value="' + val[id] + '_' + val[label] + '" selected>' + val[label] + '</option>');
+				}
+				else {
+					seloptgroup.append('<option data-icon="fa fa-pencil-square-o" style="background: #5cb85c; color: #fff;" value="' + val[id] + '_' + val[label] + '">' + val[label] + '</option>');
+				}
+			});
+			
+		};
+		select.selectpicker('refresh');
+	});
+}
+
+
+
+
+
+
+
+
 
 
 
@@ -112,10 +241,14 @@ function epm_templates_add_NewProductSelect_Change (obj)
 				}
 				$("#NewCloneModel").html(options);
 				$('#NewCloneModel option:first').attr('selected', 'selected');
+				$('#NewCloneModel').selectpicker('refresh');
 			}
 		});
 	}
-	else { $("#NewCloneModel").html(''); }
+	else { 
+		$("#NewCloneModel").html(''); 
+		$('#NewCloneModel').selectpicker('refresh');
+	}
 }
 
 function epm_templates_grid_del (iddel)
@@ -220,11 +353,11 @@ function epm_template_custom_config_get_global(elmnt)
 		success: function(data) {
 			if (data.status == true) 
 			{
-				$("#srvip").val( data.settings.srvip );
-				$("#server_type").val( data.settings.server_type );
-				$("#config_loc").val( data.settings.config_location );
-				$("#tz").val( data.settings.tz );
-				$("#ntp_server").val( data.settings.ntp );
+				epm_global_input_value_change_bt("#srvip", data.settings.srvip, false);
+				epm_global_input_value_change_bt("#server_type", data.settings.server_type, false);
+				epm_global_input_value_change_bt("#config_loc", data.settings.config_location, false);
+				epm_global_input_value_change_bt("#tz", data.settings.tz, false);
+				epm_global_input_value_change_bt("#ntp_server", data.settings.ntp, false);
 				
 				if (elmnt.name == "button_undo_globals") {
 					fpbxToast(data.message, '', 'success');

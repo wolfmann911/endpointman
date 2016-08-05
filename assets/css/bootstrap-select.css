@@ -18,6 +18,12 @@ select.selectpicker {
   padding-right: 25px;
   z-index: 1;
 }
+.bootstrap-select > .dropdown-toggle.bs-placeholder,
+.bootstrap-select > .dropdown-toggle.bs-placeholder:hover,
+.bootstrap-select > .dropdown-toggle.bs-placeholder:focus,
+.bootstrap-select > .dropdown-toggle.bs-placeholder:active {
+  color: #999;
+}
 .bootstrap-select > select {
   position: absolute !important;
   bottom: 0;
@@ -260,8 +266,16 @@ select.selectpicker {
      -moz-box-sizing: border-box;
           box-sizing: border-box;
 }
+.bs-actionsbox .btn-group {
+  display: flex;
+  width: 100%;
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+}
 .bs-actionsbox .btn-group button {
   width: 50%;
+  flex: 1;
 }
 .bs-donebutton {
   float: left;

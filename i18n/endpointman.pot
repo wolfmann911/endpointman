@@ -326,6 +326,10 @@ msgstr ""
 msgid "Creating Provisioner Directory..."
 msgstr ""
 
+#: Endpointman_Advanced.class.php:998
+msgid "Creating Provisioner Directory... "
+msgstr ""
+
 #: views/epm_devices_main.page.php:456
 msgid "Current Managed Extensions"
 msgstr ""
@@ -465,6 +469,10 @@ msgstr ""
 msgid "Edit File Configurations for:"
 msgstr ""
 
+#: views/epm_templates/editor.views.tamplate.php:103
+msgid "Edit Global Settings Overrides"
+msgstr ""
+
 #: views/epm_templates_editor.page.php:110
 msgid "Edit Global Settings Overrides:"
 msgstr ""
@@ -487,6 +495,10 @@ msgstr ""
 
 #: page.epm_advanced.php:18 page.epm_config.php:18
 msgid "End Point Configuraction Manager"
+msgstr ""
+
+#: views/epm_templates/editor.views.dialog.cfg.global.php:18
+msgid "End Point Configuration Manager"
 msgstr ""
 
 #: functions.inc.php:234
@@ -531,8 +543,19 @@ msgstr ""
 msgid "Error: "
 msgstr ""
 
+#: Endpointman_Advanced.class.php:905 Endpointman_Advanced.class.php:979
+#: Endpointman_Advanced.class.php:1131
+#, php-format
+msgid "Error: %s"
+msgstr ""
+
 #: Endpointman.class.php:2606
 msgid "Error: Aborting Brand Downloads. Can't Get Master File, Assuming Timeout Issues!"
+msgstr ""
+
+#: Endpointman_Advanced.class.php:898 Endpointman_Advanced.class.php:971
+#: Endpointman_Advanced.class.php:1122
+msgid "Error: Can Not Find Uploaded Files!"
 msgstr ""
 
 #: Endpointman.class.php:3044
@@ -548,6 +571,19 @@ msgstr ""
 msgid "Error: Failed to create the directory '%s', please Check Permissions!"
 msgstr ""
 
+#: Endpointman_Advanced.class.php:1139
+#, php-format
+msgid "Error: File %s size is 0!"
+msgstr ""
+
+#: Endpointman_Advanced.class.php:1019
+msgid "Error: File Temp no Exists!"
+msgstr ""
+
+#: Endpointman_Advanced.class.php:1079
+msgid "Error: ID Package send not valid, brand not exist!"
+msgstr ""
+
 #: Endpointman.class.php:2053 Endpointman.class.php:2090
 msgid "Error: ID not is number!"
 msgstr ""
@@ -556,13 +592,36 @@ msgstr ""
 msgid "Error: Installing brands is disabled while in repo mode!"
 msgstr ""
 
+#: Endpointman_Advanced.class.php:1185
+#, php-format
+msgid "Error: Invalid Brand Specified on line %d!"
+msgstr ""
+
+#: Endpointman_Advanced.class.php:1179 Endpointman_Advanced.class.php:1182
+#, php-format
+msgid "Error: Invalid Extension Specified on line %d!"
+msgstr ""
+
+#: Endpointman_Advanced.class.php:961 Endpointman_Advanced.class.php:1022
+msgid "Error: Invalid File Extension!"
+msgstr ""
+
 #: Endpointman.class.php:3315
 #, php-format
 msgid "Error: Invalid JSON Structure in %s/brand_data.json"
 msgstr ""
 
+#: Endpointman_Advanced.class.php:1188
+#, php-format
+msgid "Error: Invalid Mac on line %d!"
+msgstr ""
+
 #: Endpointman.class.php:3318
 msgid "Error: No 'brand_data.xml' file exists!"
+msgstr ""
+
+#: Endpointman_Advanced.class.php:956
+msgid "Error: No File Provided!"
 msgstr ""
 
 #: Endpointman.class.php:2572
@@ -572,6 +631,14 @@ msgstr ""
 #: Endpointman.class.php:2582
 #, php-format
 msgid "Error: No Local File for %s !"
+msgstr ""
+
+#: Endpointman_Advanced.class.php:1067
+msgid "Error: No package set!"
+msgstr ""
+
+#: Endpointman_Config.class.php:351 Endpointman_Config.class.php:391
+msgid "Error: No send value!"
 msgstr ""
 
 #: Endpointman.class.php:2486
@@ -590,6 +657,14 @@ msgstr ""
 msgid "Error: Not send command!"
 msgstr ""
 
+#: Endpointman_Advanced.class.php:1070
+msgid "Error: Package not valid!"
+msgstr ""
+
+#: Endpointman_Advanced.class.php:1198
+msgid "Error: Possible file upload attack!"
+msgstr ""
+
 #: Endpointman.class.php:3272
 msgid "Error: System Error in Sync Model Function, Load Failure!"
 msgstr ""
@@ -601,6 +676,23 @@ msgstr ""
 
 #: Endpointman.class.php:2613
 msgid "Error: The Remote Server Is Currently Syncing With the Master Server, Please try again later"
+msgstr ""
+
+#: Endpointman_Config.class.php:1295
+msgid "Error: The package name of the firmware to be downloaded is Null or blank!"
+msgstr ""
+
+#: Endpointman_Config.class.php:1290
+msgid "Error: The version of the firmware package is blank!"
+msgstr ""
+
+#: Endpointman_Config.class.php:359 Endpointman_Config.class.php:399
+msgid "Error: Value send is not number!"
+msgstr ""
+
+#: Endpointman_Advanced.class.php:1136
+#, php-format
+msgid "Error: We support only CVS and TXT files, type file %s no support!"
 msgstr ""
 
 #: views/epm_templates_editor.page.php:174
@@ -644,6 +736,11 @@ msgstr ""
 msgid "Exporting %_NAME_%"
 msgstr ""
 
+#: Endpointman_Advanced.class.php:1082
+#, php-format
+msgid "Exporting %s ... "
+msgstr ""
+
 #: views/epm_advanced_iedl.page.php:90 views/epm_advanced_iedl.page.php:95
 msgid "Extension"
 msgstr ""
@@ -656,8 +753,21 @@ msgstr ""
 msgid "Extracting Provisioner Package..."
 msgstr ""
 
+#: Endpointman_Advanced.class.php:992
+msgid "Extracting Provisioner Package... "
+msgstr ""
+
 #: Endpointman.class.php:1535
 msgid "Extracting Tarball %_FILEPACKAGE_% to %_TEMPDIR_%........"
+msgstr ""
+
+#: Endpointman_Advanced.class.php:931
+#, php-format
+msgid "Extracting Tarball %s to %s... "
+msgstr ""
+
+#: Endpointman_Advanced.class.php:933
+msgid "Extracting Tarball... "
 msgstr ""
 
 #: Endpointman.class.php:3017
@@ -729,6 +839,10 @@ msgstr ""
 msgid "Git not installed!"
 msgstr ""
 
+#: Endpointman_Templates.class.php:192
+msgid "Global Config Read OK!"
+msgstr ""
+
 #: views/epm_advanced_settings.page.php:114
 msgid "Global Final Config & Firmware Directory"
 msgstr ""
@@ -739,6 +853,10 @@ msgstr ""
 
 #: views/epm_templates_editor.page.php:116
 msgid "Global Settings"
+msgstr ""
+
+#: Endpointman_Templates.class.php:295
+msgid "Globals Reset to Default!"
 msgstr ""
 
 #: views/epm_advanced_manual_upload.page.php:97
@@ -795,6 +913,10 @@ msgstr ""
 msgid "IP address of phone server"
 msgstr ""
 
+#: views/epm_templates/editor.views.dialog.cfg.global.php:54
+msgid "IP address of the PBX server that will use the terminals."
+msgstr ""
+
 #: Endpointman.class.php:273
 msgid "If we can activate the model set terminals of the models.<br /> If this model is disabled will not appear in the list of models that can be configured for PBX."
 msgstr ""
@@ -845,16 +967,35 @@ msgstr ""
 msgid "Importing CVS file %_FILE_%..."
 msgstr ""
 
+#: Endpointman_Advanced.class.php:1128
+#, php-format
+msgid "Importing CVS file %s ... "
+msgstr ""
+
 #: Endpointman.class.php:1580
 msgid "Importing Provisioner file %_FILE_%..."
+msgstr ""
+
+#: Endpointman_Advanced.class.php:976
+#, php-format
+msgid "Importing Provisioner file %s..."
 msgstr ""
 
 #: Endpointman.class.php:1503
 msgid "Importing brand file %_FILE_%..."
 msgstr ""
 
+#: Endpointman_Advanced.class.php:902
+#, php-format
+msgid "Importing brand file %s..."
+msgstr ""
+
 #: views/epm_advanced/poce.views.bootnav.php:3
 msgid "In Developing!!"
+msgstr ""
+
+#: views/epm_templates/editor.views.tamplate.php:33
+msgid "Info Template"
 msgstr ""
 
 #: Endpointman.class.php:2895
@@ -1011,12 +1152,25 @@ msgstr ""
 msgid "Local Paths"
 msgstr ""
 
+#: views/epm_templates/editor.views.dialog.cfg.global.php:109
+msgid "Location where configuration files and firmware for terminals are housed."
+msgstr ""
+
+#: Endpointman_Advanced.class.php:945
+msgid "Looking file and update brand's ... "
+msgstr ""
+
 #: Endpointman.class.php:1548
 msgid "Looking file and update brand's...."
 msgstr ""
 
 #: Endpointman.class.php:1546
 msgid "Looking for file %_FILEPACKAGE_% to pass on to update_brand()..."
+msgstr ""
+
+#: Endpointman_Advanced.class.php:943
+#, php-format
+msgid "Looking for file %s to pass on to update_brand() ... "
 msgstr ""
 
 #: views/epm_advanced_iedl.page.php:90 views/epm_advanced_iedl.page.php:92
@@ -1107,6 +1261,10 @@ msgstr ""
 
 #: views/epm_advanced/poce.views.textarea.file.php:26
 msgid "NOTE: Key F11 Full Screen, ESC Exit FullScreen."
+msgstr ""
+
+#: views/epm_templates/editor.views.dialog.cfg.global.php:183
+msgid "NTP server that syncs the time the terminals."
 msgstr ""
 
 #: Endpointman.class.php:2027
@@ -1213,6 +1371,11 @@ msgstr ""
 msgid "No send Clone Model!"
 msgstr ""
 
+#: Endpointman_Templates.class.php:158 Endpointman_Templates.class.php:202
+#: Endpointman_Templates.class.php:273
+msgid "No send Custom Value!"
+msgstr ""
+
 #: Endpointman.class.php:1135
 msgid "No send File ID!"
 msgstr ""
@@ -1259,6 +1422,11 @@ msgstr ""
 msgid "No send SendID!"
 msgstr ""
 
+#: Endpointman_Templates.class.php:161 Endpointman_Templates.class.php:205
+#: Endpointman_Templates.class.php:276
+msgid "No send TID!"
+msgstr ""
+
 #: Endpointman.class.php:1308
 msgid "No send Text File!"
 msgstr ""
@@ -1284,6 +1452,10 @@ msgstr ""
 #: Endpointman.class.php:1902 Endpointman.class.php:2135
 #: Endpointman.class.php:2266
 msgid "No send value!"
+msgstr ""
+
+#: Endpointman_Templates.class.php:235
+msgid "Not a Vaild Directory"
 msgstr ""
 
 #: Endpointman.class.php:1968
@@ -1356,6 +1528,10 @@ msgstr ""
 msgid "OUI Manager"
 msgstr ""
 
+#: Endpointman_Advanced.class.php:431
+msgid "Ok!"
+msgstr ""
+
 #: Endpointman.class.php:3210 Endpointman.class.php:3235
 msgid "Old Data Detected! Migrating ... "
 msgstr ""
@@ -1386,6 +1562,10 @@ msgstr ""
 
 #: Endpointman.class.php:1674
 msgid "Package not valid!"
+msgstr ""
+
+#: views/epm_templates/editor.views.dialog.cfg.global.php:101
+msgid "Path...."
 msgstr ""
 
 #: Endpointman.class.php:2884 Endpointman.class.php:2992
@@ -1422,6 +1602,10 @@ msgstr ""
 
 #: Endpointman.class.php:1810
 msgid "Possible file upload attack!"
+msgstr ""
+
+#: Endpointman_Config.class.php:960
+msgid "Processing "
 msgstr ""
 
 #: Endpointman.class.php:3053
@@ -1498,6 +1682,10 @@ msgstr ""
 msgid "Refresh Table"
 msgstr ""
 
+#: views/epm_templates/editor.views.dialog.cfg.global.php:195
+msgid "Reload Config"
+msgstr ""
+
 #: Endpointman.class.php:284
 msgid "Remove Firmware"
 msgstr ""
@@ -1522,8 +1710,16 @@ msgstr ""
 msgid "Reset"
 msgstr ""
 
+#: views/epm_templates/editor.views.dialog.cfg.global.php:197
+msgid "Reset Global Overrides to Default"
+msgstr ""
+
 #: views/epm_advanced/poce.views.textarea.file.php:35
 msgid "Save"
+msgstr ""
+
+#: Endpointman_Templates.class.php:129
+msgid "Save & Reboot Phone(s)"
 msgstr ""
 
 #: views/epm_advanced/poce.views.textarea.file.php:48
@@ -1573,12 +1769,24 @@ msgstr ""
 msgid "Select brands, products or models that do not need to hide from the list."
 msgstr ""
 
+#: views/epm_templates/editor.views.dialog.cfg.global.php:153
+msgid "Select the time zone for the terminals. Example England/London"
+msgstr ""
+
 #: views/epm_devices_main.page.php:513
 msgid "Selected Phone(s) Options"
 msgstr ""
 
 #: views/epm_templates_editor.page.php:180
 msgid "Server IP For Line 1"
+msgstr ""
+
+#: views/epm_templates/editor.views.dialog.cfg.global.php:170
+msgid "Server NTP..."
+msgstr ""
+
+#: views/epm_templates/editor.views.dialog.cfg.global.php:42
+msgid "Server PBX..."
 msgstr ""
 
 #: views/epm_templates_editor.page.php:181
@@ -1637,8 +1845,17 @@ msgstr ""
 msgid "System Failure!"
 msgstr ""
 
+#: Endpointman_Templates.class.php:164 Endpointman_Templates.class.php:208
+#: Endpointman_Templates.class.php:279
+msgid "TID is not number!"
+msgstr ""
+
 #: Endpointman.class.php:351 Endpointman.class.php:458
 msgid "Tab is not valid!"
+msgstr ""
+
+#: Endpointman_Devices.class.php:57 Endpointman_Templates.class.php:98
+msgid "Tab not found!"
 msgstr ""
 
 #: views/epm_devices_main.page.php:248 views/epm_devices_main.page.php:471
@@ -1729,6 +1946,10 @@ msgstr ""
 msgid "Type File not valid!"
 msgstr ""
 
+#: views/epm_templates/editor.views.dialog.cfg.global.php:85
+msgid "Type Terminal Server where to obtain configuration data and firmware update. It can be http or ftp."
+msgstr ""
+
 #: Endpointman.class.php:2457
 msgid "Underflow or the modes mismatch"
 msgstr ""
@@ -1791,6 +2012,10 @@ msgstr ""
 msgid "Update Firmware"
 msgstr ""
 
+#: views/epm_templates/editor.views.dialog.cfg.global.php:196
+msgid "Update Global Overrides"
+msgstr ""
+
 #: Endpointman.class.php:290
 msgid "Update!"
 msgstr ""
@@ -1820,6 +2045,10 @@ msgstr ""
 msgid "Updating Last Modified..."
 msgstr ""
 
+#: Endpointman_Advanced.class.php:1012
+msgid "Updating Last Modified... "
+msgstr ""
+
 #: Endpointman.class.php:3285
 msgid "Updating OUI list in DB"
 msgstr ""
@@ -1844,8 +2073,20 @@ msgstr ""
 msgid "Use NMAP"
 msgstr ""
 
+#: views/epm_advanced_settings.page.php:56
+#: views/epm_advanced_settings.page.php:191
+#: views/epm_templates/editor.views.dialog.cfg.global.php:44
+#: views/epm_templates/editor.views.dialog.cfg.global.php:172
+msgid "Use me!"
+msgstr ""
+
 #: views/epm_advanced/poce.views.button.up.files.php:31
 msgid "User File Configs"
+msgstr ""
+
+#: Endpointman_Config.class.php:265 Endpointman_Config.class.php:437
+#: Endpointman_Templates.class.php:342
+msgid "Value send is not number!"
 msgstr ""
 
 #: views/epm_devices_main.page.php:32 views/epm_devices_main.page.php:39
@@ -1940,243 +2181,64 @@ msgstr ""
 msgid "with"
 msgstr ""
 
-#: Endpointman_Advanced.class.php:998
-msgid "Creating Provisioner Directory... "
+#: views/epm_advanced_settings.page.php:66
+msgid "Address IP by my server PBX."
 msgstr ""
 
-#: views/epm_templates/editor.views.tamplate.php:103
-msgid "Edit Global Settings Overrides"
+#: views/epm_templates/editor.views.tamplate.php:95
+msgid "Edit File Configurations"
 msgstr ""
 
-#: views/epm_templates/editor.views.dialog.cfg.global.php:18
-msgid "End Point Configuration Manager"
+#: Endpointman_Config.class.php:99
+msgid "FW Delete"
 msgstr ""
 
-#: Endpointman_Advanced.class.php:905 Endpointman_Advanced.class.php:979
-#: Endpointman_Advanced.class.php:1131
-#, php-format
-msgid "Error: %s"
+#: Endpointman_Config.class.php:98
+msgid "FW Install"
 msgstr ""
 
-#: Endpointman_Advanced.class.php:898 Endpointman_Advanced.class.php:971
-#: Endpointman_Advanced.class.php:1122
-msgid "Error: Can Not Find Uploaded Files!"
+#: Endpointman_Config.class.php:100
+msgid "FW Update"
 msgstr ""
 
-#: Endpointman_Advanced.class.php:1139
-#, php-format
-msgid "Error: File %s size is 0!"
+#: views/epm_advanced_settings.page.php:255
+msgid "Path location ARP."
 msgstr ""
 
-#: Endpointman_Advanced.class.php:1019
-msgid "Error: File Temp no Exists!"
+#: views/epm_advanced_settings.page.php:279
+msgid "Path location Asterisk."
 msgstr ""
 
-#: Endpointman_Advanced.class.php:1079
-msgid "Error: ID Package send not valid, brand not exist!"
+#: views/epm_advanced_settings.page.php:231
+msgid "Path location NMAP."
 msgstr ""
 
-#: Endpointman_Advanced.class.php:1185
-#, php-format
-msgid "Error: Invalid Brand Specified on line %d!"
+#: views/epm_advanced_settings.page.php:128
+msgid "Path location root TFTP server."
 msgstr ""
 
-#: Endpointman_Advanced.class.php:1179 Endpointman_Advanced.class.php:1182
-#, php-format
-msgid "Error: Invalid Extension Specified on line %d!"
+#: views/epm_advanced_settings.page.php:201
+msgid "Server NTP use the configuration terminals."
 msgstr ""
 
-#: Endpointman_Advanced.class.php:961 Endpointman_Advanced.class.php:1022
-msgid "Error: Invalid File Extension!"
+#: views/epm_advanced_settings.page.php:161
+#: views/epm_templates/editor.views.dialog.cfg.global.php:143
+msgid "TimeZone PBX"
 msgstr ""
 
-#: Endpointman_Advanced.class.php:1188
-#, php-format
-msgid "Error: Invalid Mac on line %d!"
+#: views/epm_advanced_settings.page.php:171
+msgid "TimeZone configuration terminasl. Like England/London"
 msgstr ""
 
-#: Endpointman_Advanced.class.php:956
-msgid "Error: No File Provided!"
+#: views/epm_advanced_settings.page.php:101
+msgid "Type the server by aprovisonament setting. Server TFTP, Server HTTP, Server HTTPS (not found, future version!)."
 msgstr ""
 
-#: Endpointman_Advanced.class.php:1067
-msgid "Error: No package set!"
+#: views/epm_advanced_settings.page.php:314
+msgid "URL download files and packages the configuration terminals."
 msgstr ""
 
-#: Endpointman_Config.class.php:351 Endpointman_Config.class.php:391
-msgid "Error: No send value!"
-msgstr ""
-
-#: Endpointman_Advanced.class.php:1070
-msgid "Error: Package not valid!"
-msgstr ""
-
-#: Endpointman_Advanced.class.php:1198
-msgid "Error: Possible file upload attack!"
-msgstr ""
-
-#: Endpointman_Config.class.php:1295
-msgid "Error: The package name of the firmware to be downloaded is Null or blank!"
-msgstr ""
-
-#: Endpointman_Config.class.php:1290
-msgid "Error: The version of the firmware package is blank!"
-msgstr ""
-
-#: Endpointman_Config.class.php:359 Endpointman_Config.class.php:399
-msgid "Error: Value send is not number!"
-msgstr ""
-
-#: Endpointman_Advanced.class.php:1136
-#, php-format
-msgid "Error: We support only CVS and TXT files, type file %s no support!"
-msgstr ""
-
-#: Endpointman_Advanced.class.php:1082
-#, php-format
-msgid "Exporting %s ... "
-msgstr ""
-
-#: Endpointman_Advanced.class.php:992
-msgid "Extracting Provisioner Package... "
-msgstr ""
-
-#: Endpointman_Advanced.class.php:931
-#, php-format
-msgid "Extracting Tarball %s to %s... "
-msgstr ""
-
-#: Endpointman_Advanced.class.php:933
-msgid "Extracting Tarball... "
-msgstr ""
-
-#: Endpointman_Templates.class.php:192
-msgid "Global Config Read OK!"
-msgstr ""
-
-#: Endpointman_Templates.class.php:295
-msgid "Globals Reset to Default!"
-msgstr ""
-
-#: views/epm_templates/editor.views.dialog.cfg.global.php:54
-msgid "IP address of the PBX server that will use the terminals."
-msgstr ""
-
-#: Endpointman_Advanced.class.php:1128
-#, php-format
-msgid "Importing CVS file %s ... "
-msgstr ""
-
-#: Endpointman_Advanced.class.php:976
-#, php-format
-msgid "Importing Provisioner file %s..."
-msgstr ""
-
-#: Endpointman_Advanced.class.php:902
-#, php-format
-msgid "Importing brand file %s..."
-msgstr ""
-
-#: views/epm_templates/editor.views.tamplate.php:33
-msgid "Info Template"
-msgstr ""
-
-#: views/epm_templates/editor.views.dialog.cfg.global.php:109
-msgid "Location where configuration files and firmware for terminals are housed."
-msgstr ""
-
-#: Endpointman_Advanced.class.php:945
-msgid "Looking file and update brand's ... "
-msgstr ""
-
-#: Endpointman_Advanced.class.php:943
-#, php-format
-msgid "Looking for file %s to pass on to update_brand() ... "
-msgstr ""
-
-#: views/epm_templates/editor.views.dialog.cfg.global.php:183
-msgid "NTP server that syncs the time the terminals."
-msgstr ""
-
-#: Endpointman_Templates.class.php:158 Endpointman_Templates.class.php:202
-#: Endpointman_Templates.class.php:273
-msgid "No send Custom Value!"
-msgstr ""
-
-#: Endpointman_Templates.class.php:161 Endpointman_Templates.class.php:205
-#: Endpointman_Templates.class.php:276
-msgid "No send TID!"
-msgstr ""
-
-#: Endpointman_Templates.class.php:235
-msgid "Not a Vaild Directory"
-msgstr ""
-
-#: Endpointman_Advanced.class.php:431
-msgid "Ok!"
-msgstr ""
-
-#: views/epm_templates/editor.views.dialog.cfg.global.php:101
-msgid "Path...."
-msgstr ""
-
-#: Endpointman_Config.class.php:960
-msgid "Processing "
-msgstr ""
-
-#: views/epm_templates/editor.views.dialog.cfg.global.php:195
-msgid "Reload Config"
-msgstr ""
-
-#: views/epm_templates/editor.views.dialog.cfg.global.php:197
-msgid "Reset Global Overrides to Default"
-msgstr ""
-
-#: Endpointman_Templates.class.php:129
-msgid "Save & Reboot Phone(s)"
-msgstr ""
-
-#: views/epm_templates/editor.views.dialog.cfg.global.php:153
-msgid "Select the time zone for the terminals. Example England/London"
-msgstr ""
-
-#: views/epm_templates/editor.views.dialog.cfg.global.php:170
-msgid "Server NTP..."
-msgstr ""
-
-#: views/epm_templates/editor.views.dialog.cfg.global.php:42
-msgid "Server PBX..."
-msgstr ""
-
-#: Endpointman_Templates.class.php:164 Endpointman_Templates.class.php:208
-#: Endpointman_Templates.class.php:279
-msgid "TID is not number!"
-msgstr ""
-
-#: Endpointman_Devices.class.php:57 Endpointman_Templates.class.php:98
-msgid "Tab not found!"
-msgstr ""
-
-#: views/epm_templates/editor.views.dialog.cfg.global.php:85
-msgid "Type Terminal Server where to obtain configuration data and firmware update. It can be http or ftp."
-msgstr ""
-
-#: views/epm_templates/editor.views.dialog.cfg.global.php:196
-msgid "Update Global Overrides"
-msgstr ""
-
-#: Endpointman_Advanced.class.php:1012
-msgid "Updating Last Modified... "
-msgstr ""
-
-#: views/epm_advanced_settings.page.php:56
-#: views/epm_advanced_settings.page.php:191
-#: views/epm_templates/editor.views.dialog.cfg.global.php:44
-#: views/epm_templates/editor.views.dialog.cfg.global.php:172
-msgid "Use me!"
-msgstr ""
-
-#: Endpointman_Config.class.php:265 Endpointman_Config.class.php:437
-#: Endpointman_Templates.class.php:342
-msgid "Value send is not number!"
+#: views/epm_advanced_settings.page.php:88
+#: views/epm_templates/editor.views.dialog.cfg.global.php:73
+msgid "Web (HTTPS)"
 msgstr ""

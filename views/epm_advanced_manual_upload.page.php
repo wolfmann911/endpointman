@@ -25,7 +25,7 @@
 							<i class="fa fa-question-circle fpbx-help-icon" data-for="provisioner_pack"></i>
 						</div>
 						<div class="col-md-9 text-right">
-							<span>
+                        	<span>
 								<input id="fileField" type="file" class="form-control_off" name="files[]" multiple>
 							</span>
 							<span>
@@ -97,7 +97,7 @@
 								<div class="alert alert-info text-left" role="alert"> <strong><?php echo _("Heads up!"); ?></strong> <?php echo _("List Bran's Availables empty."); ?> <i class='icon-globe'></i></div>
 							<?php else: ?>
 								<div class="input-group">
-	      							<select class="form-control" name="brand_export_pack_selected" id="brand_export_pack_selected">
+	      							<select class="form-control selectpicker show-tick" data-style="btn-primary" data-live-search-placeholder="Buscar" data-size="10" data-live-search="true" name="brand_export_pack_selected" id="brand_export_pack_selected">
 										<option value=""><?php echo _('Select Brand:')?></option>
 											<?php 
 											foreach ($brand_ava as $row) {

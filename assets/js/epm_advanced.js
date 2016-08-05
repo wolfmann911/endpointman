@@ -807,8 +807,7 @@ function epm_advanced_tab_setting_input_value_change_bt(sNameID = "", sValue = "
 {
 	if (sNameID === "" ) { return false; }
 	
-	$(sNameID).val(sValue);
-	if (bSetFocus === true) { $(sNameID).focus(); }
+	epm_global_input_value_change_bt(sNameID,sValue, bSetFocus);
 	if (bSaveChange === true) {
 		epm_advanced_tab_setting_input_change(sNameID);
 	}

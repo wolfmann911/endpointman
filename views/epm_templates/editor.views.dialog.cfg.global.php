@@ -67,10 +67,10 @@
 							<i class="fa fa-question-circle fpbx-help-icon" data-for="server_type"></i>
 						</div>
 						<div class="col-md-9">
-							<select name="server_type" class="form-control" id="server_type">
+							<select class="form-control selectpicker show-tick" data-style="btn-info" name="server_type" id="server_type">
 								<option value="file"><?php echo _("File (TFTP/FTP)")?></option>
 								<option value="http"><?php echo _("Web (HTTP)")?></option>
-                                <!-- TODO: Pendiente añadir soporte HTTPS. -->
+                                <option value="https" disabled><?php echo _("Web (HTTPS)")?></option>
 							</select>
 							<div class="alert alert-info" role="alert" id="server_type_alert">
 								<strong><?php echo _("Updated!"); ?></strong><?php echo _(" - Point your phones to: "); ?><a href="http://<?php echo $_SERVER['SERVER_ADDR']; ?>/provisioning/p.php/" class="alert-link" target="_blank">http://<?php echo $_SERVER['SERVER_ADDR']; ?>/provisioning/p.php/</a>.
@@ -131,16 +131,16 @@
 						</div>
 						<div class="col-md-9">
 							<div class="input-group">
-      							<select name="tz" class="form-control" id="tz">
+      							<select class="form-control selectpicker show-tick" data-style="" data-live-search-placeholder="Buscar" data-live-search="true" name="tz" id="tz">
                                 <?php
 									//TODO: Pendiente actualizar a ajax!!!!
 									foreach (FreePBX::Endpointman()->listTZ("") as $row) {
-										echo '<option value="'.$row['value'].'" > '.$row['text'].'</option>';
+										echo '<option data-icon="fa fa-clock-o" value="'.$row['value'].'" > '.$row['text'].'</option>';
 									}
 								?>
 								</select>
       							<span class="input-group-btn">
-        							<button class="btn btn-default" type="button" id='tzphp' onclick="epm_global_input_value_change_bt('#tz', sValue = '<?php echo FreePBX::Endpointman()->config->get('PHPTIMEZONE'); ?>');"><i class="fa fa-clock-o"></i> <?php echo _("TimeZone by PBX Setting")?></button>
+        							<button class="btn btn-default" type="button" id='tzphp' onclick="epm_global_input_value_change_bt('#tz', sValue = '<?php echo FreePBX::Endpointman()->config->get('PHPTIMEZONE'); ?>');"><i class="fa fa-clock-o"></i> <?php echo _("TimeZone PBX")?></button>
       							</span>
     						</div>
 						</div>

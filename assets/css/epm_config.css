@@ -1,5 +1,6 @@
 @CHARSET "ISO-8859-1";
 
+/*
 #epm_config div.sortable
 {
 	background: transparent;
@@ -39,6 +40,7 @@
    -webkit-box-shadow: 4px 4px 2px #00dddd;
    -moz-box-shadow: 4px 4px 2px #00dddd;
 }
+*/
 
 #moduledialogwrapper p {
 	padding: 0px;
