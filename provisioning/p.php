@@ -82,9 +82,21 @@ if(getMethod() == "GET") {
 	
     $filename = str_replace('p.php/','', $filename);
     $strip = str_replace('spa', '', $filename);
-    
     if(preg_match('/[0-9A-Fa-f]{12}/i', $strip, $matches) && !(preg_match('/[0]{10}[0-9]{2}/i',$strip))) {
-    	echo "a";
+        
+        #Just moved this Block of code up to fix the provisioning for Snom Phones
+        require_once (PROVISIONER_BASE.'endpoint/base.php');
+        $data = Provisioner_Globals::dynamic_global_files($filename, FreePBX::Endpointman()->configmod->get("config_location"), $web_path);
+        if($data !== FALSE) {
+            echo $data;
+        } 
+        else {
+        	header("HTTP/1.0 404 Not Found", true, 404);
+        	echo "<h1>"._("Error 404 Not Found")."</h1>";
+        	echo _("File not Found!");
+        	die();
+        }
+        
     	exit;
         $mac_address = $matches[0];
         
@@ -110,19 +122,6 @@ if(getMethod() == "GET") {
         }
 
     } 
-    else {
-        require_once (PROVISIONER_BASE.'endpoint/base.php');
-        $data = Provisioner_Globals::dynamic_global_files($filename, FreePBX::Endpointman()->configmod->get("config_location"), $web_path);
-        if($data !== FALSE) {
-            echo $data;
-        } 
-        else {
-        	header("HTTP/1.0 404 Not Found", true, 404);
-        	echo "<h1>"._("Error 404 Not Found")."</h1>";
-        	echo _("File not Found!");
-        	die();
-        }
-    }
 } 
 else {
     header('HTTP/1.1 403 Forbidden', true, 403);
