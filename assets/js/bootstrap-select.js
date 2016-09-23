@@ -149,6 +149,17 @@
     };
   }
 
+  // set data-selected on options that are programmatically selected
+  // prior to initialization of bootstrap-select
+  var _val = $.fn.val;
+  $.fn.val = function(value){
+    if (this.is('select') && value) {
+      this.find('option[value="' + value + '"]').data('selected', true);
+    }
+    
+    return _val.apply(this, arguments);
+  };
+
   $.fn.triggerNative = function (eventName) {
     var el = this[0],
         event;
@@ -254,6 +265,12 @@
   }
 
   var Selectpicker = function (element, options, e) {
+    // bootstrap-select has been initialized - revert val back to its original function
+    if (_val) {
+      $.fn.val = _val;
+      _val = null;
+    }
+
     if (e) {
       e.stopPropagation();
       e.preventDefault();
@@ -386,12 +403,14 @@
 
       this.$newElement.on({
         'hide.bs.dropdown': function (e) {
+          that.$menuInner.attr('aria-expanded', false);
           that.$element.trigger('hide.bs.select', e);
         },
         'hidden.bs.dropdown': function (e) {
           that.$element.trigger('hidden.bs.select', e);
         },
         'show.bs.dropdown': function (e) {
+          that.$menuInner.attr('aria-expanded', true);
           that.$element.trigger('show.bs.select', e);
         },
         'shown.bs.dropdown': function (e) {
@@ -440,7 +459,7 @@
       var searchbox = this.options.liveSearch ?
       '<div class="bs-searchbox">' +
       '<input type="text" class="form-control" autocomplete="off"' +
-      (null === this.options.liveSearchPlaceholder ? '' : ' placeholder="' + htmlEscape(this.options.liveSearchPlaceholder) + '"') + '>' +
+      (null === this.options.liveSearchPlaceholder ? '' : ' placeholder="' + htmlEscape(this.options.liveSearchPlaceholder) + '"') + ' role="textbox" aria-label="Search">' +
       '</div>'
           : '';
       var actionsbox = this.multiple && this.options.actionsBox ?
@@ -466,17 +485,17 @@
           : '';
       var drop =
           '<div class="btn-group bootstrap-select' + showTick + inputGroup + '">' +
-          '<button type="button" class="' + this.options.styleBase + ' dropdown-toggle" data-toggle="dropdown"' + autofocus + '>' +
+          '<button type="button" class="' + this.options.styleBase + ' dropdown-toggle" data-toggle="dropdown"' + autofocus + ' role="button">' +
           '<span class="filter-option pull-left"></span>&nbsp;' +
           '<span class="bs-caret">' +
           this.options.template.caret +
           '</span>' +
           '</button>' +
-          '<div class="dropdown-menu open">' +
+          '<div class="dropdown-menu open" role="combobox">' +
           header +
           searchbox +
           actionsbox +
-          '<ul class="dropdown-menu inner" role="menu">' +
+          '<ul class="dropdown-menu inner" role="listbox" aria-expanded="false">' +
           '</ul>' +
           donebutton +
           '</div>' +
@@ -541,7 +560,7 @@
             (typeof inline !== 'undefined' ? ' style="' + inline + '"' : '') +
             (that.options.liveSearchNormalize ? ' data-normalized-text="' + normalizeToBase(htmlEscape(text)) + '"' : '') +
             (typeof tokens !== 'undefined' || tokens !== null ? ' data-tokens="' + tokens + '"' : '') +
-            '>' + text +
+            ' role="option">' + text +
             '<span class="' + that.options.iconBase + ' ' + that.options.tickIcon + ' check-mark"></span>' +
             '</a>';
       };
@@ -558,11 +577,11 @@
           titleOption.appendChild(document.createTextNode(this.options.title));
           titleOption.value = '';
           element.insertBefore(titleOption, element.firstChild);
-          // Check if selected attribute is already set on an option. If not, select the titleOption option.
-          // attr gets the 'default' selected option (from markup), prop gets the 'current' selected option
-          // the selected item may have been changed by user or programmatically before the bootstrap select plugin runs
+          // Check if selected or data-selected attribute is already set on an option. If not, select the titleOption option.
+          // the selected item may have been changed by user or programmatically before the bootstrap select plugin runs,
+          // if so, the option will have the data-selected attribute
           var $opt = $(element.options[element.selectedIndex]);
-          if ($opt.attr('selected') === undefined && $opt.prop('selected') === false) {
+          if ($opt.attr('selected') === undefined && $opt.data('selected') === undefined) {
             titleOption.selected = true;
           }
         }
@@ -910,11 +929,22 @@
           selectOffsetLeft,
           selectOffsetRight,
           getPos = function() {
-            var pos = that.$newElement.offset();
-            selectOffsetTop = pos.top - $window.scrollTop();
-            selectOffsetBot = $window.height() - selectOffsetTop - selectHeight;
-            selectOffsetLeft = pos.left - $window.scrollLeft();
-            selectOffsetRight = $window.width() - selectOffsetLeft - selectWidth;
+            var pos = that.$newElement.offset(),
+                $container = $(that.options.container),
+                containerPos;
+
+            if (that.options.container && !$container.is('body')) {
+              containerPos = $container.offset();
+              containerPos.top += parseInt($container.css('borderTopWidth'));
+              containerPos.left += parseInt($container.css('borderLeftWidth'));
+            } else {
+              containerPos = { top: 0, left: 0 };
+            }
+
+            selectOffsetTop = pos.top - containerPos.top - $window.scrollTop();
+            selectOffsetBot = $window.height() - selectOffsetTop - selectHeight - containerPos.top;
+            selectOffsetLeft = pos.left - containerPos.left - $window.scrollLeft();
+            selectOffsetRight = $window.width() - selectOffsetLeft - selectWidth - containerPos.left;
           };
 
       getPos();
@@ -1049,15 +1079,27 @@
       this.$bsContainer = $('<div class="bs-container" />');
 
       var that = this,
+          $container = $(this.options.container),
           pos,
+          containerPos,
           actualHeight,
           getPlacement = function ($element) {
             that.$bsContainer.addClass($element.attr('class').replace(/form-control|fit-width/gi, '')).toggleClass('dropup', $element.hasClass('dropup'));
             pos = $element.offset();
+
+            if (!$container.is('body')) {
+              containerPos = $container.offset();
+              containerPos.top += parseInt($container.css('borderTopWidth')) + $container.scrollTop();
+              containerPos.left += parseInt($container.css('borderLeftWidth')) + $container.scrollLeft();
+            } else {
+              containerPos = { top: 0, left: 0 };
+            }
+
             actualHeight = $element.hasClass('dropup') ? 0 : $element[0].offsetHeight;
+
             that.$bsContainer.css({
-              'top': pos.top + actualHeight,
-              'left': pos.left,
+              'top': pos.top - containerPos.top + actualHeight,
+              'left': pos.left - containerPos.left,
               'width': $element[0].offsetWidth
             });
           };
@@ -1572,7 +1614,7 @@
 
       if (that.options.container) $parent = that.$menu;
 
-      $items = $('[role=menu] li', $parent);
+      $items = $('[role="listbox"] li', $parent);
 
       isActive = that.$newElement.hasClass('open');
 
@@ -1596,7 +1638,7 @@
           that.$button.focus();
         }
         // $items contains li elements when liveSearch is enabled
-        $items = $('[role=menu] li' + selector, $parent);
+        $items = $('[role="listbox"] li' + selector, $parent);
         if (!$this.val() && !/(38|40)/.test(e.keyCode.toString(10))) {
           if ($items.filter('.active').length === 0) {
             $items = that.$menuInner.find('li');
@@ -1824,8 +1866,8 @@
 
   $(document)
       .data('keycount', 0)
-      .on('keydown.bs.select', '.bootstrap-select [data-toggle=dropdown], .bootstrap-select [role="menu"], .bs-searchbox input', Selectpicker.prototype.keydown)
-      .on('focusin.modal', '.bootstrap-select [data-toggle=dropdown], .bootstrap-select [role="menu"], .bs-searchbox input', function (e) {
+      .on('keydown.bs.select', '.bootstrap-select [data-toggle=dropdown], .bootstrap-select [role="listbox"], .bs-searchbox input', Selectpicker.prototype.keydown)
+      .on('focusin.modal', '.bootstrap-select [data-toggle=dropdown], .bootstrap-select [role="listbox"], .bs-searchbox input', function (e) {
         e.stopPropagation();
       });
 

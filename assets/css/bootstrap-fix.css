@@ -1,0 +1,10 @@
+/*
+	https://github.com/silviomoreto/bootstrap-select/issues/1451
+	This is actually an issue with Bootstrap. There's a mistake in the CSS 
+	that incorrectly applies border-radius: 0; to the .input-group-btn parent, 
+	instead of the button itself.
+*/
+.input-group-btn:not(:first-child):not(:last-child) > .btn {
+  border-radius: 0;
+  height: 100%;
+}

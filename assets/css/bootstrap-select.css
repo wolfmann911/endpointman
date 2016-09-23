@@ -62,7 +62,9 @@ select.selectpicker {
   margin-bottom: 0;
   padding: 0;
   border: none;
-  height:auto;
+}
+.input-group-br > .bootstrap-select.form-control {
+	height:auto;
 }
 .bootstrap-select.form-control:not([class*="col-"]) {
   width: 100%;
@@ -103,6 +105,8 @@ select.selectpicker {
 }
 .bootstrap-select.btn-group.bs-container {
   position: absolute;
+  height: 0 !important;
+  padding: 0 !important;
 }
 .bootstrap-select.btn-group.bs-container .dropdown-menu {
   z-index: 1060;
