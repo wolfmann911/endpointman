@@ -294,7 +294,7 @@ function epm_config_tab_manager_ajax_get_add_data(data)
 			$(boxappendL0).append(
 				$('<div/>', { 'class' : 'panel panel-danger', 'id' : 'alert_list_emtry_error' })
 				.append(
-					$('<div/>', { 'class' : 'panel-heading' }).append( $('<h3/>', { 'class' : 'panel-title' }).text('ERROR NOT GET DATA BY SERVERY!!!') ),
+					$('<div/>', { 'class' : 'panel-heading' }).append( $('<h3/>', { 'class' : 'panel-title' }).text('ERROR NOT GET DATA BY SERVER!!!') ),
 					$('<div/>', { 'class' : 'panel-body' }).text('The server no return any date!!!')
 				)
 			);
@@ -307,7 +307,7 @@ function epm_config_tab_manager_ajax_get_add_data(data)
 	
 	if (data.status == false) 
 	{
-		//LISTA VACIA NO HAY NINGUNA MARCA.
+		//ERROR AJAX AL OBTENER LOS DATOS
 		if ( $('#alert_list_emtry_error_ajax').length == 0 ) 
 		{
 			$(boxappendL0).children("div").hide("slow", function () { $(this).remove(); });
@@ -345,6 +345,13 @@ function epm_config_tab_manager_ajax_get_add_data(data)
 	
 	
 	
+	
+	
+	
+	
+	
+	
+	
 	//L1: INI loop marcas
 	$(data.datlist).each(function(index, itemData) 
 	{
@@ -353,7 +360,7 @@ function epm_config_tab_manager_ajax_get_add_data(data)
 			epm_global_html_find_hide_and_remove('#' + iL1.boxelemen); 
 			return true;
 		}
-		
+				
 		if ( $('#' + iL1.boxelemen).length == 0 ) 
 		{
 			$(boxappendL0)
@@ -374,54 +381,16 @@ function epm_config_tab_manager_ajax_get_add_data(data)
 							})
 							.on( "click", function(){ epm_config_manager_ajax_hide(this); })
 							.append( $('<i/>', { 'class' : 'fa fa-times', 'aria-hidden':'true' }) )
+							
 						)
 					),
 					$('<div/>', { 'class' : 'panel-body'})
 					.append(
-						$('<div/>', { 'class' : 'col-md-2' })
+						$('<div/>', { 'class' : 'col-md-2', 'id' : iL1.boxappend + '_info' })
 						.append(
 							$('<span/>', { 'id' : iL1.prefijoid + '_txt_last_update' }),
 							$('<span/>', { 'id' : iL1.prefijoid + '_txt_update' }),
-							
-							
-							$('<div/>', { 'class':'btn-group-vertical', 'role':'group' })
-							.append(
-								$('<button/>', {
-									'type'	: 'button',
-									'id'	: iL1.prefijoid + '_bt_brand_install',
-									'class'	: 'btn btn-success',
-									'value'	: data.txt.install
-								})
-								.on( "click", function(){ epm_config_tab_manager_bt('brand_install', itemData.id, 'brand'); })
-								.append( 
-									$('<i/>', { 'class' : 'fa fa-plus-square-o fa-lg' }),
-									$('<span/>', {}).text(" " + data.txt.install)
-								),
-								$('<button/>', {
-									'type'	: 'button',
-									'id'	: iL1.prefijoid + '_bt_brand_uninstall',
-									'class'	: 'btn btn-danger',
-									'value'	: data.txt.uninstall
-								})
-								.on( "click", function(){ epm_config_tab_manager_bt('brand_uninstall', itemData.id, 'brand'); })
-								.append( 
-									$('<i/>', { 'class' : 'fa fa-trash-o fa-lg' }),
-									$('<span/>', {}).text(" " + data.txt.uninstall)
-								),
-								$('<button/>', {
-									'type'	: 'button',
-									'id'	: iL1.prefijoid + '_bt_brand_update',
-									'class'	: 'btn btn-success ',
-									'value'	: data.txt.update
-								})
-								.on( "click", function(){ epm_config_tab_manager_bt('brand_update', itemData.id, 'brand'); })
-								.append( 
-									$('<i/>', { 'class' : 'fa fa-refresh fa-spin fa-lg' }),
-									$('<span/>', {}).text(" " + data.txt.update)
-								)
-							)
-							
-							
+							$('<div/>', { 'id' : iL1.prefijoid + '_btn_grp_acction' , 'class':'btn-group-vertical', 'role':'group' })
 						),
 						$('<div/>', { 'class' : 'col-md-10', 'id' : iL1.boxappend })
 					),
@@ -433,21 +402,47 @@ function epm_config_tab_manager_ajax_get_add_data(data)
 		}
 		
 		
+		
+		
+		//INI - ACTUALIZA FECHAS DE ULTIMA ACTUALIZACION Y DE ULTIMA INSTALACION
 		$('#' + iL1.prefijoid + "_txt_update").text(data.txt.new_pack_mod + ' [' + itemData.update_vers_txt + ']');
 		$('#' + iL1.prefijoid + "_txt_last_update").text(data.txt.pack_last_mod + ' [' + itemData.cfg_ver_datetime_txt + ']');
-		epm_config_tab_manager_bt_enable_disable_ajustar(iL1, itemData, "L1");
+		epm_global_html_find_show_hide('#' + iL1.prefijoid + "_txt_update" , ((itemData.update == "1") ? true : false));
+		//END - ACTUALIZA FECHAS DE ULTIMA ACTUALIZACION Y DE ULTIMA INSTALACION
+		
+		
 		
 		
 		//INI - EN CASO DE QUE NO ESTE INSTALADO LA MARCA MUESTAR UN RECUADRO DICIENDOLO
 		if (itemData.installed == "0") {
+			epm_global_html_find_hide_and_remove('#' + iL1.prefijoid + '_bt_brand_uninstall');
+			epm_global_html_find_hide_and_remove('#' + iL1.prefijoid + '_bt_brand_update');
+			
 			//epm_global_html_find_hide_and_remove('#' + iL1.boxsubite);
 			if ($('#info_brand_no_install' + itemData.id).length == 0)
 			{
-				$('#' + iL1.boxappend).children("div").hide("slow", function () { $(this).remove(); });
+				$('#' + iL1.boxappend).empty();
 				$('#' + iL1.boxappend).append(
-					$('<div/>', { 'class' : 'panel panel-warning' , 'id' : 'info_brand_no_install' + itemData.id }).append(
+					$('<div/>', { 'class' : 'panel panel-warning' , 'id' : 'info_brand_no_install' + itemData.id })
+					.append(
 						$('<div/>', { 'class' : 'panel-heading' }).append( $('<h3/>', { 'class' : 'panel-title' }).text('MARCA NO INSTALADA!') ),
 						$('<div/>', { 'class' : 'panel-body' }).text('Esta marca no esta instalada, haz Click en el boton Instalar para instalar el paquete.')
+						.append(
+						
+							$('<button/>', {
+								'type'	: 'button',
+								'id'	: iL1.prefijoid + '_bt_brand_install',
+								'class'	: 'btn btn-success pull-right',
+								'value'	: data.txt.install
+							})
+							.on( "click", function(){ epm_config_tab_manager_bt('brand_install', itemData.id, 'brand'); })
+							.append( 
+								$('<i/>', { 'class' : 'fa fa-plus-square-o fa-lg' }),
+								$('<span/>', {}).text(" " + data.txt.install)
+							)
+							
+						
+						)
 					)
 				);
 			}
@@ -459,8 +454,105 @@ function epm_config_tab_manager_ajax_get_add_data(data)
 		
 		
 		
+		//INI - INICIO DE LA SECCION DONDE SE AÑADEN O ELIMINAN LOS BOTONES DE UPDATE/DELETE
+		if (itemData.installed == "1") 
+		{
+			if ( $('#' + iL1.prefijoid + '_bt_brand_uninstall').length == 0 ) 
+			{
+				$('#' + iL1.prefijoid + '_btn_grp_acction').append(
+					$('<button/>', {
+						'type'	: 'button',
+						'id'	: iL1.prefijoid + '_bt_brand_uninstall',
+						'class'	: 'btn btn-danger',
+						'value'	: data.txt.uninstall
+					})
+					.on( "click", function(){ epm_config_tab_manager_bt('brand_uninstall', itemData.id, 'brand'); })
+					.append( 
+						$('<i/>', { 'class' : 'fa fa-trash-o fa-lg' }),
+						$('<span/>', {}).text(" " + data.txt.uninstall)
+					)			 
+				)
+			}
+		}
+		else {
+			epm_global_html_find_hide_and_remove('#' + iL1.prefijoid + '_bt_brand_uninstall');
+		}
+		
+		if (itemData.update == "1")
+		{
+			if ( $('#' + iL1.prefijoid + '_bt_brand_update').length == 0 ) 
+			{
+				$('#' + iL1.prefijoid + '_btn_grp_acction').append(
+					$('<button/>', {
+						'type'	: 'button',
+						'id'	: iL1.prefijoid + '_bt_brand_update',
+						'class'	: 'btn btn-success ',
+						'value'	: data.txt.update
+					})
+					.on( "click", function(){ epm_config_tab_manager_bt('brand_update', itemData.id, 'brand'); })
+					.append( 
+						$('<i/>', { 'class' : 'fa fa-refresh fa-spin fa-lg' }),
+						$('<span/>', {}).text(" " + data.txt.update)
+					)
+				)
+			}
+		}
+		else {
+			epm_global_html_find_hide_and_remove('#' + iL1.prefijoid + '_bt_brand_update');
+		}
+		//END - INICIO DE LA SECCION DONDE SE AÑADEN O ELIMINAN LOS BOTONES DE UPDATE/DELETE
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		//INI - SI NO EXISTEN MODELOS MUESTRA ESTE MSG
+		if (itemData.products.length == 0) 
+		{
+			if ($('#info_brand_no_models_' + itemData.id).length == 0)
+			{
+				$('#' + iL1.boxappend).empty();
+				$('#' + iL1.boxappend).append(
+					$('<div/>', { 'class' : 'panel panel-warning' , 'id' : 'info_brand_no_models_' + itemData.id })
+					.append(
+						$('<div/>', { 'class' : 'panel-heading' }).append( $('<h3/>', { 'class' : 'panel-title' }).text('ESTA MARCA NO TIENE MODELOS!') ),
+						$('<div/>', { 'class' : 'panel-body' }).text('Esta marca no tiene ningun modelo.')
+					)
+				);
+			}
+			return true;
+		}
+		epm_global_html_find_hide_and_remove('#info_brand_no_models_' + itemData.id);
+		//END - SI NO EXISTEN MODELOS MUESTRA ESTE MSG
+		
+		
+		//INI - COMPRUEBA SI LOS GRUPOS DE PRODUCTOS QUE ESTAN EN LA LISTA EXISTEN
+		var idCheckExiste = "";
+		var bCheckExiste = "false";
+		$("#" + iL1.boxappend + " div.col-lg-12").each(function (index) 
+		{
+			idCheckExiste = $(this).attr("name");
+			bCheckExiste = "false";
+			$(itemData.products).each(function(indexC2, itemDataC2) 
+			{	
+				if (itemDataC2.id == idCheckExiste) { 
+					bCheckExiste = "true";
+					return false;
+				}
+			});
+			if (bCheckExiste == "true") { return true; }
+			epm_global_html_find_hide_and_remove('#' + $(this).attr("id"));
+		});
+		//END - COMPRUEBA SI LOS GRUPOS DE PRODUCTOS QUE ESTAN EN LA LISTA EXISTEN
+		
+		
 		//L2: ini loop productos
-		if (itemData.products.length == 0) { return true; }
 		$(itemData.products).each(function(indexL2, itemDataL2) 
 		{	
 			var iL2 = new ItemsLevel("producto", itemDataL2.id);
@@ -468,10 +560,13 @@ function epm_config_tab_manager_ajax_get_add_data(data)
 				epm_global_html_find_hide_and_remove('#' + iL2.boxelemen); 
 				return true; 
 			}
+			
+			
+			//INI - CREA LOS BLOQUES DE PRODUCTOS DE CADA MARCA
 			if ( $('#' + iL2.boxelemen).length == 0 ) 
 			{
 				$('#' + iL1.boxappend).append(
-					$("<div/>", { 'id' : iL2.boxelemen, 'class' : 'col-lg-12'})
+					$("<div/>", { 'id' : iL2.boxelemen, 'class' : 'col-lg-12', 'name' : iL2.id })
 					.append(
 						$('<ul/>', { 'id' : iL2.prefijoid, 'class' : 'list-group' })
 						.append(
@@ -487,45 +582,150 @@ function epm_config_tab_manager_ajax_get_add_data(data)
 							//LI -> LINE DE LOS BOTONES GLOBALES
 							$('<li/>', { 'class' : 'list-group-item active' })
 							.append(
-								$('<div/>', { 'class' : 'btn-group btn-group-sm', 'role' : 'group' })
-								.append(
-									$('<button/>', {
-										'type'	: 'button',
-										'id'	: iL2.prefijoid + '_bt_fw_install',
-										'class'	: 'btn btn-default btn-sm'
-									})
-									.on( "click", function(){ epm_config_tab_manager_bt('fw_install', itemDataL2.id, 'firmware'); })
-									.append( 
-										$('<i/>', { 'class' : 'fa fa-plus-square-o fa-lg' }),
-										$('<span/>', {}).text(" " + data.txt.fw_install)
-									),
-									$('<button/>', {
-										'type'	: 'button',
-										'id'	: iL2.prefijoid + '_bt_fw_uninstall',
-										'class'	: 'btn btn-danger btn-sm'
-									})
-									.on( "click", function(){ epm_config_tab_manager_bt('fw_uninstall', itemDataL2.id, 'firmware'); })
-									.append( 
-										$('<i/>', { 'class' : 'fa fa-trash-o fa-lg' }),
-										$('<span/>', {}).text(" " + data.txt.fw_uninstall)
-									),
-									$('<button/>', {
-										'type'	: 'button',
-										'id'	: iL2.prefijoid + '_bt_fw_update',
-										'class'	: 'btn btn-default btn-sm'
-									})
-									.on( "click", function(){ epm_config_tab_manager_bt('fw_update', itemDataL2.id, 'firmware'); })
-									.append( 
-										$('<i/>', { 'class' : 'fa fa-refresh fa-spin fa-lg' }),
-										$('<span/>', {}).text(" " + data.txt.fw_update)
-									)
-								) // END GRUPO BOTONES
+								$('<div/>', { 'id' : iL2.prefijoid + '_btn_grp_fw_acction', 'class' : 'btn-group btn-group-sm', 'role' : 'group' })
 							)  // END LI -> LINEA BOTONES GLOBLES
 						)  // END UL
 					) // END DIV GRUPO UL/LI
 				);	
 			}
-			epm_config_tab_manager_bt_enable_disable_ajustar(iL2, itemDataL2, "L2");
+			//epm_config_tab_manager_bt_enable_disable_ajustar(iL2, itemDataL2, "L2");
+			//END - CREA LOS BLOQUES DE PRODUCTOS DE CADA MARCA
+			
+			
+			
+			
+			
+			//INI - AÑADE LOS BOTONES DE FRIMWARE!!!
+			if (itemDataL2.fw_type == "nothing")
+			{
+				epm_global_html_find_hide_and_remove('#' + iL2.prefijoid + '_bt_fw_install');
+				epm_global_html_find_hide_and_remove('#' + iL2.prefijoid + '_bt_fw_uninstall');
+				epm_global_html_find_hide_and_remove('#' + iL2.prefijoid + '_bt_fw_update');
+			}
+			else if (itemDataL2.fw_type == "remove") 
+			{
+				epm_global_html_find_hide_and_remove('#' + iL2.prefijoid + '_bt_fw_install');
+				
+				if ( $('#' + iL2.prefijoid + '_bt_fw_uninstall').length == 0 ) 
+				{
+					$('#' + iL2.prefijoid + '_btn_grp_fw_acction').append(
+						$('<button/>', {
+							'type'	: 'button',
+							'id'	: iL2.prefijoid + '_bt_fw_uninstall',
+							'class'	: 'btn btn-danger btn-sm'
+						})
+						.on( "click", function(){ epm_config_tab_manager_bt('fw_uninstall', itemDataL2.id, 'firmware'); })
+						.append( 
+							$('<i/>', { 'class' : 'fa fa-trash-o fa-lg' }),
+							$('<span/>', {}).text(" " + data.txt.fw_uninstall)
+						)
+					)
+				}
+				
+				if (itemDataL2.update_fw == "1") 
+				{
+					if ( $('#' + iL2.prefijoid + '_bt_fw_update').length == 0 ) 
+					{
+						$('#' + iL2.prefijoid + '_btn_grp_fw_acction').append(
+							$('<button/>', {
+								'type'	: 'button',
+								'id'	: iL2.prefijoid + '_bt_fw_update',
+								'class'	: 'btn btn-default btn-sm'
+							})
+							.on( "click", function(){ epm_config_tab_manager_bt('fw_update', itemDataL2.id, 'firmware'); })
+							.append( 
+								$('<i/>', { 'class' : 'fa fa-refresh fa-spin fa-lg' }),
+								$('<span/>', {}).text(" " + data.txt.fw_update)
+							)
+						)
+					}
+				}
+				else 
+				{ 
+					epm_global_html_find_hide_and_remove('#' + iL2.prefijoid + '_bt_fw_update'); 
+				}
+			}
+			else if (itemDataL2.fw_type == "install")
+			{
+				epm_global_html_find_hide_and_remove('#' + iL2.prefijoid + '_bt_fw_uninstall');
+				epm_global_html_find_hide_and_remove('#' + iL2.prefijoid + '_bt_fw_update');
+				
+				if ( $('#' + iL2.prefijoid + '_bt_fw_install').length == 0 ) 
+				{
+					$('#' + iL2.prefijoid + '_btn_grp_fw_acction').append(
+						$('<button/>', {
+							'type'	: 'button',
+							'id'	: iL2.prefijoid + '_bt_fw_install',
+							'class'	: 'btn btn-default btn-sm'
+						})
+						.on( "click", function(){ epm_config_tab_manager_bt('fw_install', itemDataL2.id, 'firmware'); })
+						.append( 
+							$('<i/>', { 'class' : 'fa fa-plus-square-o fa-lg' }),
+							$('<span/>', {}).text(" " + data.txt.fw_install)
+						)
+					)
+				}
+			}
+			//END - AÑADE LOS BOTONES DE FRIMWARE!!!
+			
+			
+			
+			
+			
+			
+			
+		/*	
+			if ( $('#' + iL2.prefijoid + '_bt_fw_grp').length == 0 ) 
+			{
+				$('#' + iL2.prefijoid + '_btn_grp_fw_acction').empty();
+				$('#' + iL2.prefijoid + '_btn_grp_fw_acction').append(
+				
+				
+					$('<div/>', {
+						'id'	: iL2.prefijoid + '_bt_fw_grp_btn-group',
+						'class'	: 'btn-group',
+						'role'	: 'group'
+					})
+					.text("Firmware:")
+					.append( 
+						$('<button/>', {
+							'id'			: iL2.prefijoid + 'btnGroupDrop1',
+							'type'			: 'button',
+							'class'			: 'btn btn-secondary dropdown-toggle',
+							'data-toggle'	: 'dropdown',
+							'aria-haspopup'	: 'true',
+							'aria-expanded'	: 'false'
+						}),
+						$('<div/>', {
+							'class' 			: 'dropdown-menu',
+							'aria-labelledby' 	: iL2.prefijoid + 'btnGroupDrop1'
+						})
+						.append(
+							$('<a/>', { 'class' : 'dropdown-item', 'href':'#' }).text("Instalar"),
+							$('<a/>', { 'class' : 'dropdown-item', 'href':'#' }).text("UnInstall"),
+							$('<a/>', { 'class' : 'dropdown-item', 'href':'#' }).text("Update")
+						)
+					)
+				)
+			}
+		*/
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
 			
 			
 			
@@ -546,7 +746,7 @@ function epm_config_tab_manager_ajax_get_add_data(data)
 					
 					$('#' + iL2.prefijoid)
 					.append(
-						$('<li/>', { 'class' : 'list-group-item radioset text-right', 'id' : iL3.boxelemen })
+						$('<li/>', { 'class' : 'list-group-item radioset text-right', 'id' : iL3.boxelemen, 'name' : iL3.id })
 						.append(
 							$('<span/>', { 'class' : 'pull-left' })
 							.append(
@@ -780,6 +980,7 @@ function epm_config_tab_manager_bt_enable_disable_change(obt, idtype, idbt, iL2)
 			}
 		},
 	});	
+	//epm_config_tab_manager_countlist(iL2);
 }
 
 
@@ -795,8 +996,12 @@ function epm_config_tab_manager_bt(opt, idfw, command)
 
 function epm_config_tab_manager_countlist(iL0)
 {
+
 	$('#' + iL0.boxelemen )
 	.each( function() {
+		//alert ('#' + iL0.boxelemen + " Enable:" + $(this).find('input:radio[id$="_enable"]:checked').length() );
+		//alert ('#' + iL0.boxelemen + " Disable:" + $(this).find('input:radio[id$="_disable"]:checked').length );
+				
 		var num_chek = $(this).find('input:radio:checked[value="1"]').length;
 		var num_all = $(this).find('input:radio[value="1"]').length;
 		var num_txt = num_chek + "/" + num_all;
