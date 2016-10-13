@@ -2,7 +2,7 @@
 	<rawname>endpointman</rawname>
 	<repo>unsupported</repo>
 	<name>OSS PBX End Point Manager</name>
-	<version>13.0.7.11</version>
+	<version>13.0.7.16</version>
 	<type>setup</type>
 	<category>Connectivity</category>
 	<license>GPLv2+</license>
@@ -19,9 +19,14 @@
 		The front end gui is hosted at: https://github.com/FreePBX/endpointman
 		The backend configurator is hosted at: https://github.com/provisioner/Provisioner
 		Pull Requests can be made to either of these and are encouraged.
-	</description>
-	<changelog>
-		*13.0.7.11* Add delete_device_by_mac func, Update Bootstrap-select 1.11.2, fix bugs epm_config JS
+    </description>
+		<changelog>
+		*13.0.7.16* Update Bootstrap-select 1.11.2, fix bugs epm_config JS.
+		*13.0.7.15* Update, add CSS Fix Bug bootstrap-fix.css, update bootstrap-select.
+		*13.0.7.14* Update, Complete design of Package Manager. Continuous updating, Template Manager. Fix Bug's.
+		*13.0.7.13* Use bootstrap-select all Select, Fix Bug's, update translate ES, and anything else that I forget.
+		*13.0.7.12* End update style list Install/Uninstall and Hide/Show brands, products and models.
+		*13.0.7.11* Fix bug no detect update Packages, continue upate...
 		*13.0.7.10* Add new dialog loading..., continue upate...
 		*13.0.7.9* Add bootstrap-select, continue updating Template Editor...
 		*13.0.7.8* Fix bug multi sql query is not found. Continue updating Template Editor...
