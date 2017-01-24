@@ -585,6 +585,13 @@ class endpointmanager {
         return($mac_id);
     }
 
+    function retrieve_device_by_ext($ext) {
+        $sql = 'SELECT DISTINCT mac_id FROM endpointman_line_list WHERE ext = \''. $ext. '\'';
+        $mac_id = $this->eda->sql($sql, 'getOne');
+
+        return($mac_id);
+    }
+
     function get_message($function_name) {
         if (isset($this->message[$function_name])) {
             return($this->message[$function_name]);
