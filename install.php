@@ -682,7 +682,7 @@ if (!empty($epmdbversion)) {
               `mac_id` int(11) NOT NULL,
               `line` smallint(2) NOT NULL,
               `ext` varchar(15) NOT NULL,
-              `description` varchar(20) NOT NULL,
+              `description` varchar(150) NOT NULL,
               `custom_cfg_data` longblob NOT NULL,
               `user_cfg_data` longblob NOT NULL,
               PRIMARY KEY (`luid`)
