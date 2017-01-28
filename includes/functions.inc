@@ -564,6 +564,19 @@ class endpointmanager {
         return(TRUE);
     }
 
+    function delete_device_by_mac($mac) {
+        $sql = 'SELECT id FROM endpointman_mac_list WHERE mac = \''.
+          str_replace(':', '', $mac). '\'';
+        $mac_id = $this->eda->sql($sql, 'getOne');
+
+        if ($mac_id) {
+          $this->delete_device($mac_id);
+        }
+
+        $this->message['delete_device'] = "Deleted!";
+        return(TRUE);
+    }
+
     function get_message($function_name) {
         if (isset($this->message[$function_name])) {
             return($this->message[$function_name]);
