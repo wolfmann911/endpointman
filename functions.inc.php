@@ -62,19 +62,18 @@ function endpointman_configpageinit($pagename) {
 		if(!$tech) {
 			$tech = "sip";
 			$type = 'new';
-		} elseif($tech == 'sip') {
+		} elseif($tech == 'sip' OR $tech == 'pjsip') {
 			$type = 'edit';
-			$tech = 'sip';
 		}
     } elseif(isset($_REQUEST['tech_hardware']) OR isset($_REQUEST['tech'])) {
 		$tech = isset($_REQUEST['tech_hardware']) ? $_REQUEST['tech_hardware'] : $_REQUEST['tech'];
-		if(($tech == 'sip_generic') OR ($tech == 'sip')) {
+		if(($tech == 'sip_generic') OR ($tech == 'sip') OR ($tech == 'pjsip')) {
         	$tech = "sip";
 			$type = 'new';
 		}
     }
 
-    if (($tech == 'sip') AND (!empty($type))) {
+    if ((($tech == 'sip') OR ($tech == 'pjsip')) AND (!empty($type))) {
         global $endpoint;
 
 	    $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : null;
@@ -209,7 +208,7 @@ function endpointman_configpageload() {
         $tech = isset($_REQUEST['tech_hardware']) ? $_REQUEST['tech_hardware'] : null;
     }
 
-    if (isset($tech) && (($tech == 'sip') OR ($tech == 'sip_generic'))) {
+    if (isset($tech) && (($tech == 'sip') OR ($tech == 'pjsip') OR ($tech == 'sip_generic'))) {
         // Don't display this stuff it it's on a 'This xtn has been deleted' page.
         if ($action != 'del') {
 
