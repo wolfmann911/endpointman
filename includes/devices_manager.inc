@@ -219,7 +219,7 @@ switch ($sub_type) {
                     $provisioner_lib->brand_name = $phone_info['directory'];
                     $provisioner_lib->family_line = $phone_info['cfg_dir'];
 
-                    $provisioner_lib->settings['line'][0] = array('username' => $phone_info['line'][1]['ext'], 'authname' => $phone_info['line'][1]['ext']);
+                    $provisioner_lib->settings['line'][0] = array('username' => $phone_info['line'][1]['ext'], 'authname' => $phone_info['line'][1]['ext'], 'tech' => $phone_info['line'][1]['tech']);
                     $provisioner_lib->reboot();
                     unset($provisioner_lib);
                 }
@@ -372,6 +372,22 @@ foreach($device_statuses as $key => $data) {
     preg_match('/\b(?:\d{1,3}\.){3}\d{1,3}\b/i', $data, $ipaddress);
     if(!empty($extout[1])) {
         if(preg_match('/OK \(.*\)/i', $data)) {
+           $devices_status[$extout[1]]['status'] = TRUE;
+           $devices_status[$extout[1]]['ip'] = $ipaddress[0];
+        } else {
+            $devices_status[$extout[1]]['status'] = FALSE;
+        }
+    }
+}
+
+// Do the same for the pjsip peers
+$device_statuses = shell_exec($endpoint->global_cfg['asterisk_location']." -rx 'pjsip show contacts'");
+$device_statuses = explode("\n", $device_statuses);
+foreach($device_statuses as $key => $data) {
+    preg_match('/Contact:\s+(\d+)\/sip:.*/i', $data, $extout);
+    preg_match('/\b(?:\d{1,3}\.){3}\d{1,3}\b/i', $data, $ipaddress);
+    if(!empty($extout[1])) {
+        if(preg_match('/Avail\s+\d+/i', $data)) {
            $devices_status[$extout[1]]['status'] = TRUE;
            $devices_status[$extout[1]]['ip'] = $ipaddress[0];
         } else {
