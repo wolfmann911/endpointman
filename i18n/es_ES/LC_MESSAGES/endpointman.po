@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-27 18:28-0800\n"
+"POT-Creation-Date: 2017-04-06 16:56-0400\n"
 "PO-Revision-Date: 2016-12-12 02:01+0200\n"
 "Last-Translator: Ernesto <ecasas@sangoma.com>\n"
 "Language-Team: Spanish <http://weblate.freepbx.org/projects/fpbxcn/"
@@ -279,10 +279,6 @@ msgstr "Tipo de Configuracion"
 msgid "Configure"
 msgstr "Configurar"
 
-#: endpointman.i18n.php:6 endpointman.i18n.php:12
-msgid "Connectivity"
-msgstr "Conectividad"
-
 #: Endpointman_Config.class.php:1445
 msgid "Copy Error Detected! Aborting Install!"
 msgstr "Detectado error al copiar! Abortada la Instalacion!"
@@ -461,7 +457,7 @@ msgstr "Configurar Administracion End Point"
 msgid "End Point Configuration Manager"
 msgstr "Administrador de configuración de de Endpoint"
 
-#: functions.inc.php:234
+#: functions.inc.php:233
 msgid "End Point Manager"
 msgstr "Administracion End Point"
 
@@ -738,7 +734,7 @@ msgstr "FW Instalar"
 msgid "FW Update"
 msgstr "FW Actualizar"
 
-#: functions.inc.php:343
+#: functions.inc.php:342
 msgid "Failed to install "
 msgstr "Fallo de installacion"
 
@@ -1290,37 +1286,6 @@ msgstr ""
 #: Endpointman_Advanced.class.php:887
 msgid "Not is directory: "
 msgstr "No es un directorio:"
-
-#: endpointman.i18n.php:18
-msgid "OSS Endpoint Advanced Settings"
-msgstr "Configuración avanzada de Endpoint de OSS"
-
-#: endpointman.i18n.php:10
-msgid "OSS Endpoint Device List"
-msgstr ""
-
-#: endpointman.i18n.php:16
-msgid "OSS Endpoint Package Manager"
-msgstr ""
-
-#: endpointman.i18n.php:14
-msgid "OSS Endpoint Template Manager"
-msgstr ""
-
-#: endpointman.i18n.php:4
-msgid "OSS PBX End Point Manager"
-msgstr ""
-
-#: endpointman.i18n.php:8
-msgid ""
-"OSS PBX End Point Manager is the free supported PBX Endpoint Manager for "
-"FreePBX.\t\tIt is ***NOT*** supported by Schmoozecom. If you are looking for "
-"a supported endpoint manager please look into the Commercial Endpoint "
-"Manager by Schmoozecom, INC.\t\tThe front end gui is hosted at: https://"
-"github.com/FreePBX/endpointman\t\tThe backend configurator is hosted at: "
-"https://github.com/provisioner/Provisioner\t\tPull Requests can be made to "
-"either of these and are encouraged."
-msgstr ""
 
 #: views/epm_advanced/oui_manager.views.grid.php:24
 #: views/epm_advanced/oui_manager.views.new.modal.php:14
@@ -2007,6 +1972,12 @@ msgstr "es requerido"
 #: views/epm_devices_main.page.php:553 views/epm_devices_main.page.php:560
 msgid "with"
 msgstr ""
+
+#~ msgid "Connectivity"
+#~ msgstr "Conectividad"
+
+#~ msgid "OSS Endpoint Advanced Settings"
+#~ msgstr "Configuración avanzada de Endpoint de OSS"
 
 #~ msgid "- Copied %_FILE_% to %_FILETO_%."
 #~ msgstr "- Copiado %_FILE_% a %_FILETO_%."

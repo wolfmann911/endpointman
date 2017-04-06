@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-27 18:28-0800\n"
+"POT-Creation-Date: 2017-04-06 16:56-0400\n"
 "PO-Revision-Date: 2015-11-12 14:01+0200\n"
 "Last-Translator: Matthias <it@mitterhuemer.at>\n"
 "Language-Team: German <http://weblate.freepbx.org/projects/fpbxcn/"
@@ -272,10 +272,6 @@ msgstr ""
 msgid "Configure"
 msgstr ""
 
-#: endpointman.i18n.php:6 endpointman.i18n.php:12
-msgid "Connectivity"
-msgstr "Verbindung"
-
 #: Endpointman_Config.class.php:1445
 msgid "Copy Error Detected! Aborting Install!"
 msgstr ""
@@ -452,7 +448,7 @@ msgstr ""
 msgid "End Point Configuration Manager"
 msgstr ""
 
-#: functions.inc.php:234
+#: functions.inc.php:233
 msgid "End Point Manager"
 msgstr "End Point Manager"
 
@@ -713,7 +709,7 @@ msgstr ""
 msgid "FW Update"
 msgstr ""
 
-#: functions.inc.php:343
+#: functions.inc.php:342
 msgid "Failed to install "
 msgstr ""
 
@@ -1246,37 +1242,6 @@ msgstr ""
 
 #: Endpointman_Advanced.class.php:887
 msgid "Not is directory: "
-msgstr ""
-
-#: endpointman.i18n.php:18
-msgid "OSS Endpoint Advanced Settings"
-msgstr "OSS Endpoint Erweiterte Einstellungen"
-
-#: endpointman.i18n.php:10
-msgid "OSS Endpoint Device List"
-msgstr "OSS Endpoint Geräte Liste"
-
-#: endpointman.i18n.php:16
-msgid "OSS Endpoint Package Manager"
-msgstr "OSS Endpoint Pakete Manager"
-
-#: endpointman.i18n.php:14
-msgid "OSS Endpoint Template Manager"
-msgstr "OSS Endpoint Vorlagen Manager"
-
-#: endpointman.i18n.php:4
-msgid "OSS PBX End Point Manager"
-msgstr "OSS PBX End Point Manager"
-
-#: endpointman.i18n.php:8
-msgid ""
-"OSS PBX End Point Manager is the free supported PBX Endpoint Manager for "
-"FreePBX.\t\tIt is ***NOT*** supported by Schmoozecom. If you are looking for "
-"a supported endpoint manager please look into the Commercial Endpoint "
-"Manager by Schmoozecom, INC.\t\tThe front end gui is hosted at: https://"
-"github.com/FreePBX/endpointman\t\tThe backend configurator is hosted at: "
-"https://github.com/provisioner/Provisioner\t\tPull Requests can be made to "
-"either of these and are encouraged."
 msgstr ""
 
 #: views/epm_advanced/oui_manager.views.grid.php:24
@@ -1941,3 +1906,21 @@ msgstr ""
 #: views/epm_devices_main.page.php:553 views/epm_devices_main.page.php:560
 msgid "with"
 msgstr ""
+
+#~ msgid "Connectivity"
+#~ msgstr "Verbindung"
+
+#~ msgid "OSS Endpoint Advanced Settings"
+#~ msgstr "OSS Endpoint Erweiterte Einstellungen"
+
+#~ msgid "OSS Endpoint Device List"
+#~ msgstr "OSS Endpoint Geräte Liste"
+
+#~ msgid "OSS Endpoint Package Manager"
+#~ msgstr "OSS Endpoint Pakete Manager"
+
+#~ msgid "OSS Endpoint Template Manager"
+#~ msgstr "OSS Endpoint Vorlagen Manager"
+
+#~ msgid "OSS PBX End Point Manager"
+#~ msgstr "OSS PBX End Point Manager"

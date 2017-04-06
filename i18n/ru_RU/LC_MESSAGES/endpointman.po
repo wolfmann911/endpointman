@@ -20,7 +20,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2.10\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-27 18:28-0800\n"
+"POT-Creation-Date: 2017-04-06 16:56-0400\n"
 "PO-Revision-Date: 2016-05-04 17:44+0200\n"
 "Last-Translator: ded <ceo@postmet.com>\n"
 "Language-Team: Russian <http://weblate.freepbx.org/projects/fpbxcn/"
@@ -285,10 +285,6 @@ msgstr "Тип конфигурации"
 msgid "Configure"
 msgstr ""
 
-#: endpointman.i18n.php:6 endpointman.i18n.php:12
-msgid "Connectivity"
-msgstr "Подключения"
-
 #: Endpointman_Config.class.php:1445
 msgid "Copy Error Detected! Aborting Install!"
 msgstr "Обнаружена ошибка при копировании! Инсталляция прервана!"
@@ -465,7 +461,7 @@ msgstr "Менеджер конфигураций конечных устрой�
 msgid "End Point Configuration Manager"
 msgstr ""
 
-#: functions.inc.php:234
+#: functions.inc.php:233
 msgid "End Point Manager"
 msgstr "Менеджер абонентских устройств"
 
@@ -728,7 +724,7 @@ msgstr ""
 msgid "FW Update"
 msgstr ""
 
-#: functions.inc.php:343
+#: functions.inc.php:342
 msgid "Failed to install "
 msgstr "Ошибка при инсталлировании "
 
@@ -1272,44 +1268,6 @@ msgstr ""
 #: Endpointman_Advanced.class.php:887
 msgid "Not is directory: "
 msgstr "Это не директория: "
-
-#: endpointman.i18n.php:18
-msgid "OSS Endpoint Advanced Settings"
-msgstr "Расширенные настройки OSS Endpoint"
-
-#: endpointman.i18n.php:10
-msgid "OSS Endpoint Device List"
-msgstr "Список устройств OSS Endpoint"
-
-#: endpointman.i18n.php:16
-msgid "OSS Endpoint Package Manager"
-msgstr "Менеджер пакетов OSS Endpoint"
-
-#: endpointman.i18n.php:14
-msgid "OSS Endpoint Template Manager"
-msgstr "Менеджер шаблонов OSS Endpoint"
-
-#: endpointman.i18n.php:4
-msgid "OSS PBX End Point Manager"
-msgstr "Менеджер OSS PBX End Point"
-
-#: endpointman.i18n.php:8
-msgid ""
-"OSS PBX End Point Manager is the free supported PBX Endpoint Manager for "
-"FreePBX.\t\tIt is ***NOT*** supported by Schmoozecom. If you are looking for "
-"a supported endpoint manager please look into the Commercial Endpoint "
-"Manager by Schmoozecom, INC.\t\tThe front end gui is hosted at: https://"
-"github.com/FreePBX/endpointman\t\tThe backend configurator is hosted at: "
-"https://github.com/provisioner/Provisioner\t\tPull Requests can be made to "
-"either of these and are encouraged."
-msgstr ""
-"OSS PBX End Point Manager  является свободно поддержиаемым менеджером для "
-"FreePBX.\t\t  ОН *** НЕ *** поддерживается Schmoozecom. Если вы ищете "
-"поддерживаемый менеджер, пожалуйста рассмотрите Commercial Endpoint Manager "
-"от Schmoozecom,INC.\t\t Графический интерфейс пользователя расположен по "
-"адресу : https://github.com/FreePBX/endpointman\t\t. Конфигуратор находится "
-"по адресу : https://github.com/provisioner/Provisioner\t\t Запросы могут "
-"быть созданы к любому из них и поощряются."
 
 #: views/epm_advanced/oui_manager.views.grid.php:24
 #: views/epm_advanced/oui_manager.views.new.modal.php:14
@@ -1995,6 +1953,41 @@ msgstr "требуется"
 #: views/epm_devices_main.page.php:553 views/epm_devices_main.page.php:560
 msgid "with"
 msgstr ""
+
+#~ msgid "Connectivity"
+#~ msgstr "Подключения"
+
+#~ msgid "OSS Endpoint Advanced Settings"
+#~ msgstr "Расширенные настройки OSS Endpoint"
+
+#~ msgid "OSS Endpoint Device List"
+#~ msgstr "Список устройств OSS Endpoint"
+
+#~ msgid "OSS Endpoint Package Manager"
+#~ msgstr "Менеджер пакетов OSS Endpoint"
+
+#~ msgid "OSS Endpoint Template Manager"
+#~ msgstr "Менеджер шаблонов OSS Endpoint"
+
+#~ msgid "OSS PBX End Point Manager"
+#~ msgstr "Менеджер OSS PBX End Point"
+
+#~ msgid ""
+#~ "OSS PBX End Point Manager is the free supported PBX Endpoint Manager for "
+#~ "FreePBX.\t\tIt is ***NOT*** supported by Schmoozecom. If you are looking "
+#~ "for a supported endpoint manager please look into the Commercial Endpoint "
+#~ "Manager by Schmoozecom, INC.\t\tThe front end gui is hosted at: https://"
+#~ "github.com/FreePBX/endpointman\t\tThe backend configurator is hosted at: "
+#~ "https://github.com/provisioner/Provisioner\t\tPull Requests can be made "
+#~ "to either of these and are encouraged."
+#~ msgstr ""
+#~ "OSS PBX End Point Manager  является свободно поддержиаемым менеджером для "
+#~ "FreePBX.\t\t  ОН *** НЕ *** поддерживается Schmoozecom. Если вы ищете "
+#~ "поддерживаемый менеджер, пожалуйста рассмотрите Commercial Endpoint "
+#~ "Manager от Schmoozecom,INC.\t\t Графический интерфейс пользователя "
+#~ "расположен по адресу : https://github.com/FreePBX/endpointman\t\t. "
+#~ "Конфигуратор находится по адресу : https://github.com/provisioner/"
+#~ "Provisioner\t\t Запросы могут быть созданы к любому из них и поощряются."
 
 #~ msgid "- Copied %_FILE_% to %_FILETO_%."
 #~ msgstr "- Скопировано %_FILE_% в %_FILETO_%."
