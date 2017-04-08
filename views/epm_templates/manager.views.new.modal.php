@@ -5,7 +5,7 @@
 				<h4 class="modal-title"><?php echo _("Add New Template") ?></h4>
 			</div>
 			<div class="modal-body">
-			
+
 				<div class="element-container">
 					<div class="row">
 						<div class="col-md-12">
@@ -28,7 +28,7 @@
 						</div>
 					</div>
 				</div>
-				
+
 				<div class="element-container">
 					<div class="row">
 						<div class="col-md-12">
@@ -50,7 +50,7 @@
 											unset ($template_list);
 											unset ($sql);
 											?>
-		        						</select>	
+		        						</select>
 									</div>
 								</div>
 							</div>
@@ -62,7 +62,7 @@
 						</div>
 					</div>
 				</div>
-				
+
 				<div class="element-container">
 					<div class="row">
 						<div class="col-md-12">
@@ -85,7 +85,7 @@
 						</div>
 					</div>
 				</div>
-				
+
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-danger" data-dismiss="modal"><i class='fa fa-times'></i> <?php echo _("Cancel")?></button>

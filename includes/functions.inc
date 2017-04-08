@@ -54,21 +54,32 @@ class endpointmanager {
             $this->global_cfg['disable_epm'] = TRUE;
         }
 
-        //define("UPDATE_PATH", $this->global_cfg['update_server']);
-        //define("MODULES_PATH", dirname(dirname(dirname(__FILE__))) . '/');
+				if(!defined("UPDATE_PATH")) {
+					define("UPDATE_PATH", $this->global_cfg['update_server']);
+				}
+				if(!defined("MODULES_PATH")) {
+					define("MODULES_PATH", dirname(dirname(dirname(__FILE__))) . '/');
+				}
+
 
         //Determine if local path is correct!
         if (file_exists(MODULES_PATH . "endpointman/")) {
-            //define("LOCAL_PATH", MODULES_PATH . "endpointman/");
+					if(!defined("LOCAL_PATH")) {
+						define("LOCAL_PATH", MODULES_PATH . "endpointman/");
+					}
         } else {
             die("Can't Load Local Endpoint Manager Directory!");
         }
 
         //Define the location of phone modules, keeping it outside of the module directory so that when the user updates endpointmanager they don't lose all of their phones
         if (file_exists(MODULES_PATH . "_ep_phone_modules/")) {
-            //define("PHONE_MODULES_PATH", MODULES_PATH . "_ep_phone_modules/");
+					if(!defined("PHONE_MODULES_PATH")) {
+						define("PHONE_MODULES_PATH", MODULES_PATH . "_ep_phone_modules/");
+					}
         } else {
-            //define("PHONE_MODULES_PATH", MODULES_PATH . "_ep_phone_modules/");
+					if(!defined("PHONE_MODULES_PATH")) {
+						define("PHONE_MODULES_PATH", MODULES_PATH . "_ep_phone_modules/");
+					}
             if (!file_exists(PHONE_MODULES_PATH)) {
                 mkdir(PHONE_MODULES_PATH, 0775);
             }
@@ -89,14 +100,6 @@ class endpointmanager {
             } else {
                 die("Can't Load the Template Class");
             }
-        }
-
-        //Define error reporting
-        if (($this->global_cfg['debug']) AND (!isset($_REQUEST['quietmode']))) {
-            error_reporting(E_ALL);
-            ini_set('display_errors', 1);
-        } else {
-            ini_set('display_errors', 0);
         }
 
         //Check if config location is writable and/or exists!
@@ -557,6 +560,19 @@ class endpointmanager {
 
         $sql = "DELETE FROM endpointman_line_list WHERE mac_id=" . $mac_id;
         $this->eda->sql($sql);
+        $this->message['delete_device'] = "Deleted!";
+        return(TRUE);
+    }
+
+    function delete_device_by_mac($mac) {
+        $sql = 'SELECT id FROM endpointman_mac_list WHERE mac = \''.
+          str_replace(':', '', $mac). '\'';
+        $mac_id = $this->eda->sql($sql, 'getOne');
+
+        if ($mac_id) {
+          $this->delete_device($mac_id);
+        }
+
         $this->message['delete_device'] = "Deleted!";
         return(TRUE);
     }
@@ -1510,7 +1526,7 @@ class endpointmanager {
                 $li = 0;
                 foreach ($phone_info['line'] as $line) {
                     $line_options = is_array($line_ops[$line['line']]) ? $line_ops[$line['line']] : array();
-                    $line_statics = array('line' => $line['line'], 'username' => $line['ext'], 'authname' => $line['ext'], 'secret' => $line['secret'], 'displayname' => $line['description'], 'server_host' => $this->global_cfg['srvip'], 'server_port' => '5060', 'user_extension' => $line['user_extension']);
+                    $line_statics = array('line' => $line['line'], 'username' => $line['ext'], 'authname' => $line['ext'], 'secret' => $line['secret'], 'displayname' => $line['description'], 'server_host' => $this->global_cfg['srvip'], 'server_port' => '5060', 'user_extension' => $line['user_extension'], 'tech' => $line['tech']);
 
                     $provisioner_lib->settings['line'][$li] = array_merge($line_options, $line_statics);
                     $li++;
