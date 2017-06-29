@@ -151,57 +151,57 @@ class epm_system {
     * @package epm_system
     */
     function download_file_with_progress_bar($url_file, $destination_file, &$error = array()) {
-        set_time_limit(0);
-        $headers = get_headers($url_file, 1);
-        $size = $headers['Content-Length'];
-        $randnumid = trim(mt_rand(1000000000,100000000000000).$pid);
+	    set_time_limit(0);
+	    $headers = get_headers($url_file, 1);
+	    $size = $headers['Content-Length'];
+	    $randnumid = sprintf("%08d", mt_rand(1,99999999));
 
-				$dir = dirname($destination_file);
-				if(!file_exists($dir)) {
-					mkdir($dir);
-				}
+	    $dir = dirname($destination_file);
+	    if(!file_exists($dir)) {
+		    mkdir($dir);
+	    }
 
-        if (preg_match('/200/', $headers[0])) {
-					dbug("wget --no-cache " . $url_file . " -O " . $destination_file);
-            $pid = $this->run_in_background("wget --no-cache " . $url_file . " -O " . $destination_file);
+	    if (preg_match('/200/', $headers[0])) {
+		    dbug("wget --no-cache " . $url_file . " -O " . $destination_file);
+		    $pid = $this->run_in_background("wget --no-cache " . $url_file . " -O " . $destination_file);
 
-            echo sprintf("<div>"._("Downloading %s ...")."</div>", basename($destination_file));
-			echo sprintf("<div id='DivProgressBar_%d' class='progress' style='width:100%%'>", $randnumid);
-			echo "<div class='progress-bar progress-bar-striped' role='progressbar' aria-valuenow='0' aria-valuemin='0' aria-valuemax='100' style='width:0%'>0% ("._("Complete").")</div>";
-			echo "</div>";
-			usleep('300');
-            while ($this->is_process_running($pid)) {
-                $out = 100 * round(filesize($destination_file) / $size, 2);
-                ?>
-                <script type="text/javascript">
-                	$('#DivProgressBar_<?php echo $randnumid; ?> .progress-bar')
-                	.css('width', <?php echo $out ?>+'%')
-                	.attr('aria-valuenow', <?php echo $out ?>)
-                	.text("<?php echo $out ?>% (<?php echo _("Complete") ?>)");
-                </script>
-                <?php
-                usleep('500');
-                ob_end_flush();
-                //ob_flush();
-                flush();
-                ob_start();
-				clearstatcache(); // make sure PHP actually checks dest. file size
-            }
-            ?>
-			<script type="text/javascript">
-				$('#DivProgressBar_<?php echo $randnumid; ?> .progress-bar').css('width', '100%').attr('aria-valuenow', '100').text("100% (<?php echo _("Success") ?>)");
-			</script>
-			<?php
-            return true;
-        } else {
+		    echo sprintf("<div>"._("Downloading %s ...")."</div>", basename($destination_file));
+		    echo sprintf("<div id='DivProgressBar_%d' class='progress' style='width:100%%'>", $randnumid);
+		    echo "<div class='progress-bar progress-bar-striped' role='progressbar' aria-valuenow='0' aria-valuemin='0' aria-valuemax='100' style='width:0%'>0% ("._("Complete").")</div>";
+		    echo "</div>";
+		    usleep('300');
+		    while ($this->is_process_running($pid)) {
+			    $out = 100 * round(filesize($destination_file) / $size, 2);
+?>
+			    <script type="text/javascript">
+			    $('#DivProgressBar_<?php echo $randnumid; ?> .progress-bar')
+				    .css('width', <?php echo $out ?>+'%')
+				    .attr('aria-valuenow', <?php echo $out ?>)
+				    .text("<?php echo $out ?>% (<?php echo _("Complete") ?>)");
+			    </script>
+<?php
+			    usleep('500');
+			    ob_end_flush();
+			    //ob_flush();
+			    flush();
+			    ob_start();
+			    clearstatcache(); // make sure PHP actually checks dest. file size
+		    }
+?>
+		    <script type="text/javascript">
+		    $('#DivProgressBar_<?php echo $randnumid; ?> .progress-bar').css('width', '100%').attr('aria-valuenow', '100').text("100% (<?php echo _("Success") ?>)");
+		    </script>
+<?php
+		    return true;
+	    } else {
 
-        	echo sprintf("<div>"._("Downloading %s ...")."</div>", basename($destination_file));
-        	echo "<div class='progress' style='width:100%'>";
-        	echo "<div class='progress-bar progress-bar-danger progress-bar-striped' role='progressbar' aria-valuenow='100' aria-valuemin='0' aria-valuemax='100' style='width:100%'>0% ("._("Error: ").$headers[0]."!)</div>";
-        	echo "</div>";
+		    echo sprintf("<div>"._("Downloading %s ...")."</div>", basename($destination_file));
+		    echo "<div class='progress' style='width:100%'>";
+		    echo "<div class='progress-bar progress-bar-danger progress-bar-striped' role='progressbar' aria-valuenow='100' aria-valuemin='0' aria-valuemax='100' style='width:100%'>0% ("._("Error: ").$headers[0]."!)</div>";
+		    echo "</div>";
 
-            return false;
-        }
+		    return false;
+	    }
     }
 
     /**
