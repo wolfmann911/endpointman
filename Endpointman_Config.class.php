@@ -494,7 +494,7 @@ class Endpointman_Config
 				if((array_key_exists('firmware_vers', $row2)) AND ($row2['firmware_vers'] > 0)) {
 					$temp = $this->firmware_update_check($row2['id']);
 					$row_out[$i]['products'][$j]['update_fw'] = 1;
-					$row_out[$i]['products'][$j]['update_vers_fw'] = $temp['data']['version'];
+					$row_out[$i]['products'][$j]['update_vers_fw'] = $temp['data']['firmware_ver'];
 				} else {
 					$row_out[$i]['products'][$j]['update_fw'] = 0;
 					$row_out[$i]['products'][$j]['update_vers_fw'] = "";
