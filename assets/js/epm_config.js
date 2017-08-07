@@ -425,8 +425,8 @@ function epm_config_tab_manager_ajax_get_add_data(data)
 				$('#' + iL1.boxappend).append(
 					$('<div/>', { 'class' : 'panel panel-warning' , 'id' : 'info_brand_no_install' + itemData.id })
 					.append(
-						$('<div/>', { 'class' : 'panel-heading' }).append( $('<h3/>', { 'class' : 'panel-title' }).text('MARCA NO INSTALADA!') ),
-						$('<div/>', { 'class' : 'panel-body' }).text('Esta marca no esta instalada, haz Click en el boton Instalar para instalar el paquete.')
+						$('<div/>', { 'class' : 'panel-heading' }).append( $('<h3/>', { 'class' : 'panel-title' }).text('Brand not installed') ),
+						$('<div/>', { 'class' : 'panel-body' }).text('This Brand is not installed, click the Install button to install the package.')
 						.append(
 						
 							$('<button/>', {
