@@ -13,7 +13,7 @@
         
         <form class="nav navbar-form navbar-right" role="search">
             <div class="form-group">
-                <input id="search" type="text" class="form-control" placeholder="Buscar Modelo..." />
+                <input id="search" type="text" class="form-control" placeholder="<?php echo _("Search Model..."); ?>" />
             </div>
             <button class="btn btn-info btn-lg" type="button"><i class="fa fa-search" aria-hidden="true"></i></button>
         </form>
