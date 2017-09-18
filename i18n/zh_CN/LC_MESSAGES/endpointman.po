@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-06-28 21:01-0400\n"
+"POT-Creation-Date: 2017-09-18 15:54-0400\n"
 "PO-Revision-Date: 2015-02-18 18:42-0500\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -166,6 +166,10 @@ msgstr ""
 
 #: views/epm_advanced_manual_upload.page.php:90
 msgid "Brand's Available"
+msgstr ""
+
+#: views/epm_config/manager.list.hide.php:8
+msgid "Brands / Hidden Models:"
 msgstr ""
 
 #: views/epm_config_editor.page.php:7
@@ -1495,8 +1499,13 @@ msgstr ""
 msgid "Saving Changes... Ok!"
 msgstr ""
 
+#: views/epm_config/manager.list.hide.php:17
 #: views/epm_devices_main.page.php:535
 msgid "Search"
+msgstr ""
+
+#: views/epm_config/manager.barra.top.php:16
+msgid "Search Model..."
 msgstr ""
 
 #: views/epm_devices_main.page.php:536
@@ -1674,6 +1683,12 @@ msgstr ""
 msgid ""
 "They are the first 6 characters of the MAC device that identifies the brand "
 "(manufacturer)."
+msgstr ""
+
+#: views/epm_config/manager.list.hide.php:25
+msgid ""
+"This list contains all the Trademarks / Products / Models <br /> that have "
+"been hidden.  Clicking on any of them will recover."
 msgstr ""
 
 #: views/epm_advanced_settings.page.php:136

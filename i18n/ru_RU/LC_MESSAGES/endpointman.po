@@ -20,7 +20,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2.10\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-06-28 21:01-0400\n"
+"POT-Creation-Date: 2017-09-18 15:54-0400\n"
 "PO-Revision-Date: 2016-05-04 17:44+0200\n"
 "Last-Translator: ded <ceo@postmet.com>\n"
 "Language-Team: Russian <http://weblate.freepbx.org/projects/fpbxcn/"
@@ -182,6 +182,10 @@ msgstr "Пакет бренда"
 #: views/epm_advanced_manual_upload.page.php:90
 msgid "Brand's Available"
 msgstr "Доступные бренды"
+
+#: views/epm_config/manager.list.hide.php:8
+msgid "Brands / Hidden Models:"
+msgstr ""
 
 #: views/epm_config_editor.page.php:7
 msgid "Brands/Modules"
@@ -1530,8 +1534,13 @@ msgstr "Сохранение изменений..."
 msgid "Saving Changes... Ok!"
 msgstr "Сохранение изменений... Ок!"
 
+#: views/epm_config/manager.list.hide.php:17
 #: views/epm_devices_main.page.php:535
 msgid "Search"
+msgstr ""
+
+#: views/epm_config/manager.barra.top.php:16
+msgid "Search Model..."
 msgstr ""
 
 #: views/epm_devices_main.page.php:536
@@ -1728,6 +1737,12 @@ msgid ""
 msgstr ""
 "Это первые  6 символов MAC-адреса устройства, которые идентифицируют бренд"
 "(производителя)."
+
+#: views/epm_config/manager.list.hide.php:25
+msgid ""
+"This list contains all the Trademarks / Products / Models <br /> that have "
+"been hidden.  Clicking on any of them will recover."
+msgstr ""
 
 #: views/epm_advanced_settings.page.php:136
 #: views/epm_templates/editor.views.dialog.cfg.global.php:119

@@ -2,7 +2,7 @@
 	<rawname>endpointman</rawname>
 	<repo>unsupported</repo>
 	<name>OSS PBX End Point Manager</name>
-	<version>13.0.7.14</version>
+	<version>13.0.7.15</version>
 	<type>setup</type>
 	<category>Connectivity</category>
 	<license>GPLv2+</license>
@@ -21,6 +21,7 @@
 		Pull Requests can be made to either of these and are encouraged.
 	</description>
 	<changelog>
+		*13.0.7.15* Remove spanish wordages
 		*13.0.7.14* Fix totally broken random number generator, Fixes issue with variable in json
 		*13.0.7.13* Fix issue if directory doesnt exist during download
 		*13.0.7.12* pjsip_support: Add support for extensions using res_pjsip driver,, long name descriptions are truncated
