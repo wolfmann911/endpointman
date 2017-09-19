@@ -39,7 +39,7 @@ class endpointmanager {
 
         $this->global_cfg['disable_epm'] = FALSE;
 
-        $this->global_cfg['tz'] = !empty($this->global_cfg['tz']) ? $this->global_cfg['tz'] : 'America/Los_Angeles';
+        $this->global_cfg['tz'] = !empty($this->global_cfg['tz']) ? $this->global_cfg['tz'] : $amp_conf['PHPTIMEZONE'];
         //date_default_timezone_set($this->global_cfg['tz']);
 
         //Generate empty array
