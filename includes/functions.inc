@@ -39,7 +39,7 @@ class endpointmanager {
 
         $this->global_cfg['disable_epm'] = FALSE;
 
-        $this->global_cfg['tz'] = !empty($this->global_cfg['tz']) ? $this->global_cfg['tz'] : 'America/Los_Angeles';
+        $this->global_cfg['tz'] = !empty($this->global_cfg['tz']) ? $this->global_cfg['tz'] : $amp_conf['PHPTIMEZONE'];
         //date_default_timezone_set($this->global_cfg['tz']);
 
         //Generate empty array
@@ -562,6 +562,34 @@ class endpointmanager {
         $this->eda->sql($sql);
         $this->message['delete_device'] = "Deleted!";
         return(TRUE);
+    }
+
+    function delete_device_by_mac($mac) {
+        $sql = 'SELECT id FROM endpointman_mac_list WHERE mac = \''.
+          str_replace(':', '', $mac). '\'';
+        $mac_id = $this->eda->sql($sql, 'getOne');
+
+        if ($mac_id) {
+          $this->delete_device($mac_id);
+        }
+
+        $this->message['delete_device'] = "Deleted!";
+        return(TRUE);
+    }
+
+    function retrieve_device_by_mac($mac) {
+        $sql = 'SELECT id FROM endpointman_mac_list WHERE mac = \''.
+          str_replace(':', '', $mac). '\'';
+        $mac_id = $this->eda->sql($sql, 'getOne');
+
+        return($mac_id);
+    }
+
+    function retrieve_device_by_ext($ext) {
+        $sql = 'SELECT DISTINCT mac_id FROM endpointman_line_list WHERE ext = \''. $ext. '\'';
+        $mac_id = $this->eda->sql($sql, 'getOne');
+
+        return($mac_id);
     }
 
     function get_message($function_name) {
@@ -1513,7 +1541,7 @@ class endpointmanager {
                 $li = 0;
                 foreach ($phone_info['line'] as $line) {
                     $line_options = is_array($line_ops[$line['line']]) ? $line_ops[$line['line']] : array();
-                    $line_statics = array('line' => $line['line'], 'username' => $line['ext'], 'authname' => $line['ext'], 'secret' => $line['secret'], 'displayname' => $line['description'], 'server_host' => $this->global_cfg['srvip'], 'server_port' => '5060', 'user_extension' => $line['user_extension']);
+                    $line_statics = array('line' => $line['line'], 'username' => $line['ext'], 'authname' => $line['ext'], 'secret' => $line['secret'], 'displayname' => $line['description'], 'server_host' => $this->global_cfg['srvip'], 'server_port' => '5060', 'user_extension' => $line['user_extension'], 'tech' => $line['tech']);
 
                     $provisioner_lib->settings['line'][$li] = array_merge($line_options, $line_statics);
                     $li++;

@@ -9,23 +9,23 @@
 
 namespace FreePBX\modules;
 
-class Endpointman_Config 
+class Endpointman_Config
 {
 	public $UPDATE_PATH;
     public $MODULES_PATH;
 	public $LOCAL_PATH;
 	public $PHONE_MODULES_PATH;
 	public $PROVISIONER_BASE;
-	
-	public function __construct($freepbx = null, $cfgmod = null, $system = null) 
+
+	public function __construct($freepbx = null, $cfgmod = null, $system = null)
 	{
 		$this->freepbx = $freepbx;
 		$this->db = $freepbx->Database;
 		$this->config = $freepbx->Config;
 		$this->configmod = $cfgmod;
 		$this->system = $system;
-		
-		
+
+
 		$this->UPDATE_PATH = $this->configmod->get('update_server');
         $this->MODULES_PATH = $this->config->get('AMPWEBROOT') . '/admin/modules/';
         if (file_exists($this->MODULES_PATH . "endpointman/")) {
@@ -47,7 +47,7 @@ class Endpointman_Config
                 die('Endpoint Manager can not create the modules folder!');
             }
         }
-				
+
 	}
 
 	public function myShowPage(&$pagedata) {
@@ -62,8 +62,8 @@ class Endpointman_Config
 		}
 		return false;
 	}
-	
-    public function ajaxHandler($module_tab = "", $command = "") 
+
+    public function ajaxHandler($module_tab = "", $command = "")
 	{
 		$txt = array(
 			'ayuda_model' => _("If we can activate the model set terminals of the models.<br /> If this model is disabled will not appear in the list of models that can be configured for PBX."),
@@ -76,7 +76,7 @@ class Endpointman_Config
 			'install' => _("Install"),
 			'uninstall' => _("Uninstall"),
 			'update' => _("Update"),
-			'fw_install' => _('FW Install'), 
+			'fw_install' => _('FW Install'),
 			'fw_uninstall' =>  _('FW Delete'),
 			'fw_update' => _('FW Update'),
 			'enable' => _('Enable'),
@@ -94,21 +94,21 @@ class Endpointman_Config
 			'update_content' => _("Update Content..."),
 			'opt_invalid' => _("Invalid Option!")
 		);
-		
+
 		switch ($command)
 		{
-			case "saveconfig": 
+			case "saveconfig":
 				$retarr = $this->epm_config_manager_saveconfig();
 				break;
-			
-			case "list_all_brand": 
+
+			case "list_all_brand":
 				$retarr = array("status" => true, "message" => "OK", "datlist" => $this->epm_config_manager_hardware_get_list_all());
 				break;
-				
+
 			case "list_brand_model_hide":
 				$retarr = array("status" => true, "message" => "OK", "datlist" => $this->epm_config_manager_hardware_get_list_all_hide_show());
 				break;
-					
+
 			default:
 				$retarr = array("status" => false, "message" => _("Command not found!") . " [" .$command. "]");
 				break;
@@ -116,7 +116,7 @@ class Endpointman_Config
 		$retarr['txt'] = $txt;
 		return $retarr;
 	}
-	
+
 	public function doConfigPageInit($module_tab = "", $command = "") {
 		switch ($command) {
 			case "check_for_updates":
@@ -124,19 +124,19 @@ class Endpointman_Config
 				echo "<br /><hr><br />";
 				exit;
 				break;
-			
+
 			case "manual_install":
 				$this->epm_config_manual_install();
 				echo "<br /><hr><br />";
 				exit;
 				break;
-			
+
 			case "firmware":
 				$this->epm_config_manager_firmware();
 				echo "<br /><hr><br />";
 				exit;
 				break;
-			
+
 			case "brand":
 				$this->epm_config_manager_brand();
 				echo "<br /><hr><br />";
@@ -144,23 +144,23 @@ class Endpointman_Config
 				break;
 		}
 	}
-	
+
 	public function getRightNav($request) {
 		return "";
 	}
-	
+
 	public function getActionBar($request) {
 		return "";
 	}
-	
-	
+
+
 	/**
      * Get info models by product id selected.
      * @param int $id_product product ID
 	 * @param bool $show_all True return all, False return hidden = 0
      * @return array
      */
-	public function epm_config_hardware_get_list_models($id_product=NULL, $show_all = true, $byorder = "model") 
+	public function epm_config_hardware_get_list_models($id_product=NULL, $show_all = true, $byorder = "model")
 	{
 		if(! is_numeric($id_product)) { throw new \Exception( _("ID Producto not is number")." (".$id_product.")"); }
 		if($show_all == true) 	{ $sql = 'SELECT * FROM endpointman_model_list WHERE product_id = '.$id_product.' ORDER BY '.$byorder.' ASC'; }
@@ -168,14 +168,14 @@ class Endpointman_Config
 		$result = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
 		return $result;
 	}
-	
+
 	/**
      * Get info product by brand id selected.
      * @param int $id_brand brand ID
 	 * @param bool $show_all True return all, FAlse return hidde = 0
      * @return array
      */
-	public function epm_config_hardware_get_list_product($id_brand=NULL, $show_all = true, $byorder = "long_name") 
+	public function epm_config_hardware_get_list_product($id_brand=NULL, $show_all = true, $byorder = "long_name")
 	{
 		if(! is_numeric($id_brand)) { throw new \Exception(_("ID Brand not is numbre")." (".$id_brand.")"); }
 		if ($show_all == true) 	{ $sql = 'SELECT * FROM endpointman_product_list WHERE brand = '.$id_brand.' ORDER BY '.$byorder.' ASC'; }
@@ -183,7 +183,7 @@ class Endpointman_Config
 		$result = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
 		return $result;
 	}
-	
+
 	/**
      * Get info all brands.
 	 * @param bool $show_all True return all, False return hidde = 0
@@ -195,8 +195,8 @@ class Endpointman_Config
 		$result = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
 		return $result;
 	}
-	
-	
+
+
 	/**** FUNCIONES SEC MODULO "epm_config\editor" ****/
 	/**
      * Get info all brdans, prodics, models.
@@ -204,18 +204,18 @@ class Endpointman_Config
      */
 	 /*
 	 SE DESACTIVA A VERS SI NO SE USA EN NINGUN SITIO.
-	public function epm_config_editor_hardware_get_list_all () 
+	public function epm_config_editor_hardware_get_list_all ()
 	{
 		$row_out = array();
 		$i = 0;
-		foreach ($this->epm_config_hardware_get_list_brand(true, "name") as $row) 
+		foreach ($this->epm_config_hardware_get_list_brand(true, "name") as $row)
 		{
 			$row_out[$i] = $row;
 			$row_out[$i]['count'] = $i;
-			if ($row['installed']) 
+			if ($row['installed'])
 			{
 				$j = 0;
-				foreach ($this->epm_config_hardware_get_list_product($row['id'], true) as $row2) 
+				foreach ($this->epm_config_hardware_get_list_product($row['id'], true) as $row2)
 				{
 					$row_out[$i]['products'][$j] = $row2;
 					$k = 0;
@@ -232,12 +232,12 @@ class Endpointman_Config
 	}
 	*/
 	/*** END SEC FUNCTIONS ***/
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
 	/**** FUNCIONES SEC MODULO "epm_config\manager" ****/
 	private function epm_config_manager_check_for_updates ()
 	{
@@ -245,7 +245,7 @@ class Endpointman_Config
 		$this->update_check(true);
 		out ("All Done!");
 	}
-	
+
 	private function epm_config_manager_brand()
 	{
 		$arrVal['VAR_REQUEST'] = array("command_sub", "idfw");
@@ -255,7 +255,7 @@ class Endpointman_Config
 				return false;
 			}
 		}
-		
+
 		$arrVal['VAR_IS_NUM'] = array("idfw");
 		foreach ($arrVal['VAR_IS_NUM'] as $valor) {
 			if (! is_numeric($_REQUEST[$valor])) {
@@ -263,29 +263,29 @@ class Endpointman_Config
 				return false;
 			}
 		}
-		
+
 		$dget['command'] =  strtolower($_REQUEST['command_sub']);
 		$dget['id'] = $_REQUEST['idfw'];
-		
+
 		switch($dget['command']) {
 			case "brand_install":
 			case "brand_update":
 				$this->download_brand($dget['id']);
 				break;
-			
+
 			case "brand_uninstall":
 				$this->remove_brand($dget['id']);
 				break;
-				
+
 			default:
 				out (_("Error: Command not found!")." [" . $dget['command'] . "]");
 		}
 		$this->update_check();
 		unset ($dget);
-			
+
 		return true;
 	}
-	
+
 	private function epm_config_manager_firmware()
 	{
 		$arrVal['VAR_REQUEST'] = array("command_sub", "idfw");
@@ -295,7 +295,7 @@ class Endpointman_Config
 				return false;
 			}
 		}
-		
+
 		$arrVal['VAR_IS_NUM'] = array("idfw");
 		foreach ($arrVal['VAR_IS_NUM'] as $valor) {
 			if (! is_numeric($_REQUEST[$valor])) {
@@ -303,28 +303,28 @@ class Endpointman_Config
 				return false;
 			}
 		}
-		
+
 		$dget['command'] =  strtolower($_REQUEST['command_sub']);
 		$dget['id'] = $_REQUEST['idfw'];
-		
+
 		switch($dget['command']) {
 			case "fw_install":
 			case "fw_update":
 				$this->install_firmware($dget['id']);
 				break;
-				
+
 			case "fw_uninstall":
 				$this->remove_firmware($dget['id']);
 				break;
-				
+
 			default:
 				out (_("Error: Command not found!")." [" . $dget['command'] . "]");
 		}
-		
+
 		unset ($dget);
 		return true;
 	}
-	
+
 	private function epm_config_manager_saveconfig()
 	{
 		$arrVal['VAR_REQUEST'] = array("typesavecfg", "value", "idtype", "idbt");
@@ -333,28 +333,28 @@ class Endpointman_Config
 				return array("status" => false, "message" => _("No send value!")." [".$valor."]");
 			}
 		}
-		
+
 		$arrVal['VAR_IS_NUM'] = array("value", "idbt");
 		foreach ($arrVal['VAR_IS_NUM'] as $valor) {
 			if (! is_numeric($_REQUEST[$valor])) {
 				return array("status" => false, "message" => _("Value send is not number!")." [".$valor."]");
 			}
 		}
-		
+
 		$dget['typesavecfg'] = strtolower($_REQUEST['typesavecfg']);
 		$dget['value'] = strtolower($_REQUEST['value']);
 		$dget['idtype'] = strtolower($_REQUEST['idtype']);
 		$dget['id'] = $_REQUEST['idbt'];
-		
+
 		if (! in_array($dget['typesavecfg'], array("hidden", "enabled"))) {
 			return array("status" => false, "message" => _("Type Save Config is not valid!")." [".$dget['typesavecfg']."]");
 		}
-		
+
 		if (($dget['value'] > 1 ) and ($dget['value'] < 0)) {
 			return array("status" => false, "message" => _("Invalid Value!"));
 		}
-	
-	
+
+
 		if ($dget['typesavecfg'] == "enabled") {
 			if (($dget['idtype']) == "modelo") {
 				$sql = "UPDATE endpointman_model_list SET enabled = " .$dget['value']. " WHERE id = '".$dget['id']."'";
@@ -368,36 +368,36 @@ class Endpointman_Config
 				case "marca":
 					$sql = "UPDATE endpointman_brand_list SET hidden = '".$dget['value'] ."' WHERE id = '".$dget['id']."'";
 					break;
-					
+
 				case "producto":
 					$sql = "UPDATE endpointman_product_list SET hidden = '". $dget['value'] ."' WHERE id = '".$dget['id']."'";
 					break;
-					
+
 				case "modelo":
 					$sql = "UPDATE endpointman_model_list SET hidden = '". $dget['value'] ."' WHERE id = '".$dget['id']."'";
 					break;
-					
+
 				default:
-					$retarr = array("status" => false, "message" => _("IDType invalid: ") . $dget['idtype'] ); 
+					$retarr = array("status" => false, "message" => _("IDType invalid: ") . $dget['idtype'] );
 			}
-		}	
+		}
 		if (isset($sql)) {
 			sql($sql);
 			$retarr = array("status" => true, "message" => "OK", "typesavecfg" => $dget['typesavecfg'], "value" => $dget['value'], "idtype" => $dget['idtype'], "id" => $dget['id']);
 			unset($sql);
 		}
-		
+
 		unset($dget);
 		return $retarr;
 	}
-	
+
 	public function epm_config_manager_hardware_get_list_all_hide_show()
 	{
 		$row_out = array();
-		
+
 		$i = 0;
 		$brand_list = $this->epm_config_hardware_get_list_brand(true, "name");
-		foreach ($brand_list as $row) 
+		foreach ($brand_list as $row)
 		{
 			//$row_out[$i] = $row;
 			$row_out[$i]['id'] = $row['id'];
@@ -407,12 +407,12 @@ class Endpointman_Config
 			$row_out[$i]['hidden'] = $row['hidden'];
 			$row_out[$i]['count'] = $i;
 			$row_out[$i]['products'] = "";
-			if ($row['hidden'] == 1) 
-			{ 
+			if ($row['hidden'] == 1)
+			{
 				$i++;
-				continue; 
+				continue;
 			}
-			
+
 			$j = 0;
 			$product_list = $this->epm_config_hardware_get_list_product($row['id'], true);
 			foreach($product_list as $row2) {
@@ -424,15 +424,15 @@ class Endpointman_Config
 				$row_out[$i]['products'][$j]['hidden'] = $row2['hidden'];
 				$row_out[$i]['products'][$j]['count'] = $j;
 				$row_out[$i]['products'][$j]['models'] = "";
-				if ($row2['hidden'] == 1) 
-				{ 
+				if ($row2['hidden'] == 1)
+				{
 					$j++;
-					continue; 
+					continue;
 				}
-				
+
 				$k = 0;
 				$model_list = $this->epm_config_hardware_get_list_models($row2['id'], true);
-				foreach($model_list as $row3) 
+				foreach($model_list as $row3)
 				{
 					//$row_out[$i]['products'][$j]['models'][$k] = $row3;
 					$row_out[$i]['products'][$j]['models'][$k]['id'] = $row3['id'];
@@ -451,8 +451,8 @@ class Endpointman_Config
 		//echo "<textarea>" . print_r($row_out, true)  . "</textarea>";
 		return $row_out;
 	}
-	
-	
+
+
 	//TODO: PENDIENTE ACTUALIZAR Y ELIMINAR DATOS NO NECESARIOS (TEMPLATES)
 	//http://pbx.cerebelum.lan/admin/ajax.php?module=endpointman&module_sec=epm_config&module_tab=manager&command=list_all_brand
 	public function epm_config_manager_hardware_get_list_all()
@@ -461,14 +461,14 @@ class Endpointman_Config
 		$i = 0;
 		$brand_list = $this->epm_config_hardware_get_list_brand(true, "name");
 		//FIX: https://github.com/FreePBX-ContributedModules/endpointman/commit/2ad929d0b38f05c9da1b847426a4094c3314be3b
-		
-		foreach ($brand_list as $row) 
+
+		foreach ($brand_list as $row)
 		{
 			$row_out[$i] = $row;
 			$row_out[$i]['count'] = $i;
 			$row_out[$i]['cfg_ver_datetime'] = $row['cfg_ver'];
 			$row_out[$i]['cfg_ver_datetime_txt'] = date("c",$row['cfg_ver']);
-			
+
 			$row_mod = $this->brand_update_check($row['directory']);
 			$row_out[$i]['update'] = $row_mod['update'];
 			if(isset($row_mod['update_vers'])) {
@@ -480,13 +480,13 @@ class Endpointman_Config
 			if (! isset($row_out[$i]['update_vers'])) 		{ $row_out[$i]['update_vers'] = $row_out[$i]['cfg_ver_datetime']; }
 			if (! isset($row_out[$i]['update_vers_txt'])) 	{ $row_out[$i]['update_vers_txt'] = $row_out[$i]['cfg_ver_datetime_txt']; }
 
-			if ($row['hidden'] == 1) 
+			if ($row['hidden'] == 1)
 			{
 				$i++;
-				continue; 
+				continue;
 			}
-			
-			
+
+
 			$j = 0;
 			$product_list = $this->epm_config_hardware_get_list_product($row['id'], true);
 			foreach($product_list as $row2) {
@@ -494,32 +494,32 @@ class Endpointman_Config
 				if((array_key_exists('firmware_vers', $row2)) AND ($row2['firmware_vers'] > 0)) {
 					$temp = $this->firmware_update_check($row2['id']);
 					$row_out[$i]['products'][$j]['update_fw'] = 1;
-					$row_out[$i]['products'][$j]['update_vers_fw'] = $temp['data']['version'];
+					$row_out[$i]['products'][$j]['update_vers_fw'] = $temp['data']['firmware_ver'];
 				} else {
 					$row_out[$i]['products'][$j]['update_fw'] = 0;
 					$row_out[$i]['products'][$j]['update_vers_fw'] = "";
 				}
 				if (! isset($row_out[$i]['products'][$j]['update_fw'])) 		{ $row_out[$i]['products'][$j]['update_fw'] = 0; }
 				if (! isset($row_out[$i]['products'][$j]['update_vers_fw'])) 	{ $row_out[$i]['products'][$j]['update_vers_fw'] = ""; }
-	
-	
+
+
 				$row_out[$i]['products'][$j]['fw_type'] = $this->firmware_local_check($row2['id']);
 				$row_out[$i]['products'][$j]['count'] = $j;
-				if ($row2['hidden'] == 1) 
-				{ 
+				if ($row2['hidden'] == 1)
+				{
 					$j++;
-					continue; 
+					continue;
 				}
-				
+
 				$k = 0;
 				$model_list = $this->epm_config_hardware_get_list_models($row2['id'], true);
-				foreach($model_list as $row3) 
+				foreach($model_list as $row3)
 				{
 					$row_out[$i]['products'][$j]['models'][$k] = $row3;
-					
+
 					unset ($row_out[$i]['products'][$j]['models'][$k]['template_list']);
 					unset ($row_out[$i]['products'][$j]['models'][$k]['template_data']);
-					
+
 					if($row_out[$i]['products'][$j]['models'][$k]['enabled']){
 						$row_out[$i]['products'][$j]['models'][$k]['enabled_checked'] = 'checked';
 					}
@@ -528,33 +528,33 @@ class Endpointman_Config
 				}
 				$j++;
 			}
-			
-			
+
+
 			$i++;
 		}
 		//echo "<textarea>".print_r($row_out,true)."</textarea>";
 		return $row_out;
 	}
 	/*** END SEC FUNCTIONS ***/
-	
-	
-	
-	
-	function brand_update_check($brand_name_find = NULL) 
+
+
+
+
+	function brand_update_check($brand_name_find = NULL)
 	{
 		if ($brand_name_find == NULL) { return $this->brand_update_check_all(); }
-		
+
 		$sql = "SELECT * FROM  endpointman_brand_list WHERE directory = '" . $brand_name_find . "'";
 		$row = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
-		
-		$out = array();		
-		if  (! isset($row['directory'])) 
+
+		$out = array();
+		if  (! isset($row['directory']))
 		{
 			$out['update'] = -2;
 		}
-		else 
-		{			
-			if (file_exists($this->PHONE_MODULES_PATH . "endpoint/" . $row['directory'] . "/brand_data.json")) 
+		else
+		{
+			if (file_exists($this->PHONE_MODULES_PATH . "endpoint/" . $row['directory'] . "/brand_data.json"))
 			{
 				$temp = $this->file2json($this->PHONE_MODULES_PATH . "endpoint/" . $row['directory'] . "/brand_data.json");
 				$temp = $temp['data']['brands'];
@@ -566,7 +566,7 @@ class Endpointman_Config
 				}
 				$last_mod = max($last_mod, $version);
 				$version = $last_mod;
-				
+
 				if ($row['cfg_ver'] < $version) {
 					$out['update'] = 1;
 					$out['update_vers'] = $version;
@@ -581,15 +581,15 @@ class Endpointman_Config
 		}
 		return $out;
 	}
-	
-	
-	
-	function brand_update_check_all() 
+
+
+
+	function brand_update_check_all()
 	{
 		$temp = $this->file2json($this->PHONE_MODULES_PATH . 'endpoint/master.json');
 		$endpoint_package = $temp['data']['package'];
 		$endpoint_last_mod = $temp['data']['last_modified'];
-		
+
 		$version = array();
 		$out = $temp['data']['brands'];
 		foreach ($out as $data) {
@@ -607,12 +607,12 @@ class Endpointman_Config
 				$version[$brand_name] = $last_mod;
 			}
 		}
-		
+
 		$sql = 'SELECT * FROM  endpointman_brand_list WHERE id > 0';
 		$row = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
 		foreach ($row as $ava_brands) {
 			$key = $this->system->arraysearchrecursive($ava_brands['directory'], $out, 'directory');
-			
+
 			if ($key === FALSE) {
 				$tmp = $ava_brands;
 				$tmp['update'] = -1;
@@ -632,9 +632,9 @@ class Endpointman_Config
 		}
 		return $out;
 	}
-	
-	
-	
+
+
+
 	/**
      * Check for new packges for brands. These packages will include phone models and such which the user can remove if they want
      * This function will alos auto-update the provisioner.net library incase anything has changed
@@ -649,13 +649,14 @@ class Endpointman_Config
         		$master_result = $this->system->download_file($this->UPDATE_PATH . "master.json", $this->PHONE_MODULES_PATH . "endpoint/master.json");
         	}
 
-            if (!$master_result) {
+
+            if (!$master_result || !file_exists($this->PHONE_MODULES_PATH . "endpoint/master.json")) {
             	$error['brand_update_check_master'] = _("Error: Not able to connect to repository. Using local master file instead.");
             	if ($echomsg == true ) {
             		out($error['brand_update_check_master']);
             	}
             }
-            
+
             $temp = $this->file2json($this->PHONE_MODULES_PATH . 'endpoint/master.json');
             $endpoint_package = $temp['data']['package'];
             $endpoint_last_mod = $temp['data']['last_modified'];
@@ -666,7 +667,7 @@ class Endpointman_Config
             $contents = file_get_contents($this->UPDATE_PATH . "/update_status");
             if ($contents != '1') {
                 if (($data == "") OR ($data <= $endpoint_last_mod)) {
-                    if ((!$master_result) OR (!$this->system->download_file($this->UPDATE_PATH . '/' . $endpoint_package, $temp_location . $endpoint_package))) 
+                    if ((!$master_result) OR (!$this->system->download_file($this->UPDATE_PATH . '/' . $endpoint_package, $temp_location . $endpoint_package)))
                     {
                     	$error['brand_update_check_json'] = _("Not able to connect to repository. Using local Provisioner.net Package");
                     	if ($echomsg == true ) {
@@ -686,7 +687,7 @@ class Endpointman_Config
                         sql($sql);
                     }
                 }
-				
+
                 $out = $temp['data']['brands'];
                 //Assume that if we can't connect and find the master.xml file then why should we try to find every other file.
                 if ($master_result) {
@@ -727,8 +728,8 @@ class Endpointman_Config
                             }
                             $last_mod = max($last_mod, $version[$brand_name]);
                             $version[$brand_name] = $last_mod;
-                            
-							if (!($this->system->arraysearchrecursive($brand_name, $row, 'directory'))) 
+
+							if (!($this->system->arraysearchrecursive($brand_name, $row, 'directory')))
 							{
 								$sql = 'SELECT directory FROM endpointman_brand_list where id = "'.$temp['brand_id'].'"';
 								$datoif = sql($sql, 'getOne');
@@ -874,7 +875,7 @@ class Endpointman_Config
 								if ($echomsg == true ) {
 									outn(sprintf(_("Moving/Removing Model '%s' not present in JSON file......"), $data['model']));
 								}
-                                
+
                                 $model_name = $data['model'];
                                 $sql = 'DELETE FROM endpointman_model_list WHERE id = ' . $data['id'];
                                 sql($sql);
@@ -898,7 +899,7 @@ class Endpointman_Config
             }
         }
     }
-	
+
 	 /**
      * Sync the XML files (incuding all template files) from the hard drive with the database
      * @param int $model Model ID
@@ -915,11 +916,11 @@ class Endpointman_Config
             $sql = "SELECT * FROM  endpointman_brand_list WHERE id=" . $model_row['brand'];
             $brand_row = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
 
-            
+
             $path_brand_dir = $this->PHONE_MODULES_PATH . '/endpoint/' . $brand_row['directory'];
             $path_brand_dir_cfg = $path_brand_dir . '/' . $product_row['cfg_dir'];
             $path_brand_dir_cfg_json = $path_brand_dir_cfg . '/family_data.json';
-            
+
             if (!file_exists($path_brand_dir)) {
             	$error['sync_model'] = sprintf(_("Brand Directory '%s' Doesn't Exist! (%s)"), $brand_row['directory'], $path_brand_dir);
                 return(FALSE);
@@ -933,8 +934,8 @@ class Endpointman_Config
                 return(FALSE);
             }
             $family_line_json = $this->file2json($path_brand_dir_cfg_json);
-            
-            
+
+
             //TODO: Add local file checks to avoid slow reloading on PHP < 5.3
 			$key = $this->system->arraysearchrecursive($model_row['model'], $family_line_json['data']['model_list'], 'model');
             if ($key === FALSE) {
@@ -967,7 +968,7 @@ class Endpointman_Config
             return(FALSE);
         }
     }
-	
+
 	 /**
      * This will download the xml & brand package remotely
      * @param integer $id Brand ID
@@ -976,7 +977,7 @@ class Endpointman_Config
     	out(_("Install/Update Brand..."));
         if (!$this->configmod->get('use_repo')) {
             $temp_directory = $this->system->sys_get_temp_dir() . "/epm_temp/";
-			
+
 			if (!file_exists($temp_directory)) {
 				out(_("Creating EPM temp directory"));
 				if (! mkdir($temp_directory)) {
@@ -984,7 +985,7 @@ class Endpointman_Config
 					return false;
 				}
 			}
-			
+
 			outn(_("Downloading Brand JSON..... "));
             $row = sql('SELECT * FROM  endpointman_brand_list WHERE id =' . $id, 'getAll', DB_FETCHMODE_ASSOC);
             $result = $this->system->download_file($this->UPDATE_PATH . $row[0]['directory'] . "/" . $row[0]['directory'] . ".json", $this->PHONE_MODULES_PATH . "endpoint/" . $row[0]['directory'] . "/brand_data.json");
@@ -995,21 +996,21 @@ class Endpointman_Config
                 $package = $temp['data']['brands']['package'];
 
 				out(_("Downloading Brand Package..."));
-                if ($this->system->download_file_with_progress_bar($this->UPDATE_PATH . $row[0]['directory'] . '/' . $package, $temp_directory . $package)) 
+                if ($this->system->download_file_with_progress_bar($this->UPDATE_PATH . $row[0]['directory'] . '/' . $package, $temp_directory . $package))
                 {
 					if (file_exists($temp_directory . $package)) {
 						$md5_xml = $temp['data']['brands']['md5sum'];
 						$md5_pkg = md5_file($temp_directory . $package);
-						
+
 						outn(_("Checking MD5sum of Package.... "));
 						if ($md5_xml == $md5_pkg) {
 							out(_("Done!"));
-							
+
 							outn(_("Extracting Tarball........ "));
 							//TODO: PENDIENTE VALIDAR SI DA ERROR LA DESCOMPRESION
 							exec("tar -xvf " . $temp_directory . $package . " -C " . $temp_directory);
 							out(_("Done!"));
-							
+
 							//Update File in the temp directory
 							copy($this->PHONE_MODULES_PATH . 'endpoint/' . $row[0]['directory'] . '/brand_data.json', $temp_directory . $row[0]['directory'] . '/brand_data.json');
 							$this->update_brand($row[0]['directory'], TRUE);
@@ -1041,11 +1042,11 @@ class Endpointman_Config
      */
     function update_brand($package, $remote=TRUE) {
     	out(sprintf(_("Update Brand %s ... "), $package));
-		
+
 		$temp_directory = $this->system->sys_get_temp_dir() . "/epm_temp/";
 		//DEBUG
 		out(_("Processing ".$temp_directory.$package."/brand_data.json..."));
-		
+
         if (file_exists($temp_directory . $package . '/brand_data.json')) {
             $temp = $this->file2json($temp_directory . $package . '/brand_data.json');
             if (key_exists('directory', $temp['data']['brands'])) {
@@ -1058,7 +1059,7 @@ class Endpointman_Config
 
                 //create directory structure and move files
                 out(sprintf(_("Creating Directory Structure for Brand '%s' and Moving Files..."), $brand_name));
-				
+
                 if (!file_exists($this->PHONE_MODULES_PATH . "endpoint/" . $directory)) {
                     mkdir($this->PHONE_MODULES_PATH . "endpoint/" . $directory);
                 }
@@ -1122,23 +1123,23 @@ class Endpointman_Config
 
                     $data = sql("SELECT id FROM endpointman_product_list WHERE id='" . $brand_id . $family_line_xml['data']['id'] . "'", 'getOne');
                     $short_name = preg_replace("/\[(.*?)\]/si", "", $family_line_xml['data']['name']);
-					
+
 					if ($data) {
 						if ($this->configmod->get('debug')) echo "-Updating Family ".$short_name."<br/>";
                         $sql = "UPDATE endpointman_product_list SET short_name = '" . str_replace("'", "''", $short_name) . "', long_name = '" . str_replace("'", "''", $family_line_xml['data']['name']) . "', cfg_ver = '" . $family_line_xml['data']['version'] . "', config_files='" . $family_line_xml['data']['configuration_files'] . "' WHERE id = '" . $brand_id . $family_line_xml['data']['id'] . "'";
-                    } 
+                    }
 					else {
 						if ($this->configmod->get('debug')) echo "-Inserting Family ".$short_name."<br/>";
                         $sql = "INSERT INTO endpointman_product_list (`id`, `brand`, `short_name`, `long_name`, `cfg_dir`, `cfg_ver`, `config_files`, `hidden`) VALUES ('" . $brand_id . $family_line_xml['data']['id'] . "', '" . $brand_id . "', '" . str_replace("'", "''", $short_name) . "', '" . str_replace("'", "''", $family_line_xml['data']['name']) . "', '" . $family_line_xml['data']['directory'] . "', '" . $family_line_xml['data']['last_modified'] . "','" . $family_line_xml['data']['configuration_files'] . "', '0')";
                     }
 					sql($sql);
-					
+
 
 					if (count($family_line_xml['data']['model_list']) > 0) {
-						out(_("-- Updating Model Lines ... "));						
+						out(_("-- Updating Model Lines ... "));
 	                    foreach ($family_line_xml['data']['model_list'] as $model_list) {
 	                        $template_list = implode(",", $model_list['template_data']);
-	
+
 	                        $model_final_id = $brand_id . $family_line_xml['data']['id'] . $model_list['id'];
 	                        $sql = 'SELECT id, global_custom_cfg_data, global_user_cfg_data FROM endpointman_mac_list WHERE model = ' . $model_final_id;
 	                        $old_data = NULL;
@@ -1168,7 +1169,7 @@ outn(_("----Old Data Detected! Migrating ... "));
 	                                sql($sql);
 									out(_("Done!"));
 	                            }
-	
+
 	                            $global_user_cfg_data = unserialize($data['global_user_cfg_data']);
 	                            $old_check = FALSE;
 	                            if (is_array($global_user_cfg_data)) {
@@ -1234,18 +1235,18 @@ out(_("Old Data Detected! Migrating ... "));
 									out(_("Done!"));
 	                            }
 	                        }
-	
+
 	                        $m_data = sql("SELECT id FROM endpointman_model_list WHERE id='" . $brand_id . $family_line_xml['data']['id'] . $model_list['id'] . "'", 'getOne');
 	                        if ($m_data) {
 if ($this->configmod->get('debug')) echo format_txt(_("---Updating Model %_NAMEMOD_%"), "", array("%_NAMEMOD_%" => $model_list['model']));
 	                            $sql = "UPDATE endpointman_model_list SET max_lines = '" . $model_list['lines'] . "', model = '" . $model_list['model'] . "', template_list = '" . $template_list . "' WHERE id = '" . $brand_id . $family_line_xml['data']['id'] . $model_list['id'] . "'";
-	                        } 
+	                        }
 							else {
 if ($this->configmod->get('debug')) echo format_txt(_("---Inserting Model %_NAMEMOD_%"), "", array("%_NAMEMOD_%" => $model_list['model']));
 	                            $sql = "INSERT INTO endpointman_model_list (`id`, `brand`, `model`, `max_lines`, `product_id`, `template_list`, `enabled`, `hidden`) VALUES ('" . $brand_id . $family_line_xml['data']['id'] . $model_list['id'] . "', '" . $brand_id . "', '" . $model_list['model'] . "', '" . $model_list['lines'] . "', '" . $brand_id . $family_line_xml['data']['id'] . "', '" . $template_list . "', '0', '0')";
 	                        }
 	                        sql($sql);
-							
+
 	                        //echo "brand_id:".$brand_id. " - family_line_xml:" . $family_line_xml['data']['id'] . "- model_list:" . $model_list['id']."<br>";
 	                        if (!$this->sync_model($brand_id . $family_line_xml['data']['id'] . $model_list['id'], $errlog)) {
 	                        	out(_("Error: System Error in Sync Model Function, Load Failure!"));
@@ -1254,8 +1255,8 @@ if ($this->configmod->get('debug')) echo format_txt(_("---Inserting Model %_NAME
 	                        unset ($errlog);
 	                    }
 					}
-                    //END Updating Model Lines................	
-                    
+                    //END Updating Model Lines................
+
                     //Phone Models Move Here
                     $family_id = $brand_id . $family_line_xml['data']['id'];
                     $sql = "SELECT * FROM endpointman_model_list WHERE product_id = " . $family_id;
@@ -1280,7 +1281,7 @@ if ($this->configmod->get('debug')) echo format_txt(_("---Inserting Model %_NAME
                 }
 				out(_("All Done!"));
 				//END Updating Family Lines
-				
+
 				outn(_("Updating OUI list in DB ... "));
 				if ((isset($temp['data']['brands']['oui_list'])) AND (count($temp['data']['brands']['oui_list']) > 0))
 				{
@@ -1301,24 +1302,24 @@ if ($this->configmod->get('debug')) echo format_txt(_("---Inserting Model %_NAME
         $this->system->rmrf($temp_directory . $package);
         out(_("Done!"));
     }
-	
+
 	/**
      * Remove the brand
      * @param int $id Brand ID
      */
     function remove_brand($id=NULL, $remove_configs=FALSE, $force=FALSE) {
 		out(_("Uninstalla Brand..."));
-		
+
         if (!$this->configmod->get('use_repo')) {
             $sql = "SELECT id, firmware_vers FROM endpointman_product_list WHERE brand = '" . $id . "'";
             $products = sql($sql, 'getall', DB_FETCHMODE_ASSOC);
-			
+
             foreach ($products as $data) {
                 if ($data['firmware_vers'] != "") {
                     $this->remove_firmware($data['id']);
                 }
             }
-			
+
 			$sql = "SELECT directory FROM endpointman_brand_list WHERE id = '" . $id . "'";
             $brand_dir = sql($sql, 'getOne');
             $this->system->rmrf($this->PHONE_MODULES_PATH . "endpoint/" . $brand_dir);
@@ -1335,9 +1336,9 @@ if ($this->configmod->get('debug')) echo format_txt(_("---Inserting Model %_NAME
             $this->system->rmrf($this->PHONE_MODULES_PATH . $brand_dir);
             $sql = "DELETE FROM endpointman_brand_list WHERE id = '" . $id . "'";
             sql($sql);
-			
+
 			out(_("All Done!"));
-        } 
+        }
 		elseif ($force) {
 			$sql = "SELECT directory FROM endpointman_brand_list WHERE id = '" . $id . "'";
             $brand_dir = sql($sql, 'getOne');
@@ -1353,43 +1354,43 @@ if ($this->configmod->get('debug')) echo format_txt(_("---Inserting Model %_NAME
 
             $sql = "DELETE FROM endpointman_brand_list WHERE id = '" . $id . "'";
             sql($sql);
-			
+
 			out(_("Done!"));
-        } 
+        }
 		else {
 			out(_("Error: Not allowed in repo mode!!"));
         }
     }
-	
+
 	/**
      * Install Firmware for the specified Product Line
      * @param <type> $product_id Product ID
      */
     function install_firmware($product_id) {
     	out(_("Installa frimware... "));
-    	
+
         $temp_directory = $this->system->sys_get_temp_dir() . "/epm_temp/";
         $sql = 'SELECT endpointman_product_list.*, endpointman_brand_list.directory FROM endpointman_product_list, endpointman_brand_list WHERE endpointman_product_list.brand = endpointman_brand_list.id AND endpointman_product_list.id = ' . $product_id;
         $row = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
         $json_data = $this->file2json($this->PHONE_MODULES_PATH . "endpoint/" . $row['directory'] . "/" . $row['cfg_dir'] . "/family_data.json");
-		
+
         if ((! isset($json_data['data']['firmware_ver'])) OR (empty($json_data['data']['firmware_ver']))) {
         	out (_("Error: The version of the firmware package is blank!"));
         	return false;
         }
-        
+
         if ((! isset($json_data['data']['firmware_pkg'])) OR (empty($json_data['data']['firmware_pkg'])) OR ($json_data['data']['firmware_pkg'] == "NULL")) {
         	out (_("Error: The package name of the firmware to be downloaded is Null or blank!"));
         	return false;
         }
-        
+
         if ($json_data['data']['firmware_ver'] > $row['firmware_vers']) {
             if (!file_exists($temp_directory)) {
                 mkdir($temp_directory);
             }
             $md5_xml = $json_data['data']['firmware_md5sum'];
             $firmware_pkg = $json_data['data']['firmware_pkg'];
-			
+
             if (file_exists($temp_directory . $firmware_pkg)) {
                 $md5_pkg = md5_file($temp_directory . $firmware_pkg);
                 if ($md5_xml == $md5_pkg) {
@@ -1410,16 +1411,16 @@ if ($this->configmod->get('debug')) echo format_txt(_("---Inserting Model %_NAME
 				}
                 $md5_pkg = md5_file($temp_directory . $firmware_pkg);
             }
-			
+
 			outn(_("Checking MD5sum of Package... "));
             if ($md5_xml == $md5_pkg) {
 				out(_("Matches!"));
-				
+
                 if (file_exists($temp_directory . $row['directory'] . "/" . $row['cfg_dir'] . "/firmware")) {
                     $this->system->rmrf($temp_directory . $row['directory'] . "/" . $row['cfg_dir'] . "/firmware");
                 }
                 mkdir($temp_directory . $row['directory'] . "/" . $row['cfg_dir'] . "/firmware", 0777, TRUE);
-				
+
 				out(_("Installing Firmware..."));
 				//TODO: AÑADIR VALIDACION EXTRACCION CORRECTA
                 exec("tar -xvf " . $temp_directory . $firmware_pkg . " -C " . $temp_directory . $row['directory'] . "/" . $row['cfg_dir']);
@@ -1440,32 +1441,32 @@ if ($this->configmod->get('debug')) echo format_txt(_("---Inserting Model %_NAME
                 $list = implode(",", $list);
                 $sql = "UPDATE endpointman_product_list SET firmware_vers = '" . $json_data['data']['firmware_ver'] . "', firmware_files = '" . $list . "' WHERE id = " . $row['id'];
                 sql($sql);
-				
+
                 if (isset($copy_error)) {
 					out(_("Copy Error Detected! Aborting Install!"));
                     $this->remove_firmware($product_id);
 					out(_("Info: Please Check Directory/Permissions!"));
-                } 
+                }
 				else {
 					out(_("Done!"));
                 }
-            } 
+            }
 			else {
 				out(_("Firmware MD5 didn't match!"));
             }
-        } 
+        }
 		else {
 			out(_("Your Firmware is already up to date."));
         }
     }
-	
+
 	/**
      * Remove firmware from the Hard Drive
      * @param int $id Product ID
      */
     function remove_firmware($id) {
 		outn(_("Uninstalla frimware... "));
-		
+
         $sql = "SELECT firmware_files FROM  endpointman_product_list WHERE  id ='" . $id . "'";
         $files = sql($sql, 'getOne');
 
@@ -1479,13 +1480,13 @@ if ($this->configmod->get('debug')) echo format_txt(_("---Inserting Model %_NAME
         }
         $sql = "UPDATE endpointman_product_list SET firmware_files = '', firmware_vers = '' WHERE id = '" . $id . "'";
         sql($sql);
-		
+
 		out(_("Done!"));
     }
-	
-	
-	
-	
+
+
+
+
 		/**
      * Check for new firmware on the servers
      * @param int $id Product ID
@@ -1514,7 +1515,7 @@ if ($this->configmod->get('debug')) echo format_txt(_("---Inserting Model %_NAME
             }
         }
     }
-	
+
 	/**
      * Check to see the status of the firmware locally (installed or not)
      * @param int $id
@@ -1523,10 +1524,10 @@ if ($this->configmod->get('debug')) echo format_txt(_("---Inserting Model %_NAME
     function firmware_local_check($id=NULL) {
         $sql = "SELECT * FROM  endpointman_product_list WHERE hidden = 0 AND id ='" . $id . "'";
         $res = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
-		
+
         if (count($res) > 0) {
             $row = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
-			
+
             $sql = "SELECT directory FROM  endpointman_brand_list WHERE hidden = 0 AND id ='" . $row['brand'] . "'";
             $brand_directory = sql($sql, 'getOne');
 
@@ -1549,16 +1550,16 @@ if ($this->configmod->get('debug')) echo format_txt(_("---Inserting Model %_NAME
             return("nothing");
         }
     }
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
 	/**
      * Reads a file. Json decodes it and will report any errors back
      * @param string $file location of file
@@ -1603,12 +1604,12 @@ if ($this->configmod->get('debug')) echo format_txt(_("---Inserting Model %_NAME
             return(false);
         }
     }
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
 	function merge_data($path, $template_list, $maxlines = 12) {
     	//TODO: fix
     	foreach ($template_list as $files_data) {
@@ -1697,7 +1698,7 @@ if ($this->configmod->get('debug')) echo format_txt(_("---Inserting Model %_NAME
     	}
     	return($data);
     }
-	
-	
+
+
 }
 ?>
