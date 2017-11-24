@@ -12,7 +12,7 @@ function epm_templates_document_ready () {
 	
 	
 	$('#AddDlgModal').on('show.bs.modal', function (event) { $(this).find('input, select').val(""); });
-	$('#AddDlgModal_bt_new').on("click", function() { epm_tamplates_grid_add(); });
+	$('#AddDlgModal_bt_new').on("click", function() { epm_templates_grid_add(); });
 	$('#NewProductSelect').on('change', function() { epm_templates_add_NewProductSelect_Change (this); });
 
 	//http://kevinbatdorf.github.io/liquidslider/examples/page1.html#right
@@ -284,7 +284,7 @@ function epm_templates_grid_del (iddel)
 	}
 }
 
-function epm_tamplates_grid_add() 
+function epm_templates_grid_add() 
 {
 	var NameTemplate = $('#NewTemplateName').val();
 	var ProductSelec = $('#NewProductSelect').val();
@@ -444,7 +444,7 @@ function epm_template_edit_select_area_list (obj)
 {
 	
 	var maxlines = obj.options[obj.selectedIndex].value;
-	var id = epm_global_get_value_by_form("epm_tamplate_edit_form", "id");
+	var id = epm_global_get_value_by_form("epm_template_edit_form", "id");
 	
 	var silent_mode = $.getUrlVar('silent_mode');
 	if (silent_mode == true) 

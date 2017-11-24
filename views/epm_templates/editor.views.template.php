@@ -2,7 +2,7 @@
 	if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 ?>
 
-<form action="" method="post" id="epm_tamplate_edit_form" name="epm_tamplate_edit_form">
+<form action="" method="post" id="epm_template_edit_form" name="epm_template_edit_form">
 	<?php if (isset($_REQUEST['silent_mode'])) { echo '<input name="silent_mode" id="silent_mode" type="hidden" value="1">'; } ?>
 	<input name="id" id="id" type="hidden" value="<?php echo $dtemplate['hidden_id']; ?>">
 	<input name="custom" id="custom" type="hidden" value="<?php echo $dtemplate['hidden_custom'] ; ?>">

@@ -253,7 +253,7 @@ msgstr "Клонированная модель имеет отрицатель�
 msgid "Clone Template From"
 msgstr ""
 
-#: views/epm_templates/editor.views.tamplate.php:30
+#: views/epm_templates/editor.views.template.php:30
 msgid "Clone of Model:"
 msgstr ""
 
@@ -345,19 +345,19 @@ msgstr "Удаление шаблона ОК!"
 msgid "Device"
 msgstr ""
 
-#: views/epm_templates/editor.views.tamplate.php:187
+#: views/epm_templates/editor.views.template.php:187
 msgid "Device's Description in FreePBX (Usually the Full Name)"
 msgstr ""
 
-#: views/epm_templates/editor.views.tamplate.php:190
+#: views/epm_templates/editor.views.template.php:190
 msgid "Device's Mac Address"
 msgstr ""
 
-#: views/epm_templates/editor.views.tamplate.php:191
+#: views/epm_templates/editor.views.template.php:191
 msgid "Device's Model"
 msgstr ""
 
-#: views/epm_templates/editor.views.tamplate.php:186
+#: views/epm_templates/editor.views.template.php:186
 msgid "Device's Username (usually the extension)"
 msgstr ""
 
@@ -389,7 +389,7 @@ msgstr "Отключить проверку сервера TFTP"
 msgid "Disable Tooltips"
 msgstr "Отключить подсказки"
 
-#: views/epm_templates/editor.views.tamplate.php:45
+#: views/epm_templates/editor.views.template.php:45
 msgid "Display:"
 msgstr ""
 
@@ -436,11 +436,11 @@ msgstr "Обнуляются все соответствующие таблиц�
 msgid "Edit"
 msgstr ""
 
-#: views/epm_templates/editor.views.tamplate.php:82
+#: views/epm_templates/editor.views.template.php:82
 msgid "Edit File Configurations"
 msgstr ""
 
-#: views/epm_templates/editor.views.tamplate.php:73
+#: views/epm_templates/editor.views.template.php:73
 msgid "Edit Global Settings Overrides"
 msgstr ""
 
@@ -653,7 +653,7 @@ msgstr ""
 msgid "Error: We support only CVS and TXT files, type file %s no support!"
 msgstr ""
 
-#: views/epm_templates/editor.views.tamplate.php:182
+#: views/epm_templates/editor.views.template.php:182
 msgid "Example of Variables allowed in boxes"
 msgstr ""
 
@@ -916,7 +916,7 @@ msgstr ""
 msgid "Importing brand file %s..."
 msgstr ""
 
-#: views/epm_templates/editor.views.tamplate.php:17
+#: views/epm_templates/editor.views.template.php:17
 msgid "Info Template"
 msgstr ""
 
@@ -982,7 +982,7 @@ msgstr "Узнать как  загрузить пакеты  вручную  м
 msgid "Line"
 msgstr "Строка"
 
-#: views/epm_templates/editor.views.tamplate.php:55
+#: views/epm_templates/editor.views.template.php:55
 msgid "Line settings on this page"
 msgstr ""
 
@@ -1425,7 +1425,7 @@ msgstr "Редактор конфигурации продукта"
 msgid "Product Directory '%s' Doesn't Exist! (%s)"
 msgstr ""
 
-#: views/epm_templates/editor.views.tamplate.php:26
+#: views/epm_templates/editor.views.template.php:26
 msgid "Product Line:"
 msgstr ""
 
@@ -1570,7 +1570,7 @@ msgstr ""
 msgid "Selected Phone(s) Options"
 msgstr ""
 
-#: views/epm_templates/editor.views.tamplate.php:188
+#: views/epm_templates/editor.views.template.php:188
 msgid "Server IP For Line 1"
 msgstr ""
 
@@ -1586,7 +1586,7 @@ msgstr ""
 msgid "Server PBX..."
 msgstr ""
 
-#: views/epm_templates/editor.views.tamplate.php:189
+#: views/epm_templates/editor.views.template.php:189
 msgid "Server Port For Line 1"
 msgstr ""
 
@@ -1596,7 +1596,7 @@ msgid "Setting Provision"
 msgstr "Установки снабжения"
 
 #: Endpointman_Advanced.class.php:52
-#: views/epm_templates/editor.views.tamplate.php:70
+#: views/epm_templates/editor.views.template.php:70
 msgid "Settings"
 msgstr "Установки"
 
@@ -1660,7 +1660,7 @@ msgstr "Редактор шаблона"
 msgid "Template Name"
 msgstr ""
 
-#: views/epm_templates/editor.views.tamplate.php:22
+#: views/epm_templates/editor.views.template.php:22
 msgid "Template Name:"
 msgstr ""
 

@@ -246,7 +246,7 @@ msgstr "¡El modelo de clonaje enviado es negativo!"
 msgid "Clone Template From"
 msgstr "Copiar Plantilla a partir de"
 
-#: views/epm_templates/editor.views.tamplate.php:30
+#: views/epm_templates/editor.views.template.php:30
 msgid "Clone of Model:"
 msgstr "Copiar del Modelo:"
 
@@ -340,20 +340,20 @@ msgstr "Eliminacion Plantilla OK!"
 msgid "Device"
 msgstr "Dispositivo"
 
-#: views/epm_templates/editor.views.tamplate.php:187
+#: views/epm_templates/editor.views.template.php:187
 msgid "Device's Description in FreePBX (Usually the Full Name)"
 msgstr ""
 "Descripción del dispositivo en FreePBX (generalmente el nombre completo)"
 
-#: views/epm_templates/editor.views.tamplate.php:190
+#: views/epm_templates/editor.views.template.php:190
 msgid "Device's Mac Address"
 msgstr "Dirección MAC del Dispositivo"
 
-#: views/epm_templates/editor.views.tamplate.php:191
+#: views/epm_templates/editor.views.template.php:191
 msgid "Device's Model"
 msgstr "Modelo del Dispositivo"
 
-#: views/epm_templates/editor.views.tamplate.php:186
+#: views/epm_templates/editor.views.template.php:186
 msgid "Device's Username (usually the extension)"
 msgstr "Usuario del Dispositivo (usualmente la extensión)"
 
@@ -385,7 +385,7 @@ msgstr "Desactivar comprobación de servidor TFTP"
 msgid "Disable Tooltips"
 msgstr "Desactivar las sugerencias"
 
-#: views/epm_templates/editor.views.tamplate.php:45
+#: views/epm_templates/editor.views.template.php:45
 msgid "Display:"
 msgstr "Desplegar:"
 
@@ -432,11 +432,11 @@ msgstr "Eliminar todas las tablas relevantes"
 msgid "Edit"
 msgstr "Editar"
 
-#: views/epm_templates/editor.views.tamplate.php:82
+#: views/epm_templates/editor.views.template.php:82
 msgid "Edit File Configurations"
 msgstr "Editar Archivo de Configuracion"
 
-#: views/epm_templates/editor.views.tamplate.php:73
+#: views/epm_templates/editor.views.template.php:73
 msgid "Edit Global Settings Overrides"
 msgstr "Editar Configuración Global Overrides"
 
@@ -663,7 +663,7 @@ msgstr ""
 "Error: Se soportan solamente los archivos CSV y TXT, el tipo de archivo %s "
 "no esta soportado!"
 
-#: views/epm_templates/editor.views.tamplate.php:182
+#: views/epm_templates/editor.views.template.php:182
 msgid "Example of Variables allowed in boxes"
 msgstr "Ejemplo de variables permitidas en cuadros"
 
@@ -926,7 +926,7 @@ msgstr "Importando archivo %s de aprovisionamiento ..."
 msgid "Importing brand file %s..."
 msgstr "Importando archivo de marca %s  ..."
 
-#: views/epm_templates/editor.views.tamplate.php:17
+#: views/epm_templates/editor.views.template.php:17
 msgid "Info Template"
 msgstr "Información Plantilla"
 
@@ -992,7 +992,7 @@ msgstr "Aprender cómo cargar manualmente los paquetes aquí (es fácil!):"
 msgid "Line"
 msgstr "Linea"
 
-#: views/epm_templates/editor.views.tamplate.php:55
+#: views/epm_templates/editor.views.template.php:55
 msgid "Line settings on this page"
 msgstr "Ajustes de línea en esta página"
 
@@ -1436,7 +1436,7 @@ msgstr "Editor de configuración de producto"
 msgid "Product Directory '%s' Doesn't Exist! (%s)"
 msgstr "Directorio de productos '%s' no existe! (%s)"
 
-#: views/epm_templates/editor.views.tamplate.php:26
+#: views/epm_templates/editor.views.template.php:26
 msgid "Product Line:"
 msgstr "Línea de Productos:"
 
@@ -1582,7 +1582,7 @@ msgstr "Seleccione la zona horaria de los terminales. Ejemplo Europa/Madrid"
 msgid "Selected Phone(s) Options"
 msgstr "Seleccionar opciones de Teléfono(s)"
 
-#: views/epm_templates/editor.views.tamplate.php:188
+#: views/epm_templates/editor.views.template.php:188
 msgid "Server IP For Line 1"
 msgstr ""
 
@@ -1598,7 +1598,7 @@ msgstr "Servidor NTP..."
 msgid "Server PBX..."
 msgstr "Servidor PBX..."
 
-#: views/epm_templates/editor.views.tamplate.php:189
+#: views/epm_templates/editor.views.template.php:189
 msgid "Server Port For Line 1"
 msgstr ""
 
@@ -1608,7 +1608,7 @@ msgid "Setting Provision"
 msgstr "Ajustes Provision"
 
 #: Endpointman_Advanced.class.php:52
-#: views/epm_templates/editor.views.tamplate.php:70
+#: views/epm_templates/editor.views.template.php:70
 msgid "Settings"
 msgstr "Configuración"
 
@@ -1672,7 +1672,7 @@ msgstr "Editor de plantillas"
 msgid "Template Name"
 msgstr "Nombre Plantilla"
 
-#: views/epm_templates/editor.views.tamplate.php:22
+#: views/epm_templates/editor.views.template.php:22
 msgid "Template Name:"
 msgstr "Nombre Plantilla:"
 
