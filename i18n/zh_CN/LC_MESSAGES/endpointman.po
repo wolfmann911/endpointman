@@ -445,11 +445,6 @@ msgid "Enabled"
 msgstr ""
 
 #: page.epm_advanced.php:18 page.epm_config.php:16 page.epm_templates.php:20
-msgid "End Point Configuraction Manager"
-msgstr ""
-
-#: views/epm_templates/editor.views.dialog.cfg.global.php:18
-#: views/epm_templates/editor.views.dialog.edit.cfg.php:5
 msgid "End Point Configuration Manager"
 msgstr ""
 

@@ -476,7 +476,7 @@ msgstr ""
 #: page.epm_advanced.php:18
 #: page.epm_config.php:16
 #: page.epm_templates.php:20
-msgid "End Point Configuraction Manager"
+msgid "End Point Configuration Manager"
 msgstr ""
 
 #: views/epm_templates/editor.views.dialog.cfg.global.php:18

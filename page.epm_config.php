@@ -13,7 +13,7 @@ $epm = FreePBX::create()->Endpointman;
 ?>
 
 <div class="container-fluid" id="epm_config">
-	<h1><?php echo _("End Point Configuraction Manager")?></h1>
+	<h1><?php echo _("End Point Configuration Manager")?></h1>
 	<h2><?php echo _("Package Manager")?></h2>
     <div class = "display full-border">
         <div class="row">

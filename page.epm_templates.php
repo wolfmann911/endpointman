@@ -17,7 +17,7 @@ if ((! isset($_REQUEST['subpage'])) || ($_REQUEST['subpage'] == "")) {
 
 ?>
 <div class="container-fluid" id="epm_templates">
-	<h1><?php echo _("End Point Configuraction Manager")?></h1>
+	<h1><?php echo _("End Point Configuration Manager")?></h1>
 	<?php 
 	foreach($epm->myShowPage() as $key => $page) {
 		if (strtolower($_REQUEST['subpage']) == $key) 
