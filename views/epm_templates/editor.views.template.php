@@ -2,11 +2,11 @@
 	if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 ?>
 
-<form action="" method="post" id="epm_template_edit_form" name="epm_template_edit_form">
+<form action="config.php?display=epm_templates" method="post" id="epm_template_edit_form" name="epm_template_edit_form" class="fpbx-submit">
 	<?php if (isset($_REQUEST['silent_mode'])) { echo '<input name="silent_mode" id="silent_mode" type="hidden" value="1">'; } ?>
 	<input name="id" id="id" type="hidden" value="<?php echo $dtemplate['hidden_id']; ?>">
 	<input name="custom" id="custom" type="hidden" value="<?php echo $dtemplate['hidden_custom'] ; ?>">
-	
+        <input name="command" type="hidden" value="save_template">
 	<div class="">
 		<div class="row">
 			<div class="col-md-6">
@@ -611,13 +611,11 @@ return;
 		</div><!-- .coda-slider -->
 	</div><!-- .coda-slider-wrapper -->
 
-*/
-
-
-
+<?php
 
 
 /*
+
  elseif((isset($_REQUEST['button_save_template'])) AND (isset($_REQUEST['custom']))) {
  	$endpoint->save_template($_REQUEST['id'],$_REQUEST['custom'],$_REQUEST);
  	$default_display = TRUE;
@@ -626,6 +624,7 @@ return;
  	}
  }
 
+/*
 
 if($default_display) {
 	$sql = 'SELECT endpointman_template_list.*, endpointman_product_list.short_name as model_class, endpointman_model_list.model as model_clone, endpointman_model_list.enabled FROM endpointman_template_list, endpointman_model_list, endpointman_product_list WHERE endpointman_model_list.hidden = 0 AND endpointman_template_list.model_id = endpointman_model_list.id AND endpointman_template_list.product_id = endpointman_product_list.id';

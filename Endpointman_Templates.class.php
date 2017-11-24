@@ -70,7 +70,7 @@ class Endpointman_Templates
 				case "del_template":
 					$retarr = $this->epm_templates_del_template();
 					break;
-					
+
 				default:
 					$retarr = array("status" => false, "message" => _("Command not found!") . " [" .$command. "]");
 					break;
@@ -136,14 +136,8 @@ class Endpointman_Templates
                         'value' => _('Delete'),
                         'hidden' => ''
                     ),
-                    'saverebootphones' => array(
-                        'name' => 'saverebootphones',
-                        'id' => 'saverebootphones',
-                        'value' => _('Save & Reboot Phone(s)'),
-                        'hidden' => ''
-                    ),
-					'save' => array(
-                        'name' => 'save',
+		      'save' => array(
+                        'name' => 'submit',
                         'id' => 'save',
                         'value' => _('Save'),
                         'hidden' => ''

@@ -1953,6 +1953,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
     function save_template($id, $custom, $variables) {
         //Custom Means specific to that MAC
         //This function is reversed. Not sure why
+
         if ($custom != "0") {
             $sql = "SELECT endpointman_model_list.max_lines, endpointman_product_list.config_files, endpointman_mac_list.*, endpointman_product_list.id as product_id, endpointman_product_list.long_name, endpointman_model_list.template_data, endpointman_product_list.cfg_dir, endpointman_brand_list.directory FROM endpointman_brand_list, endpointman_mac_list, endpointman_model_list, endpointman_product_list WHERE endpointman_mac_list.id=" . $id . " AND endpointman_mac_list.model = endpointman_model_list.id AND endpointman_model_list.brand = endpointman_brand_list.id AND endpointman_model_list.product_id = endpointman_product_list.id";
         } else {
@@ -1960,7 +1961,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
         }
 
         //Load template data
-        $row = $this->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
+        $row = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
 
         $cfg_data = unserialize($row['template_data']);
         $count = count($cfg_data);
@@ -1983,11 +1984,11 @@ $this->error['parse_configs'] = "File not written to hard drive!";
                             foreach ($config_options as $item_key => $item_data) {
                                 $lc = isset($item_data['loop_count']) ? $item_data['loop_count'] : '';
                                 $key = 'loop|' . $key2 . '_' . $item_key . '_' . $lc;
-                                if ((isset($item_data['loop_count'])) AND (isset($_REQUEST[$key]))) {
-                                    $custom_cfg_data[$key] = $_REQUEST[$key];
+                                if ((isset($item_data['loop_count'])) AND (isset($variables[$key]))) {
+                                    $custom_cfg_data[$key] = $variables[$key];
                                     $ari_key = "ari_" . $key;
-                                    if (isset($_REQUEST[$ari_key])) {
-                                        if ($_REQUEST[$ari_key] == "on") {
+                                    if (isset($variables[$ari_key])) {
+                                        if ($variables[$ari_key] == "on") {
                                             $custom_cfg_data_ari[$key] = 1;
                                         }
                                     }
@@ -1998,11 +1999,11 @@ $this->error['parse_configs'] = "File not written to hard drive!";
                             foreach ($config_options as $item_key => $item_data) {
                                 $lc = isset($item_data['line_count']) ? $item_data['line_count'] : '';
                                 $key = 'line|' . $lc . '|' . $item_key;
-                                if ((isset($item_data['line_count'])) AND (isset($_REQUEST[$key]))) {
-                                    $custom_cfg_data[$key] = $_REQUEST[$key];
+                                if ((isset($item_data['line_count'])) AND (isset($variables[$key]))) {
+                                    $custom_cfg_data[$key] = $variables[$key];
                                     $ari_key = "ari_" . $key;
-                                    if (isset($_REQUEST[$ari_key])) {
-                                        if ($_REQUEST[$ari_key] == "on") {
+                                    if (isset($variables[$ari_key])) {
+                                        if ($variables[$ari_key] == "on") {
                                             $custom_cfg_data_ari[$key] = 1;
                                         }
                                     }
@@ -2010,11 +2011,11 @@ $this->error['parse_configs'] = "File not written to hard drive!";
                             }
                             break;
                         case "option":
-                            if (isset($_REQUEST[$key])) {
-                                $custom_cfg_data[$key] = $_REQUEST[$key];
+                            if (isset($variables[$key])) {
+                                $custom_cfg_data[$key] = $variables[$key];
                                 $ari_key = "ari_" . $key;
-                                if (isset($_REQUEST[$ari_key])) {
-                                    if ($_REQUEST[$ari_key] == "on") {
+                                if (isset($variables[$ari_key])) {
+                                    if ($variables[$ari_key] == "on") {
                                         $custom_cfg_data_ari[$key] = 1;
                                     }
                                 }
@@ -2032,11 +2033,11 @@ $this->error['parse_configs'] = "File not written to hard drive!";
         $i = 0;
         while ($i < count($config_files)) {
             $config_files[$i] = str_replace(".", "_", $config_files[$i]);
-            if (isset($_REQUEST[$config_files[$i]])) {
-                $_REQUEST[$config_files[$i]] = explode("_", $_REQUEST[$config_files[$i]], 2);
-                $_REQUEST[$config_files[$i]] = $_REQUEST[$config_files[$i]][0];
-                if ($_REQUEST[$config_files[$i]] > 0) {
-                    $config_files_selected[$config_files[$i]] = $_REQUEST[$config_files[$i]];
+            if (isset($variables[$config_files[$i]])) {
+                $variables[$config_files[$i]] = explode("_", $variables[$config_files[$i]], 2);
+                $variables[$config_files[$i]] = $variables[$config_files[$i]][0];
+                if ($variables[$config_files[$i]] > 0) {
+                    $config_files_selected[$config_files[$i]] = $variables[$config_files[$i]];
                 }
             }
             $i++;
@@ -2051,7 +2052,6 @@ $this->error['parse_configs'] = "File not written to hard drive!";
         $custom_cfg_data_temp['ari'] = $custom_cfg_data_ari;
 
         $save = serialize($custom_cfg_data_temp);
-
         if ($custom == "0") {
             $sql = 'UPDATE endpointman_template_list SET config_files_override = \'' . addslashes($config_files_selected) . '\', global_custom_cfg_data = \'' . addslashes($save) . '\' WHERE id =' . $id;
             $location = "template_manager";
@@ -2065,7 +2065,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
 
         if ($custom != 0) {
             $phone_info = $this->get_phone_info($id);
-            if (isset($_REQUEST['epm_reboot'])) {
+            if (isset($variables['epm_reboot'])) {
                 $this->prepare_configs($phone_info);
             } else {
                 $this->prepare_configs($phone_info, FALSE);
@@ -2075,7 +2075,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
             $phones = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
             foreach ($phones as $data) {
                 $phone_info = $this->get_phone_info($data['id']);
-                if (isset($_REQUEST['epm_reboot'])) {
+                if (isset($variables['epm_reboot'])) {
                     $this->prepare_configs($phone_info);
                 } else {
                     $this->prepare_configs($phone_info, FALSE);
@@ -2083,7 +2083,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
             }
         }
 
-        if (isset($_REQUEST['silent_mode'])) {
+        if (isset($variables['silent_mode'])) {
             echo '<script language="javascript" type="text/javascript">window.close();</script>';
         } else {
             return($location);
