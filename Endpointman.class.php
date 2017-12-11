@@ -733,13 +733,15 @@ echo 'TFTP Server check failed on last past. Skipping';
     	$mac = $this->mac_check_clean($mac);
     	if ($mac) {
     		if (empty($model)) {
-$this->error['add_device'] = _("You Must Select A Model From the Drop Down") . "!";
+//$this->error['add_device'] = 
+			out(_("You Must Select A Model From the Drop Down") . "!");
     			return(FALSE);
     		} elseif (empty($ext)) {
-$this->error['add_device'] = _("You Must Select an Extension/Device From the Drop Down") . "!";
+//$this->error['add_device'] = 
+			out(_("You Must Select an Extension/Device From the Drop Down") . "!");
     			return(FALSE);
     		} else {
-    			if ($this->sync_model($model)) {
+    			if ($this->epm_config->sync_model($model)) {
     				$sql = "SELECT id,template_id FROM endpointman_mac_list WHERE mac = '" . $mac . "'";
     				$dup = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
     
@@ -764,26 +766,27 @@ $this->error['add_device'] = _("You Must Select an Extension/Device From the Dro
     					$sql = "SELECT mac_id FROM endpointman_line_list WHERE ext = " . $ext;
     					$used = sql($sql, 'getOne');
     
-						if (($used) AND (! $this->configmod->get('show_all_registrations'))) {
-$this->error['add_device'] = "You can't assign the same user to multiple devices!";
+					if (($used) AND (! $this->configmod->get('show_all_registrations'))) {
+//$this->error['add_device'] = 
+						out(_("You can't assign the same user to multiple devices") . "!");
     						return(FALSE);
     					}
     
     					if (!isset($displayname)) {
     						$sql = 'SELECT description FROM devices WHERE id = ' . $ext;
-    						$name = & sql($sql, 'getOne');
+    						$name = sql($sql, 'getOne');
     					} else {
     						$name = $displayname;
     					}
     
     					$sql = 'SELECT endpointman_product_list. * , endpointman_model_list.template_data, endpointman_brand_list.directory FROM endpointman_model_list, endpointman_brand_list, endpointman_product_list WHERE endpointman_model_list.id =  \'' . $model . '\' AND endpointman_model_list.brand = endpointman_brand_list.id AND endpointman_model_list.product_id = endpointman_product_list.id';
-    					$row = & sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
+    					$row = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
     
     					$sql = "INSERT INTO `endpointman_mac_list` (`mac`, `model`, `template_id`) VALUES ('" . $mac . "', '" . $model . "', '" . $template . "')";
     					sql($sql);
     
     					$sql = 'SELECT last_insert_id()';
-    					$ext_id = & sql($sql, 'getOne');
+    					$ext_id = sql($sql, 'getOne');
     
     					if (empty($line)) {
     						$line = 1;
@@ -792,16 +795,19 @@ $this->error['add_device'] = "You can't assign the same user to multiple devices
     					$sql = "INSERT INTO `endpointman_line_list` (`mac_id`, `ext`, `line`, `description`) VALUES ('" . $ext_id . "', '" . $ext . "', '" . $line . "', '" . addslashes($name) . "')";
     					sql($sql);
     
-$this->message['add_device'][] = "Added " . $name . " to line " . $line;
+//$this->message['add_device'][] = 
+					out(_("Added ") . $name . _(" to line ") . $line);
     					return($ext_id);
     				}
     			} else {
-$this->error['Sync_Model'] = _("Invalid Model Selected, Can't Sync System") . "!";
+//$this->error['Sync_Model'] = 
+				out(_("Invalid Model Selected, Can't Sync System") . "!");
     				return(FALSE);
     			}
     		}
     	} else {
-$this->error['add_device'] = _("Invalid MAC Address") . "!";
+//$this->error['add_device'] =
+		out(_("Invalid MAC Address") . "!");
     		return(FALSE);
     	}
     }
@@ -831,14 +837,17 @@ $this->error['add_device'] = _("Invalid MAC Address") . "!";
     				$sql = "INSERT INTO `endpointman_line_list` (`mac_id`, `ext`, `line`, `description`) VALUES ('" . $mac_id . "', '" . $reg[0]['value'] . "', '" . $lines[0]['value'] . "', '" . addslashes($name) . "')";
     				sql($sql);
     
-$this->message['add_line'] = "Added '<i>" . $name . "</i>' to line '<i>" . $lines[0]['value'] . "</i>' on device '<i>" . $reg[0]['value'] . "</i>' <br/> Configuration Files will not be Generated until you click Save!";
+//$this->message['add_line'] = 
+				out(_("Added '<i>") . $name . _("</i>' to line '<i>") . $lines[0]['value'] . _("</i>' on device '<i>") . $reg[0]['value'] . _("</i>' <br/> Configuration Files will not be Generated until you click Save!"));
     				return($mac_id);
     			} else {
-$this->error['add_line'] = _("No Devices/Extensions Left to Add") . "!";
+//$this->error['add_line'] = 
+				out(_("No Devices/Extensions Left to Add") . "!");
     				return(FALSE);
     			}
     		} else {
-$this->error['add_line'] = _("No Lines Left to Add") . "!";
+//$this->error['add_line'] =
+			out(_("No Lines Left to Add") . "!");
     			return(FALSE);
     		}
     	} elseif ((!isset($line)) AND (isset($ext))) {
@@ -849,33 +858,38 @@ $this->error['add_line'] = _("No Lines Left to Add") . "!";
     				$sql = "INSERT INTO `endpointman_line_list` (`mac_id`, `ext`, `line`, `description`) VALUES ('" . $mac_id . "', '" . $ext . "', '" . $lines[0]['value'] . "', '" . addslashes($displayname) . "')";
     				sql($sql);
     
-$this->message['add_line'] = "Added '<i>" . $name . "</i>' to line '<i>" . $lines[0]['value'] . "</i>' on device '<i>" . $reg[0]['value'] . "</i>' <br/> Configuration Files will not be Generated until you click Save!";
+//$this->message['add_line'] =
+				out(_("Added '<i>") . $name . _("</i>' to line '<i>") . $lines[0]['value'] . _("</i>' on device '<i>") . $reg[0]['value'] . _("</i>' <br/> Configuration Files will not be Generated until you click Save!"));
     				return($mac_id);
     			} else {
-$this->error['add_line'] = _("No Devices/Extensions Left to Add") . "!";
+//$this->error['add_line'] =
+				out(_("No Devices/Extensions Left to Add") . "!");
     				return(FALSE);
     			}
     		} else {
-$this->error['add_line'] = _("No Lines Left to Add") . "!";
+//$this->error['add_line'] =
+			out(_("No Lines Left to Add") . "!");
     			return(FALSE);
     		}
     	} elseif ((isset($line)) AND (isset($ext))) {
     		$sql = "SELECT luid FROM endpointman_line_list WHERE line = '" . $line . "' AND mac_id = " . $mac_id;
     		$luid = sql($sql, 'getOne');
     		if ($luid) {
-$this->error['add_line'] = "This line has already been assigned!";
+//$this->error['add_line'] =
+			out(_("This line has already been assigned!"));
     			return(FALSE);
     		} else {
     			if (!isset($displayname)) {
     				$sql = 'SELECT description FROM devices WHERE id = ' . $ext;
-    				$name = & sql($sql, 'getOne');
+    				$name = sql($sql, 'getOne');
     			} else {
     				$name = $displayname;
     			}
     
     			$sql = "INSERT INTO `endpointman_line_list` (`mac_id`, `ext`, `line`, `description`) VALUES ('" . $mac_id . "', '" . $ext . "', '" . $line . "', '" . addslashes($name) . "')";
     			sql($sql);
-$this->message['add_line'] .= "Added " . $name . " to line " . $line . "<br/>";
+//$this->message['add_line'] =
+			out(_("Added ") . $name . _(" to line ") . $line . "<br/>");
     			return($mac_id);
     		}
     	}
@@ -1002,20 +1016,22 @@ $this->message['add_line'] .= "Added " . $name . " to line " . $line . "<br/>";
     function get_phone_info($mac_id=NULL) {
     	//You could screw up a phone if the mac_id is blank
     	if (!isset($mac_id)) {
-$this->error['get_phone_info'] = "Mac ID is not set";
+//$this->error['get_phone_info'] =
+		out(_("Mac ID is not set"));
     		return(FALSE);
     	}
     	$sql = "SELECT id FROM endpointman_mac_list WHERE model > 0 AND id =" . $mac_id;
     
     	//$res = sql($sql);
 		$res = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
-    	if ($res->numRows()) {
+    	if (count($res)) {
     		//Returns Brand Name, Brand Directory, Model Name, Mac Address, Extension (FreePBX), Custom Configuration Template, Custom Configuration Data, Product Name, Product ID, Product Configuration Directory, Product Configuration Version, Product XML name,
     		$sql = "SELECT endpointman_mac_list.specific_settings, endpointman_mac_list.config_files_override, endpointman_mac_list.global_user_cfg_data, endpointman_model_list.id as model_id, endpointman_brand_list.id as brand_id, endpointman_brand_list.name, endpointman_brand_list.directory, endpointman_model_list.model, endpointman_mac_list.mac, endpointman_mac_list.template_id, endpointman_mac_list.global_custom_cfg_data, endpointman_product_list.long_name, endpointman_product_list.id as product_id, endpointman_product_list.cfg_dir, endpointman_product_list.cfg_ver, endpointman_model_list.template_data, endpointman_model_list.enabled, endpointman_mac_list.global_settings_override FROM endpointman_line_list, endpointman_mac_list, endpointman_model_list, endpointman_brand_list, endpointman_product_list WHERE endpointman_mac_list.model = endpointman_model_list.id AND endpointman_brand_list.id = endpointman_model_list.brand AND endpointman_product_list.id = endpointman_model_list.product_id AND endpointman_mac_list.id = endpointman_line_list.mac_id AND endpointman_mac_list.id = " . $mac_id;
     		$phone_info = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
     
     		if (!$phone_info) {
-$this->error['get_phone_info'] = "Error with SQL Statement";
+//$this->error['get_phone_info'] =
+			out(_("Error with SQL Statement"));
     		}
     
     		//If there is a template associated with this phone then pull that information and put it into the array
@@ -1102,7 +1118,7 @@ $this->error['get_phone_info'] = "Error with SQL Statement";
     function prepare_configs($phone_info, $reboot=TRUE, $write=TRUE) 
     {
     	$this->PROVISIONER_BASE = $this->PHONE_MODULES_PATH;
-//define('PROVISIONER_BASE', $this->PROVISIONER_BASE);
+define('PROVISIONER_BASE', $this->PROVISIONER_BASE);
     	if (file_exists($this->PHONE_MODULES_PATH . 'autoload.php')) {
     		if (!class_exists('ProvisionerConfig')) {
     			require($this->PHONE_MODULES_PATH . 'autoload.php');
@@ -1166,7 +1182,7 @@ $this->error['get_phone_info'] = "Error with SQL Statement";
     
     			//Timezone
     			try {
-    				$provisioner_lib->DateTimeZone = new DateTimeZone($settings['tz']);
+    				$provisioner_lib->DateTimeZone = new \DateTimeZone($settings['tz']);
     			} catch (Exception $e) {
 $this->error['parse_configs'] = 'Error Returned From Timezone Library: ' . $e->getMessage();
     				return(FALSE);
@@ -1227,7 +1243,7 @@ $this->error['parse_configs'] = 'Error Returned From Timezone Library: ' . $e->g
     					$count = count($key);
     					switch ($count) {
     						case 1:
-    							if (($this->global_cfg['enable_ari'] == 1) AND (isset($global_custom_cfg_ari[$full_key])) AND (isset($global_user_cfg_data[$full_key]))) {
+    							if (($this->eda->global_cfg['enable_ari'] == 1) AND (isset($global_custom_cfg_ari[$full_key])) AND (isset($global_user_cfg_data[$full_key]))) {
     								$new_template_data[$full_key] = $global_user_cfg_data[$full_key];
     							} else {
     								$new_template_data[$full_key] = $global_custom_cfg_data[$full_key];
@@ -1235,14 +1251,14 @@ $this->error['parse_configs'] = 'Error Returned From Timezone Library: ' . $e->g
     							break;
     						case 2:
     							$breaks = explode('_', $key[1]);
-    							if (($this->global_cfg['enable_ari'] == 1) AND (isset($global_custom_cfg_ari[$full_key])) AND (isset($global_user_cfg_data[$full_key]))) {
+    							if (($this->eda->global_cfg['enable_ari'] == 1) AND (isset($global_custom_cfg_ari[$full_key])) AND (isset($global_user_cfg_data[$full_key]))) {
     								$new_template_data['loops'][$breaks[0]][$breaks[2]][$breaks[1]] = $global_user_cfg_data[$full_key];
     							} else {
     								$new_template_data['loops'][$breaks[0]][$breaks[2]][$breaks[1]] = $global_custom_cfg_data[$full_key];
     							}
     							break;
     						case 3:
-    							if (($this->global_cfg['enable_ari'] == 1) AND (isset($global_custom_cfg_ari[$full_key])) AND (isset($global_user_cfg_data[$full_key]))) {
+    							if (($this->eda->global_cfg['enable_ari'] == 1) AND (isset($global_custom_cfg_ari[$full_key])) AND (isset($global_user_cfg_data[$full_key]))) {
     								$line_ops[$key[1]][$key[2]] = $global_user_cfg_data[$full_key];
     							} else {
     								$line_ops[$key[1]][$key[2]] = $global_custom_cfg_data[$full_key];
@@ -1284,8 +1300,8 @@ $this->error['parse_configs'] = 'Error Returned From Timezone Library: ' . $e->g
     			//Loop through Lines!
     			$li = 0;
     			foreach ($phone_info['line'] as $line) {
-    				$line_options = is_array($line_ops[$line['line']]) ? $line_ops[$line['line']] : array();
-    				$line_statics = array('line' => $line['line'], 'username' => $line['ext'], 'authname' => $line['ext'], 'secret' => $line['secret'], 'displayname' => $line['description'], 'server_host' => $this->global_cfg['srvip'], 'server_port' => '5060', 'user_extension' => $line['user_extension']);
+    				$line_options = isset($line_ops[$line['line']]) && is_array($line_ops[$line['line']]) ? $line_ops[$line['line']] : array();
+    				$line_statics = array('line' => $line['line'], 'username' => $line['ext'], 'authname' => $line['ext'], 'secret' => $line['secret'], 'displayname' => $line['description'], 'server_host' => $this->eda->global_cfg['srvip'], 'server_port' => '5060', 'user_extension' => $line['user_extension']);
     
     				$provisioner_lib->settings['line'][$li] = array_merge($line_options, $line_statics);
     				$li++;
@@ -1344,7 +1360,7 @@ $this->error['parse_configs'] = 'Error Returned From Timezone Library: ' . $e->g
     
     			//Setting a line variable here...these aren't defined in the template_data.xml file yet. however they will still be parsed
     			//and if they have defaults assigned in a future template_data.xml or in the config file using pipes (|) those will be used, pipes take precedence
-    			$provisioner_lib->processor_info = "EndPoint Manager Version " . $this->global_cfg['version'];
+    			$provisioner_lib->processor_info = "EndPoint Manager Version " . $this->eda->global_cfg['version'];
     
     			// Because every brand is an extension (eventually) of endpoint, you know this function will exist regardless of who it is
     			//Start timer
@@ -1437,7 +1453,7 @@ $this->error['parse_configs'] = "Could Not Create File: " . $data;
     	foreach ($returned_data as $file => $data) {
     		if (((file_exists($write_path . $file)) AND (is_writable($write_path . $file)) AND (!in_array($file, $provisioner_lib->protected_files))) OR (!file_exists($write_path . $file))) {
     			//Move old file to backup
-    			if (!$this->global_cfg['backup_check']) {
+    			if (!$this->eda->global_cfg['backup_check']) {
     				if (!file_exists($write_path . 'config_bkup')) {
     					if (!@mkdir($write_path . 'config_bkup', 0775)) {
 $this->error['parse_configs'] = "Could Not Create Backup Directory";
@@ -1699,17 +1715,17 @@ $this->error['parse_configs'] = "File not written to hard drive!";
      * @return array List of devices found on the network
      */
     function discover_new($netmask, $use_nmap=TRUE) {
-        if (($use_nmap) AND (file_exists($this->global_cfg['nmap_location'])) AND ($this->validate_netmask($netmask))) {
-            shell_exec($this->global_cfg['nmap_location'] . ' -v -sP ' . $netmask);
+        if (($use_nmap) AND (file_exists($this->eda->global_cfg['nmap_location'])) AND ($this->validate_netmask($netmask))) {
+            shell_exec($this->eda->global_cfg['nmap_location'] . ' -v -sP ' . $netmask);
         } elseif (!$this->validate_netmask($netmask)) {
             $this->error['discover_new'] = "Invalid Netmask";
             return(FALSE);
-        } elseif (!file_exists($this->global_cfg['nmap_location'])) {
+        } elseif (!file_exists($this->eda->global_cfg['nmap_location'])) {
             $this->error['discover_new'] = "Could Not Find NMAP, Using ARP Only";
             //return(FALSE);
         }
         //Get arp list
-        $arp_list = shell_exec($this->global_cfg['arp_location'] . " -an");
+        $arp_list = shell_exec($this->eda->global_cfg['arp_location'] . " -an");
 
         //Throw arp list into an array, break by new lines
         $arp_array = explode("\n", $arp_list);
@@ -1960,7 +1976,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
         }
 
         //Load template data
-        $row = $this->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
+        $row = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
 
         $cfg_data = unserialize($row['template_data']);
         $count = count($cfg_data);
@@ -1983,11 +1999,11 @@ $this->error['parse_configs'] = "File not written to hard drive!";
                             foreach ($config_options as $item_key => $item_data) {
                                 $lc = isset($item_data['loop_count']) ? $item_data['loop_count'] : '';
                                 $key = 'loop|' . $key2 . '_' . $item_key . '_' . $lc;
-                                if ((isset($item_data['loop_count'])) AND (isset($_REQUEST[$key]))) {
-                                    $custom_cfg_data[$key] = $_REQUEST[$key];
+                                if ((isset($item_data['loop_count'])) AND (isset($variables[$key]))) {
+                                    $custom_cfg_data[$key] = $variables[$key];
                                     $ari_key = "ari_" . $key;
-                                    if (isset($_REQUEST[$ari_key])) {
-                                        if ($_REQUEST[$ari_key] == "on") {
+                                    if (isset($variables[$ari_key])) {
+                                        if ($variables[$ari_key] == "on") {
                                             $custom_cfg_data_ari[$key] = 1;
                                         }
                                     }
@@ -1998,11 +2014,11 @@ $this->error['parse_configs'] = "File not written to hard drive!";
                             foreach ($config_options as $item_key => $item_data) {
                                 $lc = isset($item_data['line_count']) ? $item_data['line_count'] : '';
                                 $key = 'line|' . $lc . '|' . $item_key;
-                                if ((isset($item_data['line_count'])) AND (isset($_REQUEST[$key]))) {
-                                    $custom_cfg_data[$key] = $_REQUEST[$key];
+                                if ((isset($item_data['line_count'])) AND (isset($variables[$key]))) {
+                                    $custom_cfg_data[$key] = $variables[$key];
                                     $ari_key = "ari_" . $key;
-                                    if (isset($_REQUEST[$ari_key])) {
-                                        if ($_REQUEST[$ari_key] == "on") {
+                                    if (isset($variables[$ari_key])) {
+                                        if ($variables[$ari_key] == "on") {
                                             $custom_cfg_data_ari[$key] = 1;
                                         }
                                     }
@@ -2010,11 +2026,11 @@ $this->error['parse_configs'] = "File not written to hard drive!";
                             }
                             break;
                         case "option":
-                            if (isset($_REQUEST[$key])) {
-                                $custom_cfg_data[$key] = $_REQUEST[$key];
+                            if (isset($variables[$key])) {
+                                $custom_cfg_data[$key] = $variables[$key];
                                 $ari_key = "ari_" . $key;
-                                if (isset($_REQUEST[$ari_key])) {
-                                    if ($_REQUEST[$ari_key] == "on") {
+                                if (isset($variables[$ari_key])) {
+                                    if ($variables[$ari_key] == "on") {
                                         $custom_cfg_data_ari[$key] = 1;
                                     }
                                 }
@@ -2032,11 +2048,11 @@ $this->error['parse_configs'] = "File not written to hard drive!";
         $i = 0;
         while ($i < count($config_files)) {
             $config_files[$i] = str_replace(".", "_", $config_files[$i]);
-            if (isset($_REQUEST[$config_files[$i]])) {
-                $_REQUEST[$config_files[$i]] = explode("_", $_REQUEST[$config_files[$i]], 2);
-                $_REQUEST[$config_files[$i]] = $_REQUEST[$config_files[$i]][0];
-                if ($_REQUEST[$config_files[$i]] > 0) {
-                    $config_files_selected[$config_files[$i]] = $_REQUEST[$config_files[$i]];
+            if (isset($variables[$config_files[$i]])) {
+                $variables[$config_files[$i]] = explode("_", $variables[$config_files[$i]], 2);
+                $variables[$config_files[$i]] = $variables[$config_files[$i]][0];
+                if ($variables[$config_files[$i]] > 0) {
+                    $config_files_selected[$config_files[$i]] = $variables[$config_files[$i]];
                 }
             }
             $i++;
@@ -2065,7 +2081,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
 
         if ($custom != 0) {
             $phone_info = $this->get_phone_info($id);
-            if (isset($_REQUEST['epm_reboot'])) {
+            if (isset($variables['epm_reboot'])) {
                 $this->prepare_configs($phone_info);
             } else {
                 $this->prepare_configs($phone_info, FALSE);
@@ -2075,7 +2091,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
             $phones = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
             foreach ($phones as $data) {
                 $phone_info = $this->get_phone_info($data['id']);
-                if (isset($_REQUEST['epm_reboot'])) {
+                if (isset($variables['epm_reboot'])) {
                     $this->prepare_configs($phone_info);
                 } else {
                     $this->prepare_configs($phone_info, FALSE);
@@ -2113,7 +2129,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
         $error_message = NULL;
         foreach ($this->error as $key => $error) {
             $error_message .= $error;
-            if ($this->global_cfg['debug']) {
+            if ($this->eda->global_cfg['debug']) {
                 $error_message .= " Function: [" . $key . "]";
             }
             $error_message .= "<br />";
@@ -2123,14 +2139,14 @@ $this->error['parse_configs'] = "File not written to hard drive!";
             if (is_array($error)) {
                 foreach ($error as $sub_error) {
                     $message .= $sub_error;
-                    if ($this->global_cfg['debug']) {
+                    if ($this->eda->global_cfg['debug']) {
                         $message .= " Function: [" . $key . "]";
                     }
                     $message .= "<br />";
                 }
             } else {
                 $message .= $error;
-                if ($this->global_cfg['debug']) {
+                if ($this->eda->global_cfg['debug']) {
                     $message .= " Function: [" . $key . "]";
                 }
                 $message .= "<br />";

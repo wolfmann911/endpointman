@@ -17,7 +17,7 @@ if ((! isset($_REQUEST['subpage'])) || ($_REQUEST['subpage'] == "")) {
 
 ?>
 <div class="container-fluid" id="epm_templates">
-	<h1><?php echo _("End Point Configuraction Manager")?></h1>
+	<h1><?php echo _("End Point Configuration Manager")?></h1>
 	<?php 
 	foreach($epm->myShowPage() as $key => $page) {
 		if (strtolower($_REQUEST['subpage']) == $key) 
@@ -47,5 +47,11 @@ if ($_REQUEST['subpage'] == "editor")  {
 	echo "<br /><br /><br />";
 }
 
+if (isset($_REQUEST['command']) && $_REQUEST['command'] == 'save_template') {
+   $epm->save_template($_REQUEST['id'],$_REQUEST['custom'],$_REQUEST);
+    if(empty($epm->error)) {
+        $epm->message['general'] = _('Saved');
+    }
+}
 
 ?>
