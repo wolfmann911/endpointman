@@ -7,10 +7,10 @@
 	}
 	
 	$product_list = "SELECT * FROM endpointman_product_list WHERE id > 0";
-	$product_list =& sql($product_list,'getAll', DB_FETCHMODE_ASSOC);
+	$product_list =sql($product_list,'getAll', DB_FETCHMODE_ASSOC);
 	
 	$mac_list = "SELECT * FROM endpointman_mac_list";
-	$mac_list =& sql($mac_list, 'getAll', DB_FETCHMODE_ASSOC);
+	$mac_list =sql($mac_list, 'getAll', DB_FETCHMODE_ASSOC);
 	
 	if((!$product_list) && (!$mac_list)) {
 		echo '<div class="alert alert-warning" role="alert">';
@@ -37,7 +37,7 @@
 	}
 	$dtemplate = FreePBX::Endpointman()->epm_templates->edit_template_display($_REQUEST['idsel'],$_REQUEST['custom']);
 	
-	echo load_view(__DIR__.'/epm_templates/editor.views.tamplate.php', array('request' => $_REQUEST, 'dtemplate' => $dtemplate ));
+	echo load_view(__DIR__.'/epm_templates/editor.views.template.php', array('request' => $_REQUEST, 'dtemplate' => $dtemplate ));
 	echo load_view(__DIR__.'/epm_templates/editor.views.dialog.cfg.global.php', array('request' => $_REQUEST));
 	echo load_view(__DIR__.'/epm_templates/editor.views.dialog.edit.cfg.php', array('request' => $_REQUEST, 'dtemplate' => $dtemplate ));
 	
