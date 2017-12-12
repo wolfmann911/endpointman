@@ -196,8 +196,7 @@ function endpointman_applyhooks() {
 
 // This is called before the page is actually displayed, so we can use addguielem().
 function endpointman_configpageload() {
-    global $currentcomponent, $endpoint, $db;
-
+    global $currentcomponent, $endpoint, $db, $astman;
     $display = isset($_REQUEST['display']) ? $_REQUEST['display'] : null;
     $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : null;
     $extdisplay = isset($_REQUEST['extdisplay']) ? $_REQUEST['extdisplay'] : null;
@@ -207,6 +206,10 @@ function endpointman_configpageload() {
     } else {
         $tech = isset($_REQUEST['tech_hardware']) ? $_REQUEST['tech_hardware'] : null;
     }
+
+ $extension_address = $astman->database_get("SIP","Registry"."/$extdisplay");
+    $extension_address = explode(":",$extension_address);
+  // echo $extension_address['0'];
 
     if (isset($tech) && (($tech == 'sip') OR ($tech == 'pjsip') OR ($tech == 'sip_generic'))) {
         // Don't display this stuff it it's on a 'This xtn has been deleted' page.
@@ -274,7 +277,10 @@ function endpointman_configpageload() {
                 $checked = false;
 
                 $currentcomponent->addguielem($section, new gui_checkbox('epm_delete', $checked, 'Delete', 'Delete this Extension from Endpoint Manager'), 9);
-                $currentcomponent->addguielem($section, new gui_textbox('epm_mac', $info['mac'], 'MAC Address', 'The MAC Address of the Phone Assigned to this Extension/Device. <br />(Leave Blank to Remove from Endpoint Manager)', '', 'Please enter a valid MAC Address', true, 17, false), 9);
+               
+		$currentcomponent->addguielem($section, new gui_link_new_tab('epm_account_phone', 'Go to phone web interface', "http://$extension_address[0]"));
+
+		 $currentcomponent->addguielem($section, new gui_textbox('epm_mac', $info['mac'], 'MAC Address', 'The MAC Address of the Phone Assigned to this Extension/Device. <br />(Leave Blank to Remove from Endpoint Manager)', '', 'Please enter a valid MAC Address', true, 17, false), 9);
                 $currentcomponent->addguielem($section, new gui_selectbox('epm_brand', $brand_list, $info['brand_id'], 'Brand', 'The Brand of this Phone.', false, 'frm_' . $display . '_brand_change(this.options[this.selectedIndex].value)', false), 9);
                 $currentcomponent->addguielem($section, new gui_selectbox('epm_model', $model_list, $info['model_id'], 'Model', 'The Model of this Phone.', false, 'frm_' . $display . '_model_change(this.options[this.selectedIndex].value,\'' . $line_info['luid'] . '\')', false), 9);
                 $currentcomponent->addguielem($section, new gui_selectbox('epm_line', $line_list, $line_info['line'], 'Line', 'The Line of this Extension/Device.', false, '', false), 9);
@@ -315,6 +321,7 @@ function endpointman_configpageload() {
                 $currentcomponent->addguielem($section, new gui_selectbox('epm_line', $line_list, $line_info['line'], 'Line', 'The Line of this Extension/Device.', false, '', false), 9);
                 $currentcomponent->addguielem($section, new gui_selectbox('epm_temps', $template_list, $info['template_id'], 'Template', 'The Template of this Phone.', false, '', false), 9);
                 $currentcomponent->addguielem($section, new guitext('epm_note', 'Note: This might reboot the phone if it\'s already registered to Asterisk'));
+		
             }
         }
     }
