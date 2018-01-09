@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-18 15:54-0400\n"
+"POT-Creation-Date: 2018-01-09 15:36-0500\n"
 "PO-Revision-Date: 2016-12-12 02:01+0200\n"
 "Last-Translator: Ernesto <ecasas@sangoma.com>\n"
 "Language-Team: Spanish <http://weblate.freepbx.org/projects/fpbxcn/"
@@ -113,7 +113,7 @@ msgstr "Añadir Nuevo"
 msgid "Add New Template"
 msgstr "Añadir Nueva Plantilla"
 
-#: Endpointman_Templates.class.php:380
+#: Endpointman_Templates.class.php:374
 msgid "Add New Template OK!"
 msgstr "Nueva Plantilla Creada OK!"
 
@@ -176,10 +176,6 @@ msgstr "Paquete de marcas"
 msgid "Brand's Available"
 msgstr "Marcas disponibles"
 
-#: views/epm_config/manager.list.hide.php:8
-msgid "Brands / Hidden Models:"
-msgstr ""
-
 #: views/epm_config_editor.page.php:7
 msgid "Brands/Modules"
 msgstr "Marca/Modelo"
@@ -238,7 +234,7 @@ msgstr "Click Aquí!"
 msgid "Click this link to download:"
 msgstr "Haga clic en este enlace para descargar:"
 
-#: Endpointman_Templates.class.php:366
+#: Endpointman_Templates.class.php:360
 msgid "Clone Model send is negative!"
 msgstr "¡El modelo de clonaje enviado es negativo!"
 
@@ -282,10 +278,6 @@ msgstr "Tipo de Configuracion"
 #: views/epm_devices_main.page.php:552 views/epm_devices_main.page.php:559
 msgid "Configure"
 msgstr "Configurar"
-
-#: endpointman.i18n.php:6
-msgid "Connectivity"
-msgstr "Conectividad"
 
 #: Endpointman_Config.class.php:1446
 msgid "Copy Error Detected! Aborting Install!"
@@ -332,7 +324,7 @@ msgstr "Mirror por defecto de FreePBX"
 msgid "Delete"
 msgstr "Borrar"
 
-#: Endpointman_Templates.class.php:337
+#: Endpointman_Templates.class.php:331
 msgid "Delete Template OK!"
 msgstr "Eliminacion Plantilla OK!"
 
@@ -361,7 +353,7 @@ msgstr "Usuario del Dispositivo (usualmente la extensión)"
 msgid "Devices"
 msgstr "Dispositivos"
 
-#: Endpointman_Advanced.class.php:339 Endpointman_Templates.class.php:244
+#: Endpointman_Advanced.class.php:339 Endpointman_Templates.class.php:238
 msgid "Directory Not Writable!"
 msgstr "Directorio no escribible!"
 
@@ -457,6 +449,8 @@ msgid "Enabled"
 msgstr "Habilitado"
 
 #: page.epm_advanced.php:18 page.epm_config.php:16 page.epm_templates.php:20
+#: views/epm_templates/editor.views.dialog.cfg.global.php:18
+#: views/epm_templates/editor.views.dialog.edit.cfg.php:5
 msgid "End Point Configuration Manager"
 msgstr "Configurar Administracion End Point"
 
@@ -783,7 +777,7 @@ msgstr "Pantalla Completa F11"
 msgid "GIT Branch"
 msgstr "GIT Rama"
 
-#: Endpointman_Templates.class.php:410
+#: Endpointman_Templates.class.php:404
 msgid "Generate list Ok!"
 msgstr "Lista Generada Ok!"
 
@@ -791,7 +785,7 @@ msgstr "Lista Generada Ok!"
 msgid "Git not installed!"
 msgstr "GIT no instalado!"
 
-#: Endpointman_Templates.class.php:205
+#: Endpointman_Templates.class.php:199
 msgid "Global Config Read OK!"
 msgstr "Global configuración leida OK!"
 
@@ -804,7 +798,7 @@ msgstr "Directorio final de configuracion y firmware"
 msgid "Global Phone Options"
 msgstr "Opciones Globales de Teléfonos"
 
-#: Endpointman_Templates.class.php:308
+#: Endpointman_Templates.class.php:302
 msgid "Globals Reset to Default!"
 msgstr "Restablecer valores predeterminados globales!"
 
@@ -816,6 +810,14 @@ msgstr "¡Aviso!"
 #: Endpointman_Advanced.class.php:1095
 msgid "Here"
 msgstr "Aquí"
+
+#: views/epm_config/manager.list.hide.php:8
+msgid "Hidden Brands:"
+msgstr ""
+
+#: views/epm_config/manager.list.hide.php:6
+msgid "Hidden Packages"
+msgstr ""
 
 #: Endpointman_Config.class.php:85
 msgid "Hide"
@@ -833,19 +835,19 @@ msgstr "ID Marca no es numero"
 msgid "ID Producto not is number"
 msgstr "ID Producto no es numero"
 
-#: Endpointman_Templates.class.php:324
+#: Endpointman_Templates.class.php:318
 msgid "ID is not number!"
 msgstr "ID no es numero!"
 
-#: Endpointman_Templates.class.php:327
+#: Endpointman_Templates.class.php:321
 msgid "ID send is negative!"
 msgstr "ID enviado es negativo!"
 
-#: Endpointman_Templates.class.php:392
+#: Endpointman_Templates.class.php:386
 msgid "ID send is not number!"
 msgstr "ID enviado no es numero!"
 
-#: Endpointman_Templates.class.php:395
+#: Endpointman_Templates.class.php:389
 msgid "ID send is number not valid!"
 msgstr "ID enviado es un numero no valido!"
 
@@ -1148,7 +1150,7 @@ msgstr "Servidor NTP que usaran los terminales para sincronizar la hora."
 msgid "Name invalid: "
 msgstr "Nombre no validao!"
 
-#: Endpointman_Templates.class.php:360
+#: Endpointman_Templates.class.php:354
 msgid "Name is null!"
 msgstr "Nombre es nulo!"
 
@@ -1179,7 +1181,7 @@ msgstr "Ninguna marca seleccionada para reiniciar"
 msgid "No Brand set!"
 msgstr "No se ha establecido una Marca!"
 
-#: Endpointman_Advanced.class.php:345 Endpointman_Templates.class.php:252
+#: Endpointman_Advanced.class.php:345 Endpointman_Templates.class.php:246
 msgid "No Configuration Location Defined!"
 msgstr "Configuracion de Ubicacion no definida!"
 
@@ -1233,12 +1235,12 @@ msgstr "Ningún comando fue enviado!"
 msgid "No file was uploaded"
 msgstr "No se ha cargado el fichero"
 
-#: Endpointman_Templates.class.php:171 Endpointman_Templates.class.php:215
-#: Endpointman_Templates.class.php:286
+#: Endpointman_Templates.class.php:165 Endpointman_Templates.class.php:209
+#: Endpointman_Templates.class.php:280
 msgid "No send Custom Value!"
 msgstr "No se enviará Valor Personalizado!"
 
-#: Endpointman_Templates.class.php:321 Endpointman_Templates.class.php:389
+#: Endpointman_Templates.class.php:315 Endpointman_Templates.class.php:383
 msgid "No send ID!"
 msgstr "No se ha enviado ID!"
 
@@ -1250,8 +1252,8 @@ msgstr "No se envío producto seleccionado!"
 msgid "No send SendID!"
 msgstr "No se envío ID!"
 
-#: Endpointman_Templates.class.php:174 Endpointman_Templates.class.php:218
-#: Endpointman_Templates.class.php:289
+#: Endpointman_Templates.class.php:168 Endpointman_Templates.class.php:212
+#: Endpointman_Templates.class.php:283
 msgid "No send TID!"
 msgstr "No se envío TID!"
 
@@ -1261,11 +1263,11 @@ msgstr "No se envío tipo de archivo!"
 
 #: Endpointman_Advanced.class.php:275 Endpointman_Advanced.class.php:530
 #: Endpointman_Advanced.class.php:695 Endpointman_Advanced.class.php:811
-#: Endpointman_Config.class.php:333 Endpointman_Templates.class.php:348
+#: Endpointman_Config.class.php:333 Endpointman_Templates.class.php:342
 msgid "No send value!"
 msgstr "No se ha enviado VALOR!"
 
-#: Endpointman_Templates.class.php:248
+#: Endpointman_Templates.class.php:242
 msgid "Not a Vaild Directory"
 msgstr "No es un directorio válido"
 
@@ -1289,37 +1291,6 @@ msgstr ""
 #: Endpointman_Advanced.class.php:887
 msgid "Not is directory: "
 msgstr "No es un directorio:"
-
-#: endpointman.i18n.php:16
-msgid "OSS Endpoint Advanced Settings"
-msgstr "Configuración avanzada de Endpoint de OSS"
-
-#: endpointman.i18n.php:10
-msgid "OSS Endpoint Device List"
-msgstr ""
-
-#: endpointman.i18n.php:14
-msgid "OSS Endpoint Package Manager"
-msgstr ""
-
-#: endpointman.i18n.php:12
-msgid "OSS Endpoint Template Manager"
-msgstr ""
-
-#: endpointman.i18n.php:4
-msgid "OSS PBX End Point Manager"
-msgstr ""
-
-#: endpointman.i18n.php:8
-msgid ""
-"OSS PBX End Point Manager is the free supported PBX Endpoint Manager for "
-"FreePBX.\t\tIt is ***NOT*** supported by Schmoozecom. If you are looking for "
-"a supported endpoint manager please look into the Commercial Endpoint "
-"Manager by Schmoozecom, INC.\t\tThe front end gui is hosted at: https://"
-"github.com/FreePBX/endpointman\t\tThe backend configurator is hosted at: "
-"https://github.com/provisioner/Provisioner\t\tPull Requests can be made to "
-"either of these and are encouraged."
-msgstr ""
 
 #: views/epm_advanced/oui_manager.views.grid.php:24
 #: views/epm_advanced/oui_manager.views.new.modal.php:14
@@ -1361,10 +1332,6 @@ msgstr "Administracion de Paquetes"
 #: views/epm_advanced_settings.page.php:297
 msgid "Package Server"
 msgstr "Servidor de Paquetes"
-
-#: views/epm_config/manager.list.hide.php:6
-msgid "Packages Hiden"
-msgstr ""
 
 #: views/epm_advanced_settings.page.php:255
 msgid "Path location ARP."
@@ -1447,7 +1414,7 @@ msgstr "Producto seleccionado enviado no es un número!"
 msgid "Product Select send is number not valid!"
 msgstr "Producto seleccione enviado es un número no válido!"
 
-#: Endpointman_Templates.class.php:363
+#: Endpointman_Templates.class.php:357
 msgid "Product send is negative!"
 msgstr ""
 
@@ -1512,7 +1479,7 @@ msgstr "Reiniciar"
 msgid "Reset Global Overrides to Default"
 msgstr "Restablecer valores por defecto"
 
-#: Endpointman_Templates.class.php:148
+#: Endpointman_Templates.class.php:142
 #: views/epm_advanced/poce.views.textarea.file.php:35
 #: views/epm_devices_main.page.php:312
 #: views/epm_templates/editor.views.dialog.edit.cfg.php:19
@@ -1520,15 +1487,12 @@ msgstr "Restablecer valores por defecto"
 msgid "Save"
 msgstr "Guardar"
 
-#: Endpointman_Templates.class.php:142
-msgid "Save & Reboot Phone(s)"
-msgstr "Guardar y Reiniciar Teléfono(s)"
-
 #: views/epm_advanced/poce.views.textarea.file.php:48
 msgid "Save As..."
 msgstr "Gardar Como..."
 
-#: views/epm_devices_main.page.php:928 views/epm_devices_main.page.php:1169
+#: page.epm_templates.php:53 views/epm_devices_main.page.php:928
+#: views/epm_devices_main.page.php:1169
 msgid "Saved"
 msgstr "Guardado"
 
@@ -1639,8 +1603,8 @@ msgstr "Error de sintaxis, JSON malformada"
 msgid "System Failure!"
 msgstr "¡Fallo de sistema!"
 
-#: Endpointman_Templates.class.php:177 Endpointman_Templates.class.php:221
-#: Endpointman_Templates.class.php:292
+#: Endpointman_Templates.class.php:171 Endpointman_Templates.class.php:215
+#: Endpointman_Templates.class.php:286
 msgid "TID is not number!"
 msgstr "TID no es un numero!"
 
@@ -1744,8 +1708,8 @@ msgstr ""
 
 #: views/epm_config/manager.list.hide.php:25
 msgid ""
-"This list contains all the Trademarks / Products / Models <br /> that have "
-"been hidden.  Clicking on any of them will recover."
+"This list contains all the Brands <br /> that have been hidden.  Clicking on "
+"any of them will unhide them."
 msgstr ""
 
 #: views/epm_advanced_settings.page.php:136
@@ -1871,7 +1835,7 @@ msgstr "Actualizar Configuración Personalizada"
 msgid "Update!"
 msgstr "Actualizado!"
 
-#: Endpointman_Templates.class.php:276 views/epm_advanced_settings.page.php:92
+#: Endpointman_Templates.class.php:270 views/epm_advanced_settings.page.php:92
 #: views/epm_templates/editor.views.dialog.cfg.global.php:76
 msgid "Updated!"
 msgstr "Actualizado!"
@@ -1922,7 +1886,7 @@ msgstr "Usame!"
 msgid "User File Configs"
 msgstr "Usar Archivo de Configuracion"
 
-#: Endpointman_Config.class.php:340 Endpointman_Templates.class.php:355
+#: Endpointman_Config.class.php:340 Endpointman_Templates.class.php:349
 msgid "Value send is not number!"
 msgstr "El valor enviado no es un numero!"
 
@@ -2017,6 +1981,15 @@ msgstr "es requerido"
 #: views/epm_devices_main.page.php:553 views/epm_devices_main.page.php:560
 msgid "with"
 msgstr ""
+
+#~ msgid "Connectivity"
+#~ msgstr "Conectividad"
+
+#~ msgid "OSS Endpoint Advanced Settings"
+#~ msgstr "Configuración avanzada de Endpoint de OSS"
+
+#~ msgid "Save & Reboot Phone(s)"
+#~ msgstr "Guardar y Reiniciar Teléfono(s)"
 
 #~ msgid "- Copied %_FILE_% to %_FILETO_%."
 #~ msgstr "- Copiado %_FILE_% a %_FILETO_%."
