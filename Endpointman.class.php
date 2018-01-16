@@ -1077,7 +1077,7 @@ $this->error['get_phone_info'] = "Error with SQL Statement";
     	$brand = sql($oui_sql, 'getRow', DB_FETCHMODE_ASSOC);
     
     	$res = sql($oui_sql);
-    	$brand_count = $res->numRows();
+    	$brand_count = count($res);
     
     	if (!$brand_count) {
     		//oui doesn't have a matching mysql reference, probably a PC/router/wap/printer of some sort.
@@ -1184,7 +1184,7 @@ $this->error['parse_configs'] = 'Error Returned From Timezone Library: ' . $e->g
     						$sql = "SELECT original_name,data FROM endpointman_custom_configs WHERE id = " . $list;
     						//$res = sql($sql);
 							$res = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
-    						if ($res->numRows()) {
+    						if (count($res)) {
     							$data = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
     							$provisioner_lib->config_files_override[$data['original_name']] = $data['data'];
     						}
@@ -1199,7 +1199,7 @@ $this->error['parse_configs'] = 'Error Returned From Timezone Library: ' . $e->g
     						$sql = "SELECT original_name,data FROM endpointman_custom_configs WHERE id = " . $list;
     						//$res = sql($sql);
 							$res = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
-    						if ($res->numRows()) {
+    						if (count($res)) {
     							$data = sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
     							$provisioner_lib->config_files_override[$data['original_name']] = $data['data'];
     						}
@@ -1748,7 +1748,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
                 $brand = $this->eda->sql($oui_sql, 'getRow', DB_FETCHMODE_ASSOC);
 
                 $res = $this->eda->sql($oui_sql);
-                $brand_count = $res->numRows();
+                $brand_count = count($res);
 
                 if (!$brand_count) {
                     //oui doesn't have a matching mysql reference, probably a PC/router/wap/printer of some sort.
@@ -1762,7 +1762,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
 
                 $res = $this->eda->sql($epm_sql);
 
-                $epm = $res->numRows() ? TRUE : FALSE;
+                $epm = count($res) ? TRUE : FALSE;
 
                 //Add into a final array
                 $final[$z] = array("ip" => $ip, "mac" => $mac, "mac_strip" => $mac_strip, "oui" => $oui, "brand" => $brand['name'], "brand_id" => $brand['id'], "endpoint_managed" => $epm);
