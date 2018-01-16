@@ -1166,7 +1166,7 @@ $this->error['get_phone_info'] = "Error with SQL Statement";
     
     			//Timezone
     			try {
-    				$provisioner_lib->DateTimeZone = new DateTimeZone($settings['tz']);
+                                $provisioner_lib->DateTimeZone = new \DateTimeZone($settings['tz']);
     			} catch (Exception $e) {
 $this->error['parse_configs'] = 'Error Returned From Timezone Library: ' . $e->getMessage();
     				return(FALSE);
