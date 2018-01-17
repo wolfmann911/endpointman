@@ -131,7 +131,7 @@
 						</div>
 						<div class="col-md-9">
 							<div class="input-group">
-      							<select class="form-control selectpicker show-tick" data-style="" data-live-search-placeholder="Buscar" data-live-search="true" name="tz" id="tz">
+      							<select class="form-control selectpicker show-tick" data-style="" data-live-search-placeholder="Search" data-live-search="true" name="tz" id="tz">
                                 <?php
 									//TODO: Pendiente actualizar a ajax!!!!
 									foreach (FreePBX::Endpointman()->listTZ("") as $row) {

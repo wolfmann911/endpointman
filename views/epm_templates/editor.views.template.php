@@ -32,7 +32,7 @@
                                         <td class="col-md-9"><?php echo $dtemplate['model'] ?></td>
                                     <?php else: ?>
                                         <td class="col-md-9">
-                                        <select class="form-control selectpicker show-tick" data-style="btn-primary" data-live-search-placeholder="Buscar" data-live-search="true" name="model_list" id="model_list" disabled>
+                                        <select class="form-control selectpicker show-tick" data-style="btn-primary" data-live-search-placeholder="Search" data-live-search="true" name="model_list" id="model_list" disabled>
                                             <?php
                                             foreach($dtemplate['models_ava'] as $row) {
                                                 echo '<option value="'.$row['value'].'" '.(!empty($row['selected']) ? "selected" : "").'>'.$row['text'].'</option>';
@@ -44,7 +44,7 @@
                                     <tr>
                                         <td class="col-md-3"><b><?php echo _("Display:")?></b></td>
                                         <td class="col-md-9">
-                                            <select class="form-control selectpicker show-tick" data-style="btn-primary" data-live-search-placeholder="Buscar" data-live-search="true" name="area_list" id="area_list" onchange="epm_template_edit_select_area_list(this)">
+                                            <select class="form-control selectpicker show-tick" data-style="btn-primary" data-live-search-placeholder="Search" data-live-search="true" name="area_list" id="area_list" onchange="epm_template_edit_select_area_list(this)">
                                                 <option value=""></option>
                                                 <?php 	
                                                 foreach($dtemplate['area_ava'] as $row) {
@@ -107,7 +107,7 @@
                                             data-id = "id"
 											data-label = "name"
                                             data-style = ""
-											data-live-search-placeholder = "Buscar..."
+											data-live-search-placeholder = "Search..."
 											data-live-search = "true"
                                             name="sl_boxselect_<?php echo $row['idrefbox']; ?>" 
                                             id="sl_boxselect_<?php echo $row['idrefbox']; ?>">
@@ -350,7 +350,7 @@
                                                         </div>
                                                         <div class="col-md-9">
                                                         	<?php
-	                    									echo '<select name="'.$srow['key'].'" id="'.$srow['key'].'" class="form-control selectpicker show-tick" data-style="" data-live-search-placeholder="Buscar" data-live-search="true">';
+	                    									echo '<select name="'.$srow['key'].'" id="'.$srow['key'].'" class="form-control selectpicker show-tick" data-style="" data-live-search-placeholder="Search" data-live-search="true">';
 															foreach($srow['data'] as $lrow) 
 															{
 																echo '<option value="'.$lrow['value'].'" '.(array_key_exists('selected',$lrow)? 'selected' : '').' >'.$lrow['description'].'</option>';
