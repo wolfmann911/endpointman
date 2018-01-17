@@ -1153,7 +1153,7 @@ class Endpointman_Advanced
 										//$res = sql($sql);
 										$res = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
 
-										if ($res->numRows() > 0) {
+										if (count($res) > 0) {
 											$brand_id = sql($sql, 'getOne');
 											$brand_id = $brand_id[0];
 
@@ -1163,12 +1163,12 @@ class Endpointman_Advanced
 											$line_id = isset($device[4]) ? $device[4] : 1;
 
 											$res_model = sql($sql_model);
-											if ($res_model->numRows()) {
+											if (count($res_model)) {
 												$model_id = sql($sql_model, 'getRow', DB_FETCHMODE_ASSOC);
 												$model_id = $model_id['id'];
 
 												$res_ext = sql($sql_ext);
-												if ($res_ext->numRows()) {
+												if (count($res_ext)) {
 													$ext = sql($sql_ext, 'getRow', DB_FETCHMODE_ASSOC);
 													$description = $ext['name'];
 													$ext = $ext['extension'];

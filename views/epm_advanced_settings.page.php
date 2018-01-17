@@ -148,7 +148,7 @@
 						</div>
 						<div class="col-md-9">
                         	<div class="input-group input-group-br">
-                            	<select class="form-control selectpicker show-tick" data-style="btn-primary" data-live-search-placeholder="Buscar" data-size="10" data-live-search="true" name="tz" id="tz">
+                            	<select class="form-control selectpicker show-tick" data-style="btn-primary" data-live-search-placeholder="Search" data-size="10" data-live-search="true" name="tz" id="tz">
 								<?php
 									$list_tz = FreePBX::Endpointman()->listTZ(FreePBX::Endpointman()->configmod->get("tz"));
 								   	foreach ($list_tz as $row) {

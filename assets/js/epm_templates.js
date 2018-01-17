@@ -127,7 +127,7 @@ function epm_template_update_select_files_config (e) {
 	var id     = e.attr('data-id');
 	var label  = e.attr('data-label');
 	select.html('');
-	select.append('<option data-icon="fa fa-refresh fa-spin fa-fw" value="" selected>Cargando...</option>');
+	select.append('<option data-icon="fa fa-refresh fa-spin fa-fw" value="" selected>Loading...</option>');
 	select.selectpicker('refresh');
 	$.getJSON(url, function(data)
 	{

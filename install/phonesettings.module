@@ -157,7 +157,7 @@ class phonesettings {
         $sql = "SELECT mac_id, line FROM endpointman_line_list WHERE ext = '".$_SESSION['ari_user']['extension']."' ";
 
         $res = $endpoint->db->query($sql);
-        if($res->numRows()) {
+        if(count($res)) {
 
             $mac_row = $endpoint->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
 

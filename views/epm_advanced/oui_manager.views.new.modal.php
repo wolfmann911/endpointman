@@ -37,7 +37,7 @@
 										<i class="fa fa-question-circle fpbx-help-icon" data-for="brand_new_oui"></i>
 									</div>
 									<div class="col-md-9">
-			      						<select class="form-control selectpicker show-tick" data-style="btn-info" data-live-search-placeholder="Buscar" data-size="10" data-live-search="true" id="brand_new_oui" name="brand_new_oui">
+			      						<select class="form-control selectpicker show-tick" data-style="btn-info" data-live-search-placeholder="Search" data-size="10" data-live-search="true" id="brand_new_oui" name="brand_new_oui">
 			      							<option value=""><?php echo _("Select Brand:")?></option>
 											<?php
 											foreach ($brands as $row) {
