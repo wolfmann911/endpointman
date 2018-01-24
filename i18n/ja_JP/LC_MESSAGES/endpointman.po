@@ -37,7 +37,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: FreePBX endpointman\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-09 15:36-0500\n"
+"POT-Creation-Date: 2018-01-24 15:27-0500\n"
 "PO-Revision-Date: 2014-02-24 06:17+0200\n"
 "Last-Translator: Kenichi Fukaumi <k.fukaumi@qloog.com>\n"
 "Language-Team: Japanese <http://192.168.30.85/projects/freepbx/endpointman/"
@@ -299,6 +299,10 @@ msgstr "設定タイプ"
 #: views/epm_devices_main.page.php:552 views/epm_devices_main.page.php:559
 msgid "Configure"
 msgstr ""
+
+#: endpointman.i18n.php:6
+msgid "Connectivity"
+msgstr "接続"
 
 #: Endpointman_Config.class.php:1446
 msgid "Copy Error Detected! Aborting Install!"
@@ -1277,6 +1281,37 @@ msgstr ""
 msgid "Not is directory: "
 msgstr ""
 
+#: endpointman.i18n.php:16
+msgid "OSS Endpoint Advanced Settings"
+msgstr "OSS端末の詳細設定"
+
+#: endpointman.i18n.php:10
+msgid "OSS Endpoint Device List"
+msgstr "OSS端末デバイスリスト"
+
+#: endpointman.i18n.php:14
+msgid "OSS Endpoint Package Manager"
+msgstr ""
+
+#: endpointman.i18n.php:12
+msgid "OSS Endpoint Template Manager"
+msgstr "OSS端末テンプレート管理"
+
+#: endpointman.i18n.php:4
+msgid "OSS PBX End Point Manager"
+msgstr "OSS PBX端末管理"
+
+#: endpointman.i18n.php:8
+msgid ""
+"OSS PBX End Point Manager is the free supported PBX Endpoint Manager for "
+"FreePBX.\t\tIt is ***NOT*** supported by Schmoozecom. If you are looking for "
+"a supported endpoint manager please look into the Commercial Endpoint "
+"Manager by Schmoozecom, INC.\t\tThe front end gui is hosted at: https://"
+"github.com/FreePBX/endpointman\t\tThe backend configurator is hosted at: "
+"https://github.com/provisioner/Provisioner\t\tPull Requests can be made to "
+"either of these and are encouraged."
+msgstr ""
+
 #: views/epm_advanced/oui_manager.views.grid.php:24
 #: views/epm_advanced/oui_manager.views.new.modal.php:14
 msgid "OUI"
@@ -1943,21 +1978,6 @@ msgstr ""
 #: views/epm_devices_main.page.php:553 views/epm_devices_main.page.php:560
 msgid "with"
 msgstr "次の物と一緒に"
-
-#~ msgid "Connectivity"
-#~ msgstr "接続"
-
-#~ msgid "OSS Endpoint Advanced Settings"
-#~ msgstr "OSS端末の詳細設定"
-
-#~ msgid "OSS Endpoint Device List"
-#~ msgstr "OSS端末デバイスリスト"
-
-#~ msgid "OSS Endpoint Template Manager"
-#~ msgstr "OSS端末テンプレート管理"
-
-#~ msgid "OSS PBX End Point Manager"
-#~ msgstr "OSS PBX端末管理"
 
 #~ msgid "Install Firmware"
 #~ msgstr "ファームウェアをインストール"

@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-09 15:36-0500\n"
+"POT-Creation-Date: 2018-01-24 15:27-0500\n"
 "PO-Revision-Date: 2016-12-12 02:01+0200\n"
 "Last-Translator: Ernesto <ecasas@sangoma.com>\n"
 "Language-Team: Spanish <http://weblate.freepbx.org/projects/fpbxcn/"
@@ -278,6 +278,10 @@ msgstr "Tipo de Configuracion"
 #: views/epm_devices_main.page.php:552 views/epm_devices_main.page.php:559
 msgid "Configure"
 msgstr "Configurar"
+
+#: endpointman.i18n.php:6
+msgid "Connectivity"
+msgstr "Conectividad"
 
 #: Endpointman_Config.class.php:1446
 msgid "Copy Error Detected! Aborting Install!"
@@ -1292,6 +1296,37 @@ msgstr ""
 msgid "Not is directory: "
 msgstr "No es un directorio:"
 
+#: endpointman.i18n.php:16
+msgid "OSS Endpoint Advanced Settings"
+msgstr "Configuración avanzada de Endpoint de OSS"
+
+#: endpointman.i18n.php:10
+msgid "OSS Endpoint Device List"
+msgstr ""
+
+#: endpointman.i18n.php:14
+msgid "OSS Endpoint Package Manager"
+msgstr ""
+
+#: endpointman.i18n.php:12
+msgid "OSS Endpoint Template Manager"
+msgstr ""
+
+#: endpointman.i18n.php:4
+msgid "OSS PBX End Point Manager"
+msgstr ""
+
+#: endpointman.i18n.php:8
+msgid ""
+"OSS PBX End Point Manager is the free supported PBX Endpoint Manager for "
+"FreePBX.\t\tIt is ***NOT*** supported by Schmoozecom. If you are looking for "
+"a supported endpoint manager please look into the Commercial Endpoint "
+"Manager by Schmoozecom, INC.\t\tThe front end gui is hosted at: https://"
+"github.com/FreePBX/endpointman\t\tThe backend configurator is hosted at: "
+"https://github.com/provisioner/Provisioner\t\tPull Requests can be made to "
+"either of these and are encouraged."
+msgstr ""
+
 #: views/epm_advanced/oui_manager.views.grid.php:24
 #: views/epm_advanced/oui_manager.views.new.modal.php:14
 msgid "OUI"
@@ -1981,12 +2016,6 @@ msgstr "es requerido"
 #: views/epm_devices_main.page.php:553 views/epm_devices_main.page.php:560
 msgid "with"
 msgstr ""
-
-#~ msgid "Connectivity"
-#~ msgstr "Conectividad"
-
-#~ msgid "OSS Endpoint Advanced Settings"
-#~ msgstr "Configuración avanzada de Endpoint de OSS"
 
 #~ msgid "Save & Reboot Phone(s)"
 #~ msgstr "Guardar y Reiniciar Teléfono(s)"
