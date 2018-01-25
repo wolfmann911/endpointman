@@ -131,7 +131,7 @@ function epm_config_list_brand_model_hide_ajax_load (e)
 	var id     = e.attr('data-id');
 	var label  = e.attr('data-label');
 	select.html('');
-	select.append('<option data-icon="fa fa-refresh fa-spin fa-fw" value="" selected>Cargando...</option>');
+	select.append('<option data-icon="fa fa-refresh fa-spin fa-fw" value="" selected>Loading...</option>');
 	select.selectpicker('refresh');
 	
 	$.getJSON(url, function(data)

@@ -309,7 +309,7 @@ class endpointmanager {
         $brand = $this->eda->sql($oui_sql, 'getRow', DB_FETCHMODE_ASSOC);
 
         $res = $this->eda->sql($oui_sql);
-        $brand_count = $res->numRows();
+        $brand_count = count($res);
 
         if (!$brand_count) {
             //oui doesn't have a matching mysql reference, probably a PC/router/wap/printer of some sort.
@@ -655,7 +655,7 @@ class endpointmanager {
         $sql = "SELECT id FROM endpointman_mac_list WHERE model > 0 AND id =" . $mac_id;
 
         $res = $this->eda->sql($sql);
-        if ($res->numRows()) {
+        if (count($res)) {
             //Returns Brand Name, Brand Directory, Model Name, Mac Address, Extension (FreePBX), Custom Configuration Template, Custom Configuration Data, Product Name, Product ID, Product Configuration Directory, Product Configuration Version, Product XML name,
             $sql = "SELECT endpointman_mac_list.specific_settings, endpointman_mac_list.config_files_override, endpointman_mac_list.global_user_cfg_data, endpointman_model_list.id as model_id, endpointman_brand_list.id as brand_id, endpointman_brand_list.name, endpointman_brand_list.directory, endpointman_model_list.model, endpointman_mac_list.mac, endpointman_mac_list.template_id, endpointman_mac_list.global_custom_cfg_data, endpointman_product_list.long_name, endpointman_product_list.id as product_id, endpointman_product_list.cfg_dir, endpointman_product_list.cfg_ver, endpointman_model_list.template_data, endpointman_model_list.enabled, endpointman_mac_list.global_settings_override FROM endpointman_line_list, endpointman_mac_list, endpointman_model_list, endpointman_brand_list, endpointman_product_list WHERE endpointman_mac_list.model = endpointman_model_list.id AND endpointman_brand_list.id = endpointman_model_list.brand AND endpointman_product_list.id = endpointman_model_list.product_id AND endpointman_mac_list.id = endpointman_line_list.mac_id AND endpointman_mac_list.id = " . $mac_id;
 
@@ -781,7 +781,7 @@ class endpointmanager {
         foreach ($config_files_list as $files) {
             $sql = "SELECT * FROM  endpointman_custom_configs WHERE product_id = '" . $row['product_id'] . "' AND original_name = '" . $files . "'";
             $alt_configs_list_count = $this->eda->sql($sql);
-            if ($alt_configs_list_count->numRows() > 0) {
+            if (count($alt_configs_list_count) > 0) {
                 $alt_configs_list = $this->eda->sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
                 $alt_configs[$i]['name'] = $files;
                 $files = str_replace(".", "_", $files);
@@ -1441,7 +1441,7 @@ class endpointmanager {
                         foreach ($temp as $list) {
                             $sql = "SELECT original_name,data FROM endpointman_custom_configs WHERE id = " . $list;
                             $res = $this->eda->sql($sql);
-                            if ($res->numRows()) {
+                            if (count($res)) {
                                 $data = $this->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
                                 $provisioner_lib->config_files_override[$data['original_name']] = $data['data'];
                             }
@@ -1455,7 +1455,7 @@ class endpointmanager {
                         foreach ($temp as $list) {
                             $sql = "SELECT original_name,data FROM endpointman_custom_configs WHERE id = " . $list;
                             $res = $this->eda->sql($sql);
-                            if ($res->numRows()) {
+                            if (count($res)) {
                                 $data = $this->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
                                 $provisioner_lib->config_files_override[$data['original_name']] = $data['data'];
                             }
@@ -1675,7 +1675,7 @@ class endpointmanager {
         $sql = "SELECT * FROM  endpointman_product_list WHERE hidden = 0 AND id ='" . $id . "'";
         $res = $this->eda->sql($sql);
 
-        if ($res->numRows()) {
+        if (count($res)) {
             $row = $this->eda->sql($sql, 'getRow', DB_FETCHMODE_ASSOC);
 
             $sql = "SELECT directory FROM  endpointman_brand_list WHERE hidden = 0 AND id =" . $row['brand'];
@@ -2945,7 +2945,7 @@ class endpointmanager {
                 $brand = $this->eda->sql($oui_sql, 'getRow', DB_FETCHMODE_ASSOC);
 
                 $res = $this->eda->sql($oui_sql);
-                $brand_count = $res->numRows();
+                $brand_count = count($res);
 
                 if (!$brand_count) {
                     //oui doesn't have a matching mysql reference, probably a PC/router/wap/printer of some sort.
@@ -2959,7 +2959,7 @@ class endpointmanager {
 
                 $res = $this->eda->sql($epm_sql);
 
-                $epm = $res->numRows() ? TRUE : FALSE;
+                $epm = count($res) ? TRUE : FALSE;
 
                 //Add into a final array
                 $final[$z] = array("ip" => $ip, "mac" => $mac, "mac_strip" => $mac_strip, "oui" => $oui, "brand" => $brand['name'], "brand_id" => $brand['id'], "endpoint_managed" => $epm);
