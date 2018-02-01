@@ -1102,7 +1102,7 @@ $this->error['get_phone_info'] = "Error with SQL Statement";
     function prepare_configs($phone_info, $reboot=TRUE, $write=TRUE) 
     {
     	$this->PROVISIONER_BASE = $this->PHONE_MODULES_PATH;
-//define('PROVISIONER_BASE', $this->PROVISIONER_BASE);
+        define('PROVISIONER_BASE', $this->PROVISIONER_BASE);
     	if (file_exists($this->PHONE_MODULES_PATH . 'autoload.php')) {
     		if (!class_exists('ProvisionerConfig')) {
     			require($this->PHONE_MODULES_PATH . 'autoload.php');
@@ -1227,7 +1227,7 @@ $this->error['parse_configs'] = 'Error Returned From Timezone Library: ' . $e->g
     					$count = count($key);
     					switch ($count) {
     						case 1:
-    							if (($this->global_cfg['enable_ari'] == 1) AND (isset($global_custom_cfg_ari[$full_key])) AND (isset($global_user_cfg_data[$full_key]))) {
+    							if (($this->configmod->get('enable_ari') == 1) AND (isset($global_custom_cfg_ari[$full_key])) AND (isset($global_user_cfg_data[$full_key]))) {
     								$new_template_data[$full_key] = $global_user_cfg_data[$full_key];
     							} else {
     								$new_template_data[$full_key] = $global_custom_cfg_data[$full_key];
@@ -1235,14 +1235,14 @@ $this->error['parse_configs'] = 'Error Returned From Timezone Library: ' . $e->g
     							break;
     						case 2:
     							$breaks = explode('_', $key[1]);
-    							if (($this->global_cfg['enable_ari'] == 1) AND (isset($global_custom_cfg_ari[$full_key])) AND (isset($global_user_cfg_data[$full_key]))) {
+    							if (($this->configmod->get('enable_ari') == 1) AND (isset($global_custom_cfg_ari[$full_key])) AND (isset($global_user_cfg_data[$full_key]))) {
     								$new_template_data['loops'][$breaks[0]][$breaks[2]][$breaks[1]] = $global_user_cfg_data[$full_key];
     							} else {
     								$new_template_data['loops'][$breaks[0]][$breaks[2]][$breaks[1]] = $global_custom_cfg_data[$full_key];
     							}
     							break;
     						case 3:
-    							if (($this->global_cfg['enable_ari'] == 1) AND (isset($global_custom_cfg_ari[$full_key])) AND (isset($global_user_cfg_data[$full_key]))) {
+    							if (($this->configmod->get('enable_ari') == 1) AND (isset($global_custom_cfg_ari[$full_key])) AND (isset($global_user_cfg_data[$full_key]))) {
     								$line_ops[$key[1]][$key[2]] = $global_user_cfg_data[$full_key];
     							} else {
     								$line_ops[$key[1]][$key[2]] = $global_custom_cfg_data[$full_key];
@@ -1285,8 +1285,7 @@ $this->error['parse_configs'] = 'Error Returned From Timezone Library: ' . $e->g
     			$li = 0;
     			foreach ($phone_info['line'] as $line) {
     				$line_options = is_array($line_ops[$line['line']]) ? $line_ops[$line['line']] : array();
-    				$line_statics = array('line' => $line['line'], 'username' => $line['ext'], 'authname' => $line['ext'], 'secret' => $line['secret'], 'displayname' => $line['description'], 'server_host' => $this->global_cfg['srvip'], 'server_port' => '5060', 'user_extension' => $line['user_extension']);
-    
+    				$line_statics = array('line' => $line['line'], 'username' => $line['ext'], 'authname' => $line['ext'], 'secret' => $line['secret'], 'displayname' => $line['description'], 'server_host' => $this->configmod->get('srvip'), 'server_port' => '5060', 'user_extension' => $line['user_extension']);
     				$provisioner_lib->settings['line'][$li] = array_merge($line_options, $line_statics);
     				$li++;
     			}
@@ -1344,7 +1343,7 @@ $this->error['parse_configs'] = 'Error Returned From Timezone Library: ' . $e->g
     
     			//Setting a line variable here...these aren't defined in the template_data.xml file yet. however they will still be parsed
     			//and if they have defaults assigned in a future template_data.xml or in the config file using pipes (|) those will be used, pipes take precedence
-    			$provisioner_lib->processor_info = "EndPoint Manager Version " . $this->global_cfg['version'];
+    			$provisioner_lib->processor_info = "EndPoint Manager Version " . $this->configmod->get('version');
     
     			// Because every brand is an extension (eventually) of endpoint, you know this function will exist regardless of who it is
     			//Start timer
