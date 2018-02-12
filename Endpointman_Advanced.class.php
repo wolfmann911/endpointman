@@ -8,6 +8,7 @@
  */
 
 namespace FreePBX\modules;
+use FreePBX;
 
 class Endpointman_Advanced
 {
@@ -1123,16 +1124,18 @@ class Endpointman_Advanced
 		}
 		else
 		{
-			$allowedExtensions = array("application/csv", "text/plain");
+			//$allowedExtensions = array("application/csv", "text/plain", "text/csv", "application/vnd.ms-excel");
+			$allowedExtensions = array("csv", "txt");
 			foreach ($_FILES["files"]["error"] as $key => $error) {
-				outn(sprintf(_("Importing CVS file %s ... "), $_FILES["files"]["name"][$key]));
+				outn(sprintf(_("Importing CVS file %s ...<br />"), $_FILES["files"]["name"][$key]));
 
 				if ($error != UPLOAD_ERR_OK) {
 					out(sprintf(_("Error: %s"), $this->file_upload_error_message($error)));
 				}
 				else
 				{
-					if (!in_array($_FILES["files"]["type"][$key], $allowedExtensions)) {
+					//if (!in_array($_FILES["files"]["type"][$key], $allowedExtensions)) {
+					if (!in_array(substr(strrchr($_FILES["files"]["name"][$key], "."), 1), $allowedExtensions)) {
 						out(sprintf(_("Error: We support only CVS and TXT files, type file %s no support!"), $_FILES["files"]["name"][$key]));
 					}
 					elseif ($_FILES["files"]["size"][$key] == 0) {
@@ -1155,7 +1158,7 @@ class Endpointman_Advanced
 
 										if (count($res) > 0) {
 											$brand_id = sql($sql, 'getOne');
-											$brand_id = $brand_id[0];
+										//	$brand_id = $brand_id[0];
 
 											$sql_model = "SELECT id FROM endpointman_model_list WHERE brand = " . $brand_id . " AND model LIKE '%" . $device[2] . "%' LIMIT 1";
 											$sql_ext = "SELECT extension, name FROM users WHERE extension LIKE '%" . $device[3] . "%' LIMIT 1";
@@ -1173,14 +1176,14 @@ class Endpointman_Advanced
 													$description = $ext['name'];
 													$ext = $ext['extension'];
 //TODO: PENDIENTE ASIGNAR OBJ
-$this->add_device($mac, $model_id, $ext, 0, $line_id, $description);
+FreePBX::Endpointman()->add_device($mac, $model_id, $ext, 0, $line_id, $description);
 
-													out(_("Done!"));
+													//out(_("Done!"));
 												} else {
 													out(sprintf(_("Error: Invalid Extension Specified on line %d!"), $i));
 												}
 											} else {
-												out(sprintf(_("Error: Invalid Extension Specified on line %d!"), $i));
+												out(sprintf(_("Error: Invalid Model Specified on line %d!"), $i));
 											}
 										} else {
 											out(sprintf(_("Error: Invalid Brand Specified on line %d!"), $i));
@@ -1194,7 +1197,7 @@ $this->add_device($mac, $model_id, $ext, 0, $line_id, $description);
 							}
 							fclose($handle);
 							unlink($uploadfile);
-							out(_("Please reboot & rebuild all imported phones"));
+							out(_("<font color='#FF0000'><b>Please reboot & rebuild all imported phones</b></font>"));
 						} else {
 							out(_("Error: Possible file upload attack!"));
 						}

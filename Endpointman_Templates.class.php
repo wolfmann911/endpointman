@@ -136,7 +136,7 @@ class Endpointman_Templates
                         'value' => _('Delete'),
                         'hidden' => ''
                     ),
-		      'save' => array(
+					'save' => array(
                         'name' => 'submit',
                         'id' => 'save',
                         'value' => _('Save'),
@@ -865,7 +865,7 @@ class Endpointman_Templates
     							foreach ($config_options as $var_name => $var_items) {
     								//loop|remotephonebook_url_0
     								$tv = explode('_', $variable);
-    								$key = "loop|" . $tv[0] . "_" . $var_name . "_" . $var_items['loop_count'];
+    								$key = "loop|" . $tv[0] . "_" . $var_name . (isset($var_items['loop_count']) ? "_" . $var_items['loop_count'] : '');
     								$items[$variables_count] = $var_items;
     								$template_variables_array[$group_count]['data'][$variables_count] = $this->generate_form_data($variables_count, $var_items, $key, $custom_cfg_data, $admin, $user_cfg_data, $extra_data, $template_type);
     								$template_variables_array[$group_count]['data'][$variables_count]['looping'] = TRUE;

@@ -47,12 +47,11 @@ if ($_REQUEST['subpage'] == "editor")  {
 	echo "<br /><br /><br />";
 }
 
-if ($_REQUEST['command'] AND $_REQUEST['command'] == 'save_template') {
+if (isset($_REQUEST['command']) && $_REQUEST['command'] == 'save_template') {
    $epm->save_template($_REQUEST['id'],$_REQUEST['custom'],$_REQUEST);
     if(empty($epm->error)) {
         $epm->message['general'] = _('Saved');
     }
-
 }
 
 ?>
