@@ -3,9 +3,9 @@
 ?>
 
 <div class="alert alert-info" role="alert">
-	<h3><?php echo _("Packages Hiden") ?></h3>
+	<h3><?php echo _("Hidden Packages") ?></h3>
     <div class="input-group">
-        <span class="input-group-addon"><?php echo _("Brands / Hidden Models:") ?></span>
+        <span class="input-group-addon"><?php echo _("Hidden Brands:") ?></span>
         <select 
 			data-url="ajax.php?module=endpointman&amp;module_sec=epm_config&amp;module_tab=manager&amp;command=list_brand_model_hide"
             data-cache="false"
@@ -22,6 +22,6 @@
             name="epm_config_manager_select_hidens"
             multiple>
         </select>
-        <span class="input-group-addon"><span class="help"><i class="fa fa-question-circle"></i><span style="display: none;"><?php echo _("This list contains all the Trademarks / Products / Models <br /> that have been hidden.  Clicking on any of them will recover.") ?></span></span></span>
+        <span class="input-group-addon"><span class="help"><i class="fa fa-question-circle"></i><span style="display: none;"><?php echo _("This list contains all the Brands <br /> that have been hidden.  Clicking on any of them will unhide them.") ?></span></span></span>
     </div>
 </div>

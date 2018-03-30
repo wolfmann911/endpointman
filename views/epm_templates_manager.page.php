@@ -8,10 +8,10 @@
 	
 	
 	$product_list = "SELECT * FROM endpointman_product_list WHERE id > 0";
-	$product_list =& sql($product_list,'getAll', DB_FETCHMODE_ASSOC);
+	$product_list =sql($product_list,'getAll', DB_FETCHMODE_ASSOC);
 	
 	$mac_list = "SELECT * FROM endpointman_mac_list";
-	$mac_list =& sql($mac_list, 'getAll', DB_FETCHMODE_ASSOC);
+	$mac_list =sql($mac_list, 'getAll', DB_FETCHMODE_ASSOC);
 	
 	if((!$product_list) && (!$mac_list)) {
 		echo '<div class="alert alert-warning" role="alert">';

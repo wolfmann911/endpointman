@@ -20,7 +20,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2.10\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-18 15:54-0400\n"
+"POT-Creation-Date: 2018-01-24 15:27-0500\n"
 "PO-Revision-Date: 2016-05-04 17:44+0200\n"
 "Last-Translator: ded <ceo@postmet.com>\n"
 "Language-Team: Russian <http://weblate.freepbx.org/projects/fpbxcn/"
@@ -120,7 +120,7 @@ msgstr "Добавить новый"
 msgid "Add New Template"
 msgstr ""
 
-#: Endpointman_Templates.class.php:380
+#: Endpointman_Templates.class.php:374
 msgid "Add New Template OK!"
 msgstr "Добавление нового шаблона ОК!"
 
@@ -183,10 +183,6 @@ msgstr "Пакет бренда"
 msgid "Brand's Available"
 msgstr "Доступные бренды"
 
-#: views/epm_config/manager.list.hide.php:8
-msgid "Brands / Hidden Models:"
-msgstr ""
-
 #: views/epm_config_editor.page.php:7
 msgid "Brands/Modules"
 msgstr "Бренды/модули"
@@ -245,7 +241,7 @@ msgstr ""
 msgid "Click this link to download:"
 msgstr "Кликнуть на линк для скачивания:"
 
-#: Endpointman_Templates.class.php:366
+#: Endpointman_Templates.class.php:360
 msgid "Clone Model send is negative!"
 msgstr "Клонированная модель имеет отрицательный порядковый номер!"
 
@@ -253,7 +249,7 @@ msgstr "Клонированная модель имеет отрицатель�
 msgid "Clone Template From"
 msgstr ""
 
-#: views/epm_templates/editor.views.tamplate.php:30
+#: views/epm_templates/editor.views.template.php:30
 msgid "Clone of Model:"
 msgstr ""
 
@@ -337,7 +333,7 @@ msgstr "Зеркало FreePBX по умолчанию"
 msgid "Delete"
 msgstr "Удалить"
 
-#: Endpointman_Templates.class.php:337
+#: Endpointman_Templates.class.php:331
 msgid "Delete Template OK!"
 msgstr "Удаление шаблона ОК!"
 
@@ -345,19 +341,19 @@ msgstr "Удаление шаблона ОК!"
 msgid "Device"
 msgstr ""
 
-#: views/epm_templates/editor.views.tamplate.php:187
+#: views/epm_templates/editor.views.template.php:187
 msgid "Device's Description in FreePBX (Usually the Full Name)"
 msgstr ""
 
-#: views/epm_templates/editor.views.tamplate.php:190
+#: views/epm_templates/editor.views.template.php:190
 msgid "Device's Mac Address"
 msgstr ""
 
-#: views/epm_templates/editor.views.tamplate.php:191
+#: views/epm_templates/editor.views.template.php:191
 msgid "Device's Model"
 msgstr ""
 
-#: views/epm_templates/editor.views.tamplate.php:186
+#: views/epm_templates/editor.views.template.php:186
 msgid "Device's Username (usually the extension)"
 msgstr ""
 
@@ -365,7 +361,7 @@ msgstr ""
 msgid "Devices"
 msgstr "Устройства"
 
-#: Endpointman_Advanced.class.php:339 Endpointman_Templates.class.php:244
+#: Endpointman_Advanced.class.php:339 Endpointman_Templates.class.php:238
 msgid "Directory Not Writable!"
 msgstr "Директория не имеет прав на запись!"
 
@@ -389,7 +385,7 @@ msgstr "Отключить проверку сервера TFTP"
 msgid "Disable Tooltips"
 msgstr "Отключить подсказки"
 
-#: views/epm_templates/editor.views.tamplate.php:45
+#: views/epm_templates/editor.views.template.php:45
 msgid "Display:"
 msgstr ""
 
@@ -436,11 +432,11 @@ msgstr "Обнуляются все соответствующие таблиц�
 msgid "Edit"
 msgstr ""
 
-#: views/epm_templates/editor.views.tamplate.php:82
+#: views/epm_templates/editor.views.template.php:82
 msgid "Edit File Configurations"
 msgstr ""
 
-#: views/epm_templates/editor.views.tamplate.php:73
+#: views/epm_templates/editor.views.template.php:73
 msgid "Edit Global Settings Overrides"
 msgstr ""
 
@@ -461,13 +457,10 @@ msgid "Enabled"
 msgstr ""
 
 #: page.epm_advanced.php:18 page.epm_config.php:16 page.epm_templates.php:20
-msgid "End Point Configuraction Manager"
-msgstr "Менеджер конфигураций конечных устройств"
-
 #: views/epm_templates/editor.views.dialog.cfg.global.php:18
 #: views/epm_templates/editor.views.dialog.edit.cfg.php:5
 msgid "End Point Configuration Manager"
-msgstr ""
+msgstr "Менеджер конфигураций конечных устройств"
 
 #: functions.inc.php:233
 msgid "End Point Manager"
@@ -653,7 +646,7 @@ msgstr ""
 msgid "Error: We support only CVS and TXT files, type file %s no support!"
 msgstr ""
 
-#: views/epm_templates/editor.views.tamplate.php:182
+#: views/epm_templates/editor.views.template.php:182
 msgid "Example of Variables allowed in boxes"
 msgstr ""
 
@@ -778,7 +771,7 @@ msgstr "Полный экран F11"
 msgid "GIT Branch"
 msgstr "Раздел GIT"
 
-#: Endpointman_Templates.class.php:410
+#: Endpointman_Templates.class.php:404
 msgid "Generate list Ok!"
 msgstr "Генерирование списка ОК!"
 
@@ -786,7 +779,7 @@ msgstr "Генерирование списка ОК!"
 msgid "Git not installed!"
 msgstr "Git не инсталлирован!"
 
-#: Endpointman_Templates.class.php:205
+#: Endpointman_Templates.class.php:199
 msgid "Global Config Read OK!"
 msgstr ""
 
@@ -799,7 +792,7 @@ msgstr "Директория для глобальных окончательн�
 msgid "Global Phone Options"
 msgstr ""
 
-#: Endpointman_Templates.class.php:308
+#: Endpointman_Templates.class.php:302
 msgid "Globals Reset to Default!"
 msgstr ""
 
@@ -811,6 +804,14 @@ msgstr "Носы вверх!"
 #: Endpointman_Advanced.class.php:1095
 msgid "Here"
 msgstr "Здесь"
+
+#: views/epm_config/manager.list.hide.php:8
+msgid "Hidden Brands:"
+msgstr ""
+
+#: views/epm_config/manager.list.hide.php:6
+msgid "Hidden Packages"
+msgstr ""
 
 #: Endpointman_Config.class.php:85
 msgid "Hide"
@@ -828,19 +829,19 @@ msgstr "ID бренда не является номером"
 msgid "ID Producto not is number"
 msgstr "ID продукта не является цифрой"
 
-#: Endpointman_Templates.class.php:324
+#: Endpointman_Templates.class.php:318
 msgid "ID is not number!"
 msgstr "ID не является цифрой!"
 
-#: Endpointman_Templates.class.php:327
+#: Endpointman_Templates.class.php:321
 msgid "ID send is negative!"
 msgstr "Отправленый ID отрицательный!"
 
-#: Endpointman_Templates.class.php:392
+#: Endpointman_Templates.class.php:386
 msgid "ID send is not number!"
 msgstr "Посланый ID не является цифрой!"
 
-#: Endpointman_Templates.class.php:395
+#: Endpointman_Templates.class.php:389
 msgid "ID send is number not valid!"
 msgstr "Посланый номер ID не подходит!"
 
@@ -916,7 +917,7 @@ msgstr ""
 msgid "Importing brand file %s..."
 msgstr ""
 
-#: views/epm_templates/editor.views.tamplate.php:17
+#: views/epm_templates/editor.views.template.php:17
 msgid "Info Template"
 msgstr ""
 
@@ -982,7 +983,7 @@ msgstr "Узнать как  загрузить пакеты  вручную  м
 msgid "Line"
 msgstr "Строка"
 
-#: views/epm_templates/editor.views.tamplate.php:55
+#: views/epm_templates/editor.views.template.php:55
 msgid "Line settings on this page"
 msgstr ""
 
@@ -1139,7 +1140,7 @@ msgstr ""
 msgid "Name invalid: "
 msgstr "Наименование неверно: "
 
-#: Endpointman_Templates.class.php:360
+#: Endpointman_Templates.class.php:354
 msgid "Name is null!"
 msgstr "Наименование пустое!"
 
@@ -1170,7 +1171,7 @@ msgstr ""
 msgid "No Brand set!"
 msgstr "Не установлен бренд!"
 
-#: Endpointman_Advanced.class.php:345 Endpointman_Templates.class.php:252
+#: Endpointman_Advanced.class.php:345 Endpointman_Templates.class.php:246
 msgid "No Configuration Location Defined!"
 msgstr "Не определено местоположение конфигурации!"
 
@@ -1224,12 +1225,12 @@ msgstr ""
 msgid "No file was uploaded"
 msgstr "Файл не был загружен"
 
-#: Endpointman_Templates.class.php:171 Endpointman_Templates.class.php:215
-#: Endpointman_Templates.class.php:286
+#: Endpointman_Templates.class.php:165 Endpointman_Templates.class.php:209
+#: Endpointman_Templates.class.php:280
 msgid "No send Custom Value!"
 msgstr ""
 
-#: Endpointman_Templates.class.php:321 Endpointman_Templates.class.php:389
+#: Endpointman_Templates.class.php:315 Endpointman_Templates.class.php:383
 msgid "No send ID!"
 msgstr "ID не отправлено!"
 
@@ -1241,8 +1242,8 @@ msgstr "Product Select не отправлен!"
 msgid "No send SendID!"
 msgstr "SendID не отправлен!"
 
-#: Endpointman_Templates.class.php:174 Endpointman_Templates.class.php:218
-#: Endpointman_Templates.class.php:289
+#: Endpointman_Templates.class.php:168 Endpointman_Templates.class.php:212
+#: Endpointman_Templates.class.php:283
 msgid "No send TID!"
 msgstr ""
 
@@ -1252,11 +1253,11 @@ msgstr "Тип файла не отправлен!"
 
 #: Endpointman_Advanced.class.php:275 Endpointman_Advanced.class.php:530
 #: Endpointman_Advanced.class.php:695 Endpointman_Advanced.class.php:811
-#: Endpointman_Config.class.php:333 Endpointman_Templates.class.php:348
+#: Endpointman_Config.class.php:333 Endpointman_Templates.class.php:342
 msgid "No send value!"
 msgstr "Значение не отправлено!"
 
-#: Endpointman_Templates.class.php:248
+#: Endpointman_Templates.class.php:242
 msgid "Not a Vaild Directory"
 msgstr ""
 
@@ -1356,10 +1357,6 @@ msgstr "Менеджер пакетов"
 msgid "Package Server"
 msgstr "Сервер пакетов"
 
-#: views/epm_config/manager.list.hide.php:6
-msgid "Packages Hiden"
-msgstr ""
-
 #: views/epm_advanced_settings.page.php:255
 msgid "Path location ARP."
 msgstr ""
@@ -1425,7 +1422,7 @@ msgstr "Редактор конфигурации продукта"
 msgid "Product Directory '%s' Doesn't Exist! (%s)"
 msgstr ""
 
-#: views/epm_templates/editor.views.tamplate.php:26
+#: views/epm_templates/editor.views.template.php:26
 msgid "Product Line:"
 msgstr ""
 
@@ -1441,7 +1438,7 @@ msgstr "Product Select send не является числовым значен�
 msgid "Product Select send is number not valid!"
 msgstr "Product Select send является неверным числовым значением!"
 
-#: Endpointman_Templates.class.php:363
+#: Endpointman_Templates.class.php:357
 msgid "Product send is negative!"
 msgstr "Product send имеет отрицательное значение!"
 
@@ -1506,7 +1503,7 @@ msgstr ""
 msgid "Reset Global Overrides to Default"
 msgstr ""
 
-#: Endpointman_Templates.class.php:148
+#: Endpointman_Templates.class.php:142
 #: views/epm_advanced/poce.views.textarea.file.php:35
 #: views/epm_devices_main.page.php:312
 #: views/epm_templates/editor.views.dialog.edit.cfg.php:19
@@ -1514,15 +1511,12 @@ msgstr ""
 msgid "Save"
 msgstr "Сохранить"
 
-#: Endpointman_Templates.class.php:142
-msgid "Save & Reboot Phone(s)"
-msgstr ""
-
 #: views/epm_advanced/poce.views.textarea.file.php:48
 msgid "Save As..."
 msgstr "Сохранить Как..."
 
-#: views/epm_devices_main.page.php:928 views/epm_devices_main.page.php:1169
+#: page.epm_templates.php:53 views/epm_devices_main.page.php:928
+#: views/epm_devices_main.page.php:1169
 msgid "Saved"
 msgstr ""
 
@@ -1570,7 +1564,7 @@ msgstr ""
 msgid "Selected Phone(s) Options"
 msgstr ""
 
-#: views/epm_templates/editor.views.tamplate.php:188
+#: views/epm_templates/editor.views.template.php:188
 msgid "Server IP For Line 1"
 msgstr ""
 
@@ -1586,7 +1580,7 @@ msgstr ""
 msgid "Server PBX..."
 msgstr ""
 
-#: views/epm_templates/editor.views.tamplate.php:189
+#: views/epm_templates/editor.views.template.php:189
 msgid "Server Port For Line 1"
 msgstr ""
 
@@ -1596,7 +1590,7 @@ msgid "Setting Provision"
 msgstr "Установки снабжения"
 
 #: Endpointman_Advanced.class.php:52
-#: views/epm_templates/editor.views.tamplate.php:70
+#: views/epm_templates/editor.views.template.php:70
 msgid "Settings"
 msgstr "Установки"
 
@@ -1632,8 +1626,8 @@ msgstr "Синтаксическая ошибка, неверный JSON"
 msgid "System Failure!"
 msgstr "Системная ошибка!"
 
-#: Endpointman_Templates.class.php:177 Endpointman_Templates.class.php:221
-#: Endpointman_Templates.class.php:292
+#: Endpointman_Templates.class.php:171 Endpointman_Templates.class.php:215
+#: Endpointman_Templates.class.php:286
 msgid "TID is not number!"
 msgstr ""
 
@@ -1660,7 +1654,7 @@ msgstr "Редактор шаблона"
 msgid "Template Name"
 msgstr ""
 
-#: views/epm_templates/editor.views.tamplate.php:22
+#: views/epm_templates/editor.views.template.php:22
 msgid "Template Name:"
 msgstr ""
 
@@ -1740,8 +1734,8 @@ msgstr ""
 
 #: views/epm_config/manager.list.hide.php:25
 msgid ""
-"This list contains all the Trademarks / Products / Models <br /> that have "
-"been hidden.  Clicking on any of them will recover."
+"This list contains all the Brands <br /> that have been hidden.  Clicking on "
+"any of them will unhide them."
 msgstr ""
 
 #: views/epm_advanced_settings.page.php:136
@@ -1862,7 +1856,7 @@ msgstr ""
 msgid "Update!"
 msgstr "Обновить!"
 
-#: Endpointman_Templates.class.php:276 views/epm_advanced_settings.page.php:92
+#: Endpointman_Templates.class.php:270 views/epm_advanced_settings.page.php:92
 #: views/epm_templates/editor.views.dialog.cfg.global.php:76
 msgid "Updated!"
 msgstr "Обновлено!"
@@ -1915,7 +1909,7 @@ msgstr ""
 msgid "User File Configs"
 msgstr "Пользовательские конфигурационный файлы"
 
-#: Endpointman_Config.class.php:340 Endpointman_Templates.class.php:355
+#: Endpointman_Config.class.php:340 Endpointman_Templates.class.php:349
 msgid "Value send is not number!"
 msgstr ""
 

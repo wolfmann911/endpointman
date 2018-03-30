@@ -2,11 +2,11 @@
 	<rawname>endpointman</rawname>
 	<repo>unsupported</repo>
 	<name>OSS PBX End Point Manager</name>
-	<version>13.0.7.16</version>
-	<type>setup</type>
+	<version>14.0.0.1JC</version>
+    <publisher>JCattan</publisher>
 	<category>Connectivity</category>
-	<license>GPLv2+</license>
-	<licenselink>http://www.gnu.org/licenses/gpl-2.0.txt</licenselink>
+	<license>GPLv3+</license>
+	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<menuitems>
 		<epm_devices sort="1">OSS Endpoint Device List</epm_devices>
 		<epm_templates sort="2">OSS Endpoint Template Manager</epm_templates>
@@ -21,6 +21,8 @@
 		Pull Requests can be made to either of these and are encouraged.
 	</description>
 	<changelog>
+		*13.0.7.18* Fix missing function numRows Fix DateTimeZone class init Use count() instead of broken numRow() function Fix selected in template editor dropdown Changed some Spanish words to English on non-locales files
+		*13.0.7.17* Fix Save button in custom template page
 		*13.0.7.16* Use PHP timezone as default timezone instead of static America/Los_Angeles
 		*13.0.7.15* Remove spanish wordages
 		*13.0.7.14* Fix totally broken random number generator, Fixes issue with variable in json
@@ -55,13 +57,12 @@
 		*13.0.2* Missing updated file
 		*13.0.1* Updates from Community member Javier Pastor Garcia
 	</changelog>
-	<location>release/2.11/endpointman-2.11.4.11.tgz</location>
 	<depends>
-		<version>13.0</version>
+		<version>14.0</version>
 		<phpversion>5.3.0</phpversion>
 	</depends>
 	<supported>
-		<version>13.0</version>
+		<version>14.0</version>
 	</supported>
 	<hooks>
 		<framework namespace="FreePBX\Console\Command" class="Chown">
