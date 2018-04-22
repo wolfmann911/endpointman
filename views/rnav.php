@@ -10,4 +10,5 @@
 <a class="list-group-item" href="?display=epm_config"><?php echo _("Package Manager")?></a>
 <span class="list-group-item"><h3><?php echo _("Advanced")?></h3></span>
 <a class="list-group-item" href="?display=epm_templates"><?php echo _("Template Manager")?></a>
+<a class="list-group-item" href="?display=epm_placeholders"><?php echo _("Config File Placeholders")?></a>
 </div>
