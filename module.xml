@@ -12,6 +12,7 @@
 		<epm_templates sort="2" hidden="true">Template Manager</epm_templates>
 		<epm_config sort="3" hidden="true">Package Manager</epm_config>
 		<epm_advanced sort="4" hidden="true">Advanced Settings</epm_advanced>
+		<epm_placeholders sort="4" hidden="true">Config File Placeholders</epm_placeholders>
 		<epm_oss sort="0">OSS Endpoint Manager</epm_oss>
 	</menuitems>
 	<description>
