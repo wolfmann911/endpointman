@@ -353,6 +353,7 @@
 	                    									echo '<select name="'.$srow['key'].'" id="'.$srow['key'].'" class="form-control selectpicker show-tick" data-style="" data-live-search-placeholder="Search" data-live-search="true">';
 															foreach($srow['data'] as $lrow) 
 															{
+
 																echo '<option value="'.$lrow['value'].'" '.(array_key_exists('selected',$lrow)? 'selected' : '').' >'.$lrow['description'].'</option>';
 															}
 															echo '</select>';

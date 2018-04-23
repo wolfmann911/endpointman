@@ -70,7 +70,7 @@ class Endpointman_Templates
 				case "del_template":
 					$retarr = $this->epm_templates_del_template();
 					break;
-					
+
 				default:
 					$retarr = array("status" => false, "message" => _("Command not found!") . " [" .$command. "]");
 					break;

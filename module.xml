@@ -2,8 +2,9 @@
 	<rawname>endpointman</rawname>
 	<repo>unsupported</repo>
 	<name>OSS PBX End Point Manager</name>
-	<version>14.0.0.1JC</version>
-    <publisher>JCattan</publisher>
+	<version>14.0.0.1</version>
+	<type>setup</type>
+
 	<category>Connectivity</category>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
