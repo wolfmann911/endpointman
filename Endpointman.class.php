@@ -2129,7 +2129,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
         sql($sql);
 
         $phone_info = array();
-
+/*
         if ($custom != 0) {
             $phone_info = $this->get_phone_info($id);
             if (isset($variables['epm_reboot'])) {
@@ -2149,6 +2149,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
                 }
             }
         }
+*/
 
         if (isset($variables['silent_mode'])) {
             echo '<script language="javascript" type="text/javascript">window.close();</script>';
@@ -2163,7 +2164,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
 
     }
 
-/*
+
 
 
 
