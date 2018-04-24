@@ -780,13 +780,11 @@ class Endpointman_Advanced
 		elseif ($dget['type_file'] == "tfile")
 		{
 			/*
+			
 			$db = $this->db;
 			$sql = 'INSERT INTO endpointman_custom_configs (name, original_name, product_id, data) VALUES (?,?,?,?)';
 			$q = $db->prepare($sql);
-			$ob = $q->execute(array(addslashes($dget['save_as_name']), addslashes($dget['original_name']), $dget['product_select'], addslashes($dget['config_text'])));
-			$newidinsert = $db->lastInsertId();
-			$retarr = array("status" => true, "message" => "Saved to Database!");
-
+@ -790,7 +790,7 @@ class Endpointman_Advanced
 			$retarr['type_file'] = "sql";
 			$retarr['location'] = "SQL: ". $dget['save_as_name'];
 			$retarr['sendidt'] = $newidinsert;
@@ -803,7 +801,7 @@ class Endpointman_Advanced
 		unset($dget);
 		return $retarr;
 	}
-
+	
 	function epm_advanced_poce_delete_config_custom()
 	{
 		$arrVal['VAR_REQUEST'] = array("product_select", "type_file", "sql_select");
@@ -980,7 +978,7 @@ class Endpointman_Advanced
 					out(sprintf(_("Error: %s"), $this->file_upload_error_message($error)));
 				}
 				else {
-					$uploads_dir = $this->PHONE_MODULES_PATH . "temp";
+					$uploads_dir = $this->PHONE_MODULES_PATH . "temp/export";
 					$name = $_FILES["files"]["name"][$key];
 					$extension = pathinfo($name, PATHINFO_EXTENSION);
 					if ($extension == "tgz")

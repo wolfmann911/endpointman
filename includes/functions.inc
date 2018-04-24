@@ -646,7 +646,193 @@ class endpointmanager {
      *                )
      *         )
      */
+	 
+	 
+	 
+	 
+	 	//SIP EXTENSION SETTINGS get all Extensions and Settings
+	public function getSipextensions(){
+		
+		$ret = array();
+		
+		$sql = "SELECT * FROM sip";
+		$res = $this->eda->sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
+
+		if (count($res)) {
+            
+
+            if (!$res) {
+                $this->error['getSipSettings1'] = "Error with SQL Statement";
+            }
+
+		foreach ($res as $row) {
+			$id=$row['id'];
+			$keyword=$row['keyword'];
+			$ret[$id . '-' . $keyword] = array(
+			'keyword' => $row['keyword'],
+			'data' => $row['data'],
+			'flags' => $row['flags']
+			
+			);
+
+} 
+	}
+//print_r($ret);
+		return $ret;
+		
+	}	
+		
+		
+		
+	 //SIP  SETTINGS get all SIP Settings Part 1
+	public function getSipSettings1(){
+
+		$ret = array();
+		
+		$sql = "SELECT * FROM sipsettings";
+		$res = $this->eda->sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
+
+		if (count($res)) {
+            
+
+            if (!$res) {
+                $this->error['getSipSettings1'] = "Error with SQL Statement";
+            }
+
+		foreach ($res as $row) {
+			$keyword=$row['keyword'];
+			$ret[$keyword] = array(
+			'data' => $row['data'],
+			'seq' => $row['seq']
+			
+			);
+		
+	
+	}	
+	}
+		
+		return $ret;
+	}	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	 //SIP  SETTINGS 2 get all SIP Settings Part 2
+	public function getSipSettings2(){
+		
+		$ret = array();
+		
+		$sql = "SELECT * FROM kvstore_Sipsettings";
+		$res = $this->eda->sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
+
+		if (count($res)) {
+            
+
+            if (!$res) {
+                $this->error['getSipSettings2'] = "Error with SQL Statement";
+            }
+
+		foreach ($res as $row) {
+			$key=$row['key'];
+			$ret[$key] = array(
+			'val' => $row['val'],
+			'type' => $row['type']
+			
+			);
+		
+	
+	}	
+	}
+		return $ret;
+	}	
+		
+		
+		
+		
+
+	
+	//GET ALL FEATURE CODES
+	public function getFeatureCodes(){
+		
+		$ret = array();
+		
+		$sql = "SELECT * FROM featurecodes";
+		$res = $this->eda->sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
+		
+		
+		if (count($res)) {
+            
+			
+            $featurecodes = $res;
+
+            if (!$featurecodes) {
+                $this->error['featurecodes'] = "Error with SQL Statement";
+            }
+
+		foreach ($featurecodes as $row) {
+			$featurename=$row['featurename'];
+			$ret[$featurename] = array(
+			'modulename' => $row['modulename'],
+			'featurename' => $row['featurename'],
+			'description' => $row['description'],
+			'helptext' => $row['helptext'],
+			'defaultcode' => $row['defaultcode'],
+			'customcode' => $row['customcode'],
+			'enabled' => $row['enabled'],
+			'providedest' => $row['providedest']
+			
+			);
+		
+	
+	}	
+
+		
+}
+		
+		return $ret;
+	}	
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
     function get_phone_info($mac_id=NULL) {
+	
+	
+			$sipextensions=$this->getSipextensions();
+			$SipSettings1=$this->getSipSettings1();
+			$SipSettings2=$this->getSipSettings2();
+			$featurecodes=$this->getFeatureCodes();
+	
+	
+	
+	
+	
+	
+	
+	
+	
         //You could screw up a phone if the mac_id is blank
         if (!isset($mac_id)) {
             $this->error['get_phone_info'] = "Mac ID is not set";
@@ -675,10 +861,120 @@ class endpointmanager {
             $sql = "SELECT endpointman_line_list.*, sip.data as secret, devices.*, endpointman_line_list.description AS epm_description FROM endpointman_line_list, sip, devices WHERE endpointman_line_list.ext = devices.id AND endpointman_line_list.ext = sip.id AND sip.keyword = 'secret' AND mac_id = " . $mac_id . " ORDER BY endpointman_line_list.line ASC";
             $lines_info = $this->eda->sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
             foreach ($lines_info as $line) {
+			
+			
+			
+			
+
+
+			
+			
+			
+			
+			
+			
+			
                 $phone_info['line'][$line['line']] = $line;
                 $phone_info['line'][$line['line']]['description'] = $line['epm_description'];
-                $phone_info['line'][$line['line']]['user_extension'] = $line['user'];
+				$phone_info['line'][$line['line']]['extension'] = $line['ext'];
+				$phone_info['line'][$line['line']]['user_extension'] = $line['user'];
+				$phone_info['line'][$line['line']]['allowedcodec']=$sipextensions[$phone_info['line'][$line['line']]['extension'] . '-' . 'allow'][data];
+				$phone_info['line'][$line['line']]['forcerport']=$sipextensions[$phone_info['line'][$line['line']]['extension'] . '-' . 'force_rport'][data];
+				$phone_info['line'][$line['line']]['media_encryption']=$sipextensions[$phone_info['line'][$line['line']]['extension'] . '-' . 'media_encryption'][data];
+				$phone_info['line'][$line['line']]['sipdriver']=$sipextensions[$phone_info['line'][$line['line']]['extension'] . '-' . 'sipdriver'][data];
+				$phone_info['line'][$line['line']]['transport']=$sipextensions[$phone_info['line'][$line['line']]['extension'] . '-' . 'transport'][data];
+				$phone_info['line'][$line['line']]['trustrpid']=$sipextensions[$phone_info['line'][$line['line']]['extension'] . '-' . 'trustrpid'][data];
+				$phone_info['line'][$line['line']]['callerid']=$sipextensions[$phone_info['line'][$line['line']]['extension'] . '-' . 'callerid'][data];
+				$phone_info['line'][$line['line']]['encryption']=$sipextensions[$phone_info['line'][$line['line']]['extension'] . '-' . 'encryption'][data];
+				$phone_info['line'][$line['line']]['timestamp']=time();
+				
+				
+//Calculate the right SIP PORT (SIP/PJSIP/TLS/TCP)
+	//TLS
+	if ($phone_info['line'][$line['line']]['sipdriver'] == "chan_pjsip" and $phone_info['line'][$line['line']]['transport'] == '0.0.0.0-tls') {
+	$phone_info['line'][$line['line']]['server_port'] = $SipSettings2['tlsport-0.0.0.0'][val];
+	$phone_info['line'][$line['line']]['proto'] = 'tls';
+	}
+	if ($phone_info['line'][$line['line']]['sipdriver'] == "chan_pjsip" and $phone_info['line'][$line['line']]['transport'] == '127.0.0.1-tls') {
+	$phone_info['line'][$line['line']]['server_port'] = $SipSettings2['tlsport-127.0.0.1'][val];
+	$phone_info['line'][$line['line']]['proto'] = 'tls';
+	}
+	if ($phone_info['line'][$line['line']]['sipdriver'] == "chan_sip" and $phone_info['line'][$line['line']]['transport'] == 'tls,udp,tcp') {
+	$phone_info['line'][$line['line']]['server_port'] = $SipSettings1['tlsbindport'][data];
+	$phone_info['line'][$line['line']]['proto'] = 'tls';
+	}
+	if ($phone_info['line'][$line['line']]['sipdriver'] == "chan_sip" and $phone_info['line'][$line['line']]['transport'] == 'tls,udp') {
+	$phone_info['line'][$line['line']]['server_port'] = $SipSettings1['tlsbindport'][data];
+	$phone_info['line'][$line['line']]['proto'] = 'tls';
+	}
+	if ($phone_info['line'][$line['line']]['sipdriver'] == "chan_sip" and $phone_info['line'][$line['line']]['transport'] == 'tls,tcp') {
+	$phone_info['line'][$line['line']]['server_port'] = $SipSettings1['tlsbindport'][data];
+	$phone_info['line'][$line['line']]['proto'] = 'tls';
+	}
+	if ($phone_info['line'][$line['line']]['sipdriver'] == "chan_sip" and $phone_info['line'][$line['line']]['transport'] == 'tls') {
+	$phone_info['line'][$line['line']]['server_port'] = $SipSettings1['tlsbindport'][data];
+	$phone_info['line'][$line['line']]['proto'] = 'tls';
+	}
+	//TCP
+	if ($phone_info['line'][$line['line']]['sipdriver'] == "chan_pjsip" and $phone_info['line'][$line['line']]['transport'] == '0.0.0.0-tcp') {
+	$phone_info['line'][$line['line']]['server_port'] = $SipSettings2['tcpport-0.0.0.0'][val];
+	$phone_info['line'][$line['line']]['proto'] = 'tcp';
+	}
+	if ($phone_info['line'][$line['line']]['sipdriver'] == "chan_pjsip" and $phone_info['line'][$line['line']]['transport'] == '127.0.0.1-tcp') {
+	$phone_info['line'][$line['line']]['server_port'] = $SipSettings2['tcpport-127.0.0.1'][val];
+	$phone_info['line'][$line['line']]['proto'] = 'tcp';
+	}
+	if ($phone_info['line'][$line['line']]['sipdriver'] == "chan_sip" and $phone_info['line'][$line['line']]['transport'] == 'tcp,udp,tls') {
+	$phone_info['line'][$line['line']]['server_port'] = $SipSettings1['bindport'][data];
+	$phone_info['line'][$line['line']]['proto'] = 'tcp';
+	}
+	if ($phone_info['line'][$line['line']]['sipdriver'] == "chan_sip" and $phone_info['line'][$line['line']]['transport'] == 'tcp,udp') {
+	$phone_info['line'][$line['line']]['server_port'] = $SipSettings1['bindport'][data];
+	$phone_info['line'][$line['line']]['proto'] = 'tcp';
+	}
+	if ($phone_info['line'][$line['line']]['sipdriver'] == "chan_sip" and $phone_info['line'][$line['line']]['transport'] == 'tcp,tls') {
+	$phone_info['line'][$line['line']]['server_port'] = $SipSettings1['bindport'][data];
+	$phone_info['line'][$line['line']]['proto'] = 'tcp';
+	}
+	if ($phone_info['line'][$line['line']]['sipdriver'] == "chan_sip" and $phone_info['line'][$line['line']]['transport'] == 'tcp') {
+	$phone_info['line'][$line['line']]['server_port'] = $SipSettings1['bindport'][data];
+	$phone_info['line'][$line['line']]['proto'] = 'tcp';
+	}
+	//UDP
+	if ($phone_info['line'][$line['line']]['sipdriver'] == "chan_pjsip" and $phone_info['line'][$line['line']]['transport'] == '') {
+	$phone_info['line'][$line['line']]['server_port'] = $SipSettings2['udpport-0.0.0.0'][val];
+	$phone_info['line'][$line['line']]['proto'] = 'udp';
+	}
+	if ($phone_info['line'][$line['line']]['sipdriver'] == "chan_pjsip" and $phone_info['line'][$line['line']]['transport'] == '0.0.0.0-udp') {
+	$phone_info['line'][$line['line']]['server_port'] = $SipSettings2['udpport-0.0.0.0'][val];
+	$phone_info['line'][$line['line']]['proto'] = 'udp';
+	}
+	if ($phone_info['line'][$line['line']]['sipdriver'] == "chan_pjsip" and $phone_info['line'][$line['line']]['transport'] == '127.0.0.1-udp') {
+	$phone_info['line'][$line['line']]['server_port'] = $SipSettings2['udpport-127.0.0.1'][val];
+	$phone_info['line'][$line['line']]['proto'] = 'udp';
+	}
+	if ($phone_info['line'][$line['line']]['sipdriver'] == "chan_sip" and $phone_info['line'][$line['line']]['transport'] == 'udp,tcp,tls') {
+	$phone_info['line'][$line['line']]['server_port'] = $SipSettings1['bindport'][data];
+	$phone_info['line'][$line['line']]['proto'] = 'udp';
+	}
+	if ($phone_info['line'][$line['line']]['sipdriver'] == "chan_sip" and $phone_info['line'][$line['line']]['transport'] == 'udp,tcp') {
+	$phone_info['line'][$line['line']]['server_port'] = $SipSettings1['bindport'][data];
+	$phone_info['line'][$line['line']]['proto'] = 'udp';
+	}
+	if ($phone_info['line'][$line['line']]['sipdriver'] == "chan_sip" and $phone_info['line'][$line['line']]['transport'] == 'udp,tls') {
+	$phone_info['line'][$line['line']]['server_port'] = $SipSettings1['bindport'][data];
+	$phone_info['line'][$line['line']]['proto'] = 'udp';
+	}
+	if ($phone_info['line'][$line['line']]['sipdriver'] == "chan_sip" and $phone_info['line'][$line['line']]['transport'] == 'udp') {
+	$phone_info['line'][$line['line']]['server_port'] = $SipSettings1['bindport'][data];
+	$phone_info['line'][$line['line']]['proto'] = 'udp';
+	}				
+				
+				
+				
+                
             }
+			//print_r ($phone_info);
         } else {
             $sql = "SELECT id, mac FROM endpointman_mac_list WHERE id =" . $mac_id;
             //Phone is unknown, we need to display this to the end user so that they can make corrections
@@ -700,10 +996,13 @@ class endpointmanager {
             $phone_info['mac'] = $row['mac'];
             $sql = "SELECT endpointman_line_list.*, sip.data as secret, devices.* FROM endpointman_line_list, sip, devices WHERE endpointman_line_list.ext = devices.id AND endpointman_line_list.ext = sip.id AND sip.keyword = 'secret' AND mac_id = " . $mac_id;
             $lines_info = $this->eda->sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
+			
             foreach ($lines_info as $line) {
                 $phone_info['line'][$line['line']] = $line;
+				
             }
         }
+		
         return $phone_info;
     }
 
@@ -1350,6 +1649,50 @@ class endpointmanager {
     function display_configs() {
 
     }
+	
+	
+	
+	
+	
+	
+
+	
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
     /**
      * Prepare and then send the data that Provisioner expects, then take what provisioner gives us and do what it says
@@ -1541,8 +1884,94 @@ class endpointmanager {
                 $li = 0;
                 foreach ($phone_info['line'] as $line) {
                     $line_options = is_array($line_ops[$line['line']]) ? $line_ops[$line['line']] : array();
-                    $line_statics = array('line' => $line['line'], 'username' => $line['ext'], 'authname' => $line['ext'], 'secret' => $line['secret'], 'displayname' => $line['description'], 'server_host' => $this->global_cfg['srvip'], 'server_port' => '5060', 'user_extension' => $line['user_extension'], 'tech' => $line['tech']);
+                    $line_statics = array(
+					'line' => $line['line'],
+					'username' => $line['ext'],
+					'authname' => $line['ext'],
+					'secret' => $line['secret'],
+					'displayname' => $line['description'],
+					'server_host' => $this->global_cfg['srvip'],
+					'server_port' => $line['server_port'],
+					'proto' => $line['proto'],
+					'user_extension' => $line['user_extension'],
+					'extension' => $line['ext'],
+					'allowedcodec' => $line['allowedcodec'],
+					'forcerport' => $line['forcerport'],
+					'media_encryption' => $line['media_encryption'],
+					'sipdriver' => $line['sipdriver'],
+					'transport' => $line['transport'],
+					'trustrpid' => $line['trustrpid'],
+					'callerid' => $line['callerid'],
+					'encryption' => $line['encryption'],							
+					'tech' => $line['tech']);
+					
+					
+					
 
+					
+
+					//STATIC LINE SETTINGS WITHOUT LOOP (accXSetting)
+
+					$provisioner_lib->settings['acc' . $line[line] . 'secret'] = $line['secret'];
+					$provisioner_lib->settings['acc' . $line[line] . 'displayname'] = $line['description'];
+					$provisioner_lib->settings['acc' . $line[line] . 'user_extension'] = $line['user_extension'];
+					$provisioner_lib->settings['acc' . $line[line] . 'username'] = $line['ext'];
+					$provisioner_lib->settings['acc' . $line[line] . 'authname'] = $line['ext'];
+					$provisioner_lib->settings['acc' . $line[line] . 'extension'] = $line['extension'];
+					$provisioner_lib->settings['acc' . $line[line] . 'allowedcodec'] = $line['allowedcodec'];
+					$provisioner_lib->settings['acc' . $line[line] . 'forcerport'] = $line['forcerport'];
+					$provisioner_lib->settings['acc' . $line[line] . 'media_encryption'] = $line['media_encryption'];
+					$provisioner_lib->settings['acc' . $line[line] . 'sipdriver'] = $line['sipdriver'];
+					$provisioner_lib->settings['acc' . $line[line] . 'transport'] = $line['transport'];
+					$provisioner_lib->settings['acc' . $line[line] . 'trustrpid'] = $line['trustrpid'];
+					$provisioner_lib->settings['acc' . $line[line] . 'callerid'] = $line['callerid'];
+					$provisioner_lib->settings['acc' . $line[line] . 'encryption'] = $line['encryption'];
+					$provisioner_lib->settings['acc' . $line[line] . 'server_port'] = $line['server_port'];
+					$provisioner_lib->settings['server_host'] = $this->global_cfg['srvip'];
+					
+					$provisioner_lib->settings['timestamp'] = time();
+		
+		
+		
+		
+				//THIS ARE EXTRA VALUES FOR GRANDSTREAM
+					
+					//Add loop Values for Grandstream (Tested with Analog HT8XX Adapter)
+						
+						//PROTO UPD/TCP/TLS
+						if ($line['proto'] == "tcp") {
+							$line_statics[gsproto] = '1';
+						}
+						if ($line['proto'] == "udp") {
+							$line_statics[gsproto] = '0';
+						}					
+						if ($line['proto'] == "tls") {
+							$line_statics[gsproto] = '2';
+						}
+						
+						
+						//GRANDSTREAM SRTP YES/NO
+	
+						if ($line['encryption'] == "yes" || $line['media_encryption'] == "sdes" ) {
+							$line_statics[gsSRTP] = '2';
+						}
+						if ($line['encryption'] == "no" || $line['media_encryption'] == "no" ) {
+							$line_statics[gsSRTP] = '0';
+						}
+						
+		
+					//Add static Values for Grandstream (Tested with Analog HT8XX Adapter)
+					
+						$provisioner_lib->settings['acc' . $line[line] . 'gsproto'] = $line_statics[gsproto];
+						$provisioner_lib->settings['acc' . $line[line] . 'gsSRTP'] = $line_statics[gsSRTP];
+					
+					
+					
+					
+			//MERGE ARRAYS
+					
+					
+					
                     $provisioner_lib->settings['line'][$li] = array_merge($line_options, $line_statics);
                     $li++;
                 }
@@ -1601,6 +2030,7 @@ class endpointmanager {
                 //Setting a line variable here...these aren't defined in the template_data.xml file yet. however they will still be parsed
                 //and if they have defaults assigned in a future template_data.xml or in the config file using pipes (|) those will be used, pipes take precedence
                 $provisioner_lib->processor_info = "EndPoint Manager Version " . $this->global_cfg['version'];
+				
 
                 // Because every brand is an extension (eventually) of endpoint, you know this function will exist regardless of who it is
                 //Start timer

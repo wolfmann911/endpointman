@@ -784,7 +784,6 @@ class Endpointman_Templates
     	return($temp);
     }
 	
-	
 	/**
      * Generates the Visual Display for the end user
      * @param <type> $cfg_data
@@ -934,7 +933,8 @@ class Endpointman_Templates
     	}
     
     	return($template_variables_array);
-    }
+    }	
+
 	
 	 /**
      * Generate an array that will get parsed as HTML from an array of values from XML

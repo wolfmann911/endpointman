@@ -170,6 +170,12 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 		require_once('Endpointman_Devices.class.php');
 		$this->epm_devices = new Endpointman_Devices($freepbx, $this->configmod);
 
+		require_once('Endpointman_Devices.class.php');
+		$this->epm_oss = new Endpointman_Devices($freepbx, $this->configmod);
+		
+		//require_once('Endpointman_Devices.class.php');
+		$this->epm_placeholders = new Endpointman_Devices($freepbx, $this->configmod);
+
 	}
 
 	public function chownFreepbx() {
@@ -203,6 +209,14 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 			case "epm_devices":
 				return $this->epm_devices->ajaxRequest(trim($req), $setting);
 				break;
+		
+			case "epm_oss":
+				return $this->epm_oss->ajaxRequest(trim($req), $setting);
+				break;
+				
+			case "epm_placeholders":
+				return $this->epm_placeholders->ajaxRequest(trim($req), $setting);
+				break;
 
 			case "epm_config":
 				return $this->epm_config->ajaxRequest(trim($req), $setting);
@@ -229,7 +243,7 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 			return array("status" => false, "message" => _("No command was sent!"));
 		}
 
-		$arrVal['mod_sec'] = array("epm_devices", "epm_templates", "epm_config", "epm_advanced");
+		$arrVal['mod_sec'] = array("epm_devices", "epm_oss", "epm_placeholders", "epm_templates", "epm_config", "epm_advanced");
 		if (! in_array($module_sec, $arrVal['mod_sec'])) {
 			return array("status" => false, "message" => _("Invalid section module!"));
 		}
@@ -240,6 +254,13 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 				return $this->epm_devices->ajaxHandler($module_tab, $command);
 				break;
 
+			case "epm_oss":
+				return $this->epm_oss->ajaxHandler($module_tab, $command);
+				break;
+			case "epm_placeholders":
+				return $this->epm_placeholders->ajaxHandler($module_tab, $command);
+				break;
+				
 			case "epm_templates":
 				return $this->epm_templates->ajaxHandler($module_tab, $command);
 				break;
@@ -268,7 +289,7 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 		$command = isset($_REQUEST['command'])? trim($_REQUEST['command']) : '';
 
 
-		$arrVal['mod_sec'] = array("epm_devices","epm_templates", "epm_config", "epm_advanced");
+		$arrVal['mod_sec'] = array("epm_devices","epm_oss", "epm_placeholders", "epm_templates", "epm_config", "epm_advanced");
 		if (! in_array($page, $arrVal['mod_sec'])) {
 			die(_("Invalid section module!"));
 		}
@@ -278,7 +299,12 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 			case "epm_devices":
 				$this->epm_devices->doConfigPageInit($module_tab, $command);
 				break;
-
+			case "epm_oss":
+				$this->epm_oss->doConfigPageInit($module_tab, $command);
+				break;	
+			case "epm_placeholders":
+				$this->epm_placeholders->doConfigPageInit($module_tab, $command);
+				break;	
 			case "epm_templates":
 				$this->epm_templates->doConfigPageInit($module_tab, $command);
 				break;
@@ -309,7 +335,12 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 			case "epm_devices":
 				$this->epm_devices->myShowPage($this->pagedata);
 				break;
-
+			case "epm_oss":
+				return $this->epm_oss->myShowPage($this->pagedata);
+				break;	
+			case "epm_placeholders":
+				return $this->epm_placeholders->myShowPage($this->pagedata);
+				break;	
 			case "epm_templates":
 				$this->epm_templates->myShowPage($this->pagedata);
 				return $this->pagedata;
@@ -343,12 +374,20 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 	public function getRightNav($request) {
 		if (! isset($_REQUEST['display']))
 			return '';
-
+		else {
+			return load_view(dirname(__FILE__).'/views/rnav.php',array());
+		}
 		switch($_REQUEST['display'])
 		{
 			case "epm_devices":
 				return $this->epm_devices->getRightNav($request);
 				break;
+			case "epm_oss":
+				return $this->epm_oss->getRightNav($request);
+				break;	
+			case "epm_placeholders":
+				return $this->epm_placeholders->getRightNav($request);
+				break;	
 
 			case "epm_config":
 				return $this->epm_config->getRightNav($request);
@@ -378,7 +417,13 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 			case "epm_devices":
 				return $this->epm_devices->getActionBar($request);
 				break;
-
+				
+			case "epm_oss":
+				return $this->epm_oss->getActionBar($request);
+				break;
+			case "epm_placeholders":
+				return $this->epm_placeholders->getActionBar($request);
+				break;
 			case "epm_config":
 				return $this->epm_config->getActionBar($request);
 				break;
@@ -528,7 +573,7 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
      * This function takes a string and tries to determine if it's a valid mac addess, return FALSE if invalid
      * @param string $mac The full mac address
      * @return mixed The cleaned up MAC is it was a MAC or False if not a mac
-     */
+
     function mac_check_clean($mac) {
     	if ((strlen($mac) == "17") OR (strlen($mac) == "12")) {
     		//It might be better to use switch here instead of these IF statements...
@@ -570,7 +615,7 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
     }
 
 
-
+     */
 
 
 
@@ -696,7 +741,7 @@ echo 'TFTP Server check failed on last past. Skipping';
      * @param <type> $product Product Directory
      * @param <type> $orig_name The file's original name we are sending
      * @param <type> $data The config file's data
-     */
+*/
     function submit_config($brand, $product, $orig_name, $data) {
     	$posturl = 'http://www.provisioner.net/submit_config.php';
 
@@ -726,7 +771,7 @@ echo 'TFTP Server check failed on last past. Skipping';
 
 
 
-
+    /**
 
 
     function add_device($mac, $model, $ext, $template=NULL, $line=NULL, $displayname=NULL) {
@@ -775,6 +820,8 @@ echo 'TFTP Server check failed on last past. Skipping';
     					if (!isset($displayname)) {
     						$sql = 'SELECT description FROM devices WHERE id = ' . $ext;
     						$name = sql($sql, 'getOne');
+							$name = "123";
+							$displayname = "123";
     					} else {
     						$name = $displayname;
     					}
@@ -935,10 +982,11 @@ echo 'TFTP Server check failed on last past. Skipping';
 
 
 
-    /**
+ 
      * Display all unused registrations from whatever manager we are using!
      * @return <type>
      */
+	     /**
     function display_registration_list($line_id=NULL) {
 
     	if (isset($line_id)) {
@@ -967,7 +1015,7 @@ echo 'TFTP Server check failed on last past. Skipping';
     }
 
 
-    /**
+
      * Send this function an ID from the mac devices list table and you'll get all the information we have on that particular phone
      * @param integer $mac_id ID number reference from the MySQL database referencing the table endpointman_mac_list
      * @return array
@@ -1012,7 +1060,7 @@ echo 'TFTP Server check failed on last past. Skipping';
      *                        )
      *                )
      *         )
-     */
+     
     function get_phone_info($mac_id=NULL) {
     	//You could screw up a phone if the mac_id is blank
     	if (!isset($mac_id)) {
@@ -1072,14 +1120,15 @@ echo 'TFTP Server check failed on last past. Skipping';
     			$phone_info['line'][$line['line']] = $line;
     		}
     	}
+		$phone_info = "test";
     	return $phone_info;
     }
-
+*/
     /**
      * Get the brand from any mac sent to this function
      * @param string $mac
      * @return array
-     */
+     
     function get_brand_from_mac($mac) {
     	//Check for valid mac address first
 		if (!$this->mac_check_clean($mac)) {
@@ -1107,14 +1156,14 @@ echo 'TFTP Server check failed on last past. Skipping';
     	return($phone_info);
     }
 
-
+*/
 
     /**
      * Prepare and then send the data that Provisioner expects, then take what provisioner gives us and do what it says
      * @param array $phone_info Everything from get_phone_info
      * @param bool  $reboot Reboot the Phone after write
      * @param bool  $write  Write out Directory structure.
-     */
+     
     function prepare_configs($phone_info, $reboot=TRUE, $write=TRUE)
     {
     	$this->PROVISIONER_BASE = $this->PHONE_MODULES_PATH;
@@ -1397,6 +1446,7 @@ $this->error['parse_configs'] = "Can't Load the Autoloader!";
     }
 
     function write_configs($provisioner_lib, $reboot, $write_path, $phone_info, $returned_data) {
+		
     	//Create Directory Structure (If needed)
     	if (isset($provisioner_lib->directory_structure)) {
     		foreach ($provisioner_lib->directory_structure as $data) {
@@ -1479,7 +1529,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
     		$provisioner_lib->reboot();
     	}
     }
-
+*/
 
 
 
@@ -1583,7 +1633,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
 
 
 
-
+/*
 
     function download_json($location, $directory=NULL) {
         $temp_directory = $this->sys_get_temp_dir() . "/epm_temp/";
@@ -1620,7 +1670,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
     }
 
 
-
+*/
 
 
     /**
@@ -1630,7 +1680,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
     * @param integer $Priority the Priority of the command to run
     * @return int $PID process id
     * @package epm_system
-    */
+    
     function run_in_background($Command, $Priority = 0) {
         return($Priority ? shell_exec("nohup nice -n $Priority $Command 2> /dev/null & echo $!") : shell_exec("nohup $Command > /dev/null 2> /dev/null & echo $!"));
     }
@@ -1641,7 +1691,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
     * @param string $PID proccess ID
     * @return bool true or false
     * @package epm_system
-    */
+    
     function is_process_running($PID) {
         exec("ps $PID", $ProcessState);
         return(count($ProcessState) >= 2);
@@ -1654,7 +1704,8 @@ $this->error['parse_configs'] = "File not written to hard drive!";
     * @version 2.11
     * @param string $exec Executable to find
     * @package epm_system
-    */
+
+	
     function find_exec($exec) {
         $o = exec('which '.$exec);
         if($o) {
@@ -1668,12 +1719,12 @@ $this->error['parse_configs'] = "File not written to hard drive!";
         }
     }
 
-
+    */
     /**
      * Only used once in all of Endpoint Manager to determine if a table exists
      * @param string $table Table to look for
      * @return bool
-     */
+
     function table_exists($table) {
         $sql = "SHOW TABLES FROM " . $this->config->get('AMPDBNAME');
         $result = $this->eda->sql($sql, 'getAll');
@@ -1684,7 +1735,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
         }
         return FALSE;
     }
-
+     */
 
 
 
@@ -1694,7 +1745,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
      * @param string $mask the complete netmask, eg [1.1.1.1/24]
      * @return boolean True if valid, False if not
      * @version 2.11
-     */
+     
     function validate_netmask($mask) {
         return preg_match("/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\/(\d{1,2})$/", $mask) ? TRUE : FALSE;
     }
@@ -1712,7 +1763,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
      * @param mixed $netmask The netmask, eg [1.1.1.1/24]
      * @param boolean $use_nmap True use nmap, false don't use it
      * @return array List of devices found on the network
-     */
+     
     function discover_new($netmask, $use_nmap=TRUE) {
         if (($use_nmap) AND (file_exists($this->eda->global_cfg['nmap_location'])) AND ($this->validate_netmask($netmask))) {
             shell_exec($this->eda->global_cfg['nmap_location'] . ' -v -sP ' . $netmask);
@@ -1723,6 +1774,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
             $this->error['discover_new'] = "Could Not Find NMAP, Using ARP Only";
             //return(FALSE);
         }
+		
         //Get arp list
         $arp_list = shell_exec($this->eda->global_cfg['arp_location'] . " -an");
 
@@ -1853,7 +1905,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
 
 
 
-
+    /**
 
     function update_device($macid, $model, $template, $luid=NULL, $name=NULL, $line=NULL, $update_lines=TRUE) {
         $sql = "UPDATE endpointman_mac_list SET model = " . $model . ", template_id =  " . $template . " WHERE id = " . $macid;
@@ -1900,11 +1952,11 @@ $this->error['parse_configs'] = "File not written to hard drive!";
         }
     }
 
-    /**
+
      * This will either a. delete said line or b. delete said device from line
      * @param <type> $line
      * @return <type>
-     */
+     
     function delete_line($lineid, $allow_device_remove=FALSE) {
         $sql = 'SELECT mac_id FROM endpointman_line_list WHERE luid = ' . $lineid;
         $mac_id = sql($sql, 'getOne');
@@ -1942,8 +1994,8 @@ $this->error['parse_configs'] = "File not written to hard drive!";
         $this->message['delete_device'] = "Deleted!";
         return(TRUE);
     }
-
-    function get_message($function_name) {
+*/
+ /*   function get_message($function_name) {
         if (isset($this->message[$function_name])) {
             return($this->message[$function_name]);
         } else {
@@ -2077,7 +2129,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
         sql($sql);
 
         $phone_info = array();
-
+/*
         if ($custom != 0) {
             $phone_info = $this->get_phone_info($id);
             if (isset($variables['epm_reboot'])) {
@@ -2097,6 +2149,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
                 }
             }
         }
+*/
 
         if (isset($variables['silent_mode'])) {
             echo '<script language="javascript" type="text/javascript">window.close();</script>';
@@ -2124,7 +2177,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
 
     //BORRAR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	//OBSOLETO, ANTIGUAMENTE VENTANAS EMERGENTES, AHORA SON DIALOGOS JQUERY.
-    function prepare_message_box() {
+ /*   function prepare_message_box() {
         $error_message = NULL;
         foreach ($this->error as $key => $error) {
             $error_message .= $error;
@@ -2160,7 +2213,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
             $this->display_message_box($error_message, 1);
         }
     }
-
+*/
 
 
 
