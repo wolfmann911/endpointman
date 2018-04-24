@@ -1,39 +1,41 @@
 <module>
-	<rawname>endpointman</rawname>
-	<repo>Standard</repo>
-	<name>OSS Endpoint Manager</name>
-	<version>14.0.0.2</version>
-	 <publisher>matthias1232</publisher>
-	<category>Settings</category>
-	<license>GPLv3+</license>
-	<licenselink>http://www.gnu.org/licenses/gpl-2.0.txt</licenselink>
-	<menuitems>
-		<epm_devices sort="1" hidden="true">Device List</epm_devices>
-		<epm_templates sort="2" hidden="true">Template Manager</epm_templates>
-		<epm_config sort="3" hidden="true">Package Manager</epm_config>
-		<epm_advanced sort="4" hidden="true">Advanced Settings</epm_advanced>
-		<epm_placeholders sort="4" hidden="true">Config File Placeholders</epm_placeholders>
-		<epm_oss sort="0">OSS Endpoint Manager</epm_oss>
-	</menuitems>
-	<description>
-		GreenVOIP OSS PBX Endpoint Manager is a fork of the free supported PBX Endpoint Manager for FreePBX.
-		It is ***NOT*** supported by Schmoozecom. If you are looking for a supported endpoint manager please look into the Commercial Endpoint Manager by Schmoozecom, INC.
-		The front end gui is hosted at: https://github.com/matthias1232/greenepm
-	</description>
-	<changelog>
-		*14.0.0.2* Fix some Bugs
-		*14.0.0.1* Initial release of fork from OSS EPM
-	</changelog>
-	<depends>
-		<version>14.0</version>
-		<phpversion>5.3.0</phpversion>
-	</depends>
-	<supported>
-		<version>14.0</version>
-	</supported>
-	<hooks>
-		<framework namespace="FreePBX\Console\Command" class="Chown">
-			<method namespace="FreePBX\modules" class="Endpointman" callingMethod="fwcChownFiles">chownFreepbx</method>
-		</framework>
-	</hooks>
+        <rawname>endpointman</rawname>
+        <repo>local</repo>
+        <name>OSS Endpoint Manager</name>
+        <version>14.0.0.3</version>
+         <publisher>matthias1232</publisher>
+        <category>Settings</category>
+        <license>GPLv3+</license>
+        <licenselink>http://www.gnu.org/licenses/gpl-2.0.txt</licenselink>
+        <updateurl>https://provisioning.powerpro.at/greenepm/module.json</updateurl>
+        <menuitems>
+                <epm_devices sort="1" hidden="true">Device List</epm_devices>
+                <epm_templates sort="2" hidden="true">Template Manager</epm_templates>
+                <epm_config sort="3" hidden="true">Package Manager</epm_config>
+                <epm_advanced sort="4" hidden="true">Advanced Settings</epm_advanced>
+                <epm_placeholders sort="4" hidden="true">Config File Placeholders</epm_placeholders>
+                <epm_oss sort="0">OSS Endpoint Manager</epm_oss>
+        </menuitems>
+        <description>
+                GreenVOIP OSS PBX Endpoint Manager is a fork of the free supported PBX Endpoint Manager for FreePBX.
+                It is ***NOT*** supported by Schmoozecom. If you are looking for a supported endpoint manager please look into the Commercial Endpoint Manager by Schmoozecom, INC.
+                The front end gui is hosted at: https://github.com/matthias1232/greenepm
+        </description>
+        <changelog>
+                *14.0.0.2* Fix some Bugs
+                *14.0.0.1* Initial release of fork from OSS EPM
+        </changelog>
+        <depends>
+                <version>14.0</version>
+                <phpversion>5.3.0</phpversion>
+        </depends>
+        <supported>
+                <version>14.0</version>
+        </supported>
+        <hooks>
+                <framework namespace="FreePBX\Console\Command" class="Chown">
+                        <method namespace="FreePBX\modules" class="Endpointman" callingMethod="fwcChownFiles">chownFreepbx</method>
+                </framework>
+        </hooks>
 </module>
+
