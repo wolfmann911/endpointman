@@ -2,7 +2,7 @@
 	<rawname>endpointman</rawname>
 	<repo>Standard</repo>
 	<name>OSS Endpoint Manager</name>
-	<version>14.0.0.1</version>
+	<version>14.0.0.2</version>
 	 <publisher>matthias1232</publisher>
 	<category>Settings</category>
 	<license>GPLv3+</license>
@@ -21,6 +21,7 @@
 		The front end gui is hosted at: https://github.com/matthias1232/greenepm
 	</description>
 	<changelog>
+		*14.0.0.2* Fix some Bugs
 		*14.0.0.1* Initial release of fork from OSS EPM
 	</changelog>
 	<depends>
