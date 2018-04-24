@@ -46,7 +46,7 @@ class phonesettings {
         $results = $_SESSION['dbh_asterisk']->getAll($sql, DB_FETCHMODE_ASSOC);
 
         // and we are not logged in as admin
-        if (($exten!=$ARI_ADMIN_USERNAME) AND ($results[0]['value'])) {
+        if (!DB::IsError($results) && ($exten!=$ARI_ADMIN_USERNAME) AND ($results[0]['value'])) {
             $ret .= "<p><small><small><a href='" . $_SESSION['ARI_ROOT'] . "?m=phonesettings&f=display'>" . _("Phone Settings") . "</a></small></small></p><br>";
         }
 
@@ -70,7 +70,7 @@ class phonesettings {
         $endpoint = new endpointmanager();
 
         $sql = "SELECT mac_id, line FROM endpointman_line_list WHERE ext = '".$_SESSION['ari_user']['extension']."' ";
-        $mac_row =& $endpoint->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
+        $mac_row = $endpoint->eda->sql($sql, 'getrow', DB_FETCHMODE_ASSOC);
 
         $mac_id = $mac_row['mac_id'];
         $line = $mac_row['line'];
@@ -107,7 +107,7 @@ class phonesettings {
         $custom_cfg_data = serialize($custom_cfg_data);
 
         $sql = "UPDATE endpointman_mac_list SET global_user_cfg_data = '".$custom_cfg_data."' WHERE id = ". $mac_id;
-        $endpoint->db->query($sql);
+        $endpoint->eda->sql($sql);
 
         $reboot = isset($_REQUEST['epm_reboot'])?$_REQUEST['epm_reboot']:null;
 
@@ -157,10 +157,10 @@ class phonesettings {
 
         $sql = "SELECT mac_id, line FROM endpointman_line_list WHERE ext = '".$_SESSION['ari_user']['extension']."' ";
 
-        $res =& $endpoint->db->query($sql);
-        if($res->numRows()) {
+        $res = $endpoint->eda->sql($sql);
+        if(count($res)) {
 
-            $mac_row =& $endpoint->db->getRow($sql, array(), DB_FETCHMODE_ASSOC);
+            $mac_row = $endpoint->eda->sql($sql, 'getrow', DB_FETCHMODE_ASSOC);
 
             $mac_id = $mac_row['mac_id'];
             $line = $mac_row['line'];
@@ -206,7 +206,7 @@ class phonesettings {
 
 
                 $m = "phonesettings";
-                $ret = "<form class='phonesettings' name='ari_settings' action='' method='GET'>
+                $ret = "<form class='phonesettings' name='ari_settings' action='' method='POST'>
                         <input type=hidden name=m value=" . $m . ">
                         <input type=hidden name=f value='action'>
                         <input type=hidden name=a value='update'>

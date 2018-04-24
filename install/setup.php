@@ -6,6 +6,8 @@
  * @license MPL / GPLv2 / LGPL
  * @package Provisioner
  */
+
+ if (!class_exists('ProvisionerConfig')) {
 class ProvisionerConfig {
     /**
      * Setup anything required to make our provisioner class work
@@ -28,7 +30,7 @@ class ProvisionerConfig {
         // Try to include the class
         $file = str_replace('_', DIRECTORY_SEPARATOR, $class) . '.php';
 
-		$file = PHONE_MODULES_PATH . $file;
+		$file = FreePBX::Endpointman()->PHONE_MODULES_PATH . $file;
 
         if (is_file($file)) {
             require $file;
@@ -39,5 +41,5 @@ class ProvisionerConfig {
         return FALSE;
     }
 }
-
+}
 ProvisionerConfig::setup();

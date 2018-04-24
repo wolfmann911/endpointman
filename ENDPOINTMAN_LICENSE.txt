@@ -1,9 +1,9 @@
 ***** BEGIN LICENSE BLOCK *****
-Version: MPL 1.1/GPL 2.0/LGPL 2.1
+Version: MPL1.1/GPL 2.0
 
-The contents of this file are subject to the Mozilla Public License Version 
-1.1 (the "License"); you may not use this file except in compliance with 
-the License. You may obtain a copy of the License at 
+The contents of this file are subject to the Mozilla Public License Version
+1.1 (the "License"); you may not use this file except in compliance with
+the License. You may obtain a copy of the License at
 http://www.mozilla.org/MPL/
 
 Software distributed under the License is distributed on an "AS IS" basis,
@@ -39,3 +39,7 @@ the provisions above, a recipient may use your version of this file under
 the terms of any one of the MPL, the GPL or the LGPL.
 
 ***** END LICENSE BLOCK *****
+
+
+***LICENSE NOTE: MPL 1.1 has a provision (section 13) that allows a program (or parts of it) to offer a choice of another license as well.
+If part of a program allows the GNU GPL as an alternate choice, or any other GPL-compatible license as an alternate choice, that part of the program has a GPL-compatible license.
