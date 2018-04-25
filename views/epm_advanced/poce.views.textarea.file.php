@@ -21,7 +21,7 @@
           			<div id="box_sec_source" class="row">
           				<div class="col-xs-12">
           					<button type="button" class='btn btn-default btn-sm pull-xs-right' name="bt_source_full_screen" onclick="epm_advanced_tab_poce_bt_acction(this);" disabled><i class="fa fa-arrows-alt"></i> <?php echo _('Full Screen F11')?></button>
-          					<label class="control-label" for="config_textarea"><i class="fa fa-file-code-o" data-for="config_textarea"></i> Cantenido del archivo:</label> <code class='inline' id='poce_file_name_path'><?php echo _("No Selected"); ?></code>
+          					<label class="control-label" for="config_textarea"><i class="fa fa-file-code-o" data-for="config_textarea"></i> <?php echo _("Content of the file:"); ?></label> <code class='inline' id='poce_file_name_path'><?php echo _("No Selected"); ?></code>
           					<textarea name="config_textarea" id="config_textarea" rows="5" disabled></textarea>
           					<i class='fa fa-exclamation-triangle'></i> <font style="font-size: 0.8em; font-style: italic;"><?php echo _("NOTE: Key F11 Full Screen, ESC Exit FullScreen.")?></font>
           				</div>
