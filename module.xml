@@ -1,7 +1,7 @@
 <module>
         <rawname>mihuendpoint</rawname>
         <repo>local</repo>
-        <name>OSS Endpoint Manager</name>
+        <name>Mihu Endpoint Manager</name>
         <version>14.0.0.1</version>
          <publisher>Mitterhuemer | Mensch | Energie | Technik</publisher>
         <category>Settings</category>
