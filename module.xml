@@ -2,7 +2,7 @@
 	<rawname>endpointman</rawname>
 	<repo>unsupported</repo>
 	<name>OSS PBX End Point Manager</name>
-	<version>14.0.0.1</version>
+	<version>14.0.1.1</version>
 	<type>setup</type>
 	<category>Connectivity</category>
 	<license>GPLv3+</license>

@@ -20,7 +20,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2.10\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-04-25 17:34-0400\n"
+"POT-Creation-Date: 2018-04-25 18:19-0400\n"
 "PO-Revision-Date: 2016-05-04 17:44+0200\n"
 "Last-Translator: ded <ceo@postmet.com>\n"
 "Language-Team: Russian <http://weblate.freepbx.org/projects/fpbxcn/"
@@ -243,7 +243,7 @@ msgstr "---Обновляем модель %_NAMEMOD_%"
 msgid "/tftpboot is not writable"
 msgstr ""
 
-#: Endpointman_Advanced.class.php:1200
+#: Endpointman_Advanced.class.php:1198
 msgid ""
 "<font color='#FF0000'><b>Please reboot & rebuild all imported phones</b></"
 "font>"
@@ -422,7 +422,7 @@ msgstr ""
 msgid "Click Here!"
 msgstr ""
 
-#: Endpointman_Advanced.class.php:1095
+#: Endpointman_Advanced.class.php:1093
 msgid "Click this link to download:"
 msgstr "Кликнуть на линк для скачивания:"
 
@@ -482,6 +482,11 @@ msgstr ""
 msgid "Connectivity"
 msgstr "Подключения"
 
+#: views/epm_advanced/poce.views.textarea.file.php:24
+#: views/epm_templates/editor.views.dialog.edit.cfg.php:14
+msgid "Content of the file:"
+msgstr ""
+
 #: Endpointman_Config.class.php:1446
 msgid "Copy Error Detected! Aborting Install!"
 msgstr "Обнаружена ошибка при копировании! Инсталляция прервана!"
@@ -495,11 +500,11 @@ msgstr ""
 msgid "Creating EPM temp directory"
 msgstr "Создаётся временная EPM директория"
 
-#: Endpointman_Advanced.class.php:921
+#: Endpointman_Advanced.class.php:919
 msgid "Creating EPM temp directory..."
 msgstr "Создаётся временная EPM директория..."
 
-#: Endpointman_Advanced.class.php:999
+#: Endpointman_Advanced.class.php:997
 msgid "Creating Provisioner Directory... "
 msgstr ""
 
@@ -566,7 +571,7 @@ msgstr "Устройства"
 msgid "Directory Not Writable!"
 msgstr "Директория не имеет прав на запись!"
 
-#: Endpointman_Advanced.class.php:891
+#: Endpointman_Advanced.class.php:889
 msgid "Directory no exists: "
 msgstr "Директория не существует: "
 
@@ -600,9 +605,9 @@ msgstr ""
 msgid "Display:"
 msgstr ""
 
-#: Endpointman_Advanced.class.php:923 Endpointman_Advanced.class.php:938
-#: Endpointman_Advanced.class.php:996 Endpointman_Advanced.class.php:1001
-#: Endpointman_Advanced.class.php:1016 Endpointman_Advanced.class.php:1092
+#: Endpointman_Advanced.class.php:921 Endpointman_Advanced.class.php:936
+#: Endpointman_Advanced.class.php:994 Endpointman_Advanced.class.php:999
+#: Endpointman_Advanced.class.php:1014 Endpointman_Advanced.class.php:1090
 #: Endpointman_Config.class.php:890 Endpointman_Config.class.php:993
 #: Endpointman_Config.class.php:1007 Endpointman_Config.class.php:1012
 #: Endpointman_Config.class.php:1101 Endpointman_Config.class.php:1106
@@ -709,8 +714,8 @@ msgstr "Ошибка при скачивании пакета бренда!"
 msgid "Error download frimware package!"
 msgstr "Ошибка скачивания пакета прошивой!"
 
-#: Endpointman_Advanced.class.php:89 Endpointman_Advanced.class.php:926
-#: Endpointman_Advanced.class.php:1004 Endpointman_Config.class.php:87
+#: Endpointman_Advanced.class.php:89 Endpointman_Advanced.class.php:924
+#: Endpointman_Advanced.class.php:1002 Endpointman_Config.class.php:87
 #: Endpointman_Config.class.php:1029
 msgid "Error!"
 msgstr "Ошибка!"
@@ -719,8 +724,8 @@ msgstr "Ошибка!"
 msgid "Error: "
 msgstr ""
 
-#: Endpointman_Advanced.class.php:906 Endpointman_Advanced.class.php:980
-#: Endpointman_Advanced.class.php:1133
+#: Endpointman_Advanced.class.php:904 Endpointman_Advanced.class.php:978
+#: Endpointman_Advanced.class.php:1131
 #, php-format
 msgid "Error: %s"
 msgstr ""
@@ -731,8 +736,8 @@ msgid ""
 "Issues!"
 msgstr ""
 
-#: Endpointman_Advanced.class.php:899 Endpointman_Advanced.class.php:972
-#: Endpointman_Advanced.class.php:1123
+#: Endpointman_Advanced.class.php:897 Endpointman_Advanced.class.php:970
+#: Endpointman_Advanced.class.php:1121
 msgid "Error: Can Not Find Uploaded Files!"
 msgstr ""
 
@@ -749,16 +754,16 @@ msgstr "Ошибка: команда не найдена!"
 msgid "Error: Failed to create the directory '%s', please Check Permissions!"
 msgstr ""
 
-#: Endpointman_Advanced.class.php:1142
+#: Endpointman_Advanced.class.php:1140
 #, php-format
 msgid "Error: File %s size is 0!"
 msgstr ""
 
-#: Endpointman_Advanced.class.php:1020
+#: Endpointman_Advanced.class.php:1018
 msgid "Error: File Temp no Exists!"
 msgstr ""
 
-#: Endpointman_Advanced.class.php:1080
+#: Endpointman_Advanced.class.php:1078
 msgid "Error: ID Package send not valid, brand not exist!"
 msgstr ""
 
@@ -766,17 +771,17 @@ msgstr ""
 msgid "Error: Installing brands is disabled while in repo mode!"
 msgstr ""
 
-#: Endpointman_Advanced.class.php:1189
+#: Endpointman_Advanced.class.php:1187
 #, php-format
 msgid "Error: Invalid Brand Specified on line %d!"
 msgstr ""
 
-#: Endpointman_Advanced.class.php:1183
+#: Endpointman_Advanced.class.php:1181
 #, php-format
 msgid "Error: Invalid Extension Specified on line %d!"
 msgstr ""
 
-#: Endpointman_Advanced.class.php:962 Endpointman_Advanced.class.php:1023
+#: Endpointman_Advanced.class.php:960 Endpointman_Advanced.class.php:1021
 msgid "Error: Invalid File Extension!"
 msgstr ""
 
@@ -785,12 +790,12 @@ msgstr ""
 msgid "Error: Invalid JSON Structure in %s/brand_data.json"
 msgstr ""
 
-#: Endpointman_Advanced.class.php:1192
+#: Endpointman_Advanced.class.php:1190
 #, php-format
 msgid "Error: Invalid Mac on line %d!"
 msgstr ""
 
-#: Endpointman_Advanced.class.php:1186
+#: Endpointman_Advanced.class.php:1184
 #, php-format
 msgid "Error: Invalid Model Specified on line %d!"
 msgstr ""
@@ -799,7 +804,7 @@ msgstr ""
 msgid "Error: No 'brand_data.xml' file exists!"
 msgstr ""
 
-#: Endpointman_Advanced.class.php:957
+#: Endpointman_Advanced.class.php:955
 msgid "Error: No File Provided!"
 msgstr ""
 
@@ -808,7 +813,7 @@ msgstr ""
 msgid "Error: No Local File for %s !"
 msgstr ""
 
-#: Endpointman_Advanced.class.php:1068
+#: Endpointman_Advanced.class.php:1066
 msgid "Error: No package set!"
 msgstr ""
 
@@ -825,11 +830,11 @@ msgstr ""
 msgid "Error: Not allowed in repo mode!!"
 msgstr ""
 
-#: Endpointman_Advanced.class.php:1071
+#: Endpointman_Advanced.class.php:1069
 msgid "Error: Package not valid!"
 msgstr ""
 
-#: Endpointman_Advanced.class.php:1202
+#: Endpointman_Advanced.class.php:1200
 msgid "Error: Possible file upload attack!"
 msgstr ""
 
@@ -861,7 +866,7 @@ msgstr ""
 msgid "Error: Value send is not number!"
 msgstr ""
 
-#: Endpointman_Advanced.class.php:1139
+#: Endpointman_Advanced.class.php:1137
 #, php-format
 msgid "Error: We support only CVS and TXT files, type file %s no support!"
 msgstr ""
@@ -903,7 +908,7 @@ msgstr "Экспорт CSV файла устройств"
 msgid "Export data configuracion devices."
 msgstr "Экспорт данных о конфигурации устройств."
 
-#: Endpointman_Advanced.class.php:1083
+#: Endpointman_Advanced.class.php:1081
 #, php-format
 msgid "Exporting %s ... "
 msgstr ""
@@ -920,16 +925,16 @@ msgstr ""
 msgid "Extension Number"
 msgstr ""
 
-#: Endpointman_Advanced.class.php:993
+#: Endpointman_Advanced.class.php:991
 msgid "Extracting Provisioner Package... "
 msgstr ""
 
-#: Endpointman_Advanced.class.php:932
+#: Endpointman_Advanced.class.php:930
 #, php-format
 msgid "Extracting Tarball %s to %s... "
 msgstr ""
 
-#: Endpointman_Advanced.class.php:934
+#: Endpointman_Advanced.class.php:932
 msgid "Extracting Tarball... "
 msgstr ""
 
@@ -953,7 +958,7 @@ msgstr ""
 msgid "Failed to install "
 msgstr "Ошибка при инсталлировании "
 
-#: Endpointman_Advanced.class.php:1305
+#: Endpointman_Advanced.class.php:1303
 msgid "Failed to write file to disk"
 msgstr "Ошибка при записи на диск"
 
@@ -975,7 +980,7 @@ msgstr "Файл не найден!"
 msgid "File not readable, check the permission! "
 msgstr "Файл не читается, проверьте права на чтение! "
 
-#: Endpointman_Advanced.class.php:1307
+#: Endpointman_Advanced.class.php:1305
 msgid "File upload stopped by extension"
 msgstr "Загрузка файла остановлена по расширению"
 
@@ -1050,7 +1055,7 @@ msgid "Heads up!"
 msgstr "Носы вверх!"
 
 #: Endpointman.class.php:145 Endpointman.class.php:152
-#: Endpointman_Advanced.class.php:1096
+#: Endpointman_Advanced.class.php:1094
 msgid "Here"
 msgstr "Здесь"
 
@@ -1066,7 +1071,7 @@ msgstr ""
 msgid "Hide"
 msgstr "Скрыть"
 
-#: Endpointman_Advanced.class.php:1219
+#: Endpointman_Advanced.class.php:1217
 msgid "ID  not valid!"
 msgstr "ID не подходит!"
 
@@ -1151,17 +1156,17 @@ msgstr "Импорт пакета производителей  в ручном 
 msgid "Import/Export My Devices List"
 msgstr "Импорт/Экспорт Списка Моих Устройств"
 
-#: Endpointman_Advanced.class.php:1130
+#: Endpointman_Advanced.class.php:1128
 #, php-format
 msgid "Importing CVS file %s ...<br />"
 msgstr ""
 
-#: Endpointman_Advanced.class.php:977
+#: Endpointman_Advanced.class.php:975
 #, php-format
 msgid "Importing Provisioner file %s..."
 msgstr ""
 
-#: Endpointman_Advanced.class.php:903
+#: Endpointman_Advanced.class.php:901
 #, php-format
 msgid "Importing brand file %s..."
 msgstr ""
@@ -1246,7 +1251,7 @@ msgstr ""
 msgid "List Bran's Availables empty."
 msgstr "Список доступных брендов пустой."
 
-#: Endpointman_Advanced.class.php:882
+#: Endpointman_Advanced.class.php:880
 msgid "List Done!"
 msgstr "Список готов!"
 
@@ -1284,11 +1289,11 @@ msgid ""
 "Location where configuration files and firmware for terminals are housed."
 msgstr ""
 
-#: Endpointman_Advanced.class.php:946
+#: Endpointman_Advanced.class.php:944
 msgid "Looking file and update brand's ... "
 msgstr ""
 
-#: Endpointman_Advanced.class.php:944
+#: Endpointman_Advanced.class.php:942
 #, php-format
 msgid "Looking for file %s to pass on to update_brand() ... "
 msgstr ""
@@ -1324,7 +1329,7 @@ msgstr "Совпадает!"
 msgid "Maximum stack depth exceeded"
 msgstr "Превышена максимальная глубина стека"
 
-#: Endpointman_Advanced.class.php:1303
+#: Endpointman_Advanced.class.php:1301
 msgid "Missing a temporary folder"
 msgstr "Неверная временная директория"
 
@@ -1421,7 +1426,7 @@ msgstr "Нет"
 msgid "No Brand Selected for Reboot"
 msgstr ""
 
-#: Endpointman_Advanced.class.php:1241
+#: Endpointman_Advanced.class.php:1239
 msgid "No Brand set!"
 msgstr "Не установлен бренд!"
 
@@ -1437,11 +1442,11 @@ msgstr ""
 msgid "No Devices Found"
 msgstr ""
 
-#: Endpointman_Advanced.class.php:1216
+#: Endpointman_Advanced.class.php:1214
 msgid "No ID set!"
 msgstr "ID не установлен!"
 
-#: Endpointman_Advanced.class.php:1238
+#: Endpointman_Advanced.class.php:1236
 msgid "No OUI set!"
 msgstr "Не установлен OUI!"
 
@@ -1467,7 +1472,7 @@ msgstr "Не выбрано"
 msgid "No command was sent!"
 msgstr ""
 
-#: Endpointman_Advanced.class.php:1301
+#: Endpointman_Advanced.class.php:1299
 msgid "No file was uploaded"
 msgstr "Файл не был загружен"
 
@@ -1498,7 +1503,7 @@ msgid "No send Type File!"
 msgstr "Тип файла не отправлен!"
 
 #: Endpointman_Advanced.class.php:276 Endpointman_Advanced.class.php:531
-#: Endpointman_Advanced.class.php:696 Endpointman_Advanced.class.php:812
+#: Endpointman_Advanced.class.php:696 Endpointman_Advanced.class.php:810
 #: Endpointman_Config.class.php:333 Endpointman_Templates.class.php:342
 msgid "No send value!"
 msgstr "Значение не отправлено!"
@@ -1520,7 +1525,7 @@ msgstr ""
 msgid "Not able to connect to repository. Using local brand [%s] file instead."
 msgstr ""
 
-#: Endpointman_Advanced.class.php:888
+#: Endpointman_Advanced.class.php:886
 msgid "Not is directory: "
 msgstr "Это не директория: "
 
@@ -1637,7 +1642,7 @@ msgstr "Пожалуйста измените расположение:"
 msgid "Please create /tftpboot, even if you won't use it"
 msgstr ""
 
-#: Endpointman_Advanced.class.php:952
+#: Endpointman_Advanced.class.php:950
 msgid "Please name the Package the same name as your brand!"
 msgstr "Пожалуйста назовите  пакет аналогично названию бренда!"
 
@@ -2084,7 +2089,7 @@ msgstr ""
 msgid "The project is maintained at"
 msgstr ""
 
-#: Endpointman_Advanced.class.php:1297
+#: Endpointman_Advanced.class.php:1295
 msgid ""
 "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in "
 "the HTML form"
@@ -2092,13 +2097,13 @@ msgstr ""
 "Загруженный файл превысил значение директивы MAX_FILE_SIZE, указанную в  "
 "HTML-форме"
 
-#: Endpointman_Advanced.class.php:1295
+#: Endpointman_Advanced.class.php:1293
 msgid "The uploaded file exceeds the upload_max_filesize directive in php.ini"
 msgstr ""
 "Загруженный файл превысил значение директивы upload_max_filesize, указанную "
 "в  php.ini"
 
-#: Endpointman_Advanced.class.php:1299
+#: Endpointman_Advanced.class.php:1297
 msgid "The uploaded file was only partially uploaded"
 msgstr "Файл был загружен частично"
 
@@ -2171,7 +2176,7 @@ msgstr "Выключить Безопасный режим"
 msgid "Type"
 msgstr "Тип"
 
-#: Endpointman_Advanced.class.php:826
+#: Endpointman_Advanced.class.php:824
 msgid "Type File not valid!"
 msgstr "Тип файла неверный!"
 
@@ -2223,7 +2228,7 @@ msgstr "Неизвестно"
 msgid "Unknown error"
 msgstr "Неизвестная ошибка"
 
-#: Endpointman_Advanced.class.php:1309
+#: Endpointman_Advanced.class.php:1307
 msgid "Unknown upload error"
 msgstr "Неизвестная ошибка  загрузки"
 
@@ -2271,7 +2276,7 @@ msgstr ""
 msgid "Updating Family Lines ..."
 msgstr ""
 
-#: Endpointman_Advanced.class.php:1013
+#: Endpointman_Advanced.class.php:1011
 msgid "Updating Last Modified... "
 msgstr ""
 
