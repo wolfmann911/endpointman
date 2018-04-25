@@ -11,7 +11,7 @@
 					<input type="hidden" name="name_file" value="" />
 					<input type="hidden" name="edit_file" value="false" />
                 
-          			<label class="control-label" for="config_textarea"><i class="fa fa-file-code-o" data-for="config_textarea"></i> Cantenido del archivo:</label> <code class='inline' id='edit_file_name_path'><?php echo _("No Selected"); ?></code>
+          			<label class="control-label" for="config_textarea"><i class="fa fa-file-code-o" data-for="config_textarea"></i> <?php echo _("Content of the file:"); ?></label> <code class='inline' id='edit_file_name_path'><?php echo _("No Selected"); ?></code>
           			<textarea name="config_textarea" id="config_textarea" rows="5"></textarea>
 				</form>
 			</div>

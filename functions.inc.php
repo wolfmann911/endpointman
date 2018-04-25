@@ -342,7 +342,7 @@ function endpointman_module_install_check_callback($mods = array()) {
 
     $ret = array();
     $current_mod = 'endpointman';
-    $conflicting_mods = array('endpoint','restart');
+    $conflicting_mods = array('restart');
 
 	foreach($mods as $k => $v) {
 		if (in_array($k, $conflicting_mods) && !in_array($active_modules[$current_mod]['status'],array(MODULE_STATUS_NOTINSTALLED,MODULE_STATUS_BROKEN))) {
