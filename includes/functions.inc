@@ -56,7 +56,8 @@ class endpointmanager {
 
 				if(!defined("UPDATE_PATH")) {
 					define("UPDATE_PATH", $this->global_cfg['update_server']);
-				}<?php
+				}
+				
 
 /**
  * Endpoint Manager Functions File
