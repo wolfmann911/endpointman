@@ -1927,6 +1927,7 @@ class endpointmanager {
 					$provisioner_lib->settings['acc' . $line[line] . 'callerid'] = $line['callerid'];
 					$provisioner_lib->settings['acc' . $line[line] . 'encryption'] = $line['encryption'];
 					$provisioner_lib->settings['acc' . $line[line] . 'server_port'] = $line['server_port'];
+					$provisioner_lib->settings['server_host'] = $this->global_cfg['srvip'];
 					
 					$provisioner_lib->settings['timestamp'] = time();
 		
