@@ -4,15 +4,16 @@
 	<name>OSS PBX End Point Manager</name>
 	<version>14.0.0.1</version>
 	<type>setup</type>
-
 	<category>Connectivity</category>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<menuitems>
-		<epm_devices sort="1">OSS Endpoint Device List</epm_devices>
-		<epm_templates sort="2">OSS Endpoint Template Manager</epm_templates>
-		<epm_config sort="3">OSS Endpoint Package Manager</epm_config>
-		<epm_advanced sort="4">OSS Endpoint Advanced Settings</epm_advanced>
+		<epm_devices sort="1" hidden="true">Device List</epm_devices>
+		<epm_templates sort="2" hidden="true">Template Manager</epm_templates>
+		<epm_config sort="3" hidden="true">Package Manager</epm_config>
+		<epm_advanced sort="4" hidden="true">Advanced Settings</epm_advanced>
+		<epm_placeholders sort="4" hidden="true">Config File Placeholders</epm_placeholders>
+		<epm_oss sort="0">OSS Endpoint Manager</epm_oss>
 	</menuitems>
 	<description>
 		OSS PBX End Point Manager is the free supported PBX Endpoint Manager for FreePBX.
@@ -22,6 +23,7 @@
 		Pull Requests can be made to either of these and are encouraged.
 	</description>
 	<changelog>
+		*14.0.0.1* Initial release of fork from OSS EPM inlcuding right Navigation, Bootstrap Device View and OSS Information Page
 		*13.0.7.18* Fix missing function numRows Fix DateTimeZone class init Use count() instead of broken numRow() function Fix selected in template editor dropdown Changed some Spanish words to English on non-locales files
 		*13.0.7.17* Fix Save button in custom template page
 		*13.0.7.16* Use PHP timezone as default timezone instead of static America/Los_Angeles
