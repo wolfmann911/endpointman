@@ -2,8 +2,8 @@
         <rawname>mihuendpoint</rawname>
         <repo>local</repo>
         <name>Mihu Endpoint Manager</name>
-        <version>14.0.0.1</version>
-         <publisher>Mitterhuemer | Mensch | Energie | Technik</publisher>
+        <version>14.0.0.2</version>
+         <publisher>Mitterhuemer
         <category>Settings</category>
         <license>GPLv3+</license>
         <licenselink>http://www.gnu.org/licenses/gpl-2.0.txt</licenselink>
@@ -22,6 +22,7 @@
                 The front end gui is hosted at: https://github.com/matthias1232/greenepm
         </description>
         <changelog>
+                *14.0.0.2* Some more renaming of files
                 *14.0.0.1* Initial Fork from Github with modification to new module folder name. Allow install with module Endpoint Manager together, change table names to prevent conflicts with the Commercial Enpoint Manager
         </changelog>
         <depends>
