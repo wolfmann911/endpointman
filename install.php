@@ -88,7 +88,7 @@ if (!empty($epmdbversion)) {
         //Add new Vars into database
         $sql_update_vars = "INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES
 		(5, 'config_location', '/tftpboot/'),
-		(6, 'update_server', 'https://provisioning.powerpro.at/greenepm/'),
+		(6, 'update_server', 'http://mirror.freepbx.org/provisioner/'),
 		(7, 'version', '2.0.0'),
 		(8, 'enable_ari', '0'),
 		(9, 'debug', '0'),
@@ -831,7 +831,7 @@ if (!empty($epmdbversion)) {
 
     if (version_compare_freepbx($epmdbversion,'2.10.2.1','<=')) {
         out('Updating Mirror Location...again');
-        $sql = "UPDATE endpointman_global_vars SET value = 'https://provisioning.powerpro.at/greenepm/v3/' WHERE var_name ='update_server'";
+        $sql = "UPDATE endpointman_global_vars SET value = 'http://mirror.freepbx.org/provisioner/v3/' WHERE var_name ='update_server'";
         $db->query($sql);
 
         out("Uninstalling All Installed Brands (You'll just simply have to update again, no loss of data)");
@@ -932,7 +932,7 @@ if (empty($epmdbversion)) {
             (3, 'gmtoff', ''),
             (4, 'gmthr', ''),
             (5, 'config_location', '/tftpboot/'),
-            (6, 'update_server', 'https://provisioning.powerpro.at/greenepm/v3/'),
+            (6, 'update_server', 'http://mirror.freepbx.org/provisioner/v3/'),
             (7, 'version', '" . $epmxmlversion  . "'),
             (8, 'enable_ari', '0'),
             (9, 'debug', '0'),
@@ -1049,5 +1049,5 @@ out("Update Version Number to " . $epmxmlversion);
 $sql = "UPDATE endpointman_global_vars SET value = '" . $epmxmlversion . "' WHERE var_name = 'version'";
 $db->query($sql);
 
-$sql = "UPDATE endpointman_global_vars SET value = 'https://provisioning.powerpro.at/greenepm/v3/' WHERE var_name = 'update_server'";
+$sql = "UPDATE endpointman_global_vars SET value = 'http://mirror.freepbx.org/provisioner/v3/' WHERE var_name = 'update_server'";
 $db->query($sql);
