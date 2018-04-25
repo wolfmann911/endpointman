@@ -4,9 +4,9 @@
 	<name>OSS PBX End Point Manager</name>
 	<version>14.0.0.1</version>
 	<type>setup</type>
-	<category>Settings</category>
-	<license>GPLv2+</license>
-	<licenselink>http://www.gnu.org/licenses/gpl-2.0.txt</licenselink>
+	<category>Connectivity</category>
+	<license>GPLv3+</license>
+	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<menuitems>
 		<epm_devices sort="1" hidden="true">Device List</epm_devices>
 		<epm_templates sort="2" hidden="true">Template Manager</epm_templates>
@@ -60,7 +60,6 @@
 		*13.0.2* Missing updated file
 		*13.0.1* Updates from Community member Javier Pastor Garcia
 	</changelog>
-	<location>release/2.11/endpointman-2.11.4.11.tgz</location>
 	<depends>
 		<version>14.0</version>
 		<phpversion>5.3.0</phpversion>
