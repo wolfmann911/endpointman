@@ -2128,7 +2128,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
             $location = "template_manager";
 			//print_r($sql);
         } else {
-            $sql = 'UPDATE enpointman_mac_list SET config_files_override = \'' . addslashes($config_files_selected) . '\', template_id = 0, global_custom_cfg_data = \'' . addslashes($save) . '\' WHERE id =' . $id;
+            $sql = 'UPDATE endpointman_mac_list SET config_files_override = \'' . addslashes($config_files_selected) . '\', template_id = 0, global_custom_cfg_data = \'' . addslashes($save) . '\' WHERE id =' . $id;
             $location = "devices_manager";
         }
         sql($sql);
