@@ -2124,11 +2124,11 @@ $this->error['parse_configs'] = "File not written to hard drive!";
 
         $save = serialize($custom_cfg_data_temp);
         if ($custom == "0") {
-            $sql = 'UPDATE mihuendpoint_template_list SET config_files_override = \'' . addslashes($config_files_selected) . '\', global_custom_cfg_data = \'' . addslashes($save) . '\' WHERE id =' . $id;
+            $sql = 'UPDATE endpointman_template_list SET config_files_override = \'' . addslashes($config_files_selected) . '\', global_custom_cfg_data = \'' . addslashes($save) . '\' WHERE id =' . $id;
             $location = "template_manager";
 			//print_r($sql);
         } else {
-            $sql = 'UPDATE mihuendpoint_mac_list SET config_files_override = \'' . addslashes($config_files_selected) . '\', template_id = 0, global_custom_cfg_data = \'' . addslashes($save) . '\' WHERE id =' . $id;
+            $sql = 'UPDATE enpointman_mac_list SET config_files_override = \'' . addslashes($config_files_selected) . '\', template_id = 0, global_custom_cfg_data = \'' . addslashes($save) . '\' WHERE id =' . $id;
             $location = "devices_manager";
         }
         sql($sql);
