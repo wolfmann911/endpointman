@@ -538,7 +538,6 @@ class Endpointman_Templates
 		$dReturn['alt_configs'] = $alt_configs;
 		
     	return $dReturn;		
-	}		
 	}
 	
 	function edit_template_display_files_list($id, $custom)
