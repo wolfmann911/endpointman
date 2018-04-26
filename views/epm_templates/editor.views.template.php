@@ -109,8 +109,8 @@
                                             data-style = ""
 											data-live-search-placeholder = "Search..."
 											data-live-search = "true"
-                                            name="sl_boxselect_<?php echo $row['idrefbox']; ?>" 
-                                            id="sl_boxselect_<?php echo $row['idrefbox']; ?>">
+                                            name="config_files[<?php echo $row['id']; ?>]" 
+                                            id="config_files[<?php echo $row['id']; ?>]">
                                         </select>
                                         <span class="input-group-btn">
                                             <button class="btn btn-default" type="button" name="bt_boxselect_<?php echo $row['idrefbox']; ?>" id="bt_boxselect_<?php echo $row['idrefbox']; ?>"><i class='fa fa-files-o'>&nbsp;</i></button>
