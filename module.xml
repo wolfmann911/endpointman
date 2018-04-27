@@ -2,6 +2,7 @@
 	<rawname>endpointman</rawname>
 	<repo>unsupported</repo>
 	<name>OSS PBX End Point Manager</name>
+	<version>14.0.0.4</version>
 	<type>setup</type>
 	<category>Settings</category>
 	<license>GPLv3+</license>
@@ -22,7 +23,8 @@
 		Pull Requests can be made to either of these and are encouraged.
 	</description>
 	<changelog>
-		*14.0.0.3* Fix Template Manager Custom File Selector. To edit and create files please use the Editor in the Global Advanced settings
+		*14.0.0.4* Add IPEI fields
+		*14.0.0.3* Endpointman 14.0.0.3 - Fix Template Manager
 		*14.0.0.2* Fix problems after merging 14.0.0.1
 		*14.0.0.1* Initial release of fork from OSS EPM inlcuding right Navigation, Bootstrap Device View and OSS Information Page
 		*13.0.7.18* Fix missing function numRows Fix DateTimeZone class init Use count() instead of broken numRow() function Fix selected in template editor dropdown Changed some Spanish words to English on non-locales files

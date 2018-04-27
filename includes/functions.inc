@@ -324,7 +324,7 @@ class endpointmanager {
     }
 
     function add_device($mac, $model, $ext, $template=NULL, $line=NULL, $displayname=NULL) {
-
+		$ipei = $_REQUEST['ipei'];
         $mac = $this->mac_check_clean($mac);
         if ($mac) {
             if (empty($model)) {
@@ -385,7 +385,7 @@ class endpointmanager {
                             $line = 1;
                         }
 
-                        $sql = "INSERT INTO `endpointman_line_list` (`mac_id`, `ext`, `line`, `description`) VALUES ('" . $ext_id . "', '" . $ext . "', '" . $line . "', '" . addslashes($name) . "')";
+                        $sql = "INSERT INTO `endpointman_line_list` (`mac_id`, `ipei`, `ext`, `line`, `description`) VALUES ('" . $ext_id . "', '" . $ipei . "', '" . $ext . "', '" . $line . "', '" . addslashes($name) . "')";
                         $this->eda->sql($sql);
 
                         $this->message['add_device'][] = "Added " . $name . " to line " . $line;
@@ -1903,7 +1903,9 @@ class endpointmanager {
 					'trustrpid' => $line['trustrpid'],
 					'callerid' => $line['callerid'],
 					'encryption' => $line['encryption'],							
-					'tech' => $line['tech']);
+					'tech' => $line['tech'],
+					'ipei' => $line['ipei']
+					);
 					
 					
 					
@@ -1927,6 +1929,7 @@ class endpointmanager {
 					$provisioner_lib->settings['acc' . $line[line] . 'callerid'] = $line['callerid'];
 					$provisioner_lib->settings['acc' . $line[line] . 'encryption'] = $line['encryption'];
 					$provisioner_lib->settings['acc' . $line[line] . 'server_port'] = $line['server_port'];
+					$provisioner_lib->settings['acc' . $line[line] . 'ipei'] = $line['ipei'];
 					$provisioner_lib->settings['server_host'] = $this->global_cfg['srvip'];
 					
 					$provisioner_lib->settings['timestamp'] = time();
