@@ -70,7 +70,15 @@ $modinfo = module_getinfo('endpointman');
 $epmxmlversion = $modinfo['endpointman']['version'];
 $epmdbversion = !empty($modinfo['endpointman']['dbversion']) ? $modinfo['endpointman']['dbversion'] : null;
 
+
 if (!empty($epmdbversion)) {
+
+
+if (version_compare_freepbx($epmdbversion,'14.0.0.4','<')) {
+        $sql = 'ALTER TABLE `endpointman_line_list` ADD `ipei` varchar(15) NOT NULL AFTER `luid`;';
+        $db->query($sql);
+}
+
 
     if (version_compare_freepbx($epmdbversion,'1.9','<')) {
         out("Please Wait While we upgrade your old setup");
@@ -679,6 +687,7 @@ if (!empty($epmdbversion)) {
     if (version_compare_freepbx($epmdbversion,'2.2.6','<=')) {
         $sql = "CREATE TABLE IF NOT EXISTS `endpointman_line_list` (
               `luid` int(11) NOT NULL AUTO_INCREMENT,
+			  `ipei` varchar(15) NOT NULL,
               `mac_id` int(11) NOT NULL,
               `line` smallint(2) NOT NULL,
               `ext` varchar(15) NOT NULL,
@@ -900,6 +909,7 @@ if (empty($epmdbversion)) {
 
     $sql = "CREATE TABLE IF NOT EXISTS `endpointman_line_list` (
   `luid` int(11) NOT NULL AUTO_INCREMENT,
+  `ipei` varchar(15) NOT NULL,
   `mac_id` int(11) NOT NULL,
   `line` smallint(2) NOT NULL,
   `ext` varchar(15) NOT NULL,

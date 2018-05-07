@@ -81,7 +81,7 @@ switch ($sub_type) {
                     $sql = "SELECT description FROM devices WHERE id = ".$_REQUEST['ext_list_'.$row['luid']];
                     $name = $endpoint->eda->sql($sql,'getOne');
 
-                    $sql = "UPDATE endpointman_line_list SET line = '".$_REQUEST['line_list_'.$row['luid']]."', ext = '".$_REQUEST['ext_list_'.$row['luid']]."', description = '".$endpoint->eda->escapeSimple($name)."' WHERE luid =  ". $row['luid'];
+                    $sql = "UPDATE endpointman_line_list SET ipei = '".$_REQUEST['ipei_'.$row['luid']]."', line = '".$_REQUEST['line_list_'.$row['luid']]."', ext = '".$_REQUEST['ext_list_'.$row['luid']]."', description = '".$endpoint->eda->escapeSimple($name)."' WHERE luid =  ". $row['luid'];
                     $endpoint->eda->sql($sql);
                 }
 
@@ -418,6 +418,7 @@ foreach($devices_list as $devices_row) {
         $list[$i]['line'][$z]['line'] = $line_row['line'];
         $list[$i]['line'][$z]['description'] = $line_row['description'];
         $list[$i]['line'][$z]['luid'] = $line_row['luid'];
+		$list[$i]['line'][$z]['ipei'] = $line_row['ipei'];
         $list[$i]['line'][$z]['master_id'] = $i;
         $z++;
     }
@@ -496,8 +497,19 @@ if (isset($template_editor)) {
     $endpoint->tpl->assign("no_add", $no_add);
     $endpoint->tpl->assign("mode", $mode);
 
+	
     $edit_row['id'] = isset($edit_row['id']) ? $edit_row['id'] : '0';
     $endpoint->tpl->assign("edit_id", $edit_row['id']);
+	$endpoint->tpl->assign("template_id", $edit_row['template_id']);
+	
+	if ($edit_row['template_id'] == "0"){
+	$endpoint->tpl->assign("custom", 1);
+	
+	$endpoint->tpl->assign("template_id", $edit_row['id']);
+	}
+	else{
+	$endpoint->tpl->assign("custom", 0);
+	}
 
     if(isset($final)) {
         $_SESSION['dev_cache'] = base64_encode(serialize($final));

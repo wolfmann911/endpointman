@@ -2096,20 +2096,24 @@ $this->error['parse_configs'] = "File not written to hard drive!";
         }
 
         $config_files = explode(",", $row['config_files']);
-
+	
         $i = 0;
         while ($i < count($config_files)) {
             $config_files[$i] = str_replace(".", "_", $config_files[$i]);
-            if (isset($variables[$config_files[$i]])) {
-                $variables[$config_files[$i]] = explode("_", $variables[$config_files[$i]], 2);
+			
+            if (isset($variables[config_files][$i])) {
+				
+                $variables[$config_files[$i]] = explode("_", $variables[config_files][$i], 2);
+				
                 $variables[$config_files[$i]] = $variables[$config_files[$i]][0];
                 if ($variables[$config_files[$i]] > 0) {
                     $config_files_selected[$config_files[$i]] = $variables[$config_files[$i]];
+					
+					
                 }
             }
             $i++;
         }
-
         if (!isset($config_files_selected)) {
             $config_files_selected = "";
         } else {
@@ -2122,6 +2126,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
         if ($custom == "0") {
             $sql = 'UPDATE endpointman_template_list SET config_files_override = \'' . addslashes($config_files_selected) . '\', global_custom_cfg_data = \'' . addslashes($save) . '\' WHERE id =' . $id;
             $location = "template_manager";
+			//print_r($sql);
         } else {
             $sql = 'UPDATE endpointman_mac_list SET config_files_override = \'' . addslashes($config_files_selected) . '\', template_id = 0, global_custom_cfg_data = \'' . addslashes($save) . '\' WHERE id =' . $id;
             $location = "devices_manager";

@@ -109,8 +109,8 @@
                                             data-style = ""
 											data-live-search-placeholder = "Search..."
 											data-live-search = "true"
-                                            name="sl_boxselect_<?php echo $row['idrefbox']; ?>" 
-                                            id="sl_boxselect_<?php echo $row['idrefbox']; ?>">
+                                            name="config_files[<?php echo $row['id']; ?>]" 
+                                            id="config_files[<?php echo $row['id']; ?>]">
                                         </select>
                                         <span class="input-group-btn">
                                             <button class="btn btn-default" type="button" name="bt_boxselect_<?php echo $row['idrefbox']; ?>" id="bt_boxselect_<?php echo $row['idrefbox']; ?>"><i class='fa fa-files-o'>&nbsp;</i></button>
@@ -353,7 +353,8 @@
 	                    									echo '<select name="'.$srow['key'].'" id="'.$srow['key'].'" class="form-control selectpicker show-tick" data-style="" data-live-search-placeholder="Search" data-live-search="true">';
 															foreach($srow['data'] as $lrow) 
 															{
-
+																//echo '<option value="'.$lrow['value'].'" '.(array_key_exists('selected',$lrow['selected'])? $lrow['value'] : '').' >'.$lrow['description'].'</option>';
+																//echo '<option value="'.$lrow['value'].'" '.($lrow['value'] == $lrow['selected'] ? 'selected' : '').' >'.$lrow['description'].'</option>';
 																echo '<option value="'.$lrow['value'].'" '.(array_key_exists('selected',$lrow)? 'selected' : '').' >'.$lrow['description'].'</option>';
 															}
 															echo '</select>';
