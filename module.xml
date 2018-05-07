@@ -2,7 +2,7 @@
 	<rawname>endpointman</rawname>
 	<repo>unsupported</repo>
 	<name>OSS PBX End Point Manager</name>
-	<version>14.0.0.4</version>
+	<version>14.0.0.5</version>
 	<type>setup</type>
 	<category>Settings</category>
 	<license>GPLv3+</license>
@@ -23,6 +23,7 @@
 		Pull Requests can be made to either of these and are encouraged.
 	</description>
 	<changelog>
+		*14.0.0.5* Add more placeholder fields to allow create more packages.
 		*14.0.0.4* Add IPEI fields
 		*14.0.0.3* Endpointman 14.0.0.3 - Fix Template Manager
 		*14.0.0.2* Fix problems after merging 14.0.0.1
