@@ -172,7 +172,7 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 
 		require_once('Endpointman_Devices.class.php');
 		$this->epm_oss = new Endpointman_Devices($freepbx, $this->configmod);
-		
+
 		//require_once('Endpointman_Devices.class.php');
 		$this->epm_placeholders = new Endpointman_Devices($freepbx, $this->configmod);
 
@@ -209,11 +209,11 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 			case "epm_devices":
 				return $this->epm_devices->ajaxRequest(trim($req), $setting);
 				break;
-		
+
 			case "epm_oss":
 				return $this->epm_oss->ajaxRequest(trim($req), $setting);
 				break;
-				
+
 			case "epm_placeholders":
 				return $this->epm_placeholders->ajaxRequest(trim($req), $setting);
 				break;
@@ -260,7 +260,7 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 			case "epm_placeholders":
 				return $this->epm_placeholders->ajaxHandler($module_tab, $command);
 				break;
-				
+
 			case "epm_templates":
 				return $this->epm_templates->ajaxHandler($module_tab, $command);
 				break;
@@ -301,10 +301,10 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 				break;
 			case "epm_oss":
 				$this->epm_oss->doConfigPageInit($module_tab, $command);
-				break;	
+				break;
 			case "epm_placeholders":
 				$this->epm_placeholders->doConfigPageInit($module_tab, $command);
-				break;	
+				break;
 			case "epm_templates":
 				$this->epm_templates->doConfigPageInit($module_tab, $command);
 				break;
@@ -337,10 +337,10 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 				break;
 			case "epm_oss":
 				return $this->epm_oss->myShowPage($this->pagedata);
-				break;	
+				break;
 			case "epm_placeholders":
 				return $this->epm_placeholders->myShowPage($this->pagedata);
-				break;	
+				break;
 			case "epm_templates":
 				$this->epm_templates->myShowPage($this->pagedata);
 				return $this->pagedata;
@@ -384,10 +384,10 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 				break;
 			case "epm_oss":
 				return $this->epm_oss->getRightNav($request);
-				break;	
+				break;
 			case "epm_placeholders":
 				return $this->epm_placeholders->getRightNav($request);
-				break;	
+				break;
 
 			case "epm_config":
 				return $this->epm_config->getRightNav($request);
@@ -417,7 +417,7 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 			case "epm_devices":
 				return $this->epm_devices->getActionBar($request);
 				break;
-				
+
 			case "epm_oss":
 				return $this->epm_oss->getActionBar($request);
 				break;
@@ -446,73 +446,30 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 
 	}
 
-    public function uninstall() {
-    	out(_("Removing Phone Modules Directory"));
-    	$this->system->rmrf($this->PHONE_MODULES_PATH);
-    	exec("rm -R ". $this->PHONE_MODULES_PATH);
+	public function uninstall() {
+		if(file_exists($this->PHONE_MODULES_PATH)) {
+			out(_("Removing Phone Modules Directory"));
+			$this->system->rmrf($this->PHONE_MODULES_PATH);
+			@exec("rm -R ". $this->PHONE_MODULES_PATH);
+		}
 
-    	out(_('Removing symlink to web provisioner'));
-    	$provisioning_path = $this->config->get('AMPWEBROOT')."/provisioning";
-    	if(is_link($provisioning_path)) { unlink($provisioning_path); }
+		$provisioning_path = $this->config->get('AMPWEBROOT')."/provisioning";
+		if(file_exists($provisioning_path) && is_link($provisioning_path)) {
+			out(_('Removing symlink to web provisioner'));
+			unlink($provisioning_path);
+		}
 
-    	if(!is_link($this->config->get('AMPWEBROOT').'/admin/assets/endpointman')) {
-    		$this->system->rmrf($this->config->get('AMPWEBROOT').'/admin/assets/endpointman');
-    	}
-
-    	out(_("Dropping all relevant tables"));
-    	$sql = "DROP TABLE `endpointman_brand_list`";
-    	$sth = $this->db->prepare($sql);
-    	$sth->execute();
-    	$sql = "DROP TABLE `endpointman_global_vars`";
-    	$sth = $this->db->prepare($sql);
-    	$sth->execute();
-    	$sql = "DROP TABLE `endpointman_mac_list`";
-    	$sth = $this->db->prepare($sql);
-    	$sth->execute();
-    	$sql = "DROP TABLE `endpointman_line_list`";
-    	$sth = $this->db->prepare($sql);
-    	$sth->execute();
-    	$sql = "DROP TABLE `endpointman_model_list`";
-    	$sth = $this->db->prepare($sql);
-    	$sth->execute();
-    	$sql = "DROP TABLE `endpointman_oui_list`";
-    	$sth = $this->db->prepare($sql);
-    	$sth->execute();
-    	$sql = "DROP TABLE `endpointman_product_list`";
-    	$sth = $this->db->prepare($sql);
-    	$sth->execute();
-    	$sql = "DROP TABLE `endpointman_template_list`";
-    	$sth = $this->db->prepare($sql);
-    	$sth->execute();
-    	$sql = "DROP TABLE `endpointman_time_zones`";
-    	$sth = $this->db->prepare($sql);
-    	$sth->execute();
-    	$sql = "DROP TABLE `endpointman_custom_configs`";
-    	$sth = $this->db->prepare($sql);
-    	$sth->execute();
-    	return true;
+		if(!is_link($this->config->get('AMPWEBROOT').'/admin/assets/endpointman')) {
+			$this->system->rmrf($this->config->get('AMPWEBROOT').'/admin/assets/endpointman');
+		}
+		return true;
 	}
 
-    public function backup() {
+	public function backup() {
 	}
 
     public function restore($backup) {
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 	private function epm_config_manual_install($install_type = "", $package ="")
@@ -982,7 +939,7 @@ echo 'TFTP Server check failed on last past. Skipping';
 
 
 
- 
+
      * Display all unused registrations from whatever manager we are using!
      * @return <type>
      */
@@ -1060,7 +1017,7 @@ echo 'TFTP Server check failed on last past. Skipping';
      *                        )
      *                )
      *         )
-     
+
     function get_phone_info($mac_id=NULL) {
     	//You could screw up a phone if the mac_id is blank
     	if (!isset($mac_id)) {
@@ -1128,7 +1085,7 @@ echo 'TFTP Server check failed on last past. Skipping';
      * Get the brand from any mac sent to this function
      * @param string $mac
      * @return array
-     
+
     function get_brand_from_mac($mac) {
     	//Check for valid mac address first
 		if (!$this->mac_check_clean($mac)) {
@@ -1163,7 +1120,7 @@ echo 'TFTP Server check failed on last past. Skipping';
      * @param array $phone_info Everything from get_phone_info
      * @param bool  $reboot Reboot the Phone after write
      * @param bool  $write  Write out Directory structure.
-     
+
     function prepare_configs($phone_info, $reboot=TRUE, $write=TRUE)
     {
     	$this->PROVISIONER_BASE = $this->PHONE_MODULES_PATH;
@@ -1446,7 +1403,7 @@ $this->error['parse_configs'] = "Can't Load the Autoloader!";
     }
 
     function write_configs($provisioner_lib, $reboot, $write_path, $phone_info, $returned_data) {
-		
+
     	//Create Directory Structure (If needed)
     	if (isset($provisioner_lib->directory_structure)) {
     		foreach ($provisioner_lib->directory_structure as $data) {
@@ -1680,7 +1637,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
     * @param integer $Priority the Priority of the command to run
     * @return int $PID process id
     * @package epm_system
-    
+
     function run_in_background($Command, $Priority = 0) {
         return($Priority ? shell_exec("nohup nice -n $Priority $Command 2> /dev/null & echo $!") : shell_exec("nohup $Command > /dev/null 2> /dev/null & echo $!"));
     }
@@ -1691,7 +1648,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
     * @param string $PID proccess ID
     * @return bool true or false
     * @package epm_system
-    
+
     function is_process_running($PID) {
         exec("ps $PID", $ProcessState);
         return(count($ProcessState) >= 2);
@@ -1705,7 +1662,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
     * @param string $exec Executable to find
     * @package epm_system
 
-	
+
     function find_exec($exec) {
         $o = exec('which '.$exec);
         if($o) {
@@ -1745,7 +1702,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
      * @param string $mask the complete netmask, eg [1.1.1.1/24]
      * @return boolean True if valid, False if not
      * @version 2.11
-     
+
     function validate_netmask($mask) {
         return preg_match("/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\/(\d{1,2})$/", $mask) ? TRUE : FALSE;
     }
@@ -1763,7 +1720,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
      * @param mixed $netmask The netmask, eg [1.1.1.1/24]
      * @param boolean $use_nmap True use nmap, false don't use it
      * @return array List of devices found on the network
-     
+
     function discover_new($netmask, $use_nmap=TRUE) {
         if (($use_nmap) AND (file_exists($this->eda->global_cfg['nmap_location'])) AND ($this->validate_netmask($netmask))) {
             shell_exec($this->eda->global_cfg['nmap_location'] . ' -v -sP ' . $netmask);
@@ -1774,7 +1731,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
             $this->error['discover_new'] = "Could Not Find NMAP, Using ARP Only";
             //return(FALSE);
         }
-		
+
         //Get arp list
         $arp_list = shell_exec($this->eda->global_cfg['arp_location'] . " -an");
 
@@ -1956,7 +1913,7 @@ $this->error['parse_configs'] = "File not written to hard drive!";
      * This will either a. delete said line or b. delete said device from line
      * @param <type> $line
      * @return <type>
-     
+
     function delete_line($lineid, $allow_device_remove=FALSE) {
         $sql = 'SELECT mac_id FROM endpointman_line_list WHERE luid = ' . $lineid;
         $mac_id = sql($sql, 'getOne');
@@ -2096,20 +2053,20 @@ $this->error['parse_configs'] = "File not written to hard drive!";
         }
 
         $config_files = explode(",", $row['config_files']);
-	
+
         $i = 0;
         while ($i < count($config_files)) {
             $config_files[$i] = str_replace(".", "_", $config_files[$i]);
-			
+
             if (isset($variables[config_files][$i])) {
-				
+
                 $variables[$config_files[$i]] = explode("_", $variables[config_files][$i], 2);
-				
+
                 $variables[$config_files[$i]] = $variables[$config_files[$i]][0];
                 if ($variables[$config_files[$i]] > 0) {
                     $config_files_selected[$config_files[$i]] = $variables[$config_files[$i]];
-					
-					
+
+
                 }
             }
             $i++;

@@ -64,6 +64,105 @@
 		*13.0.2* Missing updated file
 		*13.0.1* Updates from Community member Javier Pastor Garcia
 	</changelog>
+	<database>
+		<table name="endpointman_brand_list">
+			<field name="id" type="string" length="11" primarykey="true"/>
+			<field name="name" type="string" length="255"/>
+			<field name="directory" type="string" length="255"/>
+			<field name="cfg_ver" type="string" length="255"/>
+			<field name="installed" type="integer" default="0"/>
+			<field name="local" type="integer" default="0"/>
+			<field name="hidden" type="integer" default="0"/>
+		</table>
+		<table name="endpointman_custom_configs">
+			<field name="id" type="integer" primarykey="true" autoincrement="true"/>
+			<field name="name" type="string" length="255"/>
+			<field name="original_name" type="string" length="255"/>
+			<field name="product_id" type="string" length="11"/>
+			<field name="data" type="blob"/>
+		</table>
+		<table name="endpointman_global_vars">
+			<field name="idnum" type="integer" primarykey="true" autoincrement="true"/>
+			<field name="var_name" type="string" length="25"/>
+			<field name="value" type="text"/>
+			<key name="var_name" type="unique">
+				<column name="var_name"/>
+			</key>
+		</table>
+		<table name="endpointman_line_list">
+			<field name="luid" type="integer" primarykey="true" autoincrement="true"/>
+			<field name="ipei" type="string" length="15"/>
+			<field name="mac_id" type="integer"/>
+			<field name="line" type="smallint"/>
+			<field name="ext" type="string" length="15"/>
+			<field name="description" type="string" length="20"/>
+			<field name="custom_cfg_data" type="blob"/>
+			<field name="user_cfg_data" type="blob"/>
+		</table>
+		<table name="endpointman_mac_list">
+			<field name="id" type="integer" primarykey="true" autoincrement="true"/>
+			<field name="mac" type="string" length="12" notnull="false"/>
+			<field name="model" type="string" length="11"/>
+			<field name="template_id" type="integer"/>
+			<field name="global_custom_cfg_data" type="blob"/>
+			<field name="global_user_cfg_data" type="blob"/>
+			<field name="config_files_override" type="text"/>
+			<field name="global_settings_override" type="blob" notnull="false"/>
+			<field name="specific_settings" type="blob" notnull="false"/>
+			<key name="mac" type="unique">
+				<column name="mac"/>
+			</key>
+		</table>
+		<table name="endpointman_model_list">
+			<field name="id" type="string" length="11" primarykey="true"/>
+			<field name="brand" type="integer"/>
+			<field name="model" type="string" length="25"/>
+			<field name="max_lines" type="smallint"/>
+			<field name="template_list" type="text"/>
+			<field name="template_data" type="blob"/>
+			<field name="product_id" type="string" length="11"/>
+			<field name="enabled" type="integer" default="0"/>
+			<field name="hidden" type="integer" default="0"/>
+		</table>
+		<table name="endpointman_oui_list">
+			<field name="id" type="integer" primarykey="true" autoincrement="true"/>
+			<field name="oui" type="string" length="30" notnull="false"/>
+			<field name="brand" type="integer"/>
+			<field name="custom" type="integer" default="0"/>
+			<key name="oui" type="unique">
+				<column name="oui"/>
+			</key>
+		</table>
+		<table name="endpointman_product_list">
+			<field name="id" type="string" length="11" primarykey="true"/>
+			<field name="brand" type="integer"/>
+			<field name="long_name" type="string" length="255"/>
+			<field name="short_name" type="string" length="255"/>
+			<field name="cfg_dir" type="string" length="255"/>
+			<field name="cfg_ver" type="string" length="255"/>
+			<field name="hidden" type="integer" default="0"/>
+			<field name="firmware_vers" type="string" length="255"/>
+			<field name="firmware_files" type="text"/>
+			<field name="config_files" type="text" notnull="false"/>
+			<field name="special_cfgs" type="blob"/>
+		</table>
+		<table name="endpointman_template_list">
+			<field name="id" type="integer" primarykey="true" autoincrement="true"/>
+			<field name="product_id" type="string" length="11"/>
+			<field name="model_id" type="string" length="10"/>
+			<field name="name" type="string" length="255"/>
+			<field name="global_custom_cfg_data" type="blob" notnull="false"/>
+			<field name="config_files_override" type="text" notnull="false"/>
+			<field name="global_settings_override" type="blob" notnull="false"/>
+		</table>
+		<table name="endpointman_custom_configs">
+			<field name="id" type="integer" primarykey="true" autoincrement="true"/>
+			<field name="name" type="string" length="255"/>
+			<field name="original_name" type="string" length="255"/>
+			<field name="product_id" type="string" length="11"/>
+			<field name="data" type="blob"/>
+		</table>
+</database>
 	<depends>
 		<version>14.0</version>
 		<phpversion>5.3.0</phpversion>
