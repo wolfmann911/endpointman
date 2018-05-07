@@ -20,7 +20,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2.10\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-04-25 18:19-0400\n"
+"POT-Creation-Date: 2018-05-07 14:53-0400\n"
 "PO-Revision-Date: 2016-05-04 17:44+0200\n"
 "Last-Translator: ded <ceo@postmet.com>\n"
 "Language-Team: Russian <http://weblate.freepbx.org/projects/fpbxcn/"
@@ -32,6 +32,10 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "X-Generator: Weblate 2.4\n"
+
+#: templates/freepbx/compiled/devices_manager_1525249235.php:631
+msgid " "
+msgstr ""
 
 #: views/epm_advanced_settings.page.php:92
 #: views/epm_templates/editor.views.dialog.cfg.global.php:76
@@ -164,6 +168,14 @@ msgstr ""
 msgid "$media_encryption"
 msgstr ""
 
+#: page.epm_placeholders.php:248 page.epm_placeholders.php:254
+msgid "$myvoicemail"
+msgstr ""
+
+#: page.epm_placeholders.php:236 page.epm_placeholders.php:242
+msgid "$primtimeserver"
+msgstr ""
+
 #: page.epm_placeholders.php:50
 msgid "$proto"
 msgstr ""
@@ -269,7 +281,9 @@ msgstr ""
 msgid "Actions"
 msgstr "Действия"
 
-#: views/epm_devices_main.page.php:314
+#: templates/freepbx/compiled/devices_manager_1525249235.php:219
+#: templates/freepbx/compiled/devices_manager_1525249235.php:403
+#: views/epm_devices_main.page.php:315
 msgid "Add"
 msgstr ""
 
@@ -290,7 +304,8 @@ msgstr ""
 msgid "Add New Template OK!"
 msgstr "Добавление нового шаблона ОК!"
 
-#: views/epm_devices_main.page.php:437
+#: templates/freepbx/compiled/devices_manager_1525249235.php:584
+#: views/epm_devices_main.page.php:438
 msgid "Add Selected Phones"
 msgstr ""
 
@@ -337,12 +352,15 @@ msgstr ""
 msgid "Auth name for the Extension (most likely the endpoint extension number)"
 msgstr ""
 
-#: page.epm_placeholders.php:257
+#: page.epm_placeholders.php:281
+#: templates/freepbx/compiled/devices_manager_1525249235.php:232
+#: templates/freepbx/compiled/devices_manager_1525249235.php:634
+#: templates/freepbx/compiled/devices_manager_1525249235.php:719
 #: views/epm_advanced/oui_manager.views.grid.php:25
 #: views/epm_advanced/oui_manager.views.new.modal.php:36
 #: views/epm_advanced_iedl.page.php:90 views/epm_advanced_iedl.page.php:93
-#: views/epm_devices_main.page.php:244 views/epm_devices_main.page.php:467
-#: views/epm_devices_main.page.php:518
+#: views/epm_devices_main.page.php:245 views/epm_devices_main.page.php:468
+#: views/epm_devices_main.page.php:519
 msgid "Brand"
 msgstr "Бренд"
 
@@ -376,6 +394,7 @@ msgstr "Бренды/модули"
 msgid "CSV File Format"
 msgstr "Формат файла CSV"
 
+#: templates/freepbx/compiled/advanced_settings_settings_pop_1524748557.php:88
 #: views/epm_advanced/oui_manager.views.new.modal.php:61
 #: views/epm_templates/editor.views.dialog.edit.cfg.php:20
 #: views/epm_templates/manager.views.new.modal.php:91
@@ -386,7 +405,8 @@ msgstr "Отмена"
 msgid "Cant find file:"
 msgstr "Не получилось найти файл:"
 
-#: views/epm_devices_main.page.php:517
+#: templates/freepbx/compiled/devices_manager_1525249235.php:718
+#: views/epm_devices_main.page.php:518
 msgid "Change Selected Phones to"
 msgstr ""
 
@@ -434,6 +454,11 @@ msgstr "Клонированная модель имеет отрицатель�
 msgid "Clone Template From"
 msgstr ""
 
+#: templates/freepbx/compiled/template_editor_1524748557.php:59
+#: templates/freepbx/compiled/template_editor_1524748557.php:76
+msgid "Clone of Model"
+msgstr ""
+
 #: views/epm_templates/editor.views.template.php:30
 msgid "Clone of Model:"
 msgstr ""
@@ -450,7 +475,7 @@ msgstr "Команда не найдена!"
 msgid "Complete"
 msgstr ""
 
-#: page.epm_placeholders.php:243
+#: page.epm_placeholders.php:267
 msgid "Config File Placeholder Values"
 msgstr ""
 
@@ -469,18 +494,17 @@ msgstr ""
 msgid "Configuration Directory is not writable!"
 msgstr "На директории для конфигураций нет прав для записи!"
 
+#: templates/freepbx/compiled/advanced_settings_settings_pop_1524748557.php:39
 #: views/epm_advanced_settings.page.php:81
 #: views/epm_templates/editor.views.dialog.cfg.global.php:66
 msgid "Configuration Type"
 msgstr "Тип конфигурации"
 
-#: views/epm_devices_main.page.php:552 views/epm_devices_main.page.php:559
+#: templates/freepbx/compiled/devices_manager_1525249235.php:767
+#: templates/freepbx/compiled/devices_manager_1525249235.php:782
+#: views/epm_devices_main.page.php:553 views/epm_devices_main.page.php:560
 msgid "Configure"
 msgstr ""
-
-#: endpointman.i18n.php:6
-msgid "Connectivity"
-msgstr "Подключения"
 
 #: views/epm_advanced/poce.views.textarea.file.php:24
 #: views/epm_templates/editor.views.dialog.edit.cfg.php:14
@@ -508,7 +532,8 @@ msgstr "Создаётся временная EPM директория..."
 msgid "Creating Provisioner Directory... "
 msgstr ""
 
-#: views/epm_devices_main.page.php:456
+#: templates/freepbx/compiled/devices_manager_1525249235.php:599
+#: views/epm_devices_main.page.php:457
 msgid "Current Managed Extensions"
 msgstr ""
 
@@ -525,9 +550,13 @@ msgid "Default Mirror FreePBX"
 msgstr "Зеркало FreePBX по умолчанию"
 
 #: Endpointman_Templates.class.php:136
+#: templates/freepbx/compiled/devices_manager_1525249235.php:640
+#: templates/freepbx/compiled/devices_manager_1525249235.php:668
+#: templates/freepbx/compiled/devices_manager_1525249235.php:690
+#: templates/freepbx/compiled/devices_manager_1525249235.php:715
 #: views/epm_advanced/poce.views.textarea.file.php:36
-#: views/epm_devices_main.page.php:473 views/epm_devices_main.page.php:491
-#: views/epm_devices_main.page.php:504 views/epm_devices_main.page.php:514
+#: views/epm_devices_main.page.php:474 views/epm_devices_main.page.php:492
+#: views/epm_devices_main.page.php:505 views/epm_devices_main.page.php:515
 msgid "Delete"
 msgstr "Удалить"
 
@@ -535,30 +564,40 @@ msgstr "Удалить"
 msgid "Delete Template OK!"
 msgstr "Удаление шаблона ОК!"
 
-#: page.epm_placeholders.php:259
+#: page.epm_placeholders.php:283
 msgid "Description"
 msgstr ""
 
-#: views/epm_devices_main.page.php:238
+#: templates/freepbx/compiled/advanced_settings_settings_pop_1524748557.php:36
+msgid "Determine for me"
+msgstr ""
+
+#: templates/freepbx/compiled/devices_manager_1525249235.php:224
+#: views/epm_devices_main.page.php:239
 msgid "Device"
 msgstr ""
 
 #: endpointman.i18n.php:10
+#: templates/freepbx/compiled/devices_manager_1525249235.php:8
 msgid "Device List"
 msgstr ""
 
+#: templates/freepbx/compiled/variables_1525249235.php:5
 #: views/epm_templates/editor.views.template.php:187
 msgid "Device's Description in FreePBX (Usually the Full Name)"
 msgstr ""
 
+#: templates/freepbx/compiled/variables_1525249235.php:8
 #: views/epm_templates/editor.views.template.php:190
 msgid "Device's Mac Address"
 msgstr ""
 
+#: templates/freepbx/compiled/variables_1525249235.php:9
 #: views/epm_templates/editor.views.template.php:191
 msgid "Device's Model"
 msgstr ""
 
+#: templates/freepbx/compiled/variables_1525249235.php:4
 #: views/epm_templates/editor.views.template.php:186
 msgid "Device's Username (usually the extension)"
 msgstr ""
@@ -590,6 +629,10 @@ msgstr "Отключить проверку сервера TFTP"
 #: views/epm_advanced_settings.page.php:398
 msgid "Disable Tooltips"
 msgstr "Отключить подсказки"
+
+#: templates/freepbx/compiled/template_editor_1524748557.php:94
+msgid "Display"
+msgstr ""
 
 #: page.epm_placeholders.php:33
 msgid "Display name for the Extension (The Name of the Extension"
@@ -640,11 +683,14 @@ msgstr "Загружается пакет бренда..."
 msgid "Downloading firmware..."
 msgstr "Загружаются прошивки..."
 
-#: Endpointman.class.php:462
-msgid "Dropping all relevant tables"
-msgstr "Обнуляются все соответствующие таблицы"
-
-#: views/epm_devices_main.page.php:472 views/epm_devices_main.page.php:490
+#: templates/freepbx/compiled/devices_manager_1525249235.php:222
+#: templates/freepbx/compiled/devices_manager_1525249235.php:639
+#: templates/freepbx/compiled/devices_manager_1525249235.php:667
+#: templates/freepbx/compiled/devices_manager_1525249235.php:689
+#: templates/freepbx/compiled/template_editor_1524748557.php:128
+#: templates/freepbx/compiled/template_editor_1524748557.php:140
+#: templates/freepbx/compiled/template_editor_1524748557.php:177
+#: views/epm_devices_main.page.php:473 views/epm_devices_main.page.php:491
 msgid "Edit"
 msgstr ""
 
@@ -652,6 +698,12 @@ msgstr ""
 msgid "Edit File Configurations"
 msgstr ""
 
+#: templates/freepbx/compiled/template_editor_1524748557.php:138
+#: templates/freepbx/compiled/template_editor_1524748557.php:176
+msgid "Edit File Configurations for:"
+msgstr ""
+
+#: templates/freepbx/compiled/template_editor_1524748557.php:128
 #: views/epm_templates/editor.views.template.php:73
 msgid "Edit Global Settings Overrides"
 msgstr ""
@@ -673,12 +725,15 @@ msgid "Enabled"
 msgstr ""
 
 #: page.epm_advanced.php:18 page.epm_config.php:16 page.epm_templates.php:20
+#: templates/freepbx/compiled/advanced_settings_settings_pop_1524748557.php:19
+#: templates/freepbx/compiled/global_header_1525249235.php:48
+#: templates/freepbx/compiled/specifics_pop_1525249235.php:23
 #: views/epm_templates/editor.views.dialog.cfg.global.php:18
 #: views/epm_templates/editor.views.dialog.edit.cfg.php:5
 msgid "End Point Configuration Manager"
 msgstr "Менеджер конфигураций конечных устройств"
 
-#: functions.inc.php:236
+#: functions.inc.php:237
 msgid "End Point Manager"
 msgstr "Менеджер абонентских устройств"
 
@@ -871,6 +926,7 @@ msgstr ""
 msgid "Error: We support only CVS and TXT files, type file %s no support!"
 msgstr ""
 
+#: templates/freepbx/compiled/variables_1525249235.php:1
 #: views/epm_templates/editor.views.template.php:182
 msgid "Example of Variables allowed in boxes"
 msgstr ""
@@ -913,6 +969,7 @@ msgstr "Экспорт данных о конфигурации устройст
 msgid "Exporting %s ... "
 msgstr ""
 
+#: templates/freepbx/compiled/devices_manager_1525249235.php:637
 #: views/epm_advanced_iedl.page.php:90 views/epm_advanced_iedl.page.php:95
 msgid "Extension"
 msgstr "Внутренний номер"
@@ -921,7 +978,8 @@ msgstr "Внутренний номер"
 msgid "Extension Mapping"
 msgstr ""
 
-#: views/epm_devices_main.page.php:247 views/epm_devices_main.page.php:470
+#: templates/freepbx/compiled/devices_manager_1525249235.php:235
+#: views/epm_devices_main.page.php:248 views/epm_devices_main.page.php:471
 msgid "Extension Number"
 msgstr ""
 
@@ -954,7 +1012,7 @@ msgstr ""
 msgid "FW Update"
 msgstr ""
 
-#: functions.inc.php:355
+#: functions.inc.php:356
 msgid "Failed to install "
 msgstr "Ошибка при инсталлировании "
 
@@ -1025,6 +1083,8 @@ msgstr "Git не инсталлирован!"
 #: page.epm_placeholders.php:175 page.epm_placeholders.php:181
 #: page.epm_placeholders.php:187 page.epm_placeholders.php:193
 #: page.epm_placeholders.php:199 page.epm_placeholders.php:205
+#: page.epm_placeholders.php:235 page.epm_placeholders.php:241
+#: page.epm_placeholders.php:247 page.epm_placeholders.php:253
 msgid "Global"
 msgstr ""
 
@@ -1032,13 +1092,19 @@ msgstr ""
 msgid "Global Config Read OK!"
 msgstr ""
 
+#: templates/freepbx/compiled/advanced_settings_settings_pop_1524748557.php:48
 #: views/epm_advanced_settings.page.php:116
 #: views/epm_templates/editor.views.dialog.cfg.global.php:97
 msgid "Global Final Config & Firmware Directory"
 msgstr "Директория для глобальных окончательных конфигураций и прошивок"
 
-#: views/epm_devices_main.page.php:531
+#: templates/freepbx/compiled/devices_manager_1525249235.php:734
+#: views/epm_devices_main.page.php:532
 msgid "Global Phone Options"
+msgstr ""
+
+#: templates/freepbx/compiled/template_editor_1524748557.php:128
+msgid "Global Settings"
 msgstr ""
 
 #: Endpointman_Templates.class.php:302
@@ -1070,6 +1136,10 @@ msgstr ""
 #: Endpointman_Config.class.php:85
 msgid "Hide"
 msgstr "Скрыть"
+
+#: page.epm_placeholders.php:237 page.epm_placeholders.php:243
+msgid "Hostname of the Primary NTP Server from Global Settings"
+msgstr ""
 
 #: Endpointman_Advanced.class.php:1217
 msgid "ID  not valid!"
@@ -1103,6 +1173,7 @@ msgstr "Посланый номер ID не подходит!"
 msgid "IDType invalid: "
 msgstr "Тип ID неверный: "
 
+#: templates/freepbx/compiled/advanced_settings_settings_pop_1524748557.php:35
 #: views/epm_advanced_settings.page.php:49
 #: views/epm_templates/editor.views.dialog.cfg.global.php:37
 msgid "IP address of phone server"
@@ -1110,6 +1181,14 @@ msgstr "ИП адрес сервера телефонии"
 
 #: views/epm_templates/editor.views.dialog.cfg.global.php:54
 msgid "IP address of the PBX server that will use the terminals."
+msgstr ""
+
+#: templates/freepbx/compiled/devices_manager_1525249235.php:633
+msgid "IPEI"
+msgstr ""
+
+#: templates/freepbx/compiled/devices_manager_1525249235.php:231
+msgid "IPEI (DECT Handset)"
 msgstr ""
 
 #: Endpointman_Config.class.php:363
@@ -1224,8 +1303,10 @@ msgstr "Узнать как создать свой пакет бренда на
 msgid "Learn how to manually upload packages here (it's easy!):"
 msgstr "Узнать как  загрузить пакеты  вручную  можно здесь (это просто!):"
 
+#: templates/freepbx/compiled/devices_manager_1525249235.php:234
+#: templates/freepbx/compiled/devices_manager_1525249235.php:636
 #: views/epm_advanced_iedl.page.php:90 views/epm_advanced_iedl.page.php:96
-#: views/epm_devices_main.page.php:246 views/epm_devices_main.page.php:469
+#: views/epm_devices_main.page.php:247 views/epm_devices_main.page.php:470
 msgid "Line"
 msgstr "Строка"
 
@@ -1239,10 +1320,12 @@ msgstr "Строка"
 #: page.epm_placeholders.php:90 page.epm_placeholders.php:96
 #: page.epm_placeholders.php:102 page.epm_placeholders.php:108
 #: page.epm_placeholders.php:114 page.epm_placeholders.php:222
-#: page.epm_placeholders.php:228
+#: page.epm_placeholders.php:228 page.epm_placeholders.php:234
+#: page.epm_placeholders.php:246
 msgid "Line Loop"
 msgstr ""
 
+#: templates/freepbx/compiled/template_editor_1524748557.php:123
 #: views/epm_templates/editor.views.template.php:55
 msgid "Line settings on this page"
 msgstr ""
@@ -1298,8 +1381,10 @@ msgstr ""
 msgid "Looking for file %s to pass on to update_brand() ... "
 msgstr ""
 
+#: templates/freepbx/compiled/devices_manager_1525249235.php:230
+#: templates/freepbx/compiled/devices_manager_1525249235.php:632
 #: views/epm_advanced_iedl.page.php:90 views/epm_advanced_iedl.page.php:92
-#: views/epm_devices_main.page.php:243 views/epm_devices_main.page.php:466
+#: views/epm_devices_main.page.php:244 views/epm_devices_main.page.php:467
 msgid "MAC Address"
 msgstr "MAC-адрес"
 
@@ -1333,8 +1418,11 @@ msgstr "Превышена максимальная глубина стека"
 msgid "Missing a temporary folder"
 msgstr "Неверная временная директория"
 
+#: templates/freepbx/compiled/devices_manager_1525249235.php:233
+#: templates/freepbx/compiled/devices_manager_1525249235.php:635
+#: templates/freepbx/compiled/devices_manager_1525249235.php:731
 #: views/epm_advanced_iedl.page.php:90 views/epm_advanced_iedl.page.php:94
-#: views/epm_devices_main.page.php:518
+#: views/epm_devices_main.page.php:519
 msgid "Model"
 msgstr "Модель"
 
@@ -1350,7 +1438,7 @@ msgstr ""
 msgid "Model Clone"
 msgstr ""
 
-#: views/epm_devices_main.page.php:245 views/epm_devices_main.page.php:468
+#: views/epm_devices_main.page.php:246 views/epm_devices_main.page.php:469
 msgid "Model of Phone"
 msgstr ""
 
@@ -1422,7 +1510,7 @@ msgstr "Новый пакет изменён"
 msgid "No"
 msgstr "Нет"
 
-#: views/epm_devices_main.page.php:1093
+#: views/epm_devices_main.page.php:1094
 msgid "No Brand Selected for Reboot"
 msgstr ""
 
@@ -1434,11 +1522,11 @@ msgstr "Не установлен бренд!"
 msgid "No Configuration Location Defined!"
 msgstr "Не определено местоположение конфигурации!"
 
-#: views/epm_devices_main.page.php:895 views/epm_devices_main.page.php:960
+#: views/epm_devices_main.page.php:896 views/epm_devices_main.page.php:961
 msgid "No Device Selected to Edit!"
 msgstr ""
 
-#: views/epm_devices_main.page.php:1126
+#: views/epm_devices_main.page.php:1127
 msgid "No Devices Found"
 msgstr ""
 
@@ -1450,15 +1538,15 @@ msgstr "ID не установлен!"
 msgid "No OUI set!"
 msgstr "Не установлен OUI!"
 
-#: views/epm_devices_main.page.php:981 views/epm_devices_main.page.php:1014
+#: views/epm_devices_main.page.php:982 views/epm_devices_main.page.php:1015
 msgid "No Phones Selected"
 msgstr ""
 
-#: views/epm_devices_main.page.php:1175
+#: views/epm_devices_main.page.php:1176
 msgid "No Phones Selected!"
 msgstr ""
 
-#: views/epm_devices_main.page.php:1090
+#: views/epm_devices_main.page.php:1091
 msgid "No Phones to Reboot"
 msgstr ""
 
@@ -1528,6 +1616,10 @@ msgstr ""
 #: Endpointman_Advanced.class.php:886
 msgid "Not is directory: "
 msgstr "Это не директория: "
+
+#: page.epm_placeholders.php:249 page.epm_placeholders.php:255
+msgid "Number of the Voicemail from Featurecodes"
+msgstr ""
 
 #: endpointman.i18n.php:20
 msgid "OSS Endpoint Manager"
@@ -1630,7 +1722,7 @@ msgstr ""
 msgid "Path...."
 msgstr ""
 
-#: page.epm_placeholders.php:258
+#: page.epm_placeholders.php:282
 msgid "Placeholder"
 msgstr ""
 
@@ -1646,19 +1738,19 @@ msgstr ""
 msgid "Please name the Package the same name as your brand!"
 msgstr "Пожалуйста назовите  пакет аналогично названию бренда!"
 
-#: views/epm_devices_main.page.php:1172
+#: views/epm_devices_main.page.php:1173
 msgid "Please select a Brand and/or Model"
 msgstr ""
 
-#: views/epm_devices_main.page.php:1213
+#: views/epm_devices_main.page.php:1214
 msgid "Please select a model"
 msgstr ""
 
-#: views/epm_devices_main.page.php:1183
+#: views/epm_devices_main.page.php:1184
 msgid "Please select a product"
 msgstr ""
 
-#: views/epm_devices_main.page.php:1185 views/epm_devices_main.page.php:1215
+#: views/epm_devices_main.page.php:1186 views/epm_devices_main.page.php:1216
 msgid "Please select a template"
 msgstr ""
 
@@ -1699,6 +1791,11 @@ msgstr "Редактор конфигурации продукта"
 msgid "Product Directory '%s' Doesn't Exist! (%s)"
 msgstr ""
 
+#: templates/freepbx/compiled/template_editor_1524748557.php:58
+#: templates/freepbx/compiled/template_editor_1524748557.php:75
+msgid "Product Line"
+msgstr ""
+
 #: views/epm_templates/editor.views.template.php:26
 msgid "Product Line:"
 msgstr ""
@@ -1727,27 +1824,35 @@ msgstr "Пакет снабжения"
 msgid "Ready!"
 msgstr "Готово!"
 
-#: views/epm_devices_main.page.php:548
+#: templates/freepbx/compiled/devices_manager_1525249235.php:755
+#: views/epm_devices_main.page.php:549
 msgid "Reboot"
 msgstr ""
 
-#: views/epm_devices_main.page.php:548
+#: templates/freepbx/compiled/devices_manager_1525249235.php:755
+#: views/epm_devices_main.page.php:549
 msgid "Reboot This Brand"
 msgstr ""
 
-#: views/epm_devices_main.page.php:515 views/epm_devices_main.page.php:544
+#: templates/freepbx/compiled/devices_manager_1525249235.php:716
+#: templates/freepbx/compiled/devices_manager_1525249235.php:751
+#: views/epm_devices_main.page.php:516 views/epm_devices_main.page.php:545
 msgid "Rebuild"
 msgstr ""
 
-#: views/epm_devices_main.page.php:544
+#: templates/freepbx/compiled/devices_manager_1525249235.php:751
+#: views/epm_devices_main.page.php:545
 msgid "Rebuild Configs for All Phones"
 msgstr ""
 
-#: views/epm_devices_main.page.php:515
+#: templates/freepbx/compiled/devices_manager_1525249235.php:716
+#: views/epm_devices_main.page.php:516
 msgid "Rebuild Configs for Selected Phones"
 msgstr ""
 
-#: views/epm_devices_main.page.php:553 views/epm_devices_main.page.php:560
+#: templates/freepbx/compiled/devices_manager_1525249235.php:768
+#: templates/freepbx/compiled/devices_manager_1525249235.php:783
+#: views/epm_devices_main.page.php:554 views/epm_devices_main.page.php:561
 msgid "Reconfigure all"
 msgstr ""
 
@@ -1760,7 +1865,7 @@ msgstr "Обновить таблицу"
 msgid "Reload Config"
 msgstr ""
 
-#: Endpointman.class.php:450
+#: Endpointman.class.php:451
 msgid "Removing Phone Modules Directory"
 msgstr "Удаление директории модулей телефона"
 
@@ -1768,21 +1873,24 @@ msgstr "Удаление директории модулей телефона"
 msgid "Removing Temporary Files... "
 msgstr ""
 
-#: Endpointman.class.php:454
+#: Endpointman.class.php:458
 msgid "Removing symlink to web provisioner"
 msgstr "Удаление символической ссылки на web-снабжение"
 
-#: views/epm_devices_main.page.php:319
+#: templates/freepbx/compiled/devices_manager_1525249235.php:411
+#: views/epm_devices_main.page.php:320
 msgid "Reset"
 msgstr ""
 
+#: templates/freepbx/compiled/advanced_settings_settings_pop_1524748557.php:87
 #: views/epm_templates/editor.views.dialog.cfg.global.php:197
 msgid "Reset Global Overrides to Default"
 msgstr ""
 
 #: Endpointman_Templates.class.php:142
+#: templates/freepbx/compiled/devices_manager_1525249235.php:397
 #: views/epm_advanced/poce.views.textarea.file.php:35
-#: views/epm_devices_main.page.php:312
+#: views/epm_devices_main.page.php:313
 #: views/epm_templates/editor.views.dialog.edit.cfg.php:19
 #: views/epm_templates/manager.views.new.modal.php:92
 msgid "Save"
@@ -1792,8 +1900,12 @@ msgstr "Сохранить"
 msgid "Save As..."
 msgstr "Сохранить Как..."
 
-#: page.epm_templates.php:53 views/epm_devices_main.page.php:928
-#: views/epm_devices_main.page.php:1169
+#: templates/freepbx/compiled/template_editor_1524748557.php:384
+msgid "Save Template"
+msgstr ""
+
+#: page.epm_templates.php:53 views/epm_devices_main.page.php:929
+#: views/epm_devices_main.page.php:1170
 msgid "Saved"
 msgstr ""
 
@@ -1805,8 +1917,9 @@ msgstr "Сохранение изменений..."
 msgid "Saving Changes... Ok!"
 msgstr "Сохранение изменений... Ок!"
 
+#: templates/freepbx/compiled/devices_manager_1525249235.php:740
 #: views/epm_config/manager.list.hide.php:17
-#: views/epm_devices_main.page.php:535
+#: views/epm_devices_main.page.php:536
 msgid "Search"
 msgstr ""
 
@@ -1814,8 +1927,13 @@ msgstr ""
 msgid "Search Model..."
 msgstr ""
 
-#: views/epm_devices_main.page.php:536
+#: templates/freepbx/compiled/devices_manager_1525249235.php:741
+#: views/epm_devices_main.page.php:537
 msgid "Search for new devices in netmask"
+msgstr ""
+
+#: templates/freepbx/compiled/template_editor_1524748557.php:142
+msgid "Select Alternative File Configurations for"
 msgstr ""
 
 #: views/epm_advanced/oui_manager.views.new.modal.php:41
@@ -1837,7 +1955,8 @@ msgstr ""
 msgid "Select the time zone for the terminals. Example England/London"
 msgstr ""
 
-#: views/epm_devices_main.page.php:513
+#: templates/freepbx/compiled/devices_manager_1525249235.php:714
+#: views/epm_devices_main.page.php:514
 msgid "Selected Phone(s) Options"
 msgstr ""
 
@@ -1847,6 +1966,7 @@ msgid ""
 "settings)"
 msgstr ""
 
+#: templates/freepbx/compiled/variables_1525249235.php:6
 #: views/epm_templates/editor.views.template.php:188
 msgid "Server IP For Line 1"
 msgstr ""
@@ -1863,6 +1983,7 @@ msgstr ""
 msgid "Server PBX..."
 msgstr ""
 
+#: templates/freepbx/compiled/variables_1525249235.php:7
 #: views/epm_templates/editor.views.template.php:189
 msgid "Server Port For Line 1"
 msgstr ""
@@ -1884,7 +2005,7 @@ msgstr ""
 msgid "Setting Provision"
 msgstr "Установки снабжения"
 
-#: Endpointman_Advanced.class.php:53
+#: Endpointman_Advanced.class.php:53 endpointman.i18n.php:6
 #: views/epm_templates/editor.views.template.php:70 views/rnav.php:7
 msgid "Settings"
 msgstr "Установки"
@@ -1977,7 +2098,8 @@ msgstr "Извините, сейчас поддерживается только
 #: page.epm_placeholders.php:180 page.epm_placeholders.php:186
 #: page.epm_placeholders.php:192 page.epm_placeholders.php:198
 #: page.epm_placeholders.php:204 page.epm_placeholders.php:210
-#: page.epm_placeholders.php:216
+#: page.epm_placeholders.php:216 page.epm_placeholders.php:240
+#: page.epm_placeholders.php:252
 msgid "Static"
 msgstr ""
 
@@ -2010,7 +2132,9 @@ msgstr "Закладка неверная!"
 msgid "Tab not found!"
 msgstr ""
 
-#: views/epm_devices_main.page.php:248 views/epm_devices_main.page.php:471
+#: templates/freepbx/compiled/devices_manager_1525249235.php:237
+#: templates/freepbx/compiled/devices_manager_1525249235.php:638
+#: views/epm_devices_main.page.php:249 views/epm_devices_main.page.php:472
 msgid "Template"
 msgstr ""
 
@@ -2022,6 +2146,8 @@ msgstr "Редактор шаблона"
 msgid "Template Manager"
 msgstr ""
 
+#: templates/freepbx/compiled/template_editor_1524748557.php:57
+#: templates/freepbx/compiled/template_editor_1524748557.php:74
 #: views/epm_templates/editor.views.rnav.php:17
 #: views/epm_templates/manager.views.grid.php:25
 #: views/epm_templates/manager.views.new.modal.php:15
@@ -2053,7 +2179,8 @@ msgstr ""
 "если обнаружена  новая версия пакета, которая уже установлена для обновления "
 "по последней версии."
 
-#: views/epm_devices_main.page.php:585
+#: templates/freepbx/compiled/global_footer_1525249235.php:3
+#: views/epm_devices_main.page.php:586
 msgid "The Endpoint Configuration Manager was originally written by"
 msgstr ""
 
@@ -2085,7 +2212,8 @@ msgid ""
 "extension will be used. (change the X after acc with your line number)"
 msgstr ""
 
-#: views/epm_devices_main.page.php:587
+#: templates/freepbx/compiled/global_footer_1525249235.php:5
+#: views/epm_devices_main.page.php:588
 msgid "The project is maintained at"
 msgstr ""
 
@@ -2140,11 +2268,13 @@ msgstr ""
 msgid "Time"
 msgstr "Время"
 
+#: templates/freepbx/compiled/advanced_settings_settings_pop_1524748557.php:79
 #: views/epm_advanced_settings.page.php:183
 #: views/epm_templates/editor.views.dialog.cfg.global.php:165
 msgid "Time Server (NTP Server)"
 msgstr "Сервер синхронизации времени (NTP)"
 
+#: templates/freepbx/compiled/advanced_settings_settings_pop_1524748557.php:58
 #: views/epm_advanced_settings.page.php:146
 #: views/epm_templates/editor.views.dialog.cfg.global.php:129
 msgid "Time Zone"
@@ -2171,7 +2301,7 @@ msgstr ""
 msgid "Turn Off Safe Mode"
 msgstr "Выключить Безопасный режим"
 
-#: page.epm_placeholders.php:256
+#: page.epm_placeholders.php:280
 #: views/epm_advanced/oui_manager.views.grid.php:26
 msgid "Type"
 msgstr "Тип"
@@ -2220,7 +2350,7 @@ msgstr "Удаление бренда..."
 msgid "Uninstalla frimware... "
 msgstr ""
 
-#: views/epm_devices_main.page.php:122
+#: views/epm_devices_main.page.php:123
 msgid "Unknown"
 msgstr "Неизвестно"
 
@@ -2232,11 +2362,14 @@ msgstr "Неизвестная ошибка"
 msgid "Unknown upload error"
 msgstr "Неизвестная ошибка  загрузки"
 
-#: views/epm_devices_main.page.php:390
+#: templates/freepbx/compiled/devices_manager_1525249235.php:511
+#: views/epm_devices_main.page.php:391
 msgid "Unmanaged Extensions"
 msgstr ""
 
-#: Endpointman_Config.class.php:78 views/epm_devices_main.page.php:516
+#: Endpointman_Config.class.php:78
+#: templates/freepbx/compiled/devices_manager_1525249235.php:717
+#: views/epm_devices_main.page.php:517
 msgid "Update"
 msgstr "Обновить"
 
@@ -2254,6 +2387,7 @@ msgstr ""
 msgid "Update Content..."
 msgstr "Обновление содержимого...."
 
+#: templates/freepbx/compiled/advanced_settings_settings_pop_1524748557.php:86
 #: views/epm_templates/editor.views.dialog.cfg.global.php:196
 msgid "Update Global Overrides"
 msgstr ""
@@ -2300,7 +2434,8 @@ msgstr ""
 msgid "Use GITHUB Live Repo"
 msgstr "Используйте GITHUB Live Repo"
 
-#: views/epm_devices_main.page.php:538
+#: templates/freepbx/compiled/devices_manager_1525249235.php:743
+#: views/epm_devices_main.page.php:539
 msgid "Use NMAP"
 msgstr ""
 
@@ -2404,9 +2539,21 @@ msgstr ""
 msgid "is required"
 msgstr "требуется"
 
-#: views/epm_devices_main.page.php:553 views/epm_devices_main.page.php:560
+#: templates/freepbx/compiled/advanced_settings_settings_pop_1524748557.php:58
+msgid "like"
+msgstr ""
+
+#: templates/freepbx/compiled/devices_manager_1525249235.php:776
+#: templates/freepbx/compiled/devices_manager_1525249235.php:791
+#: views/epm_devices_main.page.php:554 views/epm_devices_main.page.php:561
 msgid "with"
 msgstr ""
+
+#~ msgid "Connectivity"
+#~ msgstr "Подключения"
+
+#~ msgid "Dropping all relevant tables"
+#~ msgstr "Обнуляются все соответствующие таблицы"
 
 #~ msgid "Invalid MAC Address"
 #~ msgstr "Неверный MAC-адрес"
