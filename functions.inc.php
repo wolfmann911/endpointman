@@ -26,7 +26,9 @@ function endpointman_get_config($engine) {
                 $core_conf->addSipNotify('linksys-warm-restart', array('Event' => 'restart_now', 'Content-Length' => '0'));
                 $core_conf->addSipNotify('spa-reboot', array('Event' => 'reboot', 'Content-Length' => '0'));
                 $core_conf->addSipNotify('reboot-yealink', array('Event' => 'check-sync\;reboot=true', 'Content-Length' => '0'));
-			    $core_conf->addSipNotify('reboot-gigaset', array('Event' => 'check-sync\;reboot=true', 'Content-Length' => '0'));
+			    $core_conf->addSipNotify('reboot-gigaset', array('Event' => 'check-sync;reboot=true', 'Content-Length' => '0'));
+				$core_conf->addSipNotify('panasonic-check-cfg', array('Event' => 'check-sync', 'Content-Length' => '0'));
+				$core_conf->addSipNotify('snom-check-cfg', array('Event' => 'check-sync', 'Content-Length' => '0'));
             }
             break;
     }

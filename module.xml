@@ -8,12 +8,12 @@
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<menuitems>
-		<epm_devices sort="1" hidden="true">Device List</epm_devices>
-		<epm_templates sort="2" hidden="true">Template Manager</epm_templates>
-		<epm_config sort="3" hidden="true">Package Manager</epm_config>
-		<epm_advanced sort="4" hidden="true">Advanced Settings</epm_advanced>
-		<epm_placeholders sort="4" hidden="true">Config File Placeholders</epm_placeholders>
-		<epm_oss sort="0">OSS Endpoint Manager</epm_oss>
+		<epm_devices needsenginedb="yes" sort="1" hidden="true">Device List</epm_devices>
+		<epm_templates needsenginedb="yes" sort="2" hidden="true">Template Manager</epm_templates>
+		<epm_config needsenginedb="yes" sort="3" hidden="true">Package Manager</epm_config>
+		<epm_advanced needsenginedb="yes" sort="4" hidden="true">Advanced Settings</epm_advanced>
+		<epm_placeholders needsenginedb="yes" sort="4" hidden="true">Config File Placeholders</epm_placeholders>
+		<epm_oss needsenginedb="yes" sort="0">OSS Endpoint Manager</epm_oss>
 	</menuitems>
 	<description>
 		OSS PBX End Point Manager is the free supported PBX Endpoint Manager for FreePBX.

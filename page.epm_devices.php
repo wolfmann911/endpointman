@@ -16,6 +16,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 */
 // Check for safe mode
+
+
 if( ini_get('safe_mode') ){
 	die(_('Turn Off Safe Mode'));
 }
