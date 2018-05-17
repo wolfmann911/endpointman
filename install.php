@@ -96,7 +96,7 @@ if (empty($epmdbversion)) {
 		(25, 'use_repo', '0'),
 		(26, 'adminpass', '123456'),
 		(27, 'userpass', '111111'),
-		(28, 'intsrvip', '0'),
+		(28, 'intsrvip', ''),
 		(29, 'disable_endpoint_warning', '0')";
 		
 		$db->query($sql);
