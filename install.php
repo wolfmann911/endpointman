@@ -130,4 +130,3 @@ if ($epmdbversion < "14.0.1.4"){
 		$db->query($sql);
 		out("Done");
 	}
-}
