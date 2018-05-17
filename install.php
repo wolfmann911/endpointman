@@ -115,5 +115,17 @@ out("Update Version Number to " . $epmxmlversion);
 $sql = "UPDATE endpointman_global_vars SET value = '" . $epmxmlversion . "' WHERE var_name = 'version'";
 $db->query($sql);
 
+
+if ($epmdbversion < "14.0.0.1"){
 $sql = "UPDATE endpointman_global_vars SET value = 'http://mirror.freepbx.org/provisioner/v3/' WHERE var_name = 'update_server'";
 $db->query($sql);
+}
+
+if ($epmdbversion < "14.0.1.4"){
+$sql = "UPDATE endpointman_global_vars SET value = '123456' WHERE var_name = 'adminpass'";
+$db->query($sql);
+$sql = "UPDATE endpointman_global_vars SET value = '111111' WHERE var_name = 'userpass'";
+$db->query($sql);
+$sql = "UPDATE endpointman_global_vars SET value = '0' WHERE var_name = 'disable_endpoint_warning'";
+$db->query($sql);
+}
