@@ -93,7 +93,12 @@ if (empty($epmdbversion)) {
 		(22, 'tftp_check', '0'),
 		(23, 'nmap_search', ''),
 		(24, 'backup_check', '0'),
-		(25, 'use_repo', '0')";
+		(25, 'use_repo', '0')",
+		(26, 'adminpass', '0')",
+		(27, 'userpass', '0')",
+		(28, 'intsrvip', '0')",
+		(29, 'disable_endpoint_warning', '0')";
+		
 		$db->query($sql);
 		out("Done");
 	}
