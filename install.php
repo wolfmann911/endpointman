@@ -122,10 +122,12 @@ $db->query($sql);
 }
 
 if ($epmdbversion < "14.0.1.4"){
-$sql = "UPDATE endpointman_global_vars SET value = '123456' WHERE var_name = 'adminpass'";
-$db->query($sql);
-$sql = "UPDATE endpointman_global_vars SET value = '111111' WHERE var_name = 'userpass'";
-$db->query($sql);
-$sql = "UPDATE endpointman_global_vars SET value = '0' WHERE var_name = 'disable_endpoint_warning'";
-$db->query($sql);
+		$sql = "INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES
+		(26, 'adminpass', '123456'),
+		(27, 'userpass', '111111'),
+		(28, 'intsrvip', ''),
+		(29, 'disable_endpoint_warning', '0')";
+		$db->query($sql);
+		out("Done");
+	}
 }
