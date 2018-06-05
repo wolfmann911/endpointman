@@ -1670,10 +1670,13 @@ class endpointmanager {
 	//Add Additional MAC File Symlinks to enable autoprovisioning for Multicell Devices like Snom and much more devices
 				//$additionalmacs should be added as Input field in the Template JSON File and MAC Adresses should be inserted comma "," separated.
 				$globalcfgdata = unserialize($phone_info[global_custom_cfg_data]);
+				$globalcfgdata_cs = unserialize($phone_info[template_data_info][global_custom_cfg_data]);
 				
 				
 				$additionalmacs = $globalcfgdata[data][additionalmacs];
 				$additionalmacs = explode(',', $additionalmacs);
+				$additionalmacs_cs = $globalcfgdata_cs[data][additionalmacs];
+				$additionalmacs_cs = explode(',', $additionalmacs_cs);
 				
 				$filelist = scandir($write_path);
 				
@@ -1685,15 +1688,32 @@ class endpointmanager {
 						}
 			}
 			}
+			
 				foreach($additionalmacs as $additionalmac) {
 				if ($additionalmac !== ""){
+						if (strpos($file, '_additional') !== false) {
 					$filesymlink = str_replace($phone_info[mac],$additionalmac,$file);
+						$filesymlink = str_replace("_additional", "", "$filesymlink");
 						if (!file_exists($write_path . $filesymlink)) {
 				
 				
 				symlink($write_path . $file, $write_path . $filesymlink);
 						}
 					}
+				}
+				}
+				foreach($additionalmacs_cs as $additionalmac) {
+				if ($additionalmac !== ""){
+						if (strpos($file, '_additional') !== false) {
+					$filesymlink = str_replace($phone_info[mac],$additionalmac,$file);
+						$filesymlink = str_replace("_additional", "", "$filesymlink");
+						if (!file_exists($write_path . $filesymlink)) {
+				
+				
+				symlink($write_path . $file, $write_path . $filesymlink);
+						}
+					}
+				}
 				}
 			
 	//END OF SYMLINK SECTION		
