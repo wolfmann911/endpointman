@@ -1587,6 +1587,7 @@ class endpointmanager {
     }
 
     function write_configs($provisioner_lib, $reboot, $write_path, $phone_info, $returned_data) {
+	
         //Create Directory Structure (If needed)
         if (isset($provisioner_lib->directory_structure)) {
             foreach ($provisioner_lib->directory_structure as $data) {
@@ -1653,8 +1654,51 @@ class endpointmanager {
                         copy($write_path . $file, $write_path . 'config_bkup/' . $file . '.' . time());
                     }
                 }
-                file_put_contents($write_path . $file, $data);
+
+			
+				
+				
+				
+				//print_r ($additionalmac);
+				//print_r ($file2);
+				file_put_contents($write_path . $file, $data);
+				
                 chmod($write_path . $file, 0775);
+				
+			
+			
+	//Add Additional MAC File Symlinks to enable autoprovisioning for Multicell Devices like Snom and much more devices
+				//$additionalmacs should be added as Input field in the Template JSON File and MAC Adresses should be inserted comma "," separated.
+				$globalcfgdata = unserialize($phone_info[global_custom_cfg_data]);
+				
+				
+				$additionalmacs = $globalcfgdata[data][additionalmacs];
+				$additionalmacs = explode(',', $additionalmacs);
+				
+				$filelist = scandir($write_path);
+				
+			//Now we remove symlinks for your device and rebuild all symlinks you have entered in global Settings input area $additionalmacs in your template settings.
+				foreach($filelist as $filesymlinkcheck) {
+					if (is_link($write_path . $filesymlinkcheck)) {
+						if (readlink($write_path . $filesymlinkcheck) == $write_path . $file){
+							unlink($write_path . $filesymlinkcheck);
+						}
+			}
+			}
+				foreach($additionalmacs as $additionalmac) {
+				if ($additionalmac !== ""){
+					$filesymlink = str_replace($phone_info[mac],$additionalmac,$file);
+						if (!file_exists($write_path . $filesymlink)) {
+				
+				
+				symlink($write_path . $file, $write_path . $filesymlink);
+						}
+					}
+				}
+			
+	//END OF SYMLINK SECTION		
+				
+				
                 if (!file_exists($write_path . $file)) {
                     $this->error['parse_configs'] = "File (" . $file . ") not written to hard drive!";
                     return(FALSE);
