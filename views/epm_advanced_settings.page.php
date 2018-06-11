@@ -118,7 +118,12 @@
 							</select>
                             <br /><br />
 							<?php
-							if ($server_type == 'http' or $server_type == 'https') {
+							if ($server_type == 'http') {
+							echo '<div class="alert alert-info" role="alert" id="cfg_type_alert">';
+								echo '<strong>' . _("Updated!") . '</strong>' . _(" - Point your phones to: ") . '<a href="' . $server_type . '://' . FreePBX::Endpointman()->configmod->get("srvip") . '/provisioning/p.php/" class="alert-link" target="_blank">' . $server_type . '://' . FreePBX::Endpointman()->configmod->get("srvip") . '/provisioning/p.php/</a>';
+							echo '</div>';	
+							}
+							if ($server_type == 'https') {
 							echo '<div class="alert alert-info" role="alert" id="cfg_type_alert">';
 								echo '<strong>' . _("Updated!") . '</strong>' . _(" - Point your phones to: ") . '<a href="' . $server_type . '://' . FreePBX::Endpointman()->configmod->get("srvip") . '/provisioning/p.php/" class="alert-link" target="_blank">' . $server_type . '://' . FreePBX::Endpointman()->configmod->get("srvip") . '/provisioning/p.php/</a>';
 							echo '</div>';	

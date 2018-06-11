@@ -832,7 +832,33 @@ class endpointmanager {
 	 
 	 
 	 
-	 
+	 //SYSADMIN Settings
+	public function getSysadminSettings(){
+		
+		$ret = array();
+		
+		$sql = "SELECT * FROM sysadmin_options";
+		$res = $this->eda->sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
+
+		if (count($res)) {
+            
+
+            if (!$res) {
+                $this->error['sysadmin_options'] = "Error with SQL Statement";
+            }
+
+		foreach ($res as $row) {
+			$key=$row['key'];
+			$ret[$key] = array(
+			'value' => $row['value']
+		);	
+	}	
+
+		
+}
+		
+		return $ret;
+	}	
 	 
 	 
 	 
@@ -848,6 +874,7 @@ class endpointmanager {
 			$SipSettings1=$this->getSipSettings1();
 			$SipSettings2=$this->getSipSettings2();
 			$featurecodes=$this->getFeatureCodes();
+			$getSysadminSettings=$this->getSysadminSettings();
 	
 	
 	
@@ -1972,7 +1999,10 @@ class endpointmanager {
 				
 //LOAD FEATURECODES					
 	$featurecodes=$this->getFeatureCodes();
+	$getSysadminSettings=$this->getSysadminSettings();
 
+
+	
 
 //Calculate Voicemail Number
 	if (!$featurecodes[myvoicemail][customcode]) {
@@ -2012,11 +2042,14 @@ class endpointmanager {
 					'tech' => $line['tech'],
 					'ipei' => $line['ipei'],
 					'myvoicemail' => $provisioner_lib->settings['myvoicemail'],
-					'primtimeserver' => $this->global_cfg['ntp']
+					'primtimeserver' => $this->global_cfg['ntp'],
+					'globaladminpassword' => $this->global_cfg['adminpass'],
+					'globaluserpassword' => $this->global_cfg['userpass'],
+					'provisuser' => $getSysadminSettings[provisuser][value],
+					'provispass' => $getSysadminSettings[provispass][value],
+					'sslhpro' => $getSysadminSettings[sslhpro][value],
+					'hpro' => $getSysadminSettings[hpro][value]
 					);
-					
-
-
 	
 
 					
@@ -2041,9 +2074,14 @@ class endpointmanager {
 					$provisioner_lib->settings['acc' . $line[line] . 'ipei'] = $line['ipei'];
 					$provisioner_lib->settings['server_host'] = $this->global_cfg['srvip'];
 					$provisioner_lib->settings['primtimeserver'] = $this->global_cfg['ntp'];
+					$provisioner_lib->settings['globaladminpassword'] = $this->global_cfg['adminpass'];
+					$provisioner_lib->settings['globaluserpassword'] = $this->global_cfg['userpass'];
+					$provisioner_lib->settings['provisuser'] = $getSysadminSettings[provisuser][value];
+					$provisioner_lib->settings['provispass'] = $getSysadminSettings[provispass][value];
+					$provisioner_lib->settings['sslhpro'] = $getSysadminSettings[sslhpro][value];
+					$provisioner_lib->settings['hpro'] = $getSysadminSettings[hpro][value];
 					
 					$provisioner_lib->settings['timestamp'] = time();
-		
 
 		
 		
@@ -2066,7 +2104,7 @@ class endpointmanager {
 						//GRANDSTREAM SRTP YES/NO
 	
 						if ($line['encryption'] == "yes" || $line['media_encryption'] == "sdes" ) {
-							$line_statics[gsSRTP] = '2';
+							$line_statics[gsSRTP] = '1';
 						}
 						if ($line['encryption'] == "no" || $line['media_encryption'] == "no" ) {
 							$line_statics[gsSRTP] = '0';
@@ -2078,6 +2116,36 @@ class endpointmanager {
 						$provisioner_lib->settings['acc' . $line[line] . 'gsproto'] = $line_statics[gsproto];
 						$provisioner_lib->settings['acc' . $line[line] . 'gsSRTP'] = $line_statics[gsSRTP];
 					
+				//THIS ARE EXTRA VALUES FOR YEALINK
+					
+					//Add loop Values for Yealink
+						
+						//PROTO UPD/TCP/TLS
+						if ($line['proto'] == "tcp") {
+							$line_statics[yealinktransport] = '1';
+						}
+						if ($line['proto'] == "udp") {
+							$line_statics[yealinktransport] = '0';
+						}					
+						if ($line['proto'] == "tls") {
+							$line_statics[yealinktransport] = '2';
+						}
+						
+						
+						//Yealink SRTP YES/NO
+	
+						if ($line['encryption'] == "yes" || $line['media_encryption'] == "sdes" ) {
+							$line_statics[yealinksrtp] = '2';
+						}
+						if ($line['encryption'] == "no" || $line['media_encryption'] == "no" ) {
+							$line_statics[yealinksrtp] = '0';
+						}
+						
+		
+					//Add static Values for Grandstream (Tested with Analog HT8XX Adapter)
+					
+						$provisioner_lib->settings['acc' . $line[line] . 'yealinktransport'] = $line_statics[gsproto];
+						$provisioner_lib->settings['acc' . $line[line] . 'yealinksrtp'] = $line_statics[gsSRTP];
 					
 					
 					
