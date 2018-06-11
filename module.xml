@@ -2,7 +2,7 @@
 	<rawname>endpointman</rawname>
 	<repo>unsupported</repo>
 	<name>OSS PBX End Point Manager</name>
-	<version>14.0.1.5</version>
+	<version>14.0.1.6</version>
 	<type>setup</type>
 	<category>Settings</category>
 	<license>GPLv3+</license>
@@ -23,6 +23,7 @@
 		Pull Requests can be made to either of these and are encouraged.
 	</description>
 	<changelog>
+		*14.0.1.6* -Add global Admin Password and User Password Placeholders and some more Placeholders / Add Sysadmin Pro HTTP/HTTPS Provisioning Port/User/PW Placeholders
 		*14.0.1.5* Creates a symlinks for devices which have values for "$additionalmacs". You can autoprovision Multicell Systems like Snom M700 and all additional Basestations with the MAC Adresses are symlinked to the original file.
 		*14.0.1.4* Add some more global values, prepare endpointman for using it together with commercial endpoint module.
 		*14.0.1.3* Fix some Bugs, Make Permission System Integration into Rnav Menu
