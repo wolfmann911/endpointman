@@ -641,7 +641,8 @@ class Endpointman_Config
      * @return array An array of all the brands/products/models and information about what's  enabled, installed or otherwise
      */
     function update_check($echomsg = false, &$error=array()) {
-        $temp_location = $this->system->sys_get_temp_dir() . "/epm_temp/";
+        //$temp_location = $this->system->sys_get_temp_dir() . "/epm_temp/";
+		$temp_location = $this->PHONE_MODULES_PATH . "temp/provisioner/";
         if (!$this->configmod->get('use_repo')) {
         	if ($echomsg == true) {
         		$master_result = $this->system->download_file_with_progress_bar($this->UPDATE_PATH . "master.json", $this->PHONE_MODULES_PATH . "endpoint/master.json");
@@ -660,11 +661,12 @@ class Endpointman_Config
             $temp = $this->file2json($this->PHONE_MODULES_PATH . 'endpoint/master.json');
             $endpoint_package = $temp['data']['package'];
             $endpoint_last_mod = $temp['data']['last_modified'];
-
+			
             $sql = "SELECT value FROM endpointman_global_vars WHERE var_name LIKE 'endpoint_vers'";
             $data = sql($sql, 'getOne');
 
             $contents = file_get_contents($this->UPDATE_PATH . "/update_status");
+			
             if ($contents != '1') {
                 if (($data == "") OR ($data <= $endpoint_last_mod)) {
                     if ((!$master_result) OR (!$this->system->download_file($this->UPDATE_PATH . '/' . $endpoint_package, $temp_location . $endpoint_package)))
@@ -674,13 +676,14 @@ class Endpointman_Config
                     		out($error['brand_update_check_json']);
                     	}
                     } else {
-                        exec("tar -xvf " . $temp_location . $endpoint_package . " -C " . $temp_location);
+						exec("tar -xvf " . $temp_location . $endpoint_package . " -C " . $temp_location);
                         if (!file_exists($this->PHONE_MODULES_PATH . "endpoint")) {
                             mkdir($this->PHONE_MODULES_PATH . "endpoint");
                         }
 
                         //TODO: Automate this somehow...
-                        rename($temp_location . "setup.php", $this->PHONE_MODULES_PATH . "autoload.php");
+                        copy($temp_location . "autoload.php", $this->PHONE_MODULES_PATH . "setup.php");
+						rename($temp_location . "autoload.php", $this->PHONE_MODULES_PATH . "autoload.php");
                         rename($temp_location . "endpoint/base.php", $this->PHONE_MODULES_PATH . "endpoint/base.php");
                         rename($temp_location . "endpoint/global_template_data.json", $this->PHONE_MODULES_PATH . "endpoint/global_template_data.json");
                         $sql = "UPDATE endpointman_global_vars SET value = '" . $endpoint_last_mod . "' WHERE var_name = 'endpoint_vers'";
