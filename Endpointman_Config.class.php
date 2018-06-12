@@ -682,7 +682,7 @@ class Endpointman_Config
                         }
 
                         //TODO: Automate this somehow...
-                        copy($temp_location . "autoload.php", $this->PHONE_MODULES_PATH . "setup.php");
+                        rename($temp_location . "setup.php", $this->PHONE_MODULES_PATH . "setup.php");
 						rename($temp_location . "autoload.php", $this->PHONE_MODULES_PATH . "autoload.php");
                         rename($temp_location . "endpoint/base.php", $this->PHONE_MODULES_PATH . "endpoint/base.php");
                         rename($temp_location . "endpoint/global_template_data.json", $this->PHONE_MODULES_PATH . "endpoint/global_template_data.json");
