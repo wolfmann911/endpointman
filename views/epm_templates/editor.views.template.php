@@ -32,7 +32,7 @@
                                         <td class="col-md-9"><?php echo $dtemplate['model'] ?></td>
                                     <?php else: ?>
                                         <td class="col-md-9">
-                                        <select class="form-control selectpicker show-tick" data-style="btn-primary" data-live-search-placeholder="Search" data-live-search="true" name="model_list" id="model_list" disabled>
+                                        <select class="form-control selectpicker show-tick" data-style="btn-primary" data-live-search-placeholder="Search" data-live-search="true" name="model_list" id="model_list" >
                                             <?php
                                             foreach($dtemplate['models_ava'] as $row) {
                                                 echo '<option value="'.$row['value'].'" '.(!empty($row['selected']) ? "selected" : "").'>'.$row['text'].'</option>';
@@ -299,6 +299,7 @@
                                                             <i class="fa fa-question-circle fpbx-help-icon" data-for="<?php echo $srow['key']; ?>"></i>
                                                             <div class="radioset pull-xs-right">
                                                                 <?php
+																$z=0;
                                                                 foreach($srow['data'] as $lrow) {
                                                                     /*
                                                                     echo '[<label>';
@@ -310,9 +311,10 @@
                                                                     <input type="radio" class="form-control" id="addtocdrno" name="addtocdr" value="0" <?php echo ($addtocdr == '1' ? '' : 'CHECKED'); ?>>
                                                                     <label for="addtocdrno"><?php echo _("No")?></label>
                                                                     */
-                                                                    echo '<input type="radio" class="form-control" id="'.$lrow['key'].'" name="'.$srow['key'].'" value="'.$lrow['value'].'" '.($lrow['value'] == $lrow['checked'] ? 'CHECKED' : '').'>';
-                                                                    echo '<label for="'.$lrow['key'].'">'.(! isset($lrow['tooltip']) ? $lrow['description'] : '<a href="#" class="info">'.$lrow['description'].'<span>'.$lrow['tooltip'].'</span></a>').'</label>';
-                                                                }
+                                                                    echo '<input type="radio" class="form-control" id="'.$lrow['key']. $z . '" name="'.$srow['key'].'" value="'.$lrow['value'].'" '.(array_key_exists('checked',$lrow)? 'checked' : '').' >';
+                                                                    echo '<label for="'.$lrow['key']. $z .'">'.(! isset($lrow['tooltip']) ? $lrow['description'] : '<a href="#" class="info">'.$lrow['description'].'<span>'.$lrow['tooltip'].'</span></a>').'</label>';
+                                                                $z++;
+																}
                                                                 ?>
     
                                                             </div>

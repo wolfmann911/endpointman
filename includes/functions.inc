@@ -1358,9 +1358,13 @@ class endpointmanager {
                 $template_variables_array['description'] = $cfg_data['description'];
                 $z = 0;
                 while ($z < count($cfg_data['data'])) {
+				//$key = $key . $z;
+				
+				
                     $template_variables_array['data'][$z]['key'] = $key;
                     $template_variables_array['data'][$z]['value'] = $cfg_data['data'][$z]['value'];
                     $template_variables_array['data'][$z]['description'] = $cfg_data['data'][$z]['text'];
+					
                     if ($cfg_data['data'][$z]['value'] == $num) {
                         $template_variables_array['data'][$z]['checked'] = 'checked';
                     }
@@ -2010,7 +2014,28 @@ class endpointmanager {
 	}
 	else  {
 		$provisioner_lib->settings['myvoicemail'] = $featurecodes[myvoicemail][customcode];
-	}				
+	}
+//Calculate DND_ON_NUMBER
+	if (!$featurecodes[dnd_on][customcode]) {
+		$provisioner_lib->settings['dnd_on'] = $featurecodes[dnd_on][defaultcode];
+	}
+	else  {
+		$provisioner_lib->settings['dnd_on'] = $featurecodes[dnd_on][customcode];
+	}	
+//Calculate DND_OFF_NUMBER
+	if (!$featurecodes[dnd_off][customcode]) {
+		$provisioner_lib->settings['dnd_off'] = $featurecodes[dnd_off][defaultcode];
+	}
+	else  {
+		$provisioner_lib->settings['dnd_off'] = $featurecodes[dnd_off][customcode];
+	}
+//Calculate DND_TOGGLE_NUMBER
+	if (!$featurecodes[dnd_toggle][customcode]) {
+		$provisioner_lib->settings['dnd_toggle'] = $featurecodes[dnd_toggle][defaultcode];
+	}
+	else  {
+		$provisioner_lib->settings['dnd_toggle'] = $featurecodes[dnd_toggle][customcode];
+	}		
 				
 				
 				
@@ -2042,6 +2067,9 @@ class endpointmanager {
 					'tech' => $line['tech'],
 					'ipei' => $line['ipei'],
 					'myvoicemail' => $provisioner_lib->settings['myvoicemail'],
+					'dnd_on' => $provisioner_lib->settings['dnd_on'],
+					'dnd_off' => $provisioner_lib->settings['dnd_off'],
+					'dnd_toggle' => $provisioner_lib->settings['dnd_toggle'],
 					'primtimeserver' => $this->global_cfg['ntp'],
 					'globaladminpassword' => $this->global_cfg['adminpass'],
 					'globaluserpassword' => $this->global_cfg['userpass'],
