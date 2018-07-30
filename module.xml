@@ -2,18 +2,18 @@
 	<rawname>endpointman</rawname>
 	<repo>unsupported</repo>
 	<name>OSS PBX End Point Manager</name>
-	<version>14.0.1.2</version>
+	<version>14.0.1.3</version>
 	<type>setup</type>
 	<category>Settings</category>
 	<license>GPLv3+</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-3.0.txt</licenselink>
 	<menuitems>
-		<epm_devices sort="1" hidden="true">Device List</epm_devices>
-		<epm_templates sort="2" hidden="true">Template Manager</epm_templates>
-		<epm_config sort="3" hidden="true">Package Manager</epm_config>
-		<epm_advanced sort="4" hidden="true">Advanced Settings</epm_advanced>
-		<epm_placeholders sort="4" hidden="true">Config File Placeholders</epm_placeholders>
-		<epm_oss sort="0">OSS Endpoint Manager</epm_oss>
+		<epm_devices needsenginedb="yes" sort="1" hidden="true">Device List</epm_devices>
+		<epm_templates needsenginedb="yes" sort="2" hidden="true">Template Manager</epm_templates>
+		<epm_config needsenginedb="yes" sort="3" hidden="true">Package Manager</epm_config>
+		<epm_advanced needsenginedb="yes" sort="4" hidden="true">Advanced Settings</epm_advanced>
+		<epm_placeholders needsenginedb="yes" sort="4" hidden="true">Config File Placeholders</epm_placeholders>
+		<epm_oss needsenginedb="yes" sort="0">OSS Endpoint Manager</epm_oss>
 	</menuitems>
 	<description>
 		OSS PBX End Point Manager is the free supported PBX Endpoint Manager for FreePBX.
@@ -23,6 +23,7 @@
 		Pull Requests can be made to either of these and are encouraged.
 	</description>
 	<changelog>
+		*14.0.1.3* Fix some Bugs, Make Permission System Integration into Rnav Menu
 		*14.0.1.2* Move database definitions to xml
 		*14.0.0.5* Add more placeholder fields to allow create more packages.
 		*14.0.0.4* Add IPEI fields

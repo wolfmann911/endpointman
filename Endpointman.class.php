@@ -375,30 +375,31 @@ define("PHONE_MODULES_PATH", $this->PHONE_MODULES_PATH);
 		if (! isset($_REQUEST['display']))
 			return '';
 		else {
-			return load_view(dirname(__FILE__).'/views/rnav.php',array());
+			//return load_view(dirname(__FILE__).'/views/rnav.php',array());
+			return load_view(dirname(__FILE__) . '/views/rnav.php', $var);
 		}
 		switch($_REQUEST['display'])
 		{
 			case "epm_devices":
-				return $this->epm_devices->getRightNav($request);
+				return load_view(dirname(__FILE__) . '/views/rnav.php', $var);
 				break;
 			case "epm_oss":
-				return $this->epm_oss->getRightNav($request);
+				return load_view(dirname(__FILE__) . '/views/rnav.php', $var);
 				break;
 			case "epm_placeholders":
-				return $this->epm_placeholders->getRightNav($request);
+				return load_view(dirname(__FILE__) . '/views/rnav.php', $var);
 				break;
 
 			case "epm_config":
-				return $this->epm_config->getRightNav($request);
+				return load_view(dirname(__FILE__) . '/views/rnav.php', $var);
 				break;
 
 			case "epm_advanced":
-				return $this->epm_advanced->getRightNav($request);
+				return load_view(dirname(__FILE__) . '/views/rnav.php', $var);
 				break;
 
 			case "epm_templates":
-				return $this->epm_templates->getRightNav($request);
+				return load_view(dirname(__FILE__) . '/views/rnav.php', $var);
 				break;
 
 			default:
