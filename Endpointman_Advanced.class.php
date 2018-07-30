@@ -295,6 +295,11 @@ class Endpointman_Advanced
 				$dget['value'] = strtolower($dget['value']);
 				$sql = "UPDATE endpointman_global_vars SET value='" . ($dget['value'] == "yes" ? "1": "0") . "' WHERE var_name='disable_help'";
 				break;
+	
+			case "disable_endpoint_warning":
+				$dget['value'] = strtolower($dget['value']);
+				$sql = "UPDATE endpointman_global_vars SET value='" . ($dget['value'] == "yes" ? "1": "0") . "' WHERE var_name='disable_endpoint_warning'";
+				break;
 
 			case "allow_dupext":
 				$dget['value'] = strtolower($dget['value']);
@@ -351,11 +356,23 @@ class Endpointman_Advanced
 				$dget['value'] = trim($dget['value']);
 				$sql = "UPDATE endpointman_global_vars SET value='" . $dget['value'] . "' WHERE var_name='srvip'";
 				break;
-
+			case "intsrvip":
+				$dget['value'] = trim($dget['value']);
+				$sql = "UPDATE endpointman_global_vars SET value='" . $dget['value'] . "' WHERE var_name='intsrvip'";
+				break;
 			case "tz":
 				$sql = "UPDATE endpointman_global_vars SET value='" . $dget['value'] . "' WHERE var_name='tz'";
 				break;
 
+			case "adminpass":
+				$dget['value'] = trim($dget['value']);
+				$sql = "UPDATE endpointman_global_vars SET value='" . $dget['value'] . "' WHERE var_name='adminpass'";
+				break;
+			case "userpass":
+				$dget['value'] = trim($dget['value']);
+				$sql = "UPDATE endpointman_global_vars SET value='" . $dget['value'] . "' WHERE var_name='userpass'";
+				break;
+				
 			case "ntp_server":
 				$dget['value'] = trim($dget['value']);
 				$sql = "UPDATE endpointman_global_vars SET value='" . $dget['value'] . "' WHERE var_name='ntp'";
@@ -378,7 +395,7 @@ class Endpointman_Advanced
 				break;
 
 			case "cfg_type":
-				if ($dget['value'] == 'http') {
+				if ($dget['value'] == 'http' or $dget['value'] == 'https' ) {
 					$symlink = $this->config->get('AMPWEBROOT') . "/provisioning";
 					$reallink = $this->LOCAL_PATH . "provisioning";
 					if ((!is_link($symlink)) OR (!readlink($symlink) == $reallink)) {
@@ -386,12 +403,12 @@ class Endpointman_Advanced
 							$retarr = array("status" => false, "message" => _("Your permissions are wrong on " . $this->config->get('AMPWEBROOT') . ", web provisioning link not created!"));
 							//$dget['value'] = 'file';
 							break;
-						} else {
-							$dget['value'] = 'http';
-						}
-					} else {
-						$dget['value'] = 'http';
-					}
+						} //else {
+							//$dget['value'] = 'http';
+						//}
+					}// else {
+						//$dget['value'] = 'http';
+					//}
 				} else {
 					$dget['value'] = 'file';
 				}
