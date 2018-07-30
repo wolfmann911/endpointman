@@ -93,7 +93,12 @@ if (empty($epmdbversion)) {
 		(22, 'tftp_check', '0'),
 		(23, 'nmap_search', ''),
 		(24, 'backup_check', '0'),
-		(25, 'use_repo', '0')";
+		(25, 'use_repo', '0'),
+		(26, 'adminpass', '123456'),
+		(27, 'userpass', '111111'),
+		(28, 'intsrvip', ''),
+		(29, 'disable_endpoint_warning', '0')";
+		
 		$db->query($sql);
 		out("Done");
 	}
@@ -110,5 +115,18 @@ out("Update Version Number to " . $epmxmlversion);
 $sql = "UPDATE endpointman_global_vars SET value = '" . $epmxmlversion . "' WHERE var_name = 'version'";
 $db->query($sql);
 
+
+if ($epmdbversion < "14.0.0.1"){
 $sql = "UPDATE endpointman_global_vars SET value = 'http://mirror.freepbx.org/provisioner/v3/' WHERE var_name = 'update_server'";
 $db->query($sql);
+}
+
+if ($epmdbversion < "14.0.1.4"){
+		$sql = "INSERT INTO `endpointman_global_vars` (`idnum`, `var_name`, `value`) VALUES
+		(26, 'adminpass', '123456'),
+		(27, 'userpass', '111111'),
+		(28, 'intsrvip', ''),
+		(29, 'disable_endpoint_warning', '0')";
+		$db->query($sql);
+		out("Done");
+	}
