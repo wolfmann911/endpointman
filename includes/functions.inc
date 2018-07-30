@@ -832,7 +832,33 @@ class endpointmanager {
 	 
 	 
 	 
-	 
+	 //SYSADMIN Settings
+	public function getSysadminSettings(){
+		
+		$ret = array();
+		
+		$sql = "SELECT * FROM sysadmin_options";
+		$res = $this->eda->sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
+
+		if (count($res)) {
+            
+
+            if (!$res) {
+                $this->error['sysadmin_options'] = "Error with SQL Statement";
+            }
+
+		foreach ($res as $row) {
+			$key=$row['key'];
+			$ret[$key] = array(
+			'value' => $row['value']
+		);	
+	}	
+
+		
+}
+		
+		return $ret;
+	}	
 	 
 	 
 	 
@@ -848,6 +874,7 @@ class endpointmanager {
 			$SipSettings1=$this->getSipSettings1();
 			$SipSettings2=$this->getSipSettings2();
 			$featurecodes=$this->getFeatureCodes();
+			$getSysadminSettings=$this->getSysadminSettings();
 	
 	
 	
@@ -1587,6 +1614,7 @@ class endpointmanager {
     }
 
     function write_configs($provisioner_lib, $reboot, $write_path, $phone_info, $returned_data) {
+	
         //Create Directory Structure (If needed)
         if (isset($provisioner_lib->directory_structure)) {
             foreach ($provisioner_lib->directory_structure as $data) {
@@ -1653,8 +1681,71 @@ class endpointmanager {
                         copy($write_path . $file, $write_path . 'config_bkup/' . $file . '.' . time());
                     }
                 }
-                file_put_contents($write_path . $file, $data);
+
+			
+				
+				
+				
+				//print_r ($additionalmac);
+				//print_r ($file2);
+				file_put_contents($write_path . $file, $data);
+				
                 chmod($write_path . $file, 0775);
+				
+			
+			
+	//Add Additional MAC File Symlinks to enable autoprovisioning for Multicell Devices like Snom and much more devices
+				//$additionalmacs should be added as Input field in the Template JSON File and MAC Adresses should be inserted comma "," separated.
+				$globalcfgdata = unserialize($phone_info[global_custom_cfg_data]);
+				$globalcfgdata_cs = unserialize($phone_info[template_data_info][global_custom_cfg_data]);
+				
+				
+				$additionalmacs = $globalcfgdata[data][additionalmacs];
+				$additionalmacs = explode(',', $additionalmacs);
+				$additionalmacs_cs = $globalcfgdata_cs[data][additionalmacs];
+				$additionalmacs_cs = explode(',', $additionalmacs_cs);
+				
+				$filelist = scandir($write_path);
+				
+			//Now we remove symlinks for your device and rebuild all symlinks you have entered in global Settings input area $additionalmacs in your template settings.
+				foreach($filelist as $filesymlinkcheck) {
+					if (is_link($write_path . $filesymlinkcheck)) {
+						if (readlink($write_path . $filesymlinkcheck) == $write_path . $file){
+							unlink($write_path . $filesymlinkcheck);
+						}
+			}
+			}
+			
+				foreach($additionalmacs as $additionalmac) {
+				if ($additionalmac !== ""){
+						if (strpos($file, '_additional') !== false) {
+					$filesymlink = str_replace($phone_info[mac],$additionalmac,$file);
+						$filesymlink = str_replace("_additional", "", "$filesymlink");
+						if (!file_exists($write_path . $filesymlink)) {
+				
+				
+				symlink($write_path . $file, $write_path . $filesymlink);
+						}
+					}
+				}
+				}
+				foreach($additionalmacs_cs as $additionalmac) {
+				if ($additionalmac !== ""){
+						if (strpos($file, '_additional') !== false) {
+					$filesymlink = str_replace($phone_info[mac],$additionalmac,$file);
+						$filesymlink = str_replace("_additional", "", "$filesymlink");
+						if (!file_exists($write_path . $filesymlink)) {
+				
+				
+				symlink($write_path . $file, $write_path . $filesymlink);
+						}
+					}
+				}
+				}
+			
+	//END OF SYMLINK SECTION		
+				
+				
                 if (!file_exists($write_path . $file)) {
                     $this->error['parse_configs'] = "File (" . $file . ") not written to hard drive!";
                     return(FALSE);
@@ -1908,7 +1999,10 @@ class endpointmanager {
 				
 //LOAD FEATURECODES					
 	$featurecodes=$this->getFeatureCodes();
+	$getSysadminSettings=$this->getSysadminSettings();
 
+
+	
 
 //Calculate Voicemail Number
 	if (!$featurecodes[myvoicemail][customcode]) {
@@ -1948,11 +2042,14 @@ class endpointmanager {
 					'tech' => $line['tech'],
 					'ipei' => $line['ipei'],
 					'myvoicemail' => $provisioner_lib->settings['myvoicemail'],
-					'primtimeserver' => $this->global_cfg['ntp']
+					'primtimeserver' => $this->global_cfg['ntp'],
+					'globaladminpassword' => $this->global_cfg['adminpass'],
+					'globaluserpassword' => $this->global_cfg['userpass'],
+					'provisuser' => $getSysadminSettings[provisuser][value],
+					'provispass' => $getSysadminSettings[provispass][value],
+					'sslhpro' => $getSysadminSettings[sslhpro][value],
+					'hpro' => $getSysadminSettings[hpro][value]
 					);
-					
-
-
 	
 
 					
@@ -1977,9 +2074,14 @@ class endpointmanager {
 					$provisioner_lib->settings['acc' . $line[line] . 'ipei'] = $line['ipei'];
 					$provisioner_lib->settings['server_host'] = $this->global_cfg['srvip'];
 					$provisioner_lib->settings['primtimeserver'] = $this->global_cfg['ntp'];
+					$provisioner_lib->settings['globaladminpassword'] = $this->global_cfg['adminpass'];
+					$provisioner_lib->settings['globaluserpassword'] = $this->global_cfg['userpass'];
+					$provisioner_lib->settings['provisuser'] = $getSysadminSettings[provisuser][value];
+					$provisioner_lib->settings['provispass'] = $getSysadminSettings[provispass][value];
+					$provisioner_lib->settings['sslhpro'] = $getSysadminSettings[sslhpro][value];
+					$provisioner_lib->settings['hpro'] = $getSysadminSettings[hpro][value];
 					
 					$provisioner_lib->settings['timestamp'] = time();
-		
 
 		
 		
@@ -2002,7 +2104,7 @@ class endpointmanager {
 						//GRANDSTREAM SRTP YES/NO
 	
 						if ($line['encryption'] == "yes" || $line['media_encryption'] == "sdes" ) {
-							$line_statics[gsSRTP] = '2';
+							$line_statics[gsSRTP] = '1';
 						}
 						if ($line['encryption'] == "no" || $line['media_encryption'] == "no" ) {
 							$line_statics[gsSRTP] = '0';
@@ -2014,6 +2116,36 @@ class endpointmanager {
 						$provisioner_lib->settings['acc' . $line[line] . 'gsproto'] = $line_statics[gsproto];
 						$provisioner_lib->settings['acc' . $line[line] . 'gsSRTP'] = $line_statics[gsSRTP];
 					
+				//THIS ARE EXTRA VALUES FOR YEALINK
+					
+					//Add loop Values for Yealink
+						
+						//PROTO UPD/TCP/TLS
+						if ($line['proto'] == "tcp") {
+							$line_statics[yealinktransport] = '1';
+						}
+						if ($line['proto'] == "udp") {
+							$line_statics[yealinktransport] = '0';
+						}					
+						if ($line['proto'] == "tls") {
+							$line_statics[yealinktransport] = '2';
+						}
+						
+						
+						//Yealink SRTP YES/NO
+	
+						if ($line['encryption'] == "yes" || $line['media_encryption'] == "sdes" ) {
+							$line_statics[yealinksrtp] = '2';
+						}
+						if ($line['encryption'] == "no" || $line['media_encryption'] == "no" ) {
+							$line_statics[yealinksrtp] = '0';
+						}
+						
+		
+					//Add static Values for Grandstream (Tested with Analog HT8XX Adapter)
+					
+						$provisioner_lib->settings['acc' . $line[line] . 'yealinktransport'] = $line_statics[gsproto];
+						$provisioner_lib->settings['acc' . $line[line] . 'yealinksrtp'] = $line_statics[gsSRTP];
 					
 					
 					
