@@ -1122,7 +1122,7 @@ class Endpointman_Advanced
 		header("Content-type: text/csv");
 		header('Content-Disposition: attachment; filename="'.$sFileName.'"');
 		$outstream = fopen("php://output",'w');
-		$sql = 'SELECT endpointman_mac_list.mac, endpointman_brand_list.name, endpointman_model_list.model, endpointman_line_list.ext,endpointman_line_list.line FROM endpointman_mac_list, endpointman_model_list, endpointman_brand_list, endpointman_line_list WHERE endpointman_line_list.mac_id = endpointman_mac_list.id AND endpointman_model_list.id = endpointman_mac_list.model AND endpointman_model_list.brand = endpointman_brand_list.id';
+		$sql = 'SELECT endpointman_mac_list.mac, endpointman_line_list.ipei, endpointman_brand_list.name, endpointman_model_list.model, endpointman_line_list.ext,endpointman_line_list.line FROM endpointman_mac_list, endpointman_model_list, endpointman_brand_list, endpointman_line_list WHERE endpointman_line_list.mac_id = endpointman_mac_list.id AND endpointman_model_list.id = endpointman_mac_list.model AND endpointman_model_list.brand = endpointman_brand_list.id';
 		$result = sql($sql,'getAll',DB_FETCHMODE_ASSOC);
 		foreach($result as $row) {
 			fputcsv($outstream, $row);
@@ -1142,7 +1142,7 @@ class Endpointman_Advanced
 			//$allowedExtensions = array("application/csv", "text/plain", "text/csv", "application/vnd.ms-excel");
 			$allowedExtensions = array("csv", "txt");
 			foreach ($_FILES["files"]["error"] as $key => $error) {
-				outn(sprintf(_("Importing CVS file %s ...<br />"), $_FILES["files"]["name"][$key]));
+				outn(sprintf(_("Importing CSV file %s ...<br />"), $_FILES["files"]["name"][$key]));
 
 				if ($error != UPLOAD_ERR_OK) {
 					out(sprintf(_("Error: %s"), $this->file_upload_error_message($error)));
@@ -1151,7 +1151,7 @@ class Endpointman_Advanced
 				{
 					//if (!in_array($_FILES["files"]["type"][$key], $allowedExtensions)) {
 					if (!in_array(substr(strrchr($_FILES["files"]["name"][$key], "."), 1), $allowedExtensions)) {
-						out(sprintf(_("Error: We support only CVS and TXT files, type file %s no support!"), $_FILES["files"]["name"][$key]));
+						out(sprintf(_("Error: We support only CSV and TXT files, type file %s no support!"), $_FILES["files"]["name"][$key]));
 					}
 					elseif ($_FILES["files"]["size"][$key] == 0) {
 						out(sprintf(_("Error: File %s size is 0!"), $_FILES["files"]["name"][$key]));
