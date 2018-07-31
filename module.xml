@@ -2,7 +2,7 @@
 	<rawname>endpointman</rawname>
 	<repo>unsupported</repo>
 	<name>OSS PBX End Point Manager</name>
-	<version>14.0.1.8</version>
+	<version>14.0.1.9</version>
 	<type>setup</type>
 	<category>Settings</category>
 	<license>GPLv3+</license>
@@ -23,6 +23,7 @@
 		Pull Requests can be made to either of these and are encouraged.
 	</description>
 	<changelog>
+		*14.0.1.9* Device Manager does not Group Lines by Device anymore. The MAC gets auto deleted if you remove the last line in the list	/ Fields in Device Manager are now sortable
 		*14.0.1.8* Add DND Featurecodes for Phone Provisioning / Fix Template Manager radio boxes Bug / Fix Extension Export including IPEI in export.
 		*14.0.1.7* Fix Provisioner Package Updater in Package Manager
 		*14.0.1.6* Add global Admin Password and User Password Placeholders and some more Placeholders / Add Sysadmin Pro HTTP/HTTPS Provisioning Port/User/PW Placeholders
