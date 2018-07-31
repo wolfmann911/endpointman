@@ -415,8 +415,6 @@
 
 <button type="button" id="selecter"   style="zoom: 0.8" onclick="togglePhones(true)"  ><i class="info icon-check"       id="toggle_all_phones_on"  title="Click to Select All Phones"  ></i> Select All</button>
 <button type="button" id="deselecter" style="zoom: 0.8" onclick="togglePhones(false)" ><i class="info icon-check-empty" id="toggle_all_phones_off" title="Click to Deselect All Phones"></i> Deselect All</button>
-<button type="button" id="expander"   style="zoom: 0.8" onclick="toggleDisplayAll('expand')"  ><i class="info icon-chevron-down" id="toggle_all_img" title="Click to Expand All Line Information"  ></i> Expand All</button>
-<button type="button" id="collapser"  style="zoom: 0.8" onclick="toggleDisplayAll('collapse')"><i class="info icon-chevron-up"   id="toggle_all_img" title="Click to Collapse All Line Information"></i> Collapse All</button>
 
 					<table id='devList'
 					data-toolbar="#toolbar-all" data-toggle="table" data-pagination="true" 
@@ -445,32 +443,20 @@
 							<tr>
 								<th data-sortable="false"><?php echo _(" ")?></th>
 								<th data-sortable="true"><?php echo _("MAC Address")?></th>
-								<th data-sortable="false"><?php echo _("IPEI")?></th>
-								<th data-sortable="false"><?php echo _("Brand")?></th>
-								<th data-sortable="false"><?php echo _("Model")?></th>
+								<th data-sortable="true"><?php echo _("IPEI")?></th>
+								<th data-sortable="true"><?php echo _("Brand")?></th>
+								<th data-sortable="true"><?php echo _("Model")?></th>
 								<th data-sortable="false"><?php echo _("Line")?></th>
-								<th data-sortable="false"><?php echo _("Extension")?></th>
-								<th data-sortable="false"><?php echo _("Template")?></th>
-								<th ><?php echo _("Edit")?></th>
-								<th ><?php echo _("Delete")?></th>
+								<th data-sortable="true"><?php echo _("Extension")?></th>
+								<th data-sortable="true"><?php echo _("Template")?></th>
+								<th ><?php echo _("Actions")?></th>
 
 							</tr>
 						</thead>
     <tbody>
 	{loop name="list"}
 	
-        <tr class="headerRow">
-            <td align='center' width="7%"><i class="icon-off icon-large {if condition="$value.status.status === TRUE"}green{else}red{/if}" alt="{$value.status.ip}:{$value.status.port}"></i><input type="checkbox" class="device" name="selected[]" value="{$value.id}"></td>
-            <td align='center' width='13%'>{$value.mac}</td>
-			<td align='center' width='13%'></td>
-            <td width="13%" align='center'>{$value.name}</td>
-            <td width="10%" align='center'>{$value.model}</td>
-            <td width="10%" align='center'><div id="demo"><a><i class="info icon-chevron-down" id="img2rowGroup{$value.master_id}" onclick="toggleDisplay(document.getElementById('devList'),'rowGroup{$value.master_id}')" title="Click to Expand Line Information"></i></a></div></td>
-            <td width="19%" align='center'><div id="demo"><a><i class="info icon-chevron-down" id="img3rowGroup{$value.master_id}" onclick="toggleDisplay(document.getElementById('devList'),'rowGroup{$value.master_id}')" title="Click to Expand Line Information"></i></a></div></td>
-            <td align='center' width='15%'><a href="#" onclick="submit_stype('edit',{$value.id});">{$value.template_name}</a></td>
-            <td align='center' width='6%'><div id="demo"><a href="#" onclick="submit_wtype('edit',{$value.id});"><i class='blue icon-pencil' alt='<?php echo _('Edit')?>' title="Edit phone"></i></a></div></td>
-            <td align='center' width='7%'><div id="demo"><a href="#" onclick="delete_device({$value.id});"><i class='red icon-trash' alt='<?php echo _('Delete')?>' title="Delete phone"></i></a></div></td>
-        </tr>
+
      {loop name="value.line"}
 	<?php $value3 = array_merge($value1, $value2);
 	//print_r($value3);
@@ -478,7 +464,7 @@
 
 	
         <tr class="rowGroup{$value.master_id} toggle_all" id="{$value.master_id}" style="display:none;">
-			<td align='center' width="7%"></td>
+			<td align='center' width="7%"><i class="icon-off icon-large {if condition="$value.status.status === TRUE"}green{else}red{/if}" alt="{$value.status.ip}:{$value.status.port}"></i><input type="checkbox" class="device" name="selected[]" value="{$value.ext}"></td>
             <td align='center' width='13%'><?php echo $value3[mac];?></td>
 			<td align='center' width='13%'><?php echo $value3[ipei];?></td>
             <td width="13%" align='center'><?php echo $value3[name];?></td>
@@ -486,8 +472,7 @@
             <td width="10%" align='center'>{$value.line}</td>
             <td width="19%" align='center'>{$value.ext} - {$value.description}</td>
             <td align='center' width='15%'><a href="#" onclick="submit_stype('edit',<?php echo $value3['id'];?>);"><?php echo $value3[template_name];?></a></td>
-			<td align='center' width='6%'><div id="demo"><a href="#" onclick="submit_wtype('edit',<?php echo $value3['id'];?>);"><i class='blue icon-pencil' alt='<?php echo _('Edit')?>' title="Edit phone"></i></a></div></td>
-            <td align='center' width='7%'><div id="demo"><a href="#" onclick="submit_wtype('delete_line',{$value.luid});"><i class="red icon-remove" alt='<?php echo _('Delete')?>' title='Delete Line'></i></a></div></td>
+			<td align='center' width='6%'><div id="demo"><a href="#" onclick="submit_wtype('edit',<?php echo $value3['id'];?>);"><i class='fa fa-edit' alt='<?php echo _('Edit')?>' title="Edit phone"></i></a></div></td>
         </tr>
         {/loop}
 	{/loop}
