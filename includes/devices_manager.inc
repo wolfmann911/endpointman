@@ -145,12 +145,22 @@ switch ($sub_type) {
         break;
     case "rebuild_selected_phones":
         if(isset($_REQUEST['selected'])) {
-            foreach($_REQUEST['selected'] as $key => $data) {
-			
-			$sql = "SELECT mac_id FROM endpointman_line_list WHERE ext = " . $_REQUEST['selected'][$key];
+            $sql = "SELECT mac_id, ext FROM endpointman_line_list";
 					$endpoint->eda->sql($sql);
-					$macid = $endpoint->eda->sql($sql,'getrow',DB_FETCHMODE_ASSOC);
-					$_REQUEST['selected'][$key] = $macid[mac_id];
+					$lines = $endpoint->eda->sql($sql,'getAll',DB_FETCHMODE_ASSOC);		
+			
+			foreach($_REQUEST['selected'] as $key => $data) {
+			
+				foreach($lines as $line){
+						if ($data == $line[ext]){
+						$sql = "SELECT mac_id FROM endpointman_line_list WHERE ext = " . $data;
+						$endpoint->eda->sql($sql);
+						$macid = $endpoint->eda->sql($sql,'getrow',DB_FETCHMODE_ASSOC);
+						$_REQUEST['selected'][$key] = $macid[mac_id];
+						
+						}
+				}
+
 					
                 $phone_info = $endpoint->get_phone_info($_REQUEST['selected'][$key]);
                 if(isset($_REQUEST['reboot'])) {
@@ -285,12 +295,21 @@ switch ($sub_type) {
     case "change_brand" :
         if(isset($_REQUEST['selected'])) {
             if(($_REQUEST['brand_list_selected'] > 0) AND ($_REQUEST['model_list_selected'] > 0)) {
-                foreach($_REQUEST['selected'] as $key => $data) {
-					$sql = "SELECT mac_id FROM endpointman_line_list WHERE ext = " . $_REQUEST['selected'][$key];
+                            $sql = "SELECT mac_id, ext FROM endpointman_line_list";
 					$endpoint->eda->sql($sql);
-					$macid = $endpoint->eda->sql($sql,'getrow',DB_FETCHMODE_ASSOC);
-					
-					$_REQUEST['selected'][$key] = $macid[mac_id];
+					$lines = $endpoint->eda->sql($sql,'getAll',DB_FETCHMODE_ASSOC);		
+			
+			foreach($_REQUEST['selected'] as $key => $data) {
+			
+				foreach($lines as $line){
+						if ($data == $line[ext]){
+						$sql = "SELECT mac_id FROM endpointman_line_list WHERE ext = " . $data;
+						$endpoint->eda->sql($sql);
+						$macid = $endpoint->eda->sql($sql,'getrow',DB_FETCHMODE_ASSOC);
+						$_REQUEST['selected'][$key] = $macid[mac_id];
+						
+						}
+				}
 					
                     $sql = "UPDATE endpointman_mac_list SET global_custom_cfg_data = '', template_id = 0, global_user_cfg_data = '', config_files_override = '', model = '".$_REQUEST['model_list_selected']."' WHERE id =  ". $_REQUEST['selected'][$key];
                     $endpoint->eda->sql($sql);
