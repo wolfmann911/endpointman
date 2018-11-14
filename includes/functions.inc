@@ -555,10 +555,12 @@ class endpointmanager {
     }
 
     function delete_device($mac_id) {
-        $sql = "DELETE FROM endpointman_mac_list WHERE id=" . $mac_id;
-        $this->eda->sql($sql);
 
-        $sql = "DELETE FROM endpointman_line_list WHERE mac_id=" . $mac_id;
+
+        $sql = "DELETE FROM endpointman_line_list WHERE ext=" . $mac_id;
+        $this->eda->sql($sql);
+		
+		$sql = "DELETE FROM endpointman_mac_list WHERE NOT EXISTS (SELECT * FROM endpointman_line_list WHERE mac_id = id)";
         $this->eda->sql($sql);
         $this->message['delete_device'] = "Deleted!";
         return(TRUE);
