@@ -25,12 +25,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 */
-// Check for safe mode
 
-
-if( ini_get('safe_mode') ){
-	die(_('Turn Off Safe Mode'));
-}
 if(file_exists('/tftpboot')) {
 	if(!is_writeable('/tftpboot')) {
 		die(_('/tftpboot is not writable'));
