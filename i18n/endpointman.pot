@@ -3,13 +3,13 @@
 # For licensing information, please see the file named LICENSE located in the module directory
 #
 # FreePBX language template for endpointman
-# Copyright (C) 2008-2018 Sangoma Technologies, Inc.
+# Copyright (C) 2008-2019 Sangoma Technologies, Inc.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-14 15:22-0500\n"
+"POT-Creation-Date: 2019-04-26 19:47-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -282,7 +282,7 @@ msgstr ""
 msgid "---Updating Model %_NAMEMOD_%"
 msgstr ""
 
-#: page.epm_devices.php:36
+#: page.epm_devices.php:31
 msgid "/tftpboot is not writable"
 msgstr ""
 
@@ -1732,9 +1732,9 @@ msgstr ""
 #: endpointman.i18n.php:8
 msgid ""
 "OSS PBX End Point Manager is the free supported PBX Endpoint Manager for "
-"FreePBX.\t\tIt is ***NOT*** supported by Schmoozecom. If you are looking for "
-"a supported endpoint manager please look into the Commercial Endpoint "
-"Manager by Schmoozecom, INC.\t\tThe front end gui is hosted at: https://"
+"FreePBX.\t\tIt is ***NOT*** supported by Sangoma. If you are looking for a "
+"supported endpoint manager please look into the Commercial Endpoint Manager "
+"by Sangoma Technologies, Inc\t\tThe front end gui is hosted at: https://"
 "github.com/FreePBX/endpointman\t\tThe backend configurator is hosted at: "
 "https://github.com/provisioner/Provisioner\t\tPull Requests can be made to "
 "either of these and are encouraged."
@@ -1845,7 +1845,7 @@ msgstr ""
 msgid "Please change the location:"
 msgstr ""
 
-#: page.epm_devices.php:39
+#: page.epm_devices.php:34
 msgid "Please create /tftpboot, even if you won't use it"
 msgstr ""
 
@@ -2189,7 +2189,7 @@ msgstr ""
 msgid "Skipping download, updated local version..."
 msgstr ""
 
-#: page.epm_devices.php:53
+#: page.epm_devices.php:48
 msgid "Sorry, Only Asterisk is supported currently"
 msgstr ""
 
@@ -2425,10 +2425,6 @@ msgstr ""
 
 #: page.epm_placeholders.php:295
 msgid "Trustrpid? (change the X after acc with your line number)"
-msgstr ""
-
-#: page.epm_devices.php:32
-msgid "Turn Off Safe Mode"
 msgstr ""
 
 #: page.epm_placeholders.php:386

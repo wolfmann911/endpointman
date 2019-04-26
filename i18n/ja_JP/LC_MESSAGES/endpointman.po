@@ -37,7 +37,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: FreePBX endpointman\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-07-30 14:05-0400\n"
+"POT-Creation-Date: 2019-04-26 19:47-0400\n"
 "PO-Revision-Date: 2014-02-24 06:17+0200\n"
 "Last-Translator: Kenichi Fukaumi <k.fukaumi@qloog.com>\n"
 "Language-Team: Japanese <http://192.168.30.85/projects/freepbx/endpointman/"
@@ -304,7 +304,7 @@ msgstr ""
 msgid "---Updating Model %_NAMEMOD_%"
 msgstr ""
 
-#: page.epm_devices.php:36
+#: page.epm_devices.php:31
 msgid "/tftpboot is not writable"
 msgstr ""
 
@@ -1638,9 +1638,9 @@ msgstr "OSS PBX端末管理"
 #: endpointman.i18n.php:8
 msgid ""
 "OSS PBX End Point Manager is the free supported PBX Endpoint Manager for "
-"FreePBX.\t\tIt is ***NOT*** supported by Schmoozecom. If you are looking for "
-"a supported endpoint manager please look into the Commercial Endpoint "
-"Manager by Schmoozecom, INC.\t\tThe front end gui is hosted at: https://"
+"FreePBX.\t\tIt is ***NOT*** supported by Sangoma. If you are looking for a "
+"supported endpoint manager please look into the Commercial Endpoint Manager "
+"by Sangoma Technologies, Inc\t\tThe front end gui is hosted at: https://"
 "github.com/FreePBX/endpointman\t\tThe backend configurator is hosted at: "
 "https://github.com/provisioner/Provisioner\t\tPull Requests can be made to "
 "either of these and are encouraged."
@@ -1748,7 +1748,7 @@ msgstr ""
 msgid "Please change the location:"
 msgstr ""
 
-#: page.epm_devices.php:39
+#: page.epm_devices.php:34
 msgid "Please create /tftpboot, even if you won't use it"
 msgstr ""
 
@@ -2078,7 +2078,7 @@ msgstr ""
 msgid "Skipping download, updated local version..."
 msgstr ""
 
-#: page.epm_devices.php:53
+#: page.epm_devices.php:48
 msgid "Sorry, Only Asterisk is supported currently"
 msgstr "申し訳ございません、現在Asteriskのみサポートされています。"
 
@@ -2293,10 +2293,6 @@ msgstr ""
 #: page.epm_placeholders.php:295
 msgid "Trustrpid? (change the X after acc with your line number)"
 msgstr ""
-
-#: page.epm_devices.php:32
-msgid "Turn Off Safe Mode"
-msgstr "セーフモードをOffにする"
 
 #: page.epm_placeholders.php:386
 #: views/epm_advanced/oui_manager.views.grid.php:26
@@ -2543,6 +2539,9 @@ msgstr ""
 #: views/epm_devices_main.page.php:554 views/epm_devices_main.page.php:561
 msgid "with"
 msgstr "次の物と一緒に"
+
+#~ msgid "Turn Off Safe Mode"
+#~ msgstr "セーフモードをOffにする"
 
 #~ msgid "Determine for me"
 #~ msgstr "決定する"

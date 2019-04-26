@@ -20,7 +20,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: EndPointManager\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-07-30 14:05-0400\n"
+"POT-Creation-Date: 2019-04-26 19:47-0400\n"
 "PO-Revision-Date: 2017-12-01 23:54+0200\n"
 "Last-Translator: JCattan <jeremie@famillecattan.com>\n"
 "Language-Team: French <http://weblate.freepbx.org/projects/fpbxcn/"
@@ -289,7 +289,7 @@ msgstr ""
 msgid "---Updating Model %_NAMEMOD_%"
 msgstr ""
 
-#: page.epm_devices.php:36
+#: page.epm_devices.php:31
 msgid "/tftpboot is not writable"
 msgstr "Impossible d'écrire sur /tftpboot"
 
@@ -1623,9 +1623,9 @@ msgstr ""
 #: endpointman.i18n.php:8
 msgid ""
 "OSS PBX End Point Manager is the free supported PBX Endpoint Manager for "
-"FreePBX.\t\tIt is ***NOT*** supported by Schmoozecom. If you are looking for "
-"a supported endpoint manager please look into the Commercial Endpoint "
-"Manager by Schmoozecom, INC.\t\tThe front end gui is hosted at: https://"
+"FreePBX.\t\tIt is ***NOT*** supported by Sangoma. If you are looking for a "
+"supported endpoint manager please look into the Commercial Endpoint Manager "
+"by Sangoma Technologies, Inc\t\tThe front end gui is hosted at: https://"
 "github.com/FreePBX/endpointman\t\tThe backend configurator is hosted at: "
 "https://github.com/provisioner/Provisioner\t\tPull Requests can be made to "
 "either of these and are encouraged."
@@ -1733,7 +1733,7 @@ msgstr ""
 msgid "Please change the location:"
 msgstr ""
 
-#: page.epm_devices.php:39
+#: page.epm_devices.php:34
 msgid "Please create /tftpboot, even if you won't use it"
 msgstr "Veuillez créer /tftpboot même si vous ne l'utilisez pas"
 
@@ -2063,7 +2063,7 @@ msgstr ""
 msgid "Skipping download, updated local version..."
 msgstr ""
 
-#: page.epm_devices.php:53
+#: page.epm_devices.php:48
 msgid "Sorry, Only Asterisk is supported currently"
 msgstr "Désolé, seul Asterisk est supporté actuellement"
 
@@ -2278,11 +2278,6 @@ msgstr ""
 #: page.epm_placeholders.php:295
 msgid "Trustrpid? (change the X after acc with your line number)"
 msgstr ""
-
-# more new new new!
-#: page.epm_devices.php:32
-msgid "Turn Off Safe Mode"
-msgstr "Arrêt du mode sécurisé"
 
 #: page.epm_placeholders.php:386
 #: views/epm_advanced/oui_manager.views.grid.php:26
@@ -2529,6 +2524,10 @@ msgstr ""
 #: views/epm_devices_main.page.php:554 views/epm_devices_main.page.php:561
 msgid "with"
 msgstr "avec"
+
+# more new new new!
+#~ msgid "Turn Off Safe Mode"
+#~ msgstr "Arrêt du mode sécurisé"
 
 #~ msgid "Determine for me"
 #~ msgstr "Choisir à ma place"

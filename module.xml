@@ -2,7 +2,7 @@
 	<rawname>endpointman</rawname>
 	<repo>unsupported</repo>
 	<name>OSS PBX End Point Manager</name>
-	<version>14.0.2.1</version>
+	<version>14.0.3</version>
 	<type>setup</type>
 	<category>Settings</category>
 	<license>GPLv3+</license>
@@ -17,12 +17,13 @@
 	</menuitems>
 	<description>
 		OSS PBX End Point Manager is the free supported PBX Endpoint Manager for FreePBX.
-		It is ***NOT*** supported by Schmoozecom. If you are looking for a supported endpoint manager please look into the Commercial Endpoint Manager by Schmoozecom, INC.
+		It is ***NOT*** supported by Sangoma. If you are looking for a supported endpoint manager please look into the Commercial Endpoint Manager by Sangoma Technologies, Inc
 		The front end gui is hosted at: https://github.com/FreePBX/endpointman
 		The backend configurator is hosted at: https://github.com/provisioner/Provisioner
 		Pull Requests can be made to either of these and are encouraged.
 	</description>
 	<changelog>
+		*14.0.3* Support for PHP 7
 		*14.0.2.1* Line State icon was only red. The state green/red is now fixed and works.
 		*14.0.2* Fixed a Problem if Sysadmin is not installed. Sysadmin is a commercial module and should not be forced to be installed to use OSS EPM.
 		*14.0.1.9* Device Manager does not Group Lines by Device anymore. The MAC gets auto deleted if you remove the last line in the list	/ Fields in Device Manager are now sortable

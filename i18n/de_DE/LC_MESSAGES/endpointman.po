@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-07-30 14:05-0400\n"
+"POT-Creation-Date: 2019-04-26 19:47-0400\n"
 "PO-Revision-Date: 2015-11-12 14:01+0200\n"
 "Last-Translator: Matthias <it@mitterhuemer.at>\n"
 "Language-Team: German <http://weblate.freepbx.org/projects/fpbxcn/"
@@ -276,7 +276,7 @@ msgstr ""
 msgid "---Updating Model %_NAMEMOD_%"
 msgstr ""
 
-#: page.epm_devices.php:36
+#: page.epm_devices.php:31
 msgid "/tftpboot is not writable"
 msgstr ""
 
@@ -1610,9 +1610,9 @@ msgstr "OSS PBX End Point Manager"
 #: endpointman.i18n.php:8
 msgid ""
 "OSS PBX End Point Manager is the free supported PBX Endpoint Manager for "
-"FreePBX.\t\tIt is ***NOT*** supported by Schmoozecom. If you are looking for "
-"a supported endpoint manager please look into the Commercial Endpoint "
-"Manager by Schmoozecom, INC.\t\tThe front end gui is hosted at: https://"
+"FreePBX.\t\tIt is ***NOT*** supported by Sangoma. If you are looking for a "
+"supported endpoint manager please look into the Commercial Endpoint Manager "
+"by Sangoma Technologies, Inc\t\tThe front end gui is hosted at: https://"
 "github.com/FreePBX/endpointman\t\tThe backend configurator is hosted at: "
 "https://github.com/provisioner/Provisioner\t\tPull Requests can be made to "
 "either of these and are encouraged."
@@ -1720,7 +1720,7 @@ msgstr ""
 msgid "Please change the location:"
 msgstr ""
 
-#: page.epm_devices.php:39
+#: page.epm_devices.php:34
 msgid "Please create /tftpboot, even if you won't use it"
 msgstr ""
 
@@ -2050,7 +2050,7 @@ msgstr ""
 msgid "Skipping download, updated local version..."
 msgstr ""
 
-#: page.epm_devices.php:53
+#: page.epm_devices.php:48
 msgid "Sorry, Only Asterisk is supported currently"
 msgstr ""
 
@@ -2264,10 +2264,6 @@ msgstr ""
 
 #: page.epm_placeholders.php:295
 msgid "Trustrpid? (change the X after acc with your line number)"
-msgstr ""
-
-#: page.epm_devices.php:32
-msgid "Turn Off Safe Mode"
 msgstr ""
 
 #: page.epm_placeholders.php:386
