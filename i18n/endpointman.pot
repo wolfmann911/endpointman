@@ -1426,7 +1426,7 @@ msgid "Line settings on this page"
 msgstr ""
 
 #: views/epm_advanced_manual_upload.page.php:97
-msgid "List Bran's Availables empty."
+msgid "Available Brands List empty."
 msgstr ""
 
 #: Endpointman_Advanced.class.php:897
@@ -1439,7 +1439,7 @@ msgstr ""
 
 #: views/epm_templates/editor.views.rnav.php:5
 #: views/epm_templates/rnav.php:5
-msgid "List Tempalte Custom"
+msgid "List Template Custom"
 msgstr ""
 
 #: views/epm_advanced_manual_upload.page.php:133
@@ -1713,7 +1713,7 @@ msgid "Not able to connect to repository. Using local brand [%s] file instead."
 msgstr ""
 
 #: Endpointman_Advanced.class.php:903
-msgid "Not is directory: "
+msgid "Not a directory: "
 msgstr ""
 
 #: page.epm_placeholders.php:355
