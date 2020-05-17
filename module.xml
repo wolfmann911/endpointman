@@ -130,7 +130,7 @@
 			<field name="model" type="string" length="25"/>
 			<field name="max_lines" type="smallint"/>
 			<field name="template_list" type="text"/>
-			<field name="template_data" type="blob"/>
+			<field name="template_data" type="blob" notnull="false"/>
 			<field name="product_id" type="string" length="11"/>
 			<field name="enabled" type="integer" default="0"/>
 			<field name="hidden" type="integer" default="0"/>
@@ -152,10 +152,10 @@
 			<field name="cfg_dir" type="string" length="255"/>
 			<field name="cfg_ver" type="string" length="255"/>
 			<field name="hidden" type="integer" default="0"/>
-			<field name="firmware_vers" type="string" length="255"/>
-			<field name="firmware_files" type="text"/>
+			<field name="firmware_vers" type="string" length="255" default=""/>
+			<field name="firmware_files" type="text" notnull="false"/>
 			<field name="config_files" type="text" notnull="false"/>
-			<field name="special_cfgs" type="blob"/>
+			<field name="special_cfgs" type="blob" notnull="false"/>
 		</table>
 		<table name="endpointman_template_list">
 			<field name="id" type="integer" primarykey="true" autoincrement="true"/>
