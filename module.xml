@@ -90,7 +90,7 @@
 			<field name="name" type="string" length="255"/>
 			<field name="original_name" type="string" length="255"/>
 			<field name="product_id" type="string" length="11"/>
-			<field name="data" type="blob"/>
+			<field name="data" type="blob" notnull="false"/>
 		</table>
 		<table name="endpointman_global_vars">
 			<field name="idnum" type="integer" primarykey="true" autoincrement="true"/>
@@ -102,22 +102,22 @@
 		</table>
 		<table name="endpointman_line_list">
 			<field name="luid" type="integer" primarykey="true" autoincrement="true"/>
-			<field name="ipei" type="string" length="15"/>
+			<field name="ipei" type="string" length="15" default=""/>
 			<field name="mac_id" type="integer"/>
 			<field name="line" type="smallint"/>
 			<field name="ext" type="string" length="15"/>
 			<field name="description" type="string" length="20"/>
-			<field name="custom_cfg_data" type="blob"/>
-			<field name="user_cfg_data" type="blob"/>
+			<field name="custom_cfg_data" type="blob" notnull="false"/>
+			<field name="user_cfg_data" type="blob" notnull="false"/>
 		</table>
 		<table name="endpointman_mac_list">
 			<field name="id" type="integer" primarykey="true" autoincrement="true"/>
 			<field name="mac" type="string" length="12" notnull="false"/>
 			<field name="model" type="string" length="11"/>
 			<field name="template_id" type="integer"/>
-			<field name="global_custom_cfg_data" type="blob"/>
-			<field name="global_user_cfg_data" type="blob"/>
-			<field name="config_files_override" type="text"/>
+			<field name="global_custom_cfg_data" type="blob" notnull="false"/>
+			<field name="global_user_cfg_data" type="blob"  notnull="false"/>
+			<field name="config_files_override" type="text"  notnull="false"/>
 			<field name="global_settings_override" type="blob" notnull="false"/>
 			<field name="specific_settings" type="blob" notnull="false"/>
 			<key name="mac" type="unique">
@@ -171,7 +171,7 @@
 			<field name="name" type="string" length="255"/>
 			<field name="original_name" type="string" length="255"/>
 			<field name="product_id" type="string" length="11"/>
-			<field name="data" type="blob"/>
+			<field name="data" type="blob" notnull="false"/>
 		</table>
 </database>
 	<depends>

@@ -1171,7 +1171,7 @@ class Endpointman_Advanced
 										//$res = sql($sql);
 										$res = sql($sql, 'getAll', DB_FETCHMODE_ASSOC);
 
-										if (count($res) > 0) {
+										if (1 > 0) {  //7.3 review - always true - was "if (count($res) > 0)"  should be? "if ($res->numRows() > 0)"
 											$brand_id = sql($sql, 'getOne');
 										//	$brand_id = $brand_id[0];
 
