@@ -682,11 +682,13 @@ class Endpointman_Config
                         }
 
                         //TODO: Automate this somehow... (legacy comment)
-                        //7.3 review - code is duplicated in includes/functions.inc - is the dupe code live?
+                        //7.3 review - code is duplicated in includes/functions.inc - is the dupe code orphaned?
                         //7.3 review - 14.0.2.1 provisioner_net package includes an incompatible setup.php - don't copy it
                         //rename($temp_location . "setup.php", $this->PHONE_MODULES_PATH . "setup.php");
-                        //7.3 review - below is a copy of the bad setup.php - no longer appears needed.
-                        //rename($temp_location . "autoload.php", $this->PHONE_MODULES_PATH . "autoload.php");
+
+                        //7.3 review - below is a copy of the bad setup.php - needed for device list page.  Should we copy new setup.php instead?
+                        rename($temp_location . "autoload.php", $this->PHONE_MODULES_PATH . "autoload.php");
+
                         rename($temp_location . "endpoint/base.php", $this->PHONE_MODULES_PATH . "endpoint/base.php");
                         rename($temp_location . "endpoint/global_template_data.json", $this->PHONE_MODULES_PATH . "endpoint/global_template_data.json");
                         $sql = "UPDATE endpointman_global_vars SET value = '" . $endpoint_last_mod . "' WHERE var_name = 'endpoint_vers'";
